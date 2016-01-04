@@ -34,7 +34,7 @@ console.log('key pair with password: ', keyPairWithPassword);
 
 > Initial data must be passed as String or [Buffer](https://github.com/feross/buffer)
 
-> Encrypted data will be returned as [Base64](https://github.com/feross/buffer)
+> Encrypted data will be returned as [Buffer](https://github.com/feross/buffer)
 
 ```javascript
 var virgilCrypto = window.VirgilCrypto;
@@ -70,7 +70,7 @@ virgilCrypto.encryptAsync(INITIAL_DATA, PASSWORD)
 
 > Initial data must be passed as String or [Buffer](https://github.com/feross/buffer)
 
-> Encrypted data will be returned as [Base64](https://github.com/feross/buffer)
+> Encrypted data will be returned as [Buffer](https://github.com/feross/buffer)
 
 ### Encrypt and Decrypt data using Key with password
 
@@ -189,9 +189,9 @@ virgilCrypto.generateKeyPairAsync()
 
 ## Sign and Verify data using Key
 
-> Initial data must be passed in [Base64](https://en.wikipedia.org/wiki/Base64) format.
+> Initial data must be passed as String or [Buffer](https://github.com/feross/buffer)
 
-> Encrypted data also will be returned in [Base64](https://en.wikipedia.org/wiki/Base64) format.
+> Encrypted data will be returned as [Buffer](https://github.com/feross/buffer)
 
 ### Sign and Verify data using Key with password
 

@@ -1,7 +1,15 @@
 {
   "name": "virgil-crypto-javascript",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Virgil Crypto",
+  "contributors": [
+    "Eugene Baranov <ebaranov.dev@gmail.com> (https://github.com/ebaranov/)",
+    "Egor Gumenyuk <boo1ean0807@gmail.com> (https://github.com/boo1ean/)"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VirgilSecurity/virgil-crypto-javascript"
+  },
   "main": "index.js",
   "browser": "dist/virgil-crypto.min.js",
   "scripts": {

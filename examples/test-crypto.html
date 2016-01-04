@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en-US">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Virgil Crypto Browser examples</title>
+		<script type="text/javascript" src="../dist/virgil-crypto.dev.js"></script>
+		<!--<script type="text/javascript" src="../dist/virgil-crypto.min.js"></script>-->
+	</head>
+
+	<body>
+		<script type="text/javascript">
+			var virgilCrypto = window.VirgilCrypto;
+			var keysTypesEnum = virgilCrypto.KeysTypesEnum;
+			var keyPair = virgilCrypto.generateKeyPair('', keysTypesEnum.ecNist192);
+			var initialData = 'initial data';
+
+			console.log('initialData', initialData);
+
+			console.log('keyPair', keysTypesEnum.ecNist192, keyPair);
+
+			virgilCrypto.generateKeyPairAsync('', keysTypesEnum.ecNist192).then(function(keys) {
+				console.log('async keyPair', keysTypesEnum.ecNist192, keys);
+			});
+
+			var encryptedData = virgilCrypto.encrypt(initialData, 'password');
+			console.log('encryptedData', encryptedData);
+			console.log('encryptedData base64', encryptedData.toString('base64'));
+
+			var decryptedData = virgilCrypto.decrypt(encryptedData, 'password');
+			console.log('decryptedData', decryptedData);
+			console.log('decryptedData string', decryptedData.toString());
+			console.log('decryptedData base64', decryptedData.toString('base64'));
+
+			virgilCrypto.encryptAsync(initialData, 'password').then(function(encryptedData) {
+				console.log('async encryptedData', encryptedData);
+				console.log('async encryptedData string', encryptedData.toString());
+				console.log('async encryptedData base64', encryptedData.toString('base64'));
+
+				virgilCrypto.decryptAsync(encryptedData, 'password').then(function(decryptedData) {
+					console.log('async decryptedData', decryptedData);
+					console.log('async decryptedData', decryptedData.toString());
+					console.log('async decryptedData base64', encryptedData.toString('base64'));
+				});
+			});
+
+			var encryptedDataByKey = virgilCrypto.encrypt(initialData, keyPair.publicKey, keyPair.publicKey);
+			console.log('encryptedDataByKey', encryptedDataByKey);
+
+			var decryptedDataByKey = virgilCrypto.decrypt(encryptedDataByKey, keyPair.publicKey, keyPair.privateKey);
+			console.log('decryptedDataByKey', decryptedDataByKey);
+			console.log('decryptedDataByKey', decryptedDataByKey.toString());
+			console.log('decryptedDataByKey base64', decryptedDataByKey.toString('base64'));
+
+			virgilCrypto.decryptAsync(encryptedDataByKey, keyPair.publicKey, keyPair.privateKey).then(function(decryptedDataByKey) {
+				console.log('async decryptedDataByKey', decryptedDataByKey);
+				console.log('async decryptedDataByKey', decryptedDataByKey.toString());
+				console.log('async decryptedDataByKey base64', decryptedDataByKey.toString('base64'));
+			});
+
+			var sign = virgilCrypto.sign(encryptedDataByKey, keyPair.privateKey);
+			console.log('sign', sign);
+			console.log('sign base64', sign.toString('base64'));
+
+			var verified = virgilCrypto.verify(encryptedDataByKey, keyPair.publicKey, sign);
+			console.log('verified', verified);
+
+			virgilCrypto.signAsync(encryptedDataByKey, keyPair.privateKey).then(function(sign) {
+				console.log('async sign', sign);
+				console.log('async sign base64', sign.toString('base64'));
+
+				virgilCrypto.verifyAsync(encryptedDataByKey, keyPair.publicKey, sign).then(function(verified) {
+					console.log('async verified', verified);
+				});
+			});
+
+			var encryptedDataMulti = virgilCrypto.encrypt(initialData, [{ recipientId: keyPair.publicKey, publicKey: keyPair.publicKey }], keyPair.publicKey);
+			console.log('encryptedDataMulti', encryptedDataMulti);
+			console.log('encryptedDataMulti string', encryptedDataMulti.toString());
+			console.log('encryptedDataMulti base64', encryptedDataMulti.toString('base64'));
+
+			virgilCrypto.encryptAsync(
+				initialData,
+				[{ recipientId: keyPair.publicKey, publicKey: keyPair.publicKey }],
+				keyPair.publicKey
+			).then(function(encryptedDataMulti) {
+				console.log('async encryptedDataMulti', encryptedDataMulti);
+				console.log('async encryptedDataMulti string', encryptedDataMulti.toString());
+				console.log('async encryptedDataMulti base64', encryptedDataMulti.toString('base64'));
+
+				var decryptedDataMulti = virgilCrypto.decrypt(encryptedDataMulti, keyPair.publicKey, keyPair.privateKey);
+				console.log('decryptedDataMulti', decryptedDataMulti);
+				console.log('decryptedDataMulti string', decryptedDataMulti.toString());
+				console.log('decryptedDataMulti base64', decryptedDataMulti.toString('base64'));
+			});
+
+			//        virgilCrypto.generateKeyPairAsync('', keysTypesEnum.ecNist224).then(function(keys) {
+			//          console.log(keysTypesEnum.ecNist224, keys);
+			//        });
+			//
+			//        virgilCrypto.generateKeyPairAsync('', keysTypesEnum.ecNist256).then(function(keys) {
+			//          console.log(keysTypesEnum.ecNist256, keys);
+			//        });
+			//
+			//        virgilCrypto.generateKeyPairAsync('', keysTypesEnum.ecNist384).then(function(keys) {
+			//          console.log(keysTypesEnum.ecNist384, keys);
+			//        });
+			//
+			//        virgilCrypto.generateKeyPairAsync('', keysTypesEnum.ecNist521).then(function(keys) {
+			//          console.log(keysTypesEnum.ecNist521, keys);
+			//        });
+			//
+			//        virgilCrypto.generateKeyPairAsync('', keysTypesEnum.ecBrainpool256).then(function(keys) {
+			//          console.log(keysTypesEnum.ecBrainpool256, keys);
+			//        });
+			//
+			//        virgilCrypto.generateKeyPairAsync('', keysTypesEnum.ecBrainpool384).then(function(keys) {
+			//          console.log(keysTypesEnum.ecBrainpool384, keys);
+			//        });
+			//
+			//        virgilCrypto.generateKeyPairAsync('', keysTypesEnum.ecBrainpool512).then(function(keys) {
+			//          console.log(keysTypesEnum.ecBrainpool512, keys);
+			//        });
+			//
+			//        virgilCrypto.generateKeyPairAsync('', keysTypesEnum.ecKoblitz192).then(function(keys) {
+			//          console.log(keysTypesEnum.ecKoblitz192, keys);
+			//        });
+			//
+			//        virgilCrypto.generateKeyPairAsync('', keysTypesEnum.ecKoblitz224).then(function(keys) {
+			//          console.log(keysTypesEnum.ecKoblitz224, keys);
+			//        });
+			//
+			//        virgilCrypto.generateKeyPairAsync('', keysTypesEnum.ecKoblitz256).then(function(keys) {
+			//          console.log(keysTypesEnum.ecKoblitz256, keys);
+			//        });
+			//
+			//        virgilCrypto.generateKeyPairAsync('', keysTypesEnum.rsa256).then(function(keys) {
+			//          console.log(keysTypesEnum.rsa256, keys);
+			//        });
+			//
+			//        virgilCrypto.generateKeyPairAsync('', keysTypesEnum.rsa512).then(function(keys) {
+			//          console.log(keysTypesEnum.rsa512, keys);
+			//        });
+			//
+			//        virgilCrypto.generateKeyPairAsync('', keysTypesEnum.rsa1024).then(function(keys) {
+			//          console.log(keysTypesEnum.rsa1024, keys);
+			//        });
+			//
+			//        virgilCrypto.generateKeyPairAsync('', keysTypesEnum.rsa2048).then(function(keys) {
+			//          console.log(keysTypesEnum.rsa2048, keys);
+			//        });
+		</script>
+	</body>
+
+</html>

@@ -1,7 +1,7 @@
 import browser from 'bowser';
-import * as CryptoUtils from '../utils/crypto-utils';
-import { createWorkerCryptoFunc } from '../utils/create-worker-crypto-func';
-import { throwVirgilError } from '../utils/crypto-errors';
+import * as CryptoUtils from './utils/crypto-utils';
+import { createWorkerCryptoFunc } from './utils/create-worker-crypto-func';
+import { throwVirgilError } from './utils/crypto-errors';
 import { decryptWithKey } from './decrypt-with-key';
 
 export function decryptWithKeyAsync (initialEncryptedData, recipientId, privateKey, privateKeyPassword) {

@@ -46,6 +46,7 @@
 
 			var encryptedDataByKey = virgilCrypto.encrypt(initialData, keyPair.publicKey, keyPair.publicKey);
 			console.log('encryptedDataByKey', encryptedDataByKey);
+			console.log('encryptedDataByKey base64', encryptedDataByKey.toString('base64'));
 
 			var decryptedDataByKey = virgilCrypto.decrypt(encryptedDataByKey, keyPair.publicKey, keyPair.privateKey);
 			console.log('decryptedDataByKey', decryptedDataByKey);
@@ -74,15 +75,14 @@
 				});
 			});
 
-			var encryptedDataMulti = virgilCrypto.encrypt(initialData, [{ recipientId: keyPair.publicKey, publicKey: keyPair.publicKey }], keyPair.publicKey);
+			var encryptedDataMulti = virgilCrypto.encrypt(initialData, [{ recipientId: keyPair.publicKey, publicKey: keyPair.publicKey }]);
 			console.log('encryptedDataMulti', encryptedDataMulti);
 			console.log('encryptedDataMulti string', encryptedDataMulti.toString());
 			console.log('encryptedDataMulti base64', encryptedDataMulti.toString('base64'));
 
 			virgilCrypto.encryptAsync(
 				initialData,
-				[{ recipientId: keyPair.publicKey, publicKey: keyPair.publicKey }],
-				keyPair.publicKey
+				[{ recipientId: keyPair.publicKey, publicKey: keyPair.publicKey }]
 			).then(function(encryptedDataMulti) {
 				console.log('async encryptedDataMulti', encryptedDataMulti);
 				console.log('async encryptedDataMulti string', encryptedDataMulti.toString());

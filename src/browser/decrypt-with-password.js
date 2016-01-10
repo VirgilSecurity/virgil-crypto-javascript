@@ -1,6 +1,6 @@
-import VirgilCrypto from '../utils/crypto-module';
-import * as CryptoUtils from '../utils/crypto-utils';
-import { throwVirgilError } from '../utils/crypto-errors';
+import VirgilCrypto from './utils/crypto-module';
+import * as CryptoUtils from './utils/crypto-utils';
+import { throwVirgilError } from './utils/crypto-errors';
 
 export function decryptWithPassword (initialEncryptedData, password = '') {
 	let virgilCipher = new VirgilCrypto.VirgilCipher();

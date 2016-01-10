@@ -1,7 +1,7 @@
 import browser from 'bowser';
-import * as CryptoUtils from '../utils/crypto-utils';
-import { createWorkerCryptoFunc } from '../utils/create-worker-crypto-func';
-import { throwVirgilError, throwValidationError } from '../utils/crypto-errors';
+import * as CryptoUtils from './utils/crypto-utils';
+import { createWorkerCryptoFunc } from './utils/create-worker-crypto-func';
+import { throwVirgilError, throwValidationError } from './utils/crypto-errors';
 import { encryptWithPassword } from './encrypt-with-password';
 
 export function encryptWithPasswordAsync (initialData, password = '', isEmbeddedContentInfo = true) {

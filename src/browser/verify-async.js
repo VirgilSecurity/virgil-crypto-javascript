@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import browser from 'bowser';
-import * as CryptoUtils from '../utils/crypto-utils';
-import { createWorkerCryptoFunc } from '../utils/create-worker-crypto-func';
-import { throwVirgilError, throwValidationError } from '../utils/crypto-errors';
+import * as CryptoUtils from './utils/crypto-utils';
+import { createWorkerCryptoFunc } from './utils/create-worker-crypto-func';
+import { throwVirgilError, throwValidationError } from './utils/crypto-errors';
 import verify from './verify';
 
 /**

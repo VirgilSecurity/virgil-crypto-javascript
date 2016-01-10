@@ -3,7 +3,7 @@ export { Buffer } from 'buffer';
 import { encryptWithPassword } from './encrypt-with-password';
 import { encryptWithKey } from './encrypt-with-key';
 import { encryptWithKeyMultiRecipients } from './encrypt-with-key-multi-recipients';
-import { throwValidationError } from '../utils/crypto-errors';
+import { throwValidationError } from './utils/crypto-errors';
 
 /**
  * Encrypt data

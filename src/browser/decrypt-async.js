@@ -2,7 +2,7 @@ import _ from 'lodash';
 export { Buffer } from 'buffer';
 import { decryptWithPasswordAsync } from './decrypt-with-password-async';
 import { decryptWithKeyAsync } from './decrypt-with-key-async';
-import { throwValidationError } from '../utils/crypto-errors';
+import { throwValidationError } from './utils/crypto-errors';
 
 /**
  * Decrypt data async

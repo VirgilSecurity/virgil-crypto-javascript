@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import VirgilCrypto from '../utils/crypto-module';
-import * as CryptoUtils from '../utils/crypto-utils';
-import KeysTypesEnum from './keys-types-enum';
-import { throwVirgilError, throwValidationError } from '../utils/crypto-errors';
+import VirgilCrypto from './utils/crypto-module';
+import * as CryptoUtils from './utils/crypto-utils';
+import KeysTypesEnum from '../lib/keys-types-enum';
+import { throwVirgilError, throwValidationError } from './utils/crypto-errors';
 
 /**
  * Generate the key pair - public and private keys
@@ -47,7 +47,7 @@ export function generateKeyPair (password, keysType) {
 		virgilKeys = VirgilCrypto.VirgilKeyPair[keysType](passwordByteArray);
 
 		publicKey = virgilKeys.publicKey().toUTF8();
-		privateKey = virgilKeys.privateKey().toUTF8(virgilKeys);
+		privateKey = virgilKeys.privateKey().toUTF8();
 
 		// cleanup memory to avoid memory leaks
 		passwordByteArray.delete();

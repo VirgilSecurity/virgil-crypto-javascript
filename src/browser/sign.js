@@ -1,8 +1,8 @@
 import _ from 'lodash';
 export { Buffer } from 'buffer';
-import VirgilCrypto from '../utils/crypto-module';
-import * as CryptoUtils from '../utils/crypto-utils';
-import { throwVirgilError, throwValidationError } from '../utils/crypto-errors';
+import VirgilCrypto from './utils/crypto-module';
+import * as CryptoUtils from './utils/crypto-utils';
+import { throwVirgilError, throwValidationError } from './utils/crypto-errors';
 
 /**
  * Sign the encrypted data using private key

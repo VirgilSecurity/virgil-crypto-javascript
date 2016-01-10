@@ -1,8 +1,8 @@
 import browser from 'bowser';
-import * as CryptoUtils from '../utils/crypto-utils';
-import KeysTypesEnum from './keys-types-enum';
-import { createWorkerCryptoFunc } from '../utils/create-worker-crypto-func';
-import { throwVirgilError, throwValidationError } from '../utils/crypto-errors';
+import * as CryptoUtils from './utils/crypto-utils';
+import KeysTypesEnum from '../lib/keys-types-enum';
+import { createWorkerCryptoFunc } from './utils/create-worker-crypto-func';
+import { throwVirgilError, throwValidationError } from './utils/crypto-errors';
 import { generateKeyPair } from './generate-key-pair';
 
 /**

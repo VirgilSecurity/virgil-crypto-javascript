@@ -1,3 +1,3 @@
-var VirgilCrypto = require('virgil-crypto');
+var VirgilCrypto = require('./src/node');
 
 module.exports = VirgilCrypto;

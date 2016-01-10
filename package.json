@@ -1,6 +1,6 @@
 {
   "name": "virgil-crypto-javascript",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Virgil Crypto",
   "contributors": [
     "Eugene Baranov <ebaranov.dev@gmail.com> (https://github.com/ebaranov/)",
@@ -13,6 +13,7 @@
   "main": "index.js",
   "browser": "dist/virgil-crypto.min.js",
   "scripts": {
+    "postinstall": "node scripts/download-native-library.js",
     "build": "gulp build --debug && gulp build --production"
   },
   "author": "Virgil Security Inc. <support@virgilsecurity.com>",
@@ -30,8 +31,8 @@
     "bowser": "^1.0.0",
     "buffer": "^4.0.0",
     "es6-error": "^2.0.2",
-    "operative": "^0.4.4",
-    "virgil-crypto": "^0.2.7"
+    "getos": "^2.6.0",
+    "operative": "^0.4.4"
   },
   "devDependencies": {
     "babel": "^5.8.21",
@@ -45,6 +46,7 @@
     "gulp-util": "^3.0.7",
     "raw-loader": "^0.5.1",
     "script-loader": "^0.6.1",
+    "tape": "^4.4.0",
     "vinyl-named": "^1.1.0",
     "webpack": "^1.12.9",
     "webpack-stream": "^3.1.0",

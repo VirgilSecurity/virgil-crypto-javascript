@@ -2,7 +2,7 @@ import _ from 'lodash';
 export { Buffer } from 'buffer';
 import { decryptWithPassword } from './decrypt-with-password';
 import { decryptWithKey } from './decrypt-with-key';
-import { throwValidationError } from '../utils/crypto-errors';
+import { throwValidationError } from './utils/crypto-errors';
 
 /**
  * Decrypt data

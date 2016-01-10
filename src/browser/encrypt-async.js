@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { encryptWithPasswordAsync } from './encrypt-with-password-async';
 import { encryptWithKeyAsync } from './encrypt-with-key-async';
 import { encryptWithKeyMultiRecipientsAsync } from './encrypt-with-key-multi-recipients-async';
-import { throwValidationError } from '../utils/crypto-errors';
+import { throwValidationError } from './utils/crypto-errors';
 
 /**
  * Encrypt data async

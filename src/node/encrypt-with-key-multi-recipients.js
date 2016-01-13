@@ -7,7 +7,7 @@ module.exports = function encryptWithKeyMultiRecipients(initialData, recipients)
 
 	var dataByteArray = u.toByteArray(initialData);
 
-	recipients.forEach((recipient) => {
+	recipients.forEach(function (recipient) {
 		var recipientIdByteArray = u.toByteArray(recipient.recipientId);
 		var publicKeyByteArray = u.toByteArray(recipient.publicKey);
 

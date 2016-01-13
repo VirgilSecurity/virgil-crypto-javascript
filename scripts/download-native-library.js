@@ -1,65 +1,63 @@
 var https = require('https');
 var fs = require('fs');
 var path = require('path');
-var getos = require('getos');
 var format = require('util').format;
+
 
 var destFilePath = path.resolve(__dirname + '/../virgil_js.node');
 var file = fs.createWriteStream(destFilePath);
 
-var platformsMap = {
-	'darwin': 'darwin',
-	'win32': 'win',
-	'Ubuntu Linux': 'ubuntu',
-	'Centos': 'centos',
-	'Debian': 'debian'
-};
+var url = 'https://downloads.virgilsecurity.com/packages/nodejs//virgil-crypto-1.2.0-nodejs-%s-%s-%s.node';
 
-getos(function downloadOsSpecificBuild (err, os) {
-	// node version - platform - arch
-	var url = 'https://downloads.virgilsecurity.com/packages/nodejs/crypto_lib-1.1.0_nodejs-%s_%s-%s.node';
+var platform = getPlatform();
+var arch = getArch();
+var nodeVersion = getNodeVersion();
 
-	var dist = os.dist || os.os;
-	var platform = platformsMap[dist];
+url = format(url, nodeVersion, platform, arch);
 
+console.log('Downloading native build.... %s', url);
 
-	if (!platform) {
-		console.error('Platform is not supported');
+https.get(url, function(res) {
+	if (res.statusCode != 200) {
+		console.error('Platform "%s-%s-%s" is not supported yet', platform, nodeVersion, arch);
 		process.exit(-1);
 	}
 
-	url = format(url, getNodeBuildVersion(), platform, process.arch);
-
-	console.log('Downloading native build.... %s', url);
-
-	https.get(url, function(res) {
-
-		if (res.statusCode != 200) {
-			console.error('Platform "%s_%s-%s" is not supported', getNodeBuildVersion(), platform, process.arch);
-			process.exit(-1);
-		}
-
-		res.pipe(file);
-
-		res.on('error', abortWithError);
-		res.on('end', assertFile);
-	});
-
-	function abortWithError (error) {
-		console.error('Download error.');
-		console.error(error);
-	}
-
-	function assertFile () {
-		if (fs.existsSync(destFilePath)) {
-			console.log('Successfully downloaded native build.');
-		} else {
-			console.log('NODE %s IS NOT SUPPORTED', process.version);
-		}
-	}
+	res.pipe(file);
+	res.on('error', abortWithError);
+	res.on('end', assertFile);
 });
 
-function getNodeBuildVersion () {
+function abortWithError (error) {
+	console.error('Download error.');
+	console.error(error);
+}
+
+function assertFile () {
+	if (fs.existsSync(destFilePath)) {
+		console.log('Successfully downloaded native build.');
+	} else {
+		console.error('Platform "%s-%s-%s" is not supported yet', platform, nodeVersion, arch);
+	}
+}
+
+function getPlatform () {
+	if (process.platform === 'darwin') {
+		return 'darwin-14.5.0';
+	}
+
+	return process.platform;
+}
+
+function getArch () {
+	if (process.platform === 'darwin') {
+		return 'universal';
+	}
+
+	return process.arch;
+}
+
+function getNodeVersion () {
 	var versionTokens = process.version.split('.');
 
 	// Use same build for node 4.*.*

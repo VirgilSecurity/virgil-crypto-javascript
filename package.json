@@ -1,6 +1,6 @@
 {
   "name": "virgil-crypto",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Virgil Crypto",
   "contributors": [
     "Eugene Baranov <ebaranov.dev@gmail.com> (https://github.com/ebaranov/)",
@@ -32,7 +32,6 @@
     "bowser": "^1.0.0",
     "buffer": "^4.0.0",
     "es6-error": "^2.0.2",
-    "getos": "^2.6.0",
     "lodash": "^4.0.0",
     "operative": "^0.4.4"
   },

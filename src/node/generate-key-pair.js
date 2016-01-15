@@ -11,6 +11,7 @@ var u = require('./utils');
  * @returns {{publicKey: *, privateKey: *}}
  */
 module.exports = function generateKeyPair(password, keysType) {
+	password = password || '';
 	keysType = keysType || KeysTypesEnum.ecBrainpool512;
 
 	if (!_.isString(password)) {

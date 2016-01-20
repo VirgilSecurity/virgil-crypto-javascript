@@ -132,6 +132,8 @@ Crypto Library allows to encrypt the data for several types of recipient's user 
 
 > Encrypted data will be returned as [Buffer](https://github.com/feross/buffer)
 
+> The [Buffer](https://github.com/feross/buffer) constructor available by ```virgilCrypto.Buffer```
+
 ```javascript
 var INITIAL_DATA = 'data to be encrypted';
 var PASSWORD = 'password';
@@ -167,6 +169,8 @@ virgilCrypto.encryptAsync(INITIAL_DATA, PASSWORD)
 > Initial data must be passed as String or [Buffer](https://github.com/feross/buffer)
 
 > Encrypted data will be returned as [Buffer](https://github.com/feross/buffer)
+
+> The [Buffer](https://github.com/feross/buffer) constructor available by ```virgilCrypto.Buffer```
 
 ### Encrypt/Decrypt data using Key with password
 
@@ -293,9 +297,11 @@ The following example applies a digital signature to a public key identifier.
 
 > Encrypted data will be returned as [Buffer](https://github.com/feross/buffer)
 
+> The [Buffer](https://github.com/feross/buffer) constructor available by ```virgilCrypto.Buffer```
+
 ### Sign and Verify data using Key with password
 
-```
+```javascript
 var KEY_PASSWORD = 'password';
 var INITIAL_DATA = 'data to be encrypted';
 var RECIPIENT_ID = '<SOME_RECIPIENT_ID>';
@@ -313,7 +319,7 @@ To verify that the data was signed by a particular party, you need the following
 
 The following example verifies a digital signature which was signed by the sender.
 
-```
+```javascript
 var isDataVerified = virgilCrypto.verify(encryptedData, keyPair.publicKey, sign);
 
 console.log('Encrypted data: ' + encryptedData);
@@ -325,7 +331,7 @@ console.log('Is data verified: ' + isDataVerified);
 
 > Browsers only!
 
-```
+```javascript
 var KEY_PASSWORD = 'password';
 var INITIAL_DATA = 'data to be encrypted';
 var RECIPIENT_ID = '<SOME_RECIPIENT_ID>';

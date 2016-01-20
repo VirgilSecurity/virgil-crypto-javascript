@@ -32,17 +32,17 @@ Virgil Security, Inc., guides software developers into the forthcoming security 
 
 ### NPM
 
-```
+```sh
 npm install virgil-crypto
 ```
 
 ### Bower
-```
+```sh
 bower install virgil-crypto
 ```
 
 ### CDN
-```
+```html
 <script src="https://cdn.virgilsecurity.com/packages/javascript/crypto/latest/virgil-crypto.min.js"></script>
 ```
 
@@ -50,13 +50,13 @@ bower install virgil-crypto
 
 ### Node
 
-```
+```javascript
 var virgilCrypto = requre('virgil-crypto');
 ```
 
 ### Browsers
 
-```
+```javascript
 var virgilCrypto = window.VirgilCrypto;
 ```
 
@@ -64,14 +64,14 @@ var virgilCrypto = window.VirgilCrypto;
 
 The following code example creates a new public/private key pair.
 
-```
+```javascript
 var keyPair = virgilCrypto.generateKeyPair();
 console.log('Key pair without password: ', keyPair);
 ```
 
 You can also generate a key pair with an encrypted private key just using one of the overloaded constructors.
 
-```
+```javascript
 var keyPairRsa2048 = virgilCrypto.generateKeyPair(virgilCrypto.KeysTypesEnum.rsa2048);
 console.log('Key pair rsa2048 without password: ', keyPairRsa2048);
 

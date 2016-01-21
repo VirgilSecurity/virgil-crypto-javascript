@@ -1,34 +1,22 @@
-# JavaScript Crypto Library
+# Tutorial JavaScript Crypto Library 
 
-<a href="https://virgilsecurity.com"><img width="230px" src="https://github.com/VirgilSecurity/virgil-net/blob/master/logo.png" align="left" hspace="10" vspace="6"></a>
-
-Virgil is a stack of security libraries (ECIES with Crypto Agility wrapped in Virgil Cryptogram) and all the necessary infrastructure to enable seamless, end-to-end encryption for any application, platform or device. Get in touch with us to get preview access to our key infrastructure.
-
-Virgil Security, Inc., guides software developers into the forthcoming security world in which everything will be encrypted (and passwords will be eliminated). In this world, the days of developers having to raise millions of dollars to build a secure chat, secure email, secure file-sharing, or a secure anything have come to an end. Now developers can instead focus on building features that give them a competitive market advantage while end-users can enjoy the privacy and security they increasingly demand.
-
-- [Installation](#installation)
-    - [NPM](#npm)
-    - [Bower](#bower)
-    - [CDN](#cdn)
-- [Initialization](#initialization)
-    - [Node](#node)
-    - [Browsers](#browsers)
-- [Generate Key Pair](#generate-key-pair)
-- [Encrypt/Decrypt data](#encryptdecrypt-data)
-    - [Encrypt/Decrypt data using password](#encryptdecrypt-data-using-password)
-    - [Async (using web workers) Encrypt/Decrypt data using password](#async-using-web-workers-encryptdecrypt-data-using-password)
-    - [Encrypt/Decrypt data using Key](#encryptdecrypt-data-using-key)
-    - [Encrypt/Decrypt data using Key with password](#encryptdecrypt-data-using-key-with-password)
-    - [Encrypt/Decrypt data using Key with password for multiple recipients](#encryptdecrypt-data-using-key-with-password-for-multiple-recipients)
-    - [Async (using web workers) Encrypt/Decrypt data using Key with password](#async-using-web-workers-encryptdecrypt-data-using-key-with-password)
-    - [Async (using web workers) Encrypt/Decrypt data using Key with password for multiple recipients](#async-using-web-workers-encryptdecrypt-data-using-key-with-password-for-multiple-recipients)
-    - [Encrypt/Decrypt data using Key without password](#encryptdecrypt-data-using-key-without-password)
-    - [Async (using web workers) Encrypt/Decrypt data using Key without password](#async-using-web-workers-encryptdecrypt-data-using-key-without-password)
-- [Sign and Verify data using Key](#sign-and-verify-data-using-key)
-    - [Sign and Verify data using Key with password](#sign-and-verify-data-using-key-with-password)
-- [Async (using web workers) Sign and Verify data using Key with password.](#async-using-web-workers-sign-and-verify-data-using-key-with-password)
+- [Install](#installation)
+- [Generate Keys](#generate-keys)
+- [Encrypt/Decrypt Data](#encryptdecrypt-data)
+    - [Using Password](#using-password)
+    - [Async (using web workers) Using Password](#async-using-web-workers-using-password)
+    - [Using Key](#using-key)
+    - [Using Key with Password](#using-key-with-password)
+    - [Using Key with Password for Multiple Recipients](#using-key-with-password-for-multiple-recipients)
+    - [Async (using web workers) Using Key with Password](#async-using-web-workers-using-key-with-password)
+    - [Async (using web workers) Using Key with Password for Multiple Recipients](#async-using-web-workers-using-key-with-password-for-multiple-recipients)
+    - [Using Key without Password](#using-key-without-password)
+    - [Async (using web workers) Using Key without Password](#async-using-web-workers-using-key-without-password)
+- [Sign and Verify Data Using Key](#sign-and-verify-data-using-key)
+    - [With Password](#with-password)
+    - [Async (using web workers) with Password](#async-using-web-workers-with-password)
   
-## Installation
+## Install
 
 ### NPM
 
@@ -46,21 +34,7 @@ bower install virgil-crypto
 <script src="https://cdn.virgilsecurity.com/packages/javascript/crypto/latest/virgil-crypto.min.js"></script>
 ```
 
-## Initialization
-
-### Node
-
-```javascript
-var virgilCrypto = requre('virgil-crypto');
-```
-
-### Browsers
-
-```javascript
-var virgilCrypto = window.VirgilCrypto;
-```
-
-## Generate Key Pair
+## Generate Keys
 
 The following code example creates a new public/private key pair.
 
@@ -126,13 +100,13 @@ If you want to encrypt the data to Bob, you encrypt it using Bob's public key (w
 
 Crypto Library allows to encrypt the data for several types of recipient's user data like public key and password. This means that you can encrypt the data with some password or with a public key generated with the Crypto Library.
 
-### Encrypt/Decrypt data using password
+### Using Password
 
-> Initial data must be passed as String or [Buffer](https://github.com/feross/buffer)
+> Initial data must be passed as a String or [Buffer](https://github.com/feross/buffer).
 
-> Encrypted data will be returned as [Buffer](https://github.com/feross/buffer)
+> Encrypted data will be returned as a [Buffer](https://github.com/feross/buffer).
 
-> The [Buffer](https://github.com/feross/buffer) constructor available by ```virgilCrypto.Buffer```
+> The [Buffer](https://github.com/feross/buffer) constructor is available by ```virgilCrypto.Buffer```.
 
 ```javascript
 var INITIAL_DATA = 'data to be encrypted';
@@ -145,9 +119,9 @@ console.log('Encrypted data: ' + encryptedData);
 console.log('Decrypted data: ' + decryptedData.toString());
 ```
 
-### Async (using web workers) Encrypt/Decrypt data using password
+### Async (using web workers) Using Password
 
-> Browsers only!
+> Only for browsers.
 
 ```javascript
 var INITIAL_DATA = 'data to be encrypted';
@@ -164,15 +138,15 @@ virgilCrypto.encryptAsync(INITIAL_DATA, PASSWORD)
   });
 ```
 
-### Encrypt/Decrypt data using Key
+### Using Key
 
-> Initial data must be passed as String or [Buffer](https://github.com/feross/buffer)
+> Initial data must be passed as a String or [Buffer](https://github.com/feross/buffer).
 
-> Encrypted data will be returned as [Buffer](https://github.com/feross/buffer)
+> Encrypted data will be returned as a [Buffer](https://github.com/feross/buffer).
 
-> The [Buffer](https://github.com/feross/buffer) constructor available by ```virgilCrypto.Buffer```
+> The [Buffer](https://github.com/feross/buffer) constructor is available by ```virgilCrypto.Buffer```.
 
-### Encrypt/Decrypt data using Key with password
+### Using Key with Password
 
 ```javascript
 var KEY_PASSWORD = 'password';
@@ -187,7 +161,7 @@ console.log('Encrypted data: ' + encryptedData);
 console.log('Decrypted data: ' + decryptedData.toString());
 ```
 
-### Encrypt/Decrypt data using Key with password for multiple recipients
+### Using Key with Password for Multiple Recipients
 
 ```javascript
 var KEY_PASSWORD = 'password';
@@ -203,9 +177,9 @@ console.log('Encrypted data: ' + encryptedData);
 console.log('Decrypted data: ' + decryptedData.toString());
 ```
 
-### Async (using web workers) Encrypt/Decrypt data using Key with password
+### Async (using web workers) Using Key with Password
 
-> Browsers only!
+> Only for browsers.
 
 ```javascript
 var KEY_PASSWORD = 'password';
@@ -226,9 +200,9 @@ virgilCrypto.generateKeyPairAsync(KEY_PASSWORD)
   });
 ```
 
-### Async (using web workers) Encrypt/Decrypt data using Key with password for multiple recipients
+### Async (using web workers) Using Key with Password for Multiple Recipients
 
-> Browsers only!
+> Only for browsers.
 
 ```javascript
 var KEY_PASSWORD = 'password';
@@ -251,7 +225,7 @@ virgilCrypto.generateKeyPairAsync(KEY_PASSWORD)
   });
 ```
 
-### Encrypt/Decrypt data using Key without password
+### Using Key without Password
 
 ```javascript
 var INITIAL_DATA = 'data to be encrypted';
@@ -265,9 +239,9 @@ console.log('Encrypted data: ' + encryptedData);
 console.log('Decrypted data: ' + decryptedData.toString());
 ```
 
-### Async (using web workers) Encrypt/Decrypt data using Key without password
+### Async (using web workers) Using Key without Password
 
-> Browsers only!
+> Only for browsers.
 
 ```javascript
 var INITIAL_DATA = 'data to be encrypted';
@@ -287,19 +261,19 @@ virgilCrypto.generateKeyPairAsync()
   });
 ```
 
-## Sign and Verify data using Key
+## Sign and Verify Data Using Key
 
 Cryptographic digital signatures use public key algorithms to provide data integrity. When you sign the data with a digital signature, someone else can verify the signature and can prove that the data originated from you and was not altered after you had signed it.
 
 The following example applies a digital signature to a public key identifier.
 
-> Initial data must be passed as String or [Buffer](https://github.com/feross/buffer)
+> Initial data must be passed as a String or [Buffer](https://github.com/feross/buffer).
 
-> Encrypted data will be returned as [Buffer](https://github.com/feross/buffer)
+> Encrypted data will be returned as a [Buffer](https://github.com/feross/buffer).
 
-> The [Buffer](https://github.com/feross/buffer) constructor available by ```virgilCrypto.Buffer```
+> The [Buffer](https://github.com/feross/buffer) constructor is available by ```virgilCrypto.Buffer```.
 
-### Sign and Verify data using Key with password
+### With Password
 
 ```javascript
 var KEY_PASSWORD = 'password';
@@ -327,9 +301,9 @@ console.log('Sign: ' + sign.toString('base64'));
 console.log('Is data verified: ' + isDataVerified);
 ```
 
-## Async (using web workers) Sign and Verify data using Key with password.
+### Async (using web workers) With Password
 
-> Browsers only!
+> Only for browsers.
 
 ```javascript
 var KEY_PASSWORD = 'password';

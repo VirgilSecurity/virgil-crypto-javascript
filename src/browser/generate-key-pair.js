@@ -44,7 +44,7 @@ export function generateKeyPair (password, keysType) {
 
 	try {
 		let passwordByteArray = CryptoUtils.toByteArray(password);
-		virgilKeys = VirgilCrypto.VirgilKeyPair[keysType](passwordByteArray);
+		virgilKeys = VirgilCrypto.VirgilKeyPair.generate(keysType, passwordByteArray);
 
 		publicKey = virgilKeys.publicKey().toUTF8();
 		privateKey = virgilKeys.privateKey().toUTF8();

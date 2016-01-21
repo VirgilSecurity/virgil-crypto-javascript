@@ -1,7 +1,8 @@
 var virgilCrypto = require('../index');
 
 var keysTypesEnum = virgilCrypto.KeysTypesEnum;
-var keyPair = virgilCrypto.generateKeyPair('', keysTypesEnum.ecNist192);
+var privateKeyPassword = 'veryStrongPa$$0rd';
+var keyPair = virgilCrypto.generateKeyPair(privateKeyPassword, keysTypesEnum.ecNist192);
 var initialData = 'initial data';
 
 console.log('initialData', initialData);
@@ -21,7 +22,7 @@ var encryptedDataByKey = virgilCrypto.encrypt(initialData, keyPair.publicKey, ke
 console.log('encryptedDataByKey', encryptedDataByKey);
 console.log('encryptedDataByKey base64', encryptedDataByKey.toString('base64'));
 
-var decryptedDataByKey = virgilCrypto.decrypt(encryptedDataByKey, keyPair.publicKey, keyPair.privateKey);
+var decryptedDataByKey = virgilCrypto.decrypt(encryptedDataByKey, keyPair.publicKey, keyPair.privateKey, privateKeyPassword);
 console.log('decryptedDataByKey', decryptedDataByKey);
 console.log('decryptedDataByKey', decryptedDataByKey.toString());
 console.log('decryptedDataByKey base64', decryptedDataByKey.toString('base64'));
@@ -31,12 +32,12 @@ console.log('encryptedDataMulti', encryptedDataMulti);
 console.log('encryptedDataMulti string', encryptedDataMulti.toString());
 console.log('encryptedDataMulti base64', encryptedDataMulti.toString('base64'));
 
-var decryptedDataMulti = virgilCrypto.decrypt(encryptedDataMulti, keyPair.publicKey, keyPair.privateKey);
+var decryptedDataMulti = virgilCrypto.decrypt(encryptedDataMulti, keyPair.publicKey, keyPair.privateKey, privateKeyPassword);
 console.log('decryptedDataMulti', decryptedDataMulti);
 console.log('decryptedDataMulti string', decryptedDataMulti.toString());
 console.log('decryptedDataMulti base64', decryptedDataMulti.toString('base64'));
 
-var sign = virgilCrypto.sign(encryptedDataByKey, keyPair.privateKey);
+var sign = virgilCrypto.sign(encryptedDataByKey, keyPair.privateKey, privateKeyPassword);
 console.log('sign', sign);
 console.log('sign base64', sign.toString('base64'));
 

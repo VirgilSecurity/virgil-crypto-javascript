@@ -59,7 +59,7 @@ function generateKeyPairAsyncWorker (password, keysType) {
 
 	try {
 		let passwordByteArray = VirgilCryptoWorkerContext.VirgilByteArray.fromUTF8(password);
-		let virgilKeys = VirgilCryptoWorkerContext.VirgilKeyPair[keysType](passwordByteArray);
+		let virgilKeys = VirgilCryptoWorkerContext.VirgilKeyPair.generate(keysType, passwordByteArray);
 
 		let publicKey = virgilKeys.publicKey().toUTF8();
 		let privateKey = virgilKeys.privateKey().toUTF8(virgilKeys);

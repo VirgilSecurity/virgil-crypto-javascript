@@ -8,25 +8,28 @@ import { throwVirgilError, throwValidationError } from './utils/crypto-errors';
  * Generate the key pair - public and private keys
  *
  * @param [password = ''] {string}
- * @param [keysType = 'ecBrainpool512'] {string}
+ * @param [keysType = 'Default'] {string}
  * @returns {{publicKey: *, privateKey: *}}
  */
 export function generateKeyPair (password, keysType) {
 	switch (arguments.length) {
 		case 1:
-			password = arguments[0];
-			keysType = KeysTypesEnum.ecBrainpool512;
+			if (KeysTypesEnum[password]) {
+				keysType = KeysTypesEnum[password];
+				password = '';
+			} else {
+				keysType = KeysTypesEnum.Default;
+			}
 			break;
 
 		case 2:
-			password = arguments[0];
-			keysType = KeysTypesEnum(arguments[1]);
+			keysType = KeysTypesEnum[keysType];
 			break;
 
 		case 0:
 		default:
 			password = '';
-			keysType = KeysTypesEnum.ecBrainpool512;
+			keysType = KeysTypesEnum.Default;
 			break;
 	}
 
@@ -44,7 +47,7 @@ export function generateKeyPair (password, keysType) {
 
 	try {
 		let passwordByteArray = CryptoUtils.toByteArray(password);
-		virgilKeys = VirgilCrypto.VirgilKeyPair.generate(keysType, passwordByteArray);
+		virgilKeys = VirgilCrypto.VirgilKeyPair.generate(VirgilCrypto.VirgilKeyPair.Type[keysType], passwordByteArray);
 
 		publicKey = virgilKeys.publicKey().toUTF8();
 		privateKey = virgilKeys.privateKey().toUTF8();

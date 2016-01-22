@@ -9,25 +9,28 @@ import { generateKeyPair } from './generate-key-pair';
  * Generate the key pair - public and private keys using workers
  *
  * @param [password = ''] {string}
- * @param [keysType = 'ecBrainpool512'] {string}
+ * @param [keysType = 'Default'] {string}
  * @returns {Promise}
  */
 export function generateKeyPairAsync (password, keysType) {
 	switch (arguments.length) {
 		case 1:
-			password = arguments[0];
-			keysType = KeysTypesEnum.ecBrainpool512;
+			if (KeysTypesEnum[password]) {
+				keysType = KeysTypesEnum[password];
+				password = '';
+			} else {
+				keysType = KeysTypesEnum.Default;
+			}
 			break;
 
 		case 2:
-			password = arguments[0];
-			keysType = KeysTypesEnum(arguments[1]);
+			keysType = KeysTypesEnum[keysType];
 			break;
 
 		case 0:
 		default:
 			password = '';
-			keysType = KeysTypesEnum.ecBrainpool512;
+			keysType = KeysTypesEnum.Default;
 			break;
 	}
 
@@ -59,7 +62,7 @@ function generateKeyPairAsyncWorker (password, keysType) {
 
 	try {
 		let passwordByteArray = VirgilCryptoWorkerContext.VirgilByteArray.fromUTF8(password);
-		let virgilKeys = VirgilCryptoWorkerContext.VirgilKeyPair.generate(keysType, passwordByteArray);
+		let virgilKeys = VirgilCryptoWorkerContext.VirgilKeyPair.generate(VirgilCryptoWorkerContext.VirgilKeyPair.Type[keysType], passwordByteArray);
 
 		let publicKey = virgilKeys.publicKey().toUTF8();
 		let privateKey = virgilKeys.privateKey().toUTF8(virgilKeys);

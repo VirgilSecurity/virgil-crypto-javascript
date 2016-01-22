@@ -7,12 +7,30 @@ var u = require('./utils');
  * Generate the key pair - public and private keys
  *
  * @param [password = ''] {string}
- * @param [keysType = 'ecBrainpool512'] {string}
+ * @param [keysType = 'Default'] {string}
  * @returns {{publicKey: *, privateKey: *}}
  */
-module.exports = function generateKeyPair(password, keysType) {
-	password = password || '';
-	keysType = keysType || KeysTypesEnum.ecBrainpool512;
+module.exports = function generateKeyPair (password, keysType) {
+	switch (arguments.length) {
+		case 1:
+			if (KeysTypesEnum[password]) {
+				keysType = KeysTypesEnum[password];
+				password = '';
+			} else {
+				keysType = KeysTypesEnum.Default;
+			}
+			break;
+
+		case 2:
+			keysType = KeysTypesEnum[keysType];
+			break;
+
+		case 0:
+		default:
+			password = '';
+			keysType = KeysTypesEnum.Default;
+			break;
+	}
 
 	if (!_.isString(password)) {
 		throw new TypeError('The argument `password` must be a String');
@@ -24,10 +42,15 @@ module.exports = function generateKeyPair(password, keysType) {
 
 	var virgilKeys;
 
+	// TODO: will be fine to have some kind of enum like in asmjs VirgilCrypto.VirgilKeyPair.Type[keysType]
+	// convert into nodejs specific key type property name
+	keysType = 'Type_' + keysType;
+
 	if (password) {
-		virgilKeys = new VirgilCrypto.VirgilKeyPair[keysType](u.stringToByteArray(password));
+		virgilKeys = new VirgilCrypto.VirgilKeyPair.generate(VirgilCrypto.VirgilKeyPair[keysType], u.stringToByteArray(password));
 	} else {
-		virgilKeys = new VirgilCrypto.VirgilKeyPair[keysType]();
+		//virgilKeys = new VirgilCrypto.VirgilKeyPair[keysType]();
+		virgilKeys = new VirgilCrypto.VirgilKeyPair.generate(VirgilCrypto.VirgilKeyPair[keysType]);
 	}
 
 	return {

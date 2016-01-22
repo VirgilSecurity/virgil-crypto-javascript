@@ -13,15 +13,33 @@
 			var virgilCrypto = window.VirgilCrypto;
 			var keysTypesEnum = virgilCrypto.KeysTypesEnum;
 			var privateKeyPassword = 'veryStrongPa$$0rd';
-			var keyPair = virgilCrypto.generateKeyPair(privateKeyPassword, keysTypesEnum.ecNist192);
+			var keyPair = virgilCrypto.generateKeyPair(privateKeyPassword, keysTypesEnum.Default);
 			var initialData = 'initial data';
 
 			console.log('initialData', initialData);
 
-			console.log('keyPair', keysTypesEnum.ecNist192, keyPair);
+			console.log('keyPair', keysTypesEnum.Default, JSON.stringify(keyPair));
 
-			virgilCrypto.generateKeyPairAsync(privateKeyPassword, keysTypesEnum.ecNist192).then(function(keys) {
-				console.log('async keyPair', keysTypesEnum.ecNist192, keys);
+			var keyPairDefaultParams = virgilCrypto.generateKeyPair();
+			console.log('keyPairDefaultParams', keyPairDefaultParams);
+			var keyPairOnlyPassword = virgilCrypto.generateKeyPair('password');
+			console.log('keyPairOnlyPassword', keyPairOnlyPassword);
+			var keyPairPasswordAndType = virgilCrypto.generateKeyPair('password', keysTypesEnum.RSA_2048);
+			console.log('keyPairPasswordAndType', keyPairPasswordAndType);
+			var keyPairOnlyType = virgilCrypto.generateKeyPair(keysTypesEnum.RSA_2048);
+			console.log('keyPairOnlyType', keyPairOnlyType);
+
+			virgilCrypto.generateKeyPairAsync().then(function(keyPairAsyncDefaultParams) {
+				console.log('keyPairAsyncDefaultParams', keyPairAsyncDefaultParams);
+			});
+			virgilCrypto.generateKeyPairAsync('password').then(function(keyPairAsyncOnlyPassword) {
+				console.log('keyPairAsyncOnlyPassword', keyPairAsyncOnlyPassword);
+			});
+			virgilCrypto.generateKeyPairAsync('password', keysTypesEnum.RSA_2048).then(function(keyPairAsyncPasswordAndType) {
+				console.log('keyPairAsyncPasswordAndType', keyPairAsyncPasswordAndType);
+			});
+			virgilCrypto.generateKeyPairAsync(keysTypesEnum.RSA_2048).then(function(keyPairAsyncOnlyType) {
+				console.log('keyPairAsyncOnlyType', keyPairAsyncOnlyType);
 			});
 
 			var encryptedData = virgilCrypto.encrypt(initialData, 'password');

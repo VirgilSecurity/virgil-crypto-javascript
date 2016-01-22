@@ -45,9 +45,12 @@ console.log('Key pair without password: ', keyPair);
 
 You can also generate a key pair with an encrypted private key just using one of the overloaded constructors.
 
+> Available keys types:
+> "Default", "EC_BP256R1", "EC_BP384R1", "EC_BP512R1", "EC_M221", "EC_M255", "EC_M383", "EC_M511", "EC_SECP192K1", "EC_SECP192R1", "EC_SECP224K1", "EC_SECP224R1", "EC_SECP256K1", "EC_SECP256R1", "EC_SECP384R1", "EC_SECP521R1", "RSA_256", "RSA_512", "RSA_1024", "RSA_2048", "RSA_3072", "RSA_4096", "RSA_8192"
+
 ```javascript
-var keyPairRsa2048 = virgilCrypto.generateKeyPair(virgilCrypto.KeysTypesEnum.rsa2048);
-console.log('Key pair rsa2048 without password: ', keyPairRsa2048);
+var keyPairRsa2048 = virgilCrypto.generateKeyPair(virgilCrypto.KeysTypesEnum.RSA_2048);
+console.log('Key pair RSA_2048 without password: ', keyPairRsa2048);
 
 var KEY_PASSWORD = 'password';
 var keyPairWithPassword = virgilCrypto.generateKeyPair(KEY_PASSWORD);
@@ -55,8 +58,8 @@ console.log('Key pair with password: ', keyPairWithPassword);
 
 
 var KEY_PASSWORD = 'password';
-var keyPairWithPasswordAndSpecificType = virgilCrypto.generateKeyPair(KEY_PASSWORD, virgilCrypto.KeysTypesEnum.rsa2048);
-console.log('Key pair rsa2048 with password: ', keyPairWithPasswordAndSpecificType);
+var keyPairWithPasswordAndSpecificType = virgilCrypto.generateKeyPair(KEY_PASSWORD, virgilCrypto.KeysTypesEnum.RSA_2048);
+console.log('Key pair RSA_2048 with password: ', keyPairWithPasswordAndSpecificType);
 ```
 
 In the example below you can see a simply generated public/private keypair without a password.

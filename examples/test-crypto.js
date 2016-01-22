@@ -2,12 +2,21 @@ var virgilCrypto = require('../index');
 
 var keysTypesEnum = virgilCrypto.KeysTypesEnum;
 var privateKeyPassword = 'veryStrongPa$$0rd';
-var keyPair = virgilCrypto.generateKeyPair(privateKeyPassword, keysTypesEnum.ecNist192);
+var keyPair = virgilCrypto.generateKeyPair(privateKeyPassword, keysTypesEnum.Default);
 var initialData = 'initial data';
 
 console.log('initialData', initialData);
 
-console.log('keyPair', keysTypesEnum.ecNist192, keyPair);
+console.log('keyPair', keysTypesEnum.Default, JSON.stringify(keyPair));
+
+var keyPairDefaultParams = virgilCrypto.generateKeyPair();
+console.log('keyPairDefaultParams', keyPairDefaultParams);
+var keyPairOnlyPassword = virgilCrypto.generateKeyPair('password');
+console.log('keyPairOnlyPassword', keyPairOnlyPassword);
+var keyPairPasswordAndType = virgilCrypto.generateKeyPair('password', keysTypesEnum.RSA_256);
+console.log('keyPairPasswordAndType', keyPairPasswordAndType);
+var keyPairOnlyType = virgilCrypto.generateKeyPair(keysTypesEnum.RSA_256);
+console.log('keyPairOnlyType', keyPairOnlyType);
 
 var encryptedData = virgilCrypto.encrypt(initialData, 'password');
 console.log('encryptedData', encryptedData);

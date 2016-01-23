@@ -7,7 +7,7 @@ var format = require('util').format;
 var destFilePath = path.resolve(__dirname + '/../virgil_js.node');
 var file = fs.createWriteStream(destFilePath);
 
-var url = 'https://downloads.virgilsecurity.com/packages/nodejs/virgil-crypto-1.2.2-nodejs-%s-%s-%s.node';
+var url = 'https://cdn.virgilsecurity.com/packages/nodejs/virgil-crypto-1.2.2-nodejs-%s-%s-%s.node';
 
 var platform = getPlatform();
 var arch = getArch();
@@ -52,6 +52,10 @@ function getPlatform () {
 function getArch () {
 	if (process.platform === 'darwin') {
 		return 'universal';
+	}
+
+	if (process.arch === 'x64') {
+		return 'x86_64';
 	}
 
 	return process.arch;

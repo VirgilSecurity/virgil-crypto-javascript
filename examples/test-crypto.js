@@ -18,6 +18,11 @@ console.log('keyPairPasswordAndType', keyPairPasswordAndType);
 var keyPairOnlyType = virgilCrypto.generateKeyPair(keysTypesEnum.RSA_256);
 console.log('keyPairOnlyType', keyPairOnlyType);
 
+var encryptedStringToBase64Data = virgilCrypto.encryptStringToBase64(initialData, 'password');
+console.log('encryptedStringToBase64Data', encryptedStringToBase64Data);
+var decryptedStringToBase64Data = virgilCrypto.decryptStringFromBase64(encryptedStringToBase64Data, 'password');
+console.log('decryptedStringToBase64Data', decryptedStringToBase64Data);
+
 var encryptedData = virgilCrypto.encrypt(initialData, 'password');
 console.log('encryptedData', encryptedData);
 console.log('encryptedData base64', encryptedData.toString('base64'));

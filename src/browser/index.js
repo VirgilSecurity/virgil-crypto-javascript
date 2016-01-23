@@ -1,7 +1,11 @@
 export { encrypt } from './encrypt';
+export { encryptStringToBase64 } from './encrypt-string-to-base64';
 export { encryptAsync } from './encrypt-async';
+export { encryptStringToBase64Async } from './encrypt-string-to-base64-async';
 export { decrypt } from './decrypt';
+export { decryptStringFromBase64 } from './decrypt-string-from-base64';
 export { decryptAsync } from './decrypt-async';
+export { decryptStringFromBase64Async } from './decrypt-string-from-base64-async';
 export { sign } from './sign';
 export { signAsync } from './sign-async';
 export { verify } from './verify';

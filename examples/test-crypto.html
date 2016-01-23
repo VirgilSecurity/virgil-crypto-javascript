@@ -24,9 +24,9 @@
 			console.log('keyPairDefaultParams', keyPairDefaultParams);
 			var keyPairOnlyPassword = virgilCrypto.generateKeyPair('password');
 			console.log('keyPairOnlyPassword', keyPairOnlyPassword);
-			var keyPairPasswordAndType = virgilCrypto.generateKeyPair('password', keysTypesEnum.RSA_2048);
+			var keyPairPasswordAndType = virgilCrypto.generateKeyPair('password', keysTypesEnum.RSA_256);
 			console.log('keyPairPasswordAndType', keyPairPasswordAndType);
-			var keyPairOnlyType = virgilCrypto.generateKeyPair(keysTypesEnum.RSA_2048);
+			var keyPairOnlyType = virgilCrypto.generateKeyPair(keysTypesEnum.RSA_256);
 			console.log('keyPairOnlyType', keyPairOnlyType);
 
 			virgilCrypto.generateKeyPairAsync().then(function(keyPairAsyncDefaultParams) {
@@ -35,11 +35,24 @@
 			virgilCrypto.generateKeyPairAsync('password').then(function(keyPairAsyncOnlyPassword) {
 				console.log('keyPairAsyncOnlyPassword', keyPairAsyncOnlyPassword);
 			});
-			virgilCrypto.generateKeyPairAsync('password', keysTypesEnum.RSA_2048).then(function(keyPairAsyncPasswordAndType) {
+			virgilCrypto.generateKeyPairAsync('password', keysTypesEnum.RSA_256).then(function(keyPairAsyncPasswordAndType) {
 				console.log('keyPairAsyncPasswordAndType', keyPairAsyncPasswordAndType);
 			});
-			virgilCrypto.generateKeyPairAsync(keysTypesEnum.RSA_2048).then(function(keyPairAsyncOnlyType) {
+			virgilCrypto.generateKeyPairAsync(keysTypesEnum.RSA_256).then(function(keyPairAsyncOnlyType) {
 				console.log('keyPairAsyncOnlyType', keyPairAsyncOnlyType);
+			});
+
+			var encryptedStringToBase64Data = virgilCrypto.encryptStringToBase64(initialData, 'password');
+			console.log('encryptedStringToBase64Data', encryptedStringToBase64Data);
+			var decryptedStringToBase64Data = virgilCrypto.decryptStringFromBase64(encryptedStringToBase64Data, 'password');
+			console.log('decryptedStringToBase64Data', decryptedStringToBase64Data);
+
+			virgilCrypto.encryptStringToBase64Async(initialData, 'password').then(function(encryptedStringToBase64DataAsync) {
+				console.log('encryptedStringToBase64DataAsync', encryptedStringToBase64DataAsync);
+
+				virgilCrypto.decryptStringFromBase64Async(encryptedStringToBase64Data, 'password').then(function(decryptedStringToBase64DataAsync) {
+					console.log('decryptedStringToBase64DataAsync', decryptedStringToBase64DataAsync);
+				});
 			});
 
 			var encryptedData = virgilCrypto.encrypt(initialData, 'password');

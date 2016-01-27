@@ -57,3 +57,6 @@ console.log('sign base64', sign.toString('base64'));
 
 var verified = virgilCrypto.verify(encryptedDataByKey, keyPair.publicKey, sign);
 console.log('verified', verified);
+
+var verifiedBase64 = virgilCrypto.verify(encryptedDataByKey, keyPair.publicKey, sign.toString('base64'));
+console.log('verified sign as base64', verifiedBase64);

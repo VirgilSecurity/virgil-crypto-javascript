@@ -1,7 +1,7 @@
 var VirgilCrypto = require('../../virgil_js.node');
 var u = require('./utils');
 
-module.exports = function encryptWithKey(initialData, recipientId, publicKey) {
+module.exports = function encryptWithKey (initialData, recipientId, publicKey) {
 	var virgilCipher = new VirgilCrypto.VirgilCipher();
 
 	var dataByteArray = u.toByteArray(initialData);

@@ -105,7 +105,14 @@
 				virgilCrypto.verifyAsync(encryptedDataByKey, keyPair.publicKey, sign).then(function(verified) {
 					console.log('async verified', verified);
 				});
+
+				virgilCrypto.verifyAsync(encryptedDataByKey, keyPair.publicKey, sign.toString('base64')).then(function(verifiedBase64) {
+					console.log('async verified sign as base64', verifiedBase64);
+				});
 			});
+
+			var verifiedBase64 = virgilCrypto.verify(encryptedDataByKey, keyPair.publicKey, sign.toString('base64'));
+			console.log('verified sign as base64', verifiedBase64);
 
 			var encryptedDataMulti = virgilCrypto.encrypt(initialData, [{ recipientId: keyPair.publicKey, publicKey: keyPair.publicKey }]);
 			console.log('encryptedDataMulti', encryptedDataMulti);

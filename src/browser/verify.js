@@ -9,7 +9,7 @@ import { throwVirgilError, throwValidationError } from './utils/crypto-errors';
  *
  * @param data {string|Buffer}
  * @param publicKey {string}
- * @param sign {Buffer}
+ * @param sign {string|Buffer}
  * @returns {boolean}
  */
 export function verify (data, publicKey, sign) {
@@ -21,13 +21,18 @@ export function verify (data, publicKey, sign) {
 		throwValidationError('00001', { arg: 'publicKey', type: 'String' });
 	}
 
+	if (!(_.isString(sign) || Buffer.isBuffer(sign))) {
+		throwValidationError('00001', { arg: 'sign', type: 'base64 String or Buffer' });
+	}
+
 	let virgilSigner = new VirgilCrypto.VirgilSigner();
 	let isVerified;
 
 	try {
 		let dataByteArray = CryptoUtils.toByteArray(data);
 		let publicKeyByteArray = CryptoUtils.toByteArray(publicKey);
-		let signByteArray = CryptoUtils.toByteArray(sign);
+		let signByteArray = Buffer.isBuffer(sign) ? CryptoUtils.toByteArray(sign) : CryptoUtils.toByteArray(new Buffer(sign, 'base64'));
+
 		isVerified = virgilSigner.verify(dataByteArray, signByteArray, publicKeyByteArray);
 
 		// cleanup memory to avoid memory leaks

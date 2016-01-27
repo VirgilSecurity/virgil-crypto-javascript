@@ -12,7 +12,7 @@ var encryptWithPassword = require('./encrypt-with-password');
  *
  * @returns {Buffer}
  */
-module.exports = function encrypt(initialData, recipientId, publicKey) {
+module.exports = function encrypt (initialData, recipientId, publicKey) {
 	if (!(_.isString(initialData) || Buffer.isBuffer(initialData))) {
 		throw new TypeError('The argument `password` must be a String or Buffer');
 	}

@@ -1,7 +1,7 @@
 var VirgilCrypto = require('../../virgil_js.node');
 var u = require('./utils');
 
-module.exports = function decryptWithKey(initialEncryptedData, recipientId, privateKey, privateKeyPassword) {
+module.exports = function decryptWithKey (initialEncryptedData, recipientId, privateKey, privateKeyPassword) {
 	privateKeyPassword = privateKeyPassword || '';
 
 	var virgilCipher = new VirgilCrypto.VirgilCipher();

@@ -10,7 +10,7 @@ var u = require('./utils');
  * @param [privateKeyPassword = ''] {string}
  * @returns {Buffer}
  */
-module.exports = function sign(data, privateKey, privateKeyPassword) {
+module.exports = function sign (data, privateKey, privateKeyPassword) {
 	privateKeyPassword = privateKeyPassword || '';
 
 	if (!(_.isString(data) || Buffer.isBuffer(data))) {

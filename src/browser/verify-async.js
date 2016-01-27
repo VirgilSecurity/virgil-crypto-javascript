@@ -22,6 +22,10 @@ export function verifyAsync (data, publicKey, sign) {
 		throwValidationError('00001', { arg: 'publicKey', type: 'String' });
 	}
 
+	if (!(_.isString(sign) || Buffer.isBuffer(sign))) {
+		throwValidationError('00001', { arg: 'sign', type: 'base64 String or Buffer' });
+	}
+
 	if (browser.msie) {
 		return new Promise((resolve, reject) => {
 			try {
@@ -32,8 +36,9 @@ export function verifyAsync (data, publicKey, sign) {
 		});
 	} else {
 		let worker = createWorkerCryptoFunc(verifyAsyncWorker);
+		sign = Buffer.isBuffer(sign) ? CryptoUtils.toBase64(sign) : sign;
 
-		return worker(CryptoUtils.toBase64(data), publicKey, CryptoUtils.toBase64(sign)).catch(() => {
+		return worker(CryptoUtils.toBase64(data), publicKey, sign).catch(() => {
 			throwVirgilError('90006', { initialData: data, key: publicKey, sign: sign });
 		});
 	}

@@ -2,7 +2,7 @@ var _ = require('lodash');
 var decryptWithKey = require('./decrypt-with-key');
 var decryptWithPassword = require('./decrypt-with-password');
 
-module.exports = function decrypt(initialEncryptedData, recipientId, privateKey, privateKeyPassword) {
+module.exports = function decrypt (initialEncryptedData, recipientId, privateKey, privateKeyPassword) {
 	privateKeyPassword = privateKeyPassword || '';
 
 	if (!Buffer.isBuffer(initialEncryptedData)) {

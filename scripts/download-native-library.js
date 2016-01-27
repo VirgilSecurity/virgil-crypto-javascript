@@ -9,9 +9,9 @@ var file = fs.createWriteStream(destFilePath);
 
 var url = 'https://cdn.virgilsecurity.com/packages/nodejs/virgil-crypto-1.2.2-nodejs-%s-%s-%s.node';
 
+var nodeVersion = getNodeVersion();
 var platform = getPlatform();
 var arch = getArch();
-var nodeVersion = getNodeVersion();
 
 url = format(url, nodeVersion, platform, arch);
 
@@ -46,6 +46,10 @@ function getPlatform () {
 		return 'darwin-14.5';
 	}
 
+	if (process.platform === 'win32') {
+		return 'windows-6.2';
+	}
+
 	return process.platform;
 }
 
@@ -54,7 +58,7 @@ function getArch () {
 		return 'universal';
 	}
 
-	if (process.arch === 'x64') {
+	if (process.arch === 'x64' && process.platform !== 'win32') {
 		return 'x86_64';
 	}
 

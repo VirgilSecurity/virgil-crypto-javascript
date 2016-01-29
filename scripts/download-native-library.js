@@ -19,8 +19,7 @@ console.log('Downloading native build.... %s', url);
 
 https.get(url, function(res) {
 	if (res.statusCode != 200) {
-		console.error('Platform "%s-%s-%s" is not supported yet', platform, nodeVersion, arch);
-		process.exit(-1);
+		noSupport();
 	}
 
 	res.pipe(file);
@@ -37,7 +36,7 @@ function assertFile () {
 	if (fs.existsSync(destFilePath)) {
 		console.log('Successfully downloaded native build.');
 	} else {
-		console.error('Platform "%s-%s-%s" is not supported yet', platform, nodeVersion, arch);
+		noSupport();
 	}
 }
 
@@ -79,4 +78,11 @@ function getNodeVersion () {
 	}
 
 	return process.version.slice(1);
+}
+
+function noSupport () {
+	console.error('\n\n========== WARNING ==========\n');
+	console.error('Platform "nodejs-%s-%s-%s" is not supported yet', nodeVersion, platform, arch);
+	console.error('\n=============================\n\n');
+	process.exit(0);
 }

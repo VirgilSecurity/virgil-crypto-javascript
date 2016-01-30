@@ -49,6 +49,7 @@
     "gulp-plumber": "^1.0.1",
     "gulp-util": "^3.0.7",
     "jasmine": "^2.4.1",
+    "jasmine-expect": "^2.0.0-beta2",
     "karma": "^0.13.19",
     "karma-chrome-launcher": "^0.2.2",
     "karma-firefox-launcher": "^0.1.7",

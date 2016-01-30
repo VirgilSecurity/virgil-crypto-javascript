@@ -158,8 +158,12 @@ const KARMA_CONFIG = {
 };
 
 gulp.task('test', function(done) {
+	let isDoneCallbackCalled = false;
+
 	let karmaServer = new KarmaServer(KARMA_CONFIG, () => {
-		done();
+		if (!isDoneCallbackCalled) {
+			done();
+		}
 	});
 
 	karmaServer.start();

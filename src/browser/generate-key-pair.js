@@ -38,7 +38,7 @@ export function generateKeyPair (password, keysType) {
 	}
 
 	if (_.isUndefined(keysType)) {
-		throwValidationError('00002', { arg: 'keysType', type: `equal to one of ${_.values(KeysTypesEnum).join(', ')} - use the KeysTypesEnum for it.` });
+		throwValidationError('00002', { arg: 'keysType', type: ` second argument and must be equal to one of ${_.values(KeysTypesEnum).join(', ')} - use the KeysTypesEnum for it.` });
 	}
 
 	let virgilKeys;

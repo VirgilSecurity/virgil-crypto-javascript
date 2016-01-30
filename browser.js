@@ -10,4 +10,4 @@ if (global && !global._babelPolyfill) {
 export { Buffer } from 'buffer';
 import * as VirgilCryptoAPI from './src/browser';
 export const Version = PACKAGE_VERSION;
-export const VirgilCrypto = { Buffer, ...VirgilCryptoAPI };
+export const VirgilCrypto = { ...{ Buffer: Buffer }, ...VirgilCryptoAPI };

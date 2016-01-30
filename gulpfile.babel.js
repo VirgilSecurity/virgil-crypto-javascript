@@ -12,6 +12,16 @@ import packageJson from './package.json';
 import yargs from 'yargs';
 import _ from 'lodash';
 
+import { Server as KarmaServer } from 'karma';
+import karmaWebpack from 'karma-webpack';
+import karmaJasmine from 'karma-jasmine';
+import karmaJasmineMatchers from 'karma-jasmine-matchers';
+import karmaChromeLauncher from 'karma-chrome-launcher';
+import karmaFirefoxLauncher from 'karma-firefox-launcher';
+import karmaSafariLauncher from 'karma-safari-launcher';
+import karmaMochaReporter from 'karma-mocha-reporter';
+import karmaSourcemapLoader from 'karma-sourcemap-loader';
+
 function handleError (...args) {
 	gulpNotify.onError({ title: 'COMPILE ERROR:', message: '<%= error %>' })(...args);
 	this.emit('end');
@@ -20,6 +30,7 @@ function handleError (...args) {
 export const fromRoot = pathJoin.bind(path, __dirname);
 
 export const PATHS = {
+	root: fromRoot('./'),
 	build: fromRoot('dist')
 };
 
@@ -56,7 +67,7 @@ if (!IS_DEV) {
 	]);
 }
 
-export const WEBPACK_CONFIG = {
+const WEBPACK_CONFIG = {
 	entry: {
 		crypto: fromRoot('browser.js')
 	},
@@ -100,6 +111,59 @@ export const WEBPACK_CONFIG = {
 		]
 	}
 };
+
+const KARMA_CONFIG = {
+	basePath: PATHS.root,
+	browsers: ARGV.browsers ? ARGV.browsers.split(',') : ['Chrome'],
+	browserNoActivityTimeout: 60000,
+	autoWatch: IS_WATCH,
+	// to avoid spamming and double running just increase the watch delay
+	autoWatchBatchDelay: 300,
+	singleRun: !IS_WATCH,
+	frameworks: ['jasmine', 'jasmine-matchers'],
+	port: 9876,
+	colors: true,
+	files: [
+		'./src/browser/__TEST__/tests.bundle.js'
+	],
+	preprocessors: {
+		'./src/browser/__TEST__/tests.bundle.js': ['webpack'].concat(IS_DEBUG ? ['sourcemap'] : [])
+	},
+	reporters: ['mocha'],
+	webpack: {
+		devtool: 'inline-source-map',
+		resolve: WEBPACK_CONFIG.resolve,
+		plugins: WEBPACK_CONFIG.plugins,
+		module: {
+			loaders: WEBPACK_CONFIG.module.loaders
+		}
+	},
+	plugins: [
+		karmaWebpack,
+		karmaJasmine,
+		karmaJasmineMatchers,
+		karmaChromeLauncher,
+		karmaFirefoxLauncher,
+		karmaSafariLauncher,
+		karmaMochaReporter,
+		karmaSourcemapLoader
+	],
+	webpackMiddleware: {
+		noInfo: true
+	},
+	webpackServer: {
+		noInfo: true
+	},
+	logLevel: 'INFO'
+};
+
+gulp.task('test', function(done) {
+	let karmaServer = new KarmaServer(KARMA_CONFIG, () => {
+		done();
+	});
+
+	karmaServer.start();
+});
 
 gulp.task('build', () => {
 	return gulp.src(_.values(WEBPACK_CONFIG.entry))

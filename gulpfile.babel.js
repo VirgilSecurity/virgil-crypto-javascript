@@ -115,7 +115,7 @@ const WEBPACK_CONFIG = {
 const KARMA_CONFIG = {
 	basePath: PATHS.root,
 	browsers: ARGV.browsers ? ARGV.browsers.split(',') : ['Chrome'],
-	browserNoActivityTimeout: 60000,
+	browserNoActivityTimeout: 240 * 1000,
 	autoWatch: IS_WATCH,
 	// to avoid spamming and double running just increase the watch delay
 	autoWatchBatchDelay: 300,

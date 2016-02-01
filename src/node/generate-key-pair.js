@@ -49,7 +49,6 @@ module.exports = function generateKeyPair (password, keysType) {
 	if (password) {
 		virgilKeys = new VirgilCrypto.VirgilKeyPair.generate(VirgilCrypto.VirgilKeyPair[keysType], u.stringToByteArray(password));
 	} else {
-		//virgilKeys = new VirgilCrypto.VirgilKeyPair[keysType]();
 		virgilKeys = new VirgilCrypto.VirgilKeyPair.generate(VirgilCrypto.VirgilKeyPair[keysType]);
 	}
 

@@ -1,7 +1,7 @@
 {
 	"name": "virgil-crypto",
 	"description": "Virgil Security JavaScript Crypto library",
-	"version": "1.2.2",
+	"version": "1.2.3",
 	"authors": [
 		"Virgil Security Inc. <support@virgilsecurity.com>",
 		"Eugene Baranov <ebaranov.dev@gmail.com> (https://github.com/ebaranov/)"

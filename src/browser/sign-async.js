@@ -2,7 +2,7 @@ import _ from 'lodash';
 export { Buffer } from 'buffer';
 import browser from 'bowser';
 import * as CryptoUtils from './utils/crypto-utils';
-import { createWorkerCryptoFunc } from './utils/create-worker-crypto-func';
+import CryptoWorkerApi from './crypto-worker-api';
 import { throwVirgilError, throwValidationError } from './utils/crypto-errors';
 import { sign } from './sign';
 
@@ -32,38 +32,11 @@ export function signAsync (data, privateKey, privateKeyPassword = '') {
 			}
 		});
 	} else {
-		let worker = createWorkerCryptoFunc(signAsyncWorker);
-
-		return worker(CryptoUtils.toBase64(data), CryptoUtils.toBase64(privateKey), privateKeyPassword).then(
+		return CryptoWorkerApi.sign(CryptoUtils.toBase64(data), CryptoUtils.toBase64(privateKey), privateKeyPassword).then(
 			// convert the base64 response to Buffer for support new interface
 			(result) => CryptoUtils.base64ToBuffer(result),
 			() => throwVirgilError('90005', { initialData: data, key: privateKey, password: privateKeyPassword })
 		);
-	}
-}
-
-function signAsyncWorker (initialData, privateKeyBase64, privateKeyPassword) {
-	let deferred = this.deferred();
-	let virgilSigner = new VirgilCryptoWorkerContext.VirgilSigner();
-
-	try {
-		let dataByteArray = VirgilCryptoWorkerContext.VirgilBase64.decode(initialData);
-		let privateKeyByteArray = VirgilCryptoWorkerContext.VirgilBase64.decode(privateKeyBase64);
-		let privateKeyPasswordByteArray = VirgilCryptoWorkerContext.VirgilByteArray.fromUTF8(privateKeyPassword);
-
-		let sign = virgilSigner.sign(dataByteArray, privateKeyByteArray, privateKeyPasswordByteArray);
-		let signBase64 = VirgilCryptoWorkerContext.VirgilBase64.encode(sign);
-
-		// cleanup memory to avoid memory leaks
-		dataByteArray.delete();
-		privateKeyByteArray.delete();
-		privateKeyPasswordByteArray.delete();
-
-		deferred.resolve(signBase64);
-	} catch (e) {
-		deferred.reject(e);
-	} finally {
-		virgilSigner.delete();
 	}
 }
 

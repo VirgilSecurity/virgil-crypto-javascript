@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import browser from 'bowser';
 import * as CryptoUtils from './utils/crypto-utils';
-import { createWorkerCryptoFunc } from './utils/create-worker-crypto-func';
+import CryptoWorkerApi from './crypto-worker-api';
 import { throwVirgilError, throwValidationError } from './utils/crypto-errors';
 import verify from './verify';
 
@@ -35,36 +35,11 @@ export function verifyAsync (data, publicKey, sign) {
 			}
 		});
 	} else {
-		let worker = createWorkerCryptoFunc(verifyAsyncWorker);
 		sign = Buffer.isBuffer(sign) ? CryptoUtils.toBase64(sign) : sign;
 
-		return worker(CryptoUtils.toBase64(data), publicKey, sign).catch(() => {
+		return CryptoWorkerApi.verify(CryptoUtils.toBase64(data), publicKey, sign).catch(() => {
 			throwVirgilError('90006', { initialData: data, key: publicKey, sign: sign });
 		});
-	}
-}
-
-// module functions
-function verifyAsyncWorker (initialData, publicKey, sign) {
-	let deferred = this.deferred();
-	let virgilSigner = new VirgilCryptoWorkerContext.VirgilSigner();
-
-	try {
-		let signByteArray = VirgilCryptoWorkerContext.VirgilBase64.decode(sign);
-		let dataByteArray = VirgilCryptoWorkerContext.VirgilBase64.decode(initialData);
-		let publicKeyByteArray = VirgilCryptoWorkerContext.VirgilByteArray.fromUTF8(publicKey);
-		let isVerified = virgilSigner.verify(dataByteArray, signByteArray, publicKeyByteArray);
-
-		// cleanup memory to avoid memory leaks
-		dataByteArray.delete();
-		publicKeyByteArray.delete();
-		signByteArray.delete();
-
-		deferred.resolve(isVerified);
-	} catch (e) {
-		deferred.reject(e);
-	} finally {
-		virgilSigner.delete();
 	}
 }
 

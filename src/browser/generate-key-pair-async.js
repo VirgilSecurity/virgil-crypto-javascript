@@ -1,7 +1,7 @@
 import browser from 'bowser';
 import * as CryptoUtils from './utils/crypto-utils';
 import KeysTypesEnum from '../lib/keys-types-enum';
-import { createWorkerCryptoFunc } from './utils/create-worker-crypto-func';
+import CryptoWorkerApi from './crypto-worker-api';
 import { throwVirgilError, throwValidationError } from './utils/crypto-errors';
 import { generateKeyPair } from './generate-key-pair';
 
@@ -51,29 +51,7 @@ export function generateKeyPairAsync (password, keysType) {
 			}
 		});
 	} else {
-		let worker = createWorkerCryptoFunc(generateKeyPairAsyncWorker);
-
-		return worker(password, keysType).catch(() => throwVirgilError('90007', { password: password }));
-	}
-}
-
-function generateKeyPairAsyncWorker (password, keysType) {
-	let deferred = this.deferred();
-
-	try {
-		let passwordByteArray = VirgilCryptoWorkerContext.VirgilByteArray.fromUTF8(password);
-		let virgilKeys = VirgilCryptoWorkerContext.VirgilKeyPair.generate(VirgilCryptoWorkerContext.VirgilKeyPair.Type[keysType], passwordByteArray);
-
-		let publicKey = virgilKeys.publicKey().toUTF8();
-		let privateKey = virgilKeys.privateKey().toUTF8(virgilKeys);
-
-		// cleanup memory to avoid memory leaks
-		passwordByteArray.delete();
-		virgilKeys.delete();
-
-		deferred.resolve({ publicKey: publicKey, privateKey: privateKey });
-	} catch (e) {
-		deferred.reject(e);
+		return CryptoWorkerApi.generateKeyPair(password, keysType).catch(() => throwVirgilError('90007', { password: password }));
 	}
 }
 

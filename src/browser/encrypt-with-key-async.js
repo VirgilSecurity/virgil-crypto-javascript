@@ -5,7 +5,7 @@ import { throwVirgilError } from './utils/crypto-errors';
 import { encryptWithKey } from './encrypt-with-key';
 
 export function encryptWithKeyAsync (initialData, recipientId, publicKey) {
-	if (browser.msie) {
+	if (browser.msie || browser.msedge) {
 		return new Promise((resolve, reject) => {
 			try {
 				resolve(encryptWithKey(initialData, recipientId, publicKey));

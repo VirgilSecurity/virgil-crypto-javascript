@@ -42,7 +42,7 @@ export function generateKeyPairAsync (password, keysType) {
 		throwValidationError('00002', { arg: 'keysType', type: `equal to one of ${_.values(KeysTypesEnum).join(', ')} - use the KeysTypesEnum for it.` });
 	}
 
-	if (browser.msie) {
+	if (browser.msie || browser.msedge) {
 		return new Promise((resolve, reject) => {
 			try {
 				resolve(generateKeyPair(password, keysType));

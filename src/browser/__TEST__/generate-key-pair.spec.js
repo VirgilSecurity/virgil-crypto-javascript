@@ -78,24 +78,25 @@ describe('generaKeyPair', () => {
 		});
 	});
 
-	//describe('with specific type', () => {
-	//	describe(`"${KEYS_TYPES_ENUM.Default}"`, () => {
-	//		beforeAll(() => {
-	//			keyPair = VirgilCrypto.generateKeyPair(KEYS_TYPES_ENUM.Default);
-	//		});
-  //
-	//		it('`publicKey` should be defined', () => {
-	//			expect(keyPair.publicKey).toBeDefined();
-	//		});
-  //
-	//		it('`privateKey` should be defined', () => {
-	//			expect(keyPair.privateKey).toBeDefined();
-	//		});
-  //
-	//		it('`privateKey` not encrypted', () => {
-	//			expect(keyPair.privateKey).not.toContain('ENCRYPTED');
-	//		});
-	//	});
+	describe('with specific type', () => {
+		describe(`"${KEYS_TYPES_ENUM.Default}"`, () => {
+			beforeAll(() => {
+				keyPair = VirgilCrypto.generateKeyPair(KEYS_TYPES_ENUM.Default);
+			});
+
+			it('`publicKey` should be defined', () => {
+				expect(keyPair.publicKey).toBeDefined();
+			});
+
+			it('`privateKey` should be defined', () => {
+				expect(keyPair.privateKey).toBeDefined();
+			});
+
+			it('`privateKey` not encrypted', () => {
+				expect(keyPair.privateKey).not.toContain('ENCRYPTED');
+			});
+		});
+	});
   //
 	//	describe(`"${KEYS_TYPES_ENUM.EC_BP256R1}"`, () => {
 	//		beforeAll(() => {
@@ -241,45 +242,9 @@ describe('generaKeyPair', () => {
 	//		});
 	//	});
   //
-	//	describe(`"${KEYS_TYPES_ENUM.EC_SECP192R1}"`, () => {
-	//		beforeAll(() => {
-	//			keyPair = VirgilCrypto.generateKeyPair(KEYS_TYPES_ENUM.EC_SECP192R1);
-	//		});
-  //
-	//		it('`publicKey` should be defined', () => {
-	//			expect(keyPair.publicKey).toBeDefined();
-	//		});
-  //
-	//		it('`privateKey` should be defined', () => {
-	//			expect(keyPair.privateKey).toBeDefined();
-	//		});
-  //
-	//		it('`privateKey` not encrypted', () => {
-	//			expect(keyPair.privateKey).not.toContain('ENCRYPTED');
-	//		});
-	//	});
-  //
 	//	describe(`"${KEYS_TYPES_ENUM.EC_SECP224K1}"`, () => {
 	//		beforeAll(() => {
 	//			keyPair = VirgilCrypto.generateKeyPair(KEYS_TYPES_ENUM.EC_SECP224K1);
-	//		});
-  //
-	//		it('`publicKey` should be defined', () => {
-	//			expect(keyPair.publicKey).toBeDefined();
-	//		});
-  //
-	//		it('`privateKey` should be defined', () => {
-	//			expect(keyPair.privateKey).toBeDefined();
-	//		});
-  //
-	//		it('`privateKey` not encrypted', () => {
-	//			expect(keyPair.privateKey).not.toContain('ENCRYPTED');
-	//		});
-	//	});
-  //
-	//	describe(`"${KEYS_TYPES_ENUM.EC_SECP224R1}"`, () => {
-	//		beforeAll(() => {
-	//			keyPair = VirgilCrypto.generateKeyPair(KEYS_TYPES_ENUM.EC_SECP224R1);
 	//		});
   //
 	//		it('`publicKey` should be defined', () => {
@@ -352,60 +317,6 @@ describe('generaKeyPair', () => {
 	//	describe(`"${KEYS_TYPES_ENUM.EC_SECP521R1}"`, () => {
 	//		beforeAll(() => {
 	//			keyPair = VirgilCrypto.generateKeyPair(KEYS_TYPES_ENUM.EC_SECP521R1);
-	//		});
-  //
-	//		it('`publicKey` should be defined', () => {
-	//			expect(keyPair.publicKey).toBeDefined();
-	//		});
-  //
-	//		it('`privateKey` should be defined', () => {
-	//			expect(keyPair.privateKey).toBeDefined();
-	//		});
-  //
-	//		it('`privateKey` not encrypted', () => {
-	//			expect(keyPair.privateKey).not.toContain('ENCRYPTED');
-	//		});
-	//	});
-  //
-	//	describe(`"${KEYS_TYPES_ENUM.RSA_256}"`, () => {
-	//		beforeAll(() => {
-	//			keyPair = VirgilCrypto.generateKeyPair(KEYS_TYPES_ENUM.RSA_256);
-	//		});
-  //
-	//		it('`publicKey` should be defined', () => {
-	//			expect(keyPair.publicKey).toBeDefined();
-	//		});
-  //
-	//		it('`privateKey` should be defined', () => {
-	//			expect(keyPair.privateKey).toBeDefined();
-	//		});
-  //
-	//		it('`privateKey` not encrypted', () => {
-	//			expect(keyPair.privateKey).not.toContain('ENCRYPTED');
-	//		});
-	//	});
-  //
-	//	describe(`"${KEYS_TYPES_ENUM.RSA_512}"`, () => {
-	//		beforeAll(() => {
-	//			keyPair = VirgilCrypto.generateKeyPair(KEYS_TYPES_ENUM.RSA_512);
-	//		});
-  //
-	//		it('`publicKey` should be defined', () => {
-	//			expect(keyPair.publicKey).toBeDefined();
-	//		});
-  //
-	//		it('`privateKey` should be defined', () => {
-	//			expect(keyPair.privateKey).toBeDefined();
-	//		});
-  //
-	//		it('`privateKey` not encrypted', () => {
-	//			expect(keyPair.privateKey).not.toContain('ENCRYPTED');
-	//		});
-	//	});
-  //
-	//	describe(`"${KEYS_TYPES_ENUM.RSA_1024}"`, () => {
-	//		beforeAll(() => {
-	//			keyPair = VirgilCrypto.generateKeyPair(KEYS_TYPES_ENUM.RSA_1024);
 	//		});
   //
 	//		it('`publicKey` should be defined', () => {

@@ -26,7 +26,7 @@ export function verifyAsync (data, publicKey, sign) {
 		throwValidationError('00001', { arg: 'sign', type: 'base64 String or Buffer' });
 	}
 
-	if (browser.msie) {
+	if (browser.msie || browser.msedge) {
 		return new Promise((resolve, reject) => {
 			try {
 				resolve(verify(data, publicKey, sign));

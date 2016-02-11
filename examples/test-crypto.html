@@ -10,6 +10,18 @@
 
 	<body>
 		<script type="text/javascript">
+			var origLog = console.log;
+			console.log = function() {
+				for (var i = 0; i < arguments.length; i++) {
+					var arg = arguments[i];
+					var div = document.createElement('div');
+					div.innerHTML = arg;
+					document.body.appendChild(div);
+				}
+
+				origLog.apply(console, arguments);
+			};
+
 			var virgilCrypto = window.VirgilCrypto;
 			var keysTypesEnum = virgilCrypto.KeysTypesEnum;
 			var privateKeyPassword = 'veryStrongPa$$0rd';
@@ -24,9 +36,9 @@
 			console.log('keyPairDefaultParams', keyPairDefaultParams);
 			var keyPairOnlyPassword = virgilCrypto.generateKeyPair('password');
 			console.log('keyPairOnlyPassword', keyPairOnlyPassword);
-			var keyPairPasswordAndType = virgilCrypto.generateKeyPair('password', keysTypesEnum.RSA_256);
+			var keyPairPasswordAndType = virgilCrypto.generateKeyPair('password', keysTypesEnum.EC_SECP256K1);
 			console.log('keyPairPasswordAndType', keyPairPasswordAndType);
-			var keyPairOnlyType = virgilCrypto.generateKeyPair(keysTypesEnum.RSA_256);
+			var keyPairOnlyType = virgilCrypto.generateKeyPair(keysTypesEnum.EC_SECP256K1);
 			console.log('keyPairOnlyType', keyPairOnlyType);
 
 			virgilCrypto.generateKeyPairAsync().then(function(keyPairAsyncDefaultParams) {
@@ -35,10 +47,10 @@
 			virgilCrypto.generateKeyPairAsync('password').then(function(keyPairAsyncOnlyPassword) {
 				console.log('keyPairAsyncOnlyPassword', keyPairAsyncOnlyPassword);
 			});
-			virgilCrypto.generateKeyPairAsync('password', keysTypesEnum.RSA_256).then(function(keyPairAsyncPasswordAndType) {
+			virgilCrypto.generateKeyPairAsync('password', keysTypesEnum.EC_SECP256K1).then(function(keyPairAsyncPasswordAndType) {
 				console.log('keyPairAsyncPasswordAndType', keyPairAsyncPasswordAndType);
 			});
-			virgilCrypto.generateKeyPairAsync(keysTypesEnum.RSA_256).then(function(keyPairAsyncOnlyType) {
+			virgilCrypto.generateKeyPairAsync(keysTypesEnum.EC_SECP256K1).then(function(keyPairAsyncOnlyType) {
 				console.log('keyPairAsyncOnlyType', keyPairAsyncOnlyType);
 			});
 

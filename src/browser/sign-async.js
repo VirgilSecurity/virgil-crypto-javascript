@@ -23,7 +23,7 @@ export function signAsync (data, privateKey, privateKeyPassword = '') {
 		throwValidationError('00001', { arg: 'privateKey', type: 'String' });
 	}
 
-	if (browser.msie) {
+	if (browser.msie || browser.msedge) {
 		return new Promise((resolve, reject) => {
 			try {
 				resolve(sign(data, privateKey, privateKeyPassword));

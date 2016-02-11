@@ -5,7 +5,7 @@ import { throwVirgilError } from './utils/crypto-errors';
 import { decryptWithPassword } from './decrypt-with-password';
 
 export function decryptWithPasswordAsync (initialEncryptedData, password = '') {
-	if (browser.msie) {
+	if (browser.msie || browser.msedge) {
 		return new Promise((resolve, reject) => {
 			try {
 				resolve(decryptWithPassword(initialEncryptedData, password));

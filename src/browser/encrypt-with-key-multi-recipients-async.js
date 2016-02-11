@@ -5,7 +5,7 @@ import { throwVirgilError } from './utils/crypto-errors';
 import { encryptWithKeyMultiRecipients } from './encrypt-with-key-multi-recipients';
 
 export function encryptWithKeyMultiRecipientsAsync (initialData, recipients) {
-	if (browser.msie) {
+	if (browser.msie || browser.msedge) {
 		return new Promise((resolve, reject) => {
 			try {
 				resolve(encryptWithKeyMultiRecipients(initialData, recipients));

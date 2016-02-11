@@ -5,7 +5,7 @@ import { throwVirgilError, throwValidationError } from './utils/crypto-errors';
 import { encryptWithPassword } from './encrypt-with-password';
 
 export function encryptWithPasswordAsync (initialData, password = '', isEmbeddedContentInfo = true) {
-	if (browser.msie) {
+	if (browser.msie || browser.msedge) {
 		return new Promise((resolve, reject) => {
 			try {
 				resolve(encryptWithPassword(initialData, password, isEmbeddedContentInfo));

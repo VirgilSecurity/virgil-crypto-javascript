@@ -49,16 +49,11 @@ In the table below you can see all types.
 
 | Key Type          | Description                    |
 |-------------------|--------------------------------|
-| Default      | recommended safest type     |
-| RSA_256      | RSA 1024 bit (not recommended) |
-| RSA_512      | RSA 1024 bit (not recommended) |
-| RSA_1024     | RSA 1024 bit (not recommended) |
+| Default      | recommended safest type        |
 | RSA_2048     | RSA 2048 bit (not recommended) |
 | RSA_3072     | RSA 3072 bit                   |
 | RSA_4096     | RSA 4096 bit                   |
 | RSA_8192     | RSA 8192 bit                   |
-| EC_SECP192R1 | 192-bits NIST curve            |
-| EC_SECP224R1 | 224-bits NIST curve            |
 | EC_SECP256R1 | 256-bits NIST curve            |
 | EC_SECP384R1 | 384-bits NIST curve            |
 | EC_SECP521R1 | 521-bits NIST curve            |

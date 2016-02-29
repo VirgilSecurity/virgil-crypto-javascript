@@ -1,4 +1,4 @@
-# Tutorial JavaScript Crypto Library [![Build Status](https://travis-ci.org/VirgilSecurity/virgil-crypto-javascript.svg?branch=master)](https://travis-ci.org/VirgilSecurity/virgil-crypto-javascript)
+# Tutorial JavaScript Crypto Library [![Build Status](https://travis-ci.org/VirgilSecurity/virgil-crypto-javascript.svg?branch=master)](https://travis-ci.org/VirgilSecurity/virgil-crypto-javascript) [![npm](https://img.shields.io/npm/v/virgil-crypto.svg)](https://www.npmjs.com/package/virgil-crypto)
 
 - [Install](#installation)
 - [Generate Keys](#generate-keys)

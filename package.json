@@ -16,7 +16,7 @@
     "postinstall": "node scripts/download-native-library.js",
     "build": "gulp build --debug && gulp build --production",
     "asm-update": "node scripts/download-asmjs-library.js",
-    "test": "gulp test",
+    "test": "./node_modules/.bin/mocha src/node/tests",
     "test-watch": "gulp test --debug --watch"
   },
   "author": "Virgil Security Inc. <support@virgilsecurity.com>",

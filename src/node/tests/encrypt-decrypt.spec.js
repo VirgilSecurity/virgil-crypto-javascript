@@ -95,10 +95,10 @@ describe('encrypt/decrypt', () => {
 		//expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
 	//});
 
-	it('using keys "EC_M511" without password', () => {
-		let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_M511);
-		expect(decryptedData).toEqual(INITIAL_DATA);
-	});
+	//it('using keys "EC_M511" without password', () => {
+		//let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_M511);
+		//expect(decryptedData).toEqual(INITIAL_DATA);
+	//});
 
 	//it('using keys "EC_M511" with password', () => {
 		//let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_M511, PASSWORD);

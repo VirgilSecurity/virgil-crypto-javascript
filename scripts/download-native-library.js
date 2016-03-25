@@ -7,7 +7,7 @@ var format = require('util').format;
 var destFilePath = path.resolve(__dirname + '/../virgil_js.node');
 var file = fs.createWriteStream(destFilePath);
 
-var url = 'https://cdn.virgilsecurity.com/packages/nodejs/virgil-crypto-1.3.0-nodejs-%s-%s-%s.node';
+var url = 'https://cdn.virgilsecurity.com/packages/nodejs/virgil-crypto-1.3.3-nodejs-%s-%s-%s.node';
 
 var nodeVersion = getNodeVersion();
 var platform = getPlatform();

@@ -3,17 +3,17 @@ var fs = require('fs');
 var path = require('path');
 var format = require('util').format;
 
-
 var destFilePath = path.resolve(__dirname + '/../virgil_js.node');
 var file = fs.createWriteStream(destFilePath);
 
-var url = 'https://cdn.virgilsecurity.com/packages/nodejs/virgil-crypto-1.3.4-nodejs-%s-%s-%s.node';
+var url = 'https://cdn.virgilsecurity.com/packages/nodejs/virgil-crypto-%s-nodejs-%s-%s-%s.node';
 
+var cryptoVersion = '1.4.0';
 var nodeVersion = getNodeVersion();
 var platform = getPlatform();
 var arch = getArch();
 
-url = format(url, nodeVersion, platform, arch);
+url = format(url, cryptoVersion, nodeVersion, platform, arch);
 
 console.log('Downloading native build.... %s', url);
 

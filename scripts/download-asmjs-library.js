@@ -3,7 +3,8 @@ var path = require('path');
 var del = require('del');
 var request = require('request');
 
-var downloadUrl = 'https://downloads.virgilsecurity.com/packages/asmjs/virgil-crypto-1.3.4-asmjs.js';
+var cryptoVersion = '1.4.0';
+var downloadUrl = 'https://cdn.virgilsecurity.com/packages/asmjs/virgil-crypto-' + cryptoVersion + '-asmjs.js';
 var downloadFilePath = path.join(__dirname, '../', 'virgil-emscripten.js');
 var libPath = path.resolve(path.join(__dirname, '../src/lib/virgil-emscripten.js'));
 

@@ -1,6 +1,6 @@
 {
   "name": "virgil-crypto",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Virgil Crypto",
   "contributors": [
     "Eugene Baranov <ebaranov.dev@gmail.com> (https://github.com/ebaranov/)",
@@ -31,14 +31,14 @@
   ],
   "license": "BSD",
   "dependencies": {
-    "bowser": "^1.0.0",
-    "buffer": "^4.0.0",
-    "es6-error": "^2.0.2",
     "lodash": "^4.0.0",
-    "node-uuid": "^1.4.7",
-    "operative": "^0.4.4"
+    "node-uuid": "^1.4.7"
   },
   "devDependencies": {
+    "es6-error": "^2.0.2",
+    "operative": "^0.4.4",
+    "buffer": "^4.0.0",
+    "bowser": "^1.0.0",
     "babel": "^5.8.21",
     "babel-loader": "^5.3.2",
     "babel-runtime": "^5.8.20",

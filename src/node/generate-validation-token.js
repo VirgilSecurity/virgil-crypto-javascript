@@ -11,10 +11,6 @@ module.exports = function generateValidationToken (identityValue, identityType, 
 		throw new TypeError('identityValue must be a string');
 	}
 
-	if (!(identityType in IdentityTypes)) {
-		throw new TypeError('Invalid identityType');
-	}
-
 	if (!_.isString(privateKey)) {
 		throw new TypeError('privateKey msut be string');
 	}

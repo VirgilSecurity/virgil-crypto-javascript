@@ -8,10 +8,13 @@ var decryptStringFromBase64 = require('./decrypt-string-from-base64');
 var sign = require('./sign');
 var verify = require('./verify');
 var generateValidationToken = require('./generate-validation-token');
+var obfuscate = require('./obfuscate');
+var PBKDFHashTypes = require('./PBKDF-hash-types');
 
 module.exports = {
 	KeysTypesEnum: KeysTypesEnum,
-	IdentityTypesEnum,: IdentityTypes,
+	IdentityTypesEnum: IdentityTypes,
+	PBKDFHashTypes: PBKDFHashTypes,
 	generateKeyPair: generateKeyPair,
 	encrypt: encrypt,
 	encryptStringToBase64: encryptStringToBase64,
@@ -19,5 +22,6 @@ module.exports = {
 	decryptStringFromBase64: decryptStringFromBase64,
 	sign: sign,
 	verify: verify,
-	generateValidationToken: generateValidationToken
+	generateValidationToken: generateValidationToken,
+	obfuscate: obfuscate
 };

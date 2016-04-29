@@ -12,4 +12,5 @@ export { verify } from './verify';
 export { verifyAsync } from './verify-async';
 export { generateKeyPair } from './generate-key-pair';
 export { generateKeyPairAsync } from './generate-key-pair-async';
+export { generateValidationToken } from './generate-validation-token';
 export { default as KeysTypesEnum } from '../lib/keys-types-enum';

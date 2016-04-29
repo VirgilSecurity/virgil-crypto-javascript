@@ -11,7 +11,7 @@
     "url": "https://github.com/VirgilSecurity/virgil-crypto-javascript"
   },
   "main": "index.js",
-  "browser": "dist/virgil-crypto.min.js",
+  "browser": "dist/virgil-crypto.dev.js",
   "scripts": {
     "postinstall": "node scripts/download-native-library.js",
     "build": "gulp build --debug && gulp build --production",
@@ -35,6 +35,7 @@
     "buffer": "^4.0.0",
     "es6-error": "^2.0.2",
     "lodash": "^4.0.0",
+    "node-uuid": "^1.4.7",
     "operative": "^0.4.4"
   },
   "devDependencies": {

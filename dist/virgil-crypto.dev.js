@@ -81,7 +81,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			return _buffer.Buffer;
 		}
 	});
-	var Version = ("1.4.0");
+	var Version = ("1.5.2");
 	exports.Version = Version;
 	var VirgilCrypto = babelHelpers._extends({ Buffer: Buffer }, VirgilCryptoAPI);
 	exports.VirgilCrypto = VirgilCrypto;
@@ -24860,7 +24860,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = {
 		email: 'email',
-		custom: 'custon'
+		application: 'application'
 	};
 
 /***/ },

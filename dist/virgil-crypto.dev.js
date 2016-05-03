@@ -81,7 +81,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			return _buffer.Buffer;
 		}
 	});
-	var Version = ("1.5.3");
+	var Version = ("1.5.4");
 	exports.Version = Version;
 	var VirgilCrypto = babelHelpers._extends({ Buffer: Buffer }, VirgilCryptoAPI);
 	exports.VirgilCrypto = VirgilCrypto;
@@ -24309,12 +24309,12 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 
 		if (!_lodash2['default'].isString(privateKey)) {
-			throw new TypeError('privateKey msut be string');
+			throw new TypeError('privateKey must be string');
 		}
 
 		var uid = _nodeUuid2['default'].v4();
 		var signature = (0, _sign2['default'])(uid + identityType + identityValue, privateKey, privateKeyPassword);
-		var validationToken = Buffer.concat([new Buffer(uid), new Buffer('.'), signature]);
+		var validationToken = Buffer.concat([new Buffer(uid), new Buffer('.'), new Buffer(signature.toString('base64'))]);
 		return validationToken.toString('base64');
 	}
 

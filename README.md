@@ -35,7 +35,7 @@
 ```sh
 npm install virgil-crypto
 ```
-Or install Virgil SDK with Virgil Crypto: 
+Or install Virgil SDK with Virgil Crypto (recommended): 
 
 ```sh
 npm install virgil-sdk
@@ -45,7 +45,7 @@ npm install virgil-sdk
 ```sh
 bower install virgil-crypto
 ```
-Or install Virgil SDK with Virgil Crypto: 
+Or install Virgil SDK with Virgil Crypto(recommended): 
 
 ```sh
 bower install virgil-sdk

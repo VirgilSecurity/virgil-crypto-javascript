@@ -58,7 +58,7 @@ src="https://cdn.virgilsecurity.com/packages/javascript/crypto/1.5.5/virgil-cryp
 integrity="sha256-3W5xboDke1qIoYdoIGh3alQWUBMElS+lIyGL2JAjYhE=" 
 crossorigin="anonymous"></script>
 ```
-Or install Virgil SDK with Virgil Crypto:
+Or install Virgil SDK with Virgil Crypto (recommended):
 
 ```html
 <script 

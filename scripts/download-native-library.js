@@ -46,7 +46,7 @@ function getPlatform () {
 	}
 
 	if (process.platform === 'win32') {
-		return 'windows-6.2';
+		return 'windows-6.3';
 	}
 
 	return process.platform;

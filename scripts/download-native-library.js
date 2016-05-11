@@ -8,7 +8,7 @@ var file = fs.createWriteStream(destFilePath);
 
 var url = 'https://cdn.virgilsecurity.com/packages/nodejs/virgil-crypto-%s-nodejs-%s-%s-%s.node';
 
-var cryptoVersion = '1.5.1';
+var cryptoVersion = '1.6.0';
 var nodeVersion = getNodeVersion();
 var platform = getPlatform();
 var arch = getArch();
@@ -69,7 +69,17 @@ function getNodeVersion () {
 
 	// Use same build for node 4.*.*
 	if (versionTokens[0] == 'v4') {
-		return '4.1.0';
+		return '4.4.4';
+	}
+
+	// Use same build for node 5.*.*
+	if (versionTokens[0] == 'v5') {
+		return '5.9.1';
+	}
+
+	// Use same build for node 6.*.*
+	if (versionTokens[0] == 'v6') {
+		return '6.1.0';
 	}
 
 	// Use same build for node 0.12.*

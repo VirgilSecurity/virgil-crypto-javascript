@@ -2,13 +2,13 @@
 var VirgilCrypto = require('../');
 var expect = require('expect');
 
-const PASSWORD = 'veryStrongPa$$0rd';
-const IDENTITY_VALUE = 'email@example.com';
+var PASSWORD = 'veryStrongPa$$0rd';
+var IDENTITY_VALUE = 'email@example.com';
 
-describe('generateValidationToken', () => {
-	it('Validation token is generated', () => {
-		let keyPair = VirgilCrypto.generateKeyPair(PASSWORD);
-		let validationToken = VirgilCrypto.generateValidationToken(
+describe('generateValidationToken', function () {
+	it('Validation token is generated', function () {
+		var keyPair = VirgilCrypto.generateKeyPair(PASSWORD);
+		var validationToken = VirgilCrypto.generateValidationToken(
 			IDENTITY_VALUE,
 			VirgilCrypto.IdentityTypesEnum.custom,
 			keyPair.privateKey,

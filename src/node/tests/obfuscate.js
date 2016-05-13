@@ -2,15 +2,15 @@
 var VirgilCrypto = require('../');
 var expect = require('expect');
 
-describe('obfuscate', () => {
-	it('it obfuscates strings', () => {
+describe('obfuscate', function () {
+	it('it obfuscates strings', function () {
 		var o1 = VirgilCrypto.obfuscate('asfasfas', 'qwqeqwe');
 		var o2 = VirgilCrypto.obfuscate('asfasfas', 'qwqeqwe');
 		expect(typeof o1).toEqual('string');
 		expect(o1).toEqual(o2);
 	});
 
-	it('different salt -> different result', () => {
+	it('different salt -> different result', function () {
 		var o1 = VirgilCrypto.obfuscate('asfasfas', 'qwqeqwe');
 		var o2 = VirgilCrypto.obfuscate('asfasfas', 'qwqeqwe2');
 		expect(typeof o1).toEqual('string');

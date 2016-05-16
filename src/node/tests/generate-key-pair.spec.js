@@ -99,4 +99,16 @@ describe('generaKeyPair', function () {
 			});
 		});
 	});
+
+	describe('Change private key password', function () {
+		var firstPassword = 'qwerty1';
+		var secondPassword = 'qwerty2';
+		var data = 'abc';
+		var recipientId = 'im id';
+		var keyPair = VirgilCrypto.generateKeyPair(firstPassword);
+		var updatedPrivateKey = VirgilCrypto.changePrivateKeyPassword(keyPair.privateKey, firstPassword, secondPassword);
+		var encryptedData = VirgilCrypto.encrypt(data, recipientId, keyPair.publicKey, secondPassword);
+		var decryptedData = VirgilCrypto.decrypt(encryptedData, recipientId, updatedPrivateKey, secondPassword);
+		expect(decryptedData.toString('utf8')).toContain(data);
+	});
 });

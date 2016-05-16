@@ -1,27 +1,15 @@
-var KeysTypesEnum = require('../lib/keys-types-enum');
-var IdentityTypes = require('../lib/identity-types');
-var generateKeyPair = require('./generate-key-pair');
-var encrypt = require('./encrypt');
-var encryptStringToBase64 = require('./encrypt-string-to-base64');
-var decrypt = require('./decrypt');
-var decryptStringFromBase64 = require('./decrypt-string-from-base64');
-var sign = require('./sign');
-var verify = require('./verify');
-var generateValidationToken = require('./generate-validation-token');
-var obfuscate = require('./obfuscate');
-var PBKDFHashTypes = require('./PBKDF-hash-types');
-
 module.exports = {
-	KeysTypesEnum: KeysTypesEnum,
-	IdentityTypesEnum: IdentityTypes,
-	PBKDFHashTypes: PBKDFHashTypes,
-	generateKeyPair: generateKeyPair,
-	encrypt: encrypt,
-	encryptStringToBase64: encryptStringToBase64,
-	decrypt: decrypt,
-	decryptStringFromBase64: decryptStringFromBase64,
-	sign: sign,
-	verify: verify,
-	generateValidationToken: generateValidationToken,
-	obfuscate: obfuscate
+	KeysTypesEnum: require('../lib/keys-types-enum'),
+	IdentityTypesEnum: require('../lib/identity-types'),
+	PBKDFHashTypes: require('./PBKDF-hash-types'),
+	generateKeyPair: require('./generate-key-pair'),
+	encrypt: require('./encrypt'),
+	encryptStringToBase64: require('./encrypt-string-to-base64'),
+	decrypt: require('./decrypt'),
+	decryptStringFromBase64: require('./decrypt-string-from-base64'),
+	sign: require('./sign'),
+	verify: require('./verify'),
+	generateValidationToken: require('./generate-validation-token'),
+	obfuscate: require('./obfuscate'),
+	changePrivateKeyPassword: require('./change-private-key-password')
 };

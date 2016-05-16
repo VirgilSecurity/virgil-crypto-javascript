@@ -13,6 +13,7 @@ export { verifyAsync } from './verify-async';
 export { generateKeyPair } from './generate-key-pair';
 export { generateKeyPairAsync } from './generate-key-pair-async';
 export { generateValidationToken } from './generate-validation-token';
+export { changePrivateKeyPassword } from './change-private-key-password';
 export { obfuscate } from './obfuscate';
 export { default as KeysTypesEnum } from '../lib/keys-types-enum';
 export { default as IdentityTypesEnum } from '../lib/identity-types';

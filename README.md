@@ -78,7 +78,7 @@ Quickstart guide for making your own E2E encrypted IP Messaging is: [here](https
 The following code example creates a new public/private key pair.
 
 ```javascript
-var keyPair = virgilCrypto.generateKeyPair();
+var keyPair = VirgilCrypto.generateKeyPair();
 console.log('Key pair without password: ', keyPair);
 ```
 
@@ -109,16 +109,16 @@ In the table below you can see all types.
 
 
 ```javascript
-var keyPairRsa2048 = virgilCrypto.generateKeyPair(virgilCrypto.KeysTypesEnum.RSA_2048);
+var keyPairRsa2048 = VirgilCrypto.generateKeyPair(VirgilCrypto.KeysTypesEnum.RSA_2048);
 console.log('Key pair RSA_2048 without password: ', keyPairRsa2048);
 
 var KEY_PASSWORD = 'password';
-var keyPairWithPassword = virgilCrypto.generateKeyPair(KEY_PASSWORD);
+var keyPairWithPassword = VirgilCrypto.generateKeyPair(KEY_PASSWORD);
 console.log('Key pair with password: ', keyPairWithPassword);
 
 
 var KEY_PASSWORD = 'password';
-var keyPairWithPasswordAndSpecificType = virgilCrypto.generateKeyPair(KEY_PASSWORD, virgilCrypto.KeysTypesEnum.RSA_2048);
+var keyPairWithPasswordAndSpecificType = VirgilCrypto.generateKeyPair(KEY_PASSWORD, VirgilCrypto.KeysTypesEnum.RSA_2048);
 console.log('Key pair RSA_2048 with password: ', keyPairWithPasswordAndSpecificType);
 ```
 
@@ -314,14 +314,14 @@ Crypto Library allows to encrypt the data for several types of recipient's user 
 
 > Encrypted data will be returned as a [Buffer](https://github.com/feross/buffer).
 
-> The [Buffer](https://github.com/feross/buffer) constructor is available by ```virgilCrypto.Buffer```.
+> The [Buffer](https://github.com/feross/buffer) constructor is available by ```VirgilCrypto.Buffer```.
 
 ```javascript
 var INITIAL_DATA = 'data to be encrypted';
 var PASSWORD = 'password';
 
-var encryptedData = virgilCrypto.encrypt(INITIAL_DATA, PASSWORD);
-var decryptedData = virgilCrypto.decrypt(encryptedData, PASSWORD);
+var encryptedData = VirgilCrypto.encrypt(INITIAL_DATA, PASSWORD);
+var decryptedData = VirgilCrypto.decrypt(encryptedData, PASSWORD);
 
 console.log('Encrypted data: ' + encryptedData);
 console.log('Decrypted data: ' + decryptedData.toString());
@@ -335,11 +335,11 @@ console.log('Decrypted data: ' + decryptedData.toString());
 var INITIAL_DATA = 'data to be encrypted';
 var PASSWORD = 'password';
 
-virgilCrypto.encryptAsync(INITIAL_DATA, PASSWORD)
+VirgilCrypto.encryptAsync(INITIAL_DATA, PASSWORD)
   .then(function(encryptedData) {
     console.log('Encrypted data: ' + encryptedData);
 
-    virgilCrypto.decryptAsync(encryptedData, PASSWORD)
+    VirgilCrypto.decryptAsync(encryptedData, PASSWORD)
       .then(function(decryptedData) {
         console.log('Decrypted data: ' + decryptedData.toString());
       });
@@ -352,7 +352,7 @@ virgilCrypto.encryptAsync(INITIAL_DATA, PASSWORD)
 
 > Encrypted data will be returned as a [Buffer](https://github.com/feross/buffer).
 
-> The [Buffer](https://github.com/feross/buffer) constructor is available by ```virgilCrypto.Buffer```.
+> The [Buffer](https://github.com/feross/buffer) constructor is available by ```VirgilCrypto.Buffer```.
 
 ### Using Key with Password
 
@@ -361,9 +361,9 @@ var KEY_PASSWORD = 'password';
 var INITIAL_DATA = 'data to be encrypted';
 var RECIPIENT_ID = '<SOME_RECIPIENT_ID>';
 
-var keyPair = virgilCrypto.generateKeyPair(KEY_PASSWORD);
-var encryptedData = virgilCrypto.encrypt(INITIAL_DATA, RECIPIENT_ID, keyPair.publicKey);
-var decryptedData = virgilCrypto.decrypt(encryptedData, RECIPIENT_ID, keyPair.privateKey, KEY_PASSWORD);
+var keyPair = VirgilCrypto.generateKeyPair(KEY_PASSWORD);
+var encryptedData = VirgilCrypto.encrypt(INITIAL_DATA, RECIPIENT_ID, keyPair.publicKey);
+var decryptedData = VirgilCrypto.decrypt(encryptedData, RECIPIENT_ID, keyPair.privateKey, KEY_PASSWORD);
 
 console.log('Encrypted data: ' + encryptedData);
 console.log('Decrypted data: ' + decryptedData.toString());
@@ -376,10 +376,10 @@ var KEY_PASSWORD = 'password';
 var INITIAL_DATA = 'data to be encrypted';
 var RECIPIENT_ID = '<SOME_RECIPIENT_ID>';
 
-var keyPair = virgilCrypto.generateKeyPair(KEY_PASSWORD);
+var keyPair = VirgilCrypto.generateKeyPair(KEY_PASSWORD);
 var recipientsList = [{ recipientId: RECIPIENT_ID, publicKey: keyPair.publicKey }];
-var encryptedData = virgilCrypto.encrypt(INITIAL_DATA, recipientsList);
-var decryptedData = virgilCrypto.decrypt(encryptedData, RECIPIENT_ID, keyPair.privateKey, KEY_PASSWORD);
+var encryptedData = VirgilCrypto.encrypt(INITIAL_DATA, recipientsList);
+var decryptedData = VirgilCrypto.decrypt(encryptedData, RECIPIENT_ID, keyPair.privateKey, KEY_PASSWORD);
 
 console.log('Encrypted data: ' + encryptedData);
 console.log('Decrypted data: ' + decryptedData.toString());
@@ -394,13 +394,13 @@ var KEY_PASSWORD = 'password';
 var INITIAL_DATA = 'data to be encrypted';
 var RECIPIENT_ID = '<SOME_RECIPIENT_ID>';
 
-virgilCrypto.generateKeyPairAsync(KEY_PASSWORD)
+VirgilCrypto.generateKeyPairAsync(KEY_PASSWORD)
   .then(function(keyPair) {
-    virgilCrypto.encryptAsync(INITIAL_DATA, RECIPIENT_ID, keyPair.publicKey)
+    VirgilCrypto.encryptAsync(INITIAL_DATA, RECIPIENT_ID, keyPair.publicKey)
       .then(function(encryptedData) {
         console.log('Encrypted data: ' + encryptedData);
 
-        virgilCrypto.decryptAsync(encryptedData, RECIPIENT_ID, keyPair.privateKey, KEY_PASSWORD)
+        VirgilCrypto.decryptAsync(encryptedData, RECIPIENT_ID, keyPair.privateKey, KEY_PASSWORD)
           .then(function(decryptedData) {
             console.log('Decrypted data: ' + decryptedData.toString());
           });
@@ -417,15 +417,15 @@ var KEY_PASSWORD = 'password';
 var INITIAL_DATA = 'data to be encrypted';
 var RECIPIENT_ID = '<SOME_RECIPIENT_ID>';
 
-virgilCrypto.generateKeyPairAsync(KEY_PASSWORD)
+VirgilCrypto.generateKeyPairAsync(KEY_PASSWORD)
   .then(function(keyPair) {
     var recipientsList = [{ recipientId: RECIPIENT_ID, publicKey: keyPair.publicKey }];
     
-    virgilCrypto.encryptAsync(INITIAL_DATA, recipientsList)
+    VirgilCrypto.encryptAsync(INITIAL_DATA, recipientsList)
       .then(function(encryptedData) {
         console.log('Encrypted data: ' + encryptedData);
 
-        virgilCrypto.decryptAsync(encryptedData, RECIPIENT_ID, keyPair.privateKey, KEY_PASSWORD)
+        VirgilCrypto.decryptAsync(encryptedData, RECIPIENT_ID, keyPair.privateKey, KEY_PASSWORD)
           .then(function(decryptedData) {
             console.log('Decrypted data: ' + decryptedData.toString());
           });
@@ -439,9 +439,9 @@ virgilCrypto.generateKeyPairAsync(KEY_PASSWORD)
 var INITIAL_DATA = 'data to be encrypted';
 var RECIPIENT_ID = '<SOME_RECIPIENT_ID>';
 
-var keyPair = virgilCrypto.generateKeyPair();
-var encryptedData = virgilCrypto.encrypt(INITIAL_DATA, RECIPIENT_ID, keyPair.publicKey);
-var decryptedData = virgilCrypto.decrypt(encryptedData, RECIPIENT_ID, keyPair.privateKey);
+var keyPair = VirgilCrypto.generateKeyPair();
+var encryptedData = VirgilCrypto.encrypt(INITIAL_DATA, RECIPIENT_ID, keyPair.publicKey);
+var decryptedData = VirgilCrypto.decrypt(encryptedData, RECIPIENT_ID, keyPair.privateKey);
 
 console.log('Encrypted data: ' + encryptedData);
 console.log('Decrypted data: ' + decryptedData.toString());
@@ -455,13 +455,13 @@ console.log('Decrypted data: ' + decryptedData.toString());
 var INITIAL_DATA = 'data to be encrypted';
 var RECIPIENT_ID = '<SOME_RECIPIENT_ID>';
 
-virgilCrypto.generateKeyPairAsync()
+VirgilCrypto.generateKeyPairAsync()
   .then(function(keyPair) {
-    virgilCrypto.encryptAsync(INITIAL_DATA, RECIPIENT_ID, keyPair.publicKey)
+    VirgilCrypto.encryptAsync(INITIAL_DATA, RECIPIENT_ID, keyPair.publicKey)
       .then(function(encryptedData) {
         console.log('Encrypted data: ' + encryptedData);
 
-        virgilCrypto.decryptAsync(encryptedData, RECIPIENT_ID, keyPair.privateKey)
+        VirgilCrypto.decryptAsync(encryptedData, RECIPIENT_ID, keyPair.privateKey)
           .then(function(decryptedData) {
             console.log('Decrypted data: ' + decryptedData.toString());
           });
@@ -479,7 +479,7 @@ The following example applies a digital signature to a public key identifier.
 
 > Encrypted data will be returned as a [Buffer](https://github.com/feross/buffer).
 
-> The [Buffer](https://github.com/feross/buffer) constructor is available by ```virgilCrypto.Buffer```.
+> The [Buffer](https://github.com/feross/buffer) constructor is available by ```VirgilCrypto.Buffer```.
 
 ### With Password
 
@@ -488,9 +488,9 @@ var KEY_PASSWORD = 'password';
 var INITIAL_DATA = 'data to be encrypted';
 var RECIPIENT_ID = '<SOME_RECIPIENT_ID>';
 
-var keyPair = virgilCrypto.generateKeyPair(KEY_PASSWORD);
-var encryptedData = virgilCrypto.encrypt(INITIAL_DATA, RECIPIENT_ID, keyPair.publicKey);
-var sign = virgilCrypto.sign(encryptedData, keyPair.privateKey, KEY_PASSWORD);
+var keyPair = VirgilCrypto.generateKeyPair(KEY_PASSWORD);
+var encryptedData = VirgilCrypto.encrypt(INITIAL_DATA, RECIPIENT_ID, keyPair.publicKey);
+var sign = VirgilCrypto.sign(encryptedData, keyPair.privateKey, KEY_PASSWORD);
 ```
 
 To verify that the data was signed by a particular party, you need the following information:
@@ -502,7 +502,7 @@ To verify that the data was signed by a particular party, you need the following
 The following example verifies a digital signature which was signed by the sender.
 
 ```javascript
-var isDataVerified = virgilCrypto.verify(encryptedData, keyPair.publicKey, sign);
+var isDataVerified = VirgilCrypto.verify(encryptedData, keyPair.publicKey, sign);
 
 console.log('Encrypted data: ' + encryptedData);
 console.log('Sign: ' + sign.toString('base64'));
@@ -518,17 +518,17 @@ var KEY_PASSWORD = 'password';
 var INITIAL_DATA = 'data to be encrypted';
 var RECIPIENT_ID = '<SOME_RECIPIENT_ID>';
 
-virgilCrypto.generateKeyPairAsync(KEY_PASSWORD)
+VirgilCrypto.generateKeyPairAsync(KEY_PASSWORD)
   .then(function(keyPair) {
-    virgilCrypto.encryptAsync(INITIAL_DATA, RECIPIENT_ID, keyPair.publicKey)
+    VirgilCrypto.encryptAsync(INITIAL_DATA, RECIPIENT_ID, keyPair.publicKey)
       .then(function(encryptedData) {
         console.log('Encrypted data: ' + encryptedData);
 
-        virgilCrypto.signAsync(encryptedData, keyPair.privateKey, KEY_PASSWORD)
+        VirgilCrypto.signAsync(encryptedData, keyPair.privateKey, KEY_PASSWORD)
           .then(function(sign) {
             console.log('Sign: ' + sign.toString('base64'));
 
-            virgilCrypto.verifyAsync(encryptedData, keyPair.publicKey, sign)
+            VirgilCrypto.verifyAsync(encryptedData, keyPair.publicKey, sign)
               .then(function(isDataVerified) {
                 console.log('Is data verified: ' + isDataVerified);
               });

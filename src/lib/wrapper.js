@@ -21,6 +21,14 @@ module.exports = function createWrapper (utils) {
 
 	// Add type conversions to class methods
 	function wrapPrototype (root, className) {
+		// asmjs bindings
+		for (var i in root[className].prototype) {
+			if (typeof root[className].prototype[i] === 'function') {
+				root[className].prototype[i] = wrapFunction(root[className].prototype[i]);
+			}
+		}
+
+		// Node bindings
 		for (var i in root[className].prototype.__proto__) {
 			if (typeof root[className].prototype.__proto__[i] === 'function') {
 				root[className].prototype.__proto__[i] = wrapFunction(root[className].prototype.__proto__[i]);

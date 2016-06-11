@@ -1,5 +1,6 @@
 import VirgilCrypto from './crypto-module';
 import { Buffer } from 'buffer';
+import createWrapper from '../../lib/wrapper';
 
 export const bufferToByteArray = (buffer) => {
 	let array = VirgilCrypto.VirgilBase64.decode(buffer.toString('base64'));
@@ -42,3 +43,5 @@ export const toBase64 = (data) => VirgilCrypto.VirgilBase64.encode(toByteArray(d
 export const base64ToBuffer = (data) => byteArrayToBuffer(VirgilCrypto.VirgilBase64.decode(data));
 
 export const stringToBuffer = (data) => byteArrayToBuffer(toByteArray(data));
+
+export const wrapper = createWrapper({ toByteArray, byteArrayToBuffer });

@@ -1,3 +1,8 @@
+import { wrapper } from './utils/crypto-utils';
+import Virgil from './utils/crypto-module';
+
+wrapper.wrapPrototype(Virgil, 'VirgilTinyCipher');
+
 export { encrypt } from './encrypt';
 export { encryptStringToBase64 } from './encrypt-string-to-base64';
 export { encryptAsync } from './encrypt-async';
@@ -17,4 +22,5 @@ export { changePrivateKeyPassword } from './change-private-key-password';
 export { obfuscate } from './obfuscate';
 export { default as KeysTypesEnum } from '../lib/keys-types-enum';
 export { default as IdentityTypesEnum } from '../lib/identity-types';
-export { VirgilPBKDFHash as PBKDFHashTypes } from './utils/crypto-module';
+export const PBKDFHashTypes = Virgil.VirgilPBKDFHash;
+export const VirgilTinyCipher = Virgil.VirgilTinyCipher;

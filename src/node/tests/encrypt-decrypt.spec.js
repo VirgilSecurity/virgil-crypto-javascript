@@ -164,4 +164,17 @@ describe('encrypt/decrypt', function () {
 		var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP521R1, PASSWORD);
 		expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
 	});
+
+	it('Tiny Cipher', function () {
+		var data = 'this is sample data';
+		var keyPair = VirgilCrypto.generateKeyPair();
+		var tiny = new VirgilCrypto.VirgilTinyCipher(128);
+		tiny.encrypt(data, keyPair.publicKey);
+		var encryptedPackage = tiny.getPackage(0);
+
+		var decryptTiny = new VirgilCrypto.VirgilTinyCipher(128);
+		decryptTiny.addPackage(encryptedPackage);
+		expect(decryptTiny.isPackagesAccumulated()).toEqual(true);
+		expect(decryptTiny.decrypt(keyPair.privateKey).toString('utf8')).toEqual(data);
+	});
 });

@@ -1,3 +1,7 @@
+var Virgil = require('../../virgil_js');
+var wrapper = require('../lib/wrapper')(require('./utils'));
+wrapper.wrapPrototype(Virgil, 'VirgilTinyCipher');
+
 module.exports = {
 	KeysTypesEnum: require('../lib/keys-types-enum'),
 	IdentityTypesEnum: require('../lib/identity-types'),
@@ -11,5 +15,6 @@ module.exports = {
 	verify: require('./verify'),
 	generateValidationToken: require('./generate-validation-token'),
 	obfuscate: require('./obfuscate'),
-	changePrivateKeyPassword: require('./change-private-key-password')
+	changePrivateKeyPassword: require('./change-private-key-password'),
+	VirgilTinyCipher: Virgil.VirgilTinyCipher
 };

@@ -8,7 +8,7 @@ var file = fs.createWriteStream(destFilePath);
 
 var url = 'https://cdn.virgilsecurity.com/packages/nodejs/virgil-crypto-%s-nodejs-%s-%s-%s.node';
 
-var cryptoVersion = '1.7.0';
+var cryptoVersion = '1.8.1';
 var nodeVersion = getNodeVersion();
 var platform = getPlatform();
 var arch = getArch();

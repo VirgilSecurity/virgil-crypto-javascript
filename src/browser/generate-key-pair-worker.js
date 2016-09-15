@@ -1,12 +1,18 @@
 export default function(password, keysType) {
-	let deferred = this.deferred();
+	const deferred = this.deferred();
+	const KeyPair = VirgilCryptoWorkerContext.VirgilKeyPair;
 
 	try {
-		let passwordByteArray = VirgilCryptoWorkerContext.VirgilByteArray.fromUTF8(password);
-		let virgilKeys = VirgilCryptoWorkerContext.VirgilKeyPair.generate(VirgilCryptoWorkerContext.VirgilKeyPair.Type[keysType], passwordByteArray);
+		const passwordByteArray = VirgilCryptoWorkerContext.VirgilByteArray.fromUTF8(password);
+		let virgilKeys;
+		if (keysType) {
+			virgilKeys = KeyPair.generate(KeyPair.Type[keysType], passwordByteArray);
+		} else {
+			virgilKeys = KeyPair.generateRecommended(passwordByteArray);
+		}
 
-		let publicKey = virgilKeys.publicKey().toUTF8();
-		let privateKey = virgilKeys.privateKey().toUTF8(virgilKeys);
+		const publicKey = virgilKeys.publicKey().toUTF8();
+		const privateKey = virgilKeys.privateKey().toUTF8();
 
 		// cleanup memory to avoid memory leaks
 		passwordByteArray.delete();

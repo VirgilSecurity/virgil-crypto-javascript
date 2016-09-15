@@ -1,57 +1,43 @@
 import browser from 'bowser';
-import * as CryptoUtils from './utils/crypto-utils';
 import KeysTypesEnum from '../lib/keys-types-enum';
 import CryptoWorkerApi from './crypto-worker-api';
 import { throwVirgilError, throwValidationError } from './utils/crypto-errors';
 import { generateKeyPair } from './generate-key-pair';
 
 /**
- * Generate the key pair - public and private keys using workers
+ * Asynchronously generate the key pair - public and private keys.
  *
- * @param [password = ''] {string}
- * @param [keysType = 'Default'] {string}
- * @returns {Promise}
+ * @param {Object} [options={}] - Keys options.
+ * @param {string=} options.password - Private key password (Optional).
+ * @param {string=} options.type - Keys type identifier (Optional). If provided must be one of KeysTypesEnum values.
+ * @returns {Promise<{publicKey: *, privateKey: *}>}
  */
-export function generateKeyPairAsync (password, keysType) {
-	switch (arguments.length) {
-		case 1:
-			if (KeysTypesEnum[password]) {
-				keysType = KeysTypesEnum[password];
-				password = '';
-			} else {
-				keysType = KeysTypesEnum.Default;
-			}
-			break;
+export function generateKeyPairAsync (options = {}) {
+	const password = options.password || '';
+	let keysType = options.type;
 
-		case 2:
-			keysType = KeysTypesEnum[keysType];
-			break;
-
-		case 0:
-		default:
-			password = '';
-			keysType = KeysTypesEnum.Default;
-			break;
+	if (keysType && !KeysTypesEnum.hasOwnProperty(keysType)) {
+		throwValidationError('00003', {
+			arg: 'keysType',
+			text: `must be one of ${_.values(KeysTypesEnum).join(', ')} - use the KeysTypesEnum to get it.`
+		});
 	}
 
 	if (!_.isString(password)) {
 		throwValidationError('00001', { arg: 'password', type: 'String' });
 	}
 
-	if (_.isUndefined(keysType)) {
-		throwValidationError('00002', { arg: 'keysType', type: `equal to one of ${_.values(KeysTypesEnum).join(', ')} - use the KeysTypesEnum for it.` });
-	}
-
 	if (browser.msie || browser.msedge) {
 		return new Promise((resolve, reject) => {
 			try {
-				resolve(generateKeyPair(password, keysType));
+				resolve(generateKeyPair({ password, type: KeysTypesEnum[keysType] }));
 			} catch (e) {
 				reject(e.message);
 			}
 		});
 	} else {
-		return CryptoWorkerApi.generateKeyPair(password, keysType).catch(() => throwVirgilError('90007', { password: password }));
+		return CryptoWorkerApi.generateKeyPair(password, KeysTypesEnum[keysType])
+			.catch(() => throwVirgilError('90007', { password: password }));
 	}
 }
 

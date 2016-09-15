@@ -7,6 +7,7 @@ export const errors = {
 	'00000': 'An error occurred',
 	'00001': 'The "{arg}" must be a "{type}"',
 	'00002': 'The "{arg}" must be an "{type}"',
+	'00003': 'The "{arg}" {text}',
 	'90001': 'Unable to ENCRYPT the given data "{initialData}", using the given key "{key}"',
 	'90002': 'Unable to DECRYPT the given data "{initialData}", using the given key "{key}"',
 	'90003': 'Unable to ENCRYPT the given data "{initialData}", using the given password "{password}"',

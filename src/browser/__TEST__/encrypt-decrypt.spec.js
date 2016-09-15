@@ -6,7 +6,10 @@ const INITIAL_DATA = 'initial data';
 describe('encrypt/decrypt', () => {
 
 	function encryptDecryptUsingKeyPair(initialData, keysType, password = '') {
-		let keyPair = VirgilCrypto.generateKeyPair(password, keysType);
+		let keyPair = VirgilCrypto.generateKeyPair({
+			password: password,
+			type: keysType
+		});
 		let encryptedData = VirgilCrypto.encrypt(initialData, keyPair.publicKey, keyPair.publicKey);
 		let decryptedData = VirgilCrypto.decrypt(encryptedData, keyPair.publicKey, keyPair.privateKey, password);
 

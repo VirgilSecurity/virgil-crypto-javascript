@@ -27,7 +27,7 @@ describe('generaKeyPairAsync', () => {
 
 	describe('with password', () => {
 		beforeEach(async (cb) => {
-			keyPair = await VirgilCrypto.generateKeyPairAsync(PASSWORD);
+			keyPair = await VirgilCrypto.generateKeyPairAsync({ password: PASSWORD });
 			cb();
 		});
 
@@ -46,7 +46,7 @@ describe('generaKeyPairAsync', () => {
 
 	describe('with specific type "Default"', () => {
 		beforeEach(async (cb) => {
-			keyPair = await VirgilCrypto.generateKeyPairAsync(KEYS_TYPES_ENUM.Default);
+			keyPair = await VirgilCrypto.generateKeyPairAsync({ type: KEYS_TYPES_ENUM.Default });
 			cb();
 		});
 
@@ -63,9 +63,12 @@ describe('generaKeyPairAsync', () => {
 		});
 	});
 
-	describe('with specific type "Default" and password', () => {
+	describe('with specific type "EC_CURVE25519" and password', () => {
 		beforeEach(async (cb) => {
-			keyPair = await VirgilCrypto.generateKeyPairAsync(PASSWORD, KEYS_TYPES_ENUM.Default);
+			keyPair = await VirgilCrypto.generateKeyPairAsync({
+				password: PASSWORD,
+				type: KEYS_TYPES_ENUM.EC_CURVE25519
+			});
 			cb();
 		});
 

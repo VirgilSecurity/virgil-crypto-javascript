@@ -6,7 +6,7 @@ const INITIAL_DATA = 'initial data';
 describe('encrypt/decrypt', () => {
 
 	async function encryptDecryptUsingKeyPair(initialData, keysType, password = '') {
-		let keyPair = VirgilCrypto.generateKeyPair(password, keysType);
+		let keyPair = VirgilCrypto.generateKeyPair({ password: password, type: keysType });
 		let encryptedData = await VirgilCrypto.encryptAsync(initialData, keyPair.publicKey, keyPair.publicKey);
 		let decryptedData = await VirgilCrypto.decryptAsync(encryptedData, keyPair.publicKey, keyPair.privateKey, password);
 

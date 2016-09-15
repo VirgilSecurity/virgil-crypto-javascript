@@ -22,5 +22,5 @@ export { changePrivateKeyPassword } from './change-private-key-password';
 export { obfuscate } from './obfuscate';
 export { default as KeysTypesEnum } from '../lib/keys-types-enum';
 export { default as IdentityTypesEnum } from '../lib/identity-types';
-export const PBKDFHashTypes = Virgil.VirgilPBKDFHash;
+export const PBKDFHashTypes = Virgil.VirgilHashAlgorithm;
 export const VirgilTinyCipher = Virgil.VirgilTinyCipher;

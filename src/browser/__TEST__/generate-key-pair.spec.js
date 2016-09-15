@@ -84,7 +84,7 @@ describe('generaKeyPair', () => {
 	describe('with specific type', () => {
 		describe(`"${KEYS_TYPES_ENUM.EC_SECP256R1}"`, () => {
 			beforeAll(() => {
-				keyPair = VirgilCrypto.generateKeyPair(KEYS_TYPES_ENUM.EC_SECP256R1);
+				keyPair = VirgilCrypto.generateKeyPair({ type: KEYS_TYPES_ENUM.EC_SECP256R1 });
 			});
 
 			it('`publicKey` should be defined', () => {

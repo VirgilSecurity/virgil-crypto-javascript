@@ -10,7 +10,7 @@ describe('encrypt/decrypt', function () {
 	function encryptDecryptUsingKeyPair(initialData, keysType, password) {
 		password = password || '';
 
-		var keyPair = VirgilCrypto.generateKeyPair(password, keysType);
+		var keyPair = VirgilCrypto.generateKeyPair({ password: password, type: keysType });
 		var encryptedData = VirgilCrypto.encrypt(initialData, keyPair.publicKey, keyPair.publicKey);
 		var decryptedData = VirgilCrypto.decrypt(encryptedData, keyPair.publicKey, keyPair.privateKey, password);
 
@@ -64,67 +64,6 @@ describe('encrypt/decrypt', function () {
 		expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
 	});
 
-	//it('using keys "EC_M221" without password', function () {
-		//console.log('\n\n\n', VirgilCrypto.KeysTypesEnum.EC_M221, '\n\n');
-		//var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_M221);
-		//expect(decryptedData).toEqual(INITIAL_DATA);
-	//});
-
-	//it('using keys "EC_M221" with password', function () {
-		//var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_M221, PASSWORD);
-		//expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
-	//});
-
-	//it('using keys "EC_M255" without password', function () {
-		//var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_M255);
-		//expect(decryptedData).toEqual(INITIAL_DATA);
-	//});
-
-	//it('using keys "EC_M255" with password', function () {
-		//var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_M255, PASSWORD);
-		//expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
-	//});
-
-	//it('using keys "EC_M383" without password', function () {
-		//var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_M383);
-		//expect(decryptedData).toEqual(INITIAL_DATA);
-	//});
-
-	//it('using keys "EC_M383" with password', function () {
-		//var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_M383, PASSWORD);
-		//expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
-	//});
-
-	//it('using keys "EC_M511" without password', function () {
-		//var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_M511);
-		//expect(decryptedData).toEqual(INITIAL_DATA);
-	//});
-
-	//it('using keys "EC_M511" with password', function () {
-		//var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_M511, PASSWORD);
-		//expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
-	//});
-
-	it('using keys "EC_SECP192K1" without password', function () {
-		var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP192K1);
-		expect(decryptedData).toEqual(INITIAL_DATA);
-	});
-
-	it('using keys "EC_SECP192K1" with password', function () {
-		var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP192K1, PASSWORD);
-		expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
-	});
-
-	it('using keys "EC_SECP224K1" without password', function () {
-		var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP224K1);
-		expect(decryptedData).toEqual(INITIAL_DATA);
-	});
-
-	it('using keys "EC_SECP224K1" with password', function () {
-		var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP224K1, PASSWORD);
-		expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
-	});
-
 	it('using keys "EC_SECP256K1" without password', function () {
 		var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP256K1);
 		expect(decryptedData).toEqual(INITIAL_DATA);
@@ -162,6 +101,26 @@ describe('encrypt/decrypt', function () {
 
 	it('using keys "EC_SECP521R1" with password', function () {
 		var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP521R1, PASSWORD);
+		expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
+	});
+
+	it('using keys "EC_CURVE25519" without password', function () {
+		var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_CURVE25519);
+		expect(decryptedData).toEqual(INITIAL_DATA);
+	});
+
+	it('using keys "EC_CURVE25519" with password', function () {
+		var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_CURVE25519, PASSWORD);
+		expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
+	});
+
+	it('using keys "EC_ED25519" without password', function () {
+		var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_ED25519);
+		expect(decryptedData).toEqual(INITIAL_DATA);
+	});
+
+	it('using keys "EC_ED25519" with password', function () {
+		var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_ED25519, PASSWORD);
 		expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
 	});
 

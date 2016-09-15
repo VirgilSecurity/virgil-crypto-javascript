@@ -33,6 +33,16 @@ describe('encrypt/decrypt', () => {
 		expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
 	});
 
+	it('using keys "RSA_2048" without password', () => {
+		let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.RSA_2048);
+		expect(decryptedData).toEqual(INITIAL_DATA);
+	});
+
+	it('using keys "RSA_2048" with password', () => {
+		let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.RSA_2048, PASSWORD);
+		expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
+	});
+
 	it('using keys "EC_BP256R1" without password', () => {
 		let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_BP256R1);
 		expect(decryptedData).toEqual(INITIAL_DATA);
@@ -60,41 +70,6 @@ describe('encrypt/decrypt', () => {
 
 	it('using keys "EC_BP512R1" with password', () => {
 		let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_BP512R1, PASSWORD);
-		expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
-	});
-
-	it('using keys "EC_M221" without password', () => {
-		let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_M221);
-		expect(decryptedData).toEqual(INITIAL_DATA);
-	});
-
-	it('using keys "EC_M255" without password', () => {
-		let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_M255);
-		expect(decryptedData).toEqual(INITIAL_DATA);
-	});
-
-	it('using keys "EC_M255" with password', () => {
-		let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_M255, PASSWORD);
-		expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
-	});
-
-	it('using keys "EC_SECP192K1" without password', () => {
-		let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP192K1);
-		expect(decryptedData).toEqual(INITIAL_DATA);
-	});
-
-	it('using keys "EC_SECP192K1" with password', () => {
-		let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP192K1, PASSWORD);
-		expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
-	});
-
-	it('using keys "EC_SECP224K1" without password', () => {
-		let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP224K1);
-		expect(decryptedData).toEqual(INITIAL_DATA);
-	});
-
-	it('using keys "EC_SECP224K1" with password', () => {
-		let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP224K1, PASSWORD);
 		expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
 	});
 
@@ -135,6 +110,26 @@ describe('encrypt/decrypt', () => {
 
 	it('using keys "EC_SECP521R1" with password', () => {
 		let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP521R1, PASSWORD);
+		expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
+	});
+
+	it('using keys "EC_CURVE25519" without password', () => {
+		let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_CURVE25519);
+		expect(decryptedData).toEqual(INITIAL_DATA);
+	});
+
+	it('using keys "EC_CURVE25519" with password', () => {
+		let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_CURVE25519, PASSWORD);
+		expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
+	});
+
+	it('using keys "EC_ED25519" without password', () => {
+		let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_ED25519);
+		expect(decryptedData).toEqual(INITIAL_DATA);
+	});
+
+	it('using keys "EC_ED25519" with password', () => {
+		let decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_ED25519, PASSWORD);
 		expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
 	});
 

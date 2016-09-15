@@ -1,56 +1,40 @@
 var _ = require('lodash');
-var VirgilCrypto = require('../../virgil_js.node');
+var VirgilKeyPair = require('../../virgil_js.node').VirgilKeyPair;
 var KeysTypesEnum = require('../lib/keys-types-enum');
 var u = require('./utils');
+
+function isValidKeysType(keysType) {
+	return KeysTypesEnum.hasOwnProperty(keysType);
+}
 
 /**
  * Generate the key pair - public and private keys
  *
- * @param [password = ''] {string}
- * @param [keysType = 'Default'] {string}
+ * @param {Object} [options={}] - Keys options.
+ * @param {string=} options.password - Private key password (Optional).
+ * @param {string=} options.type - Keys type identifier (Optional). If provided must be one of KeysTypesEnum values.
  * @returns {{publicKey: *, privateKey: *}}
  */
-module.exports = function generateKeyPair (password, keysType) {
-	switch (arguments.length) {
-		case 1:
-			if (KeysTypesEnum[password]) {
-				keysType = KeysTypesEnum[password];
-				password = '';
-			} else {
-				keysType = KeysTypesEnum.Default;
-			}
-			break;
+module.exports = function generateKeyPair (options) {
+	options = options || {};
+	var password = options.password || '';
+	var keysType = options.type;
 
-		case 2:
-			keysType = KeysTypesEnum[keysType];
-			break;
-
-		case 0:
-		default:
-			password = '';
-			keysType = KeysTypesEnum.Default;
-			break;
+	if (keysType && !isValidKeysType(keysType)) {
+		throw new TypeError('The value `' + keysType + '` is not a valid type identifier. Must be one of ' +
+			_.keys(KeysTypesEnum).join(', ') + ' - use the KeysTypesEnum to get it.');
 	}
 
 	if (!_.isString(password)) {
 		throw new TypeError('The argument `password` must be a String');
 	}
+	
+	var generate = keysType ?
+		VirgilKeyPair.generate.bind(VirgilKeyPair, VirgilKeyPair['Type_' + KeysTypesEnum[keysType]]) :
+		VirgilKeyPair.generateRecommended.bind(VirgilKeyPair);
 
-	if (_.isUndefined(keysType)) {
-		throw new TypeError('The argument `keysType` must be an equal to one of ' + _.values(KeysTypesEnum).join(', ') + ' - use the KeysTypesEnum for it.');
-	}
 
-	var virgilKeys;
-
-	// TODO: will be fine to have some kind of enum like in asmjs VirgilCrypto.VirgilKeyPair.Type[keysType]
-	// convert into nodejs specific key type property name
-	keysType = 'Type_' + keysType;
-
-	if (password) {
-		virgilKeys = new VirgilCrypto.VirgilKeyPair.generate(VirgilCrypto.VirgilKeyPair[keysType], u.stringToByteArray(password));
-	} else {
-		virgilKeys = new VirgilCrypto.VirgilKeyPair.generate(VirgilCrypto.VirgilKeyPair[keysType]);
-	}
+	var virgilKeys = generate(u.stringToByteArray(password));
 
 	return {
 		privateKey: u.byteArrayToString(virgilKeys.privateKey()),

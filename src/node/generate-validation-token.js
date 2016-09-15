@@ -1,7 +1,6 @@
 var _ = require('lodash');
 var uuid = require('node-uuid');
 var sign = require('./sign');
-var IdentityTypes = require('../lib/identity-types');
 
 /**
  * Generate validation token

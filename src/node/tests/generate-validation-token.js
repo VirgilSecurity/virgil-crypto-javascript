@@ -7,7 +7,7 @@ var IDENTITY_VALUE = 'email@example.com';
 
 describe('generateValidationToken', function () {
 	it('Validation token is generated', function () {
-		var keyPair = VirgilCrypto.generateKeyPair(PASSWORD);
+		var keyPair = VirgilCrypto.generateKeyPair({ password: PASSWORD });
 		var validationToken = VirgilCrypto.generateValidationToken(
 			IDENTITY_VALUE,
 			VirgilCrypto.IdentityTypesEnum.custom,

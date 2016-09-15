@@ -28,7 +28,7 @@ describe('generaKeyPair', function () {
 
 	describe('with password', function () {
 		beforeEach(function () {
-			keyPair = VirgilCrypto.generateKeyPair(PASSWORD);
+			keyPair = VirgilCrypto.generateKeyPair({ password: PASSWORD });
 		});
 
 		it('"publicKey" should be defined', function () {
@@ -46,7 +46,7 @@ describe('generaKeyPair', function () {
 
 	describe('with specific type "Default"', function () {
 		beforeEach(function () {
-			keyPair = VirgilCrypto.generateKeyPair(KEYS_TYPES_ENUM.Default);
+			keyPair = VirgilCrypto.generateKeyPair({ type: KEYS_TYPES_ENUM.Default });
 		});
 
 		it('"publicKey" should be defined', function () {
@@ -64,7 +64,7 @@ describe('generaKeyPair', function () {
 
 	describe('with specific type "Default" and password', function () {
 		beforeEach(function () {
-			keyPair = VirgilCrypto.generateKeyPair(PASSWORD, KEYS_TYPES_ENUM.Default);
+			keyPair = VirgilCrypto.generateKeyPair({ password: PASSWORD, type: KEYS_TYPES_ENUM.Default });
 		});
 
 		it('"publicKey" should be defined', function () {
@@ -81,9 +81,9 @@ describe('generaKeyPair', function () {
 	});
 
 	describe('with specific type', function () {
-		describe(KEYS_TYPES_ENUM.Default, function () {
+		describe(KEYS_TYPES_ENUM.EC_SECP384R1, function () {
 			beforeEach(function () {
-				keyPair = VirgilCrypto.generateKeyPair(KEYS_TYPES_ENUM.Default);
+				keyPair = VirgilCrypto.generateKeyPair({ type: KEYS_TYPES_ENUM.EC_SECP384R1 });
 			});
 
 			it('`publicKey` should be defined', function () {
@@ -105,7 +105,7 @@ describe('generaKeyPair', function () {
 		var secondPassword = 'qwerty2';
 		var data = 'abc';
 		var recipientId = 'im id';
-		var keyPair = VirgilCrypto.generateKeyPair(firstPassword);
+		var keyPair = VirgilCrypto.generateKeyPair({ password: firstPassword });
 		var updatedPrivateKey = VirgilCrypto.changePrivateKeyPassword(keyPair.privateKey, firstPassword, secondPassword);
 		var encryptedData = VirgilCrypto.encrypt(data, recipientId, keyPair.publicKey, secondPassword);
 		var decryptedData = VirgilCrypto.decrypt(encryptedData, recipientId, updatedPrivateKey, secondPassword);

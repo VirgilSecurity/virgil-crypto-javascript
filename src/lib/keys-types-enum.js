@@ -1,7 +1,7 @@
 var Enum = require('../lib/Enum');
 
 module.exports = Enum({
-	Default: 'EC_ED25519',
+	Default: 'FAST_EC_ED25519',
 	RSA_2048: 'RSA_2048',
 	RSA_3072: 'RSA_3072',
 	RSA_4096: 'RSA_4096',
@@ -14,6 +14,7 @@ module.exports = Enum({
 	EC_BP512R1: 'EC_BP512R1',
 	EC_SECP256K1: 'EC_SECP256K1',
 	EC_CURVE25519: 'EC_CURVE25519',
-	EC_ED25519: 'EC_ED25519'
+	FAST_EC_X25519: 'FAST_EC_X25519',
+	FAST_EC_ED25519: 'FAST_EC_ED25519'
 });
 

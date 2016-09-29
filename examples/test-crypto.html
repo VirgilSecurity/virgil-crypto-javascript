@@ -33,6 +33,11 @@
 
 			console.log('keyPair', JSON.stringify(keyPair));
 
+			var privateKeyDER = virgilCrypto.privateKeyToDER(keyPair.privateKey, privateKeyPassword);
+			console.log('private key in DER: ', privateKeyDER.toString('base64'));
+			var publicKeyDER = virgilCrypto.publicKeyToDER(keyPair.publicKey);
+			console.log('public key in DER: ', publicKeyDER.toString('base64'));
+
 			var keyPairDefaultParams = virgilCrypto.generateKeyPair();
 			console.log('keyPairDefaultParams', keyPairDefaultParams);
 			var keyPairOnlyPassword = virgilCrypto.generateKeyPair({ password: 'password' });

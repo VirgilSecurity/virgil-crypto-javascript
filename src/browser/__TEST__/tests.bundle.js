@@ -8,3 +8,4 @@ import './encrypt-decrypt-async.spec';
 import './sign-verify.spec';
 import './sign-verify-async.spec';
 import './obfuscate.spec';
+import './hash.spec';

@@ -17,8 +17,8 @@ export function sign (data, privateKey, privateKeyPassword = '') {
 		throwValidationError('00001', { arg: 'data', type: 'String or Buffer' });
 	}
 
-	if (!_.isString(privateKey)) {
-		throwValidationError('00001', { arg: 'privateKey', type: 'String' });
+	if (!(_.isString(privateKey) || Buffer.isBuffer(privateKey))) {
+		throwValidationError('00001', { arg: 'privateKey', type: 'String or Buffer' });
 	}
 
 	let virgilSigner = new VirgilCrypto.VirgilSigner();

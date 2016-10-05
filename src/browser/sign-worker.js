@@ -17,7 +17,7 @@ export default function(initialData, privateKeyBase64, privateKeyPassword) {
 
 		deferred.resolve(signBase64);
 	} catch (e) {
-		deferred.reject(e);
+		deferred.reject(e.message);
 	} finally {
 		virgilSigner.delete();
 	}

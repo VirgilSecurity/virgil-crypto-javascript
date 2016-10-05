@@ -20,6 +20,6 @@ export default function(password, keysType) {
 
 		deferred.resolve({ publicKey: publicKey, privateKey: privateKey });
 	} catch (e) {
-		deferred.reject(e);
+		deferred.reject(e.message);
 	}
 };

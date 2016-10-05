@@ -18,7 +18,7 @@ export default function(initialData, recipientId, publicKey) {
 
 		deferred.resolve(encryptedDataBase64);
 	} catch (e) {
-		deferred.reject(e);
+		deferred.reject(e.message);
 	} finally {
 		virgilCipher.delete();
 	}

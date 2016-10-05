@@ -15,7 +15,7 @@ export default function(initialData, publicKey, sign) {
 
 		deferred.resolve(isVerified);
 	} catch (e) {
-		deferred.reject(e);
+		deferred.reject(e.message);
 	} finally {
 		virgilSigner.delete();
 	}

@@ -15,7 +15,7 @@ export default function(initialEncryptedData, password) {
 
 		deferred.resolve(decryptedData);
 	} catch (e) {
-		deferred.reject(e);
+		deferred.reject(e.message);
 	} finally {
 		virgilCipher.delete();
 	}

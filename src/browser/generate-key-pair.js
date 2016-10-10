@@ -1,53 +1,50 @@
-import _ from 'lodash';
 import VirgilCrypto from './utils/crypto-module';
-import * as CryptoUtils from './utils/crypto-utils';
+import { bufferToByteArray, byteArrayToBuffer } from './utils/crypto-utils';
 import KeysTypesEnum from '../lib/keys-types-enum';
-import { throwVirgilError, throwValidationError } from './utils/crypto-errors';
+import { throwVirgilError, throwValidationError, checkIsBuffer } from './utils/crypto-errors';
 
 /**
  * Generate the key pair - public and private keys
  *
  * @param {Object} [options={}] - Keys options.
- * @param {string=} options.password - Private key password (Optional).
- * @param {string=} options.type - Keys type identifier (Optional). If provided must be one of KeysTypesEnum values.
- * @returns {{publicKey: *, privateKey: *}}
+ * @param {Buffer} [options.password] - Private key password (Optional).
+ * @param {string} [options.type=] - Keys type identifier (Optional). If provided must be one of KeysTypesEnum values.
+ * @returns {{publicKey: Buffer, privateKey: Buffer}}
  */
 export function generateKeyPair (options = {}) {
-	const password = options.password || '';
-	let keysType = options.type;
+	let { type, password } = options;
 
-	if (keysType && !KeysTypesEnum.hasOwnProperty(keysType)) {
-		throwValidationError('00003', {
+	if (type && !KeysTypesEnum.hasOwnProperty(type)) {
+		throwValidationError('00002', {
 			arg: 'keysType',
-			text: `must be one of ${_.values(KeysTypesEnum).join(', ')} - use the KeysTypesEnum to get it.`
+			type: `one of ${_.values(KeysTypesEnum).join(', ')} - use the KeysTypesEnum to get it.`
 		});
 	}
 
-	if (!_.isString(password)) {
-		throwValidationError('00001', { arg: 'password', type: 'String' });
+	if (password) {
+		checkIsBuffer(password, 'password');
+	} else {
+		password = new Buffer(0);
 	}
 
 	const KeyPair = VirgilCrypto.VirgilKeyPair;
 
-	const generate = keysType ?
-		KeyPair.generate.bind(KeyPair, KeyPair.Type[KeysTypesEnum[keysType]]) :
-		KeyPair.generateRecommended.bind(KeyPair);
+	const generateKeyPair = type ?
+		KeyPair.generate.bind(null, KeyPair.Type[KeysTypesEnum[type]]) :
+		KeyPair.generateRecommended;
 
 	let publicKey;
 	let privateKey;
 
 	try {
-		const passwordByteArray = CryptoUtils.toByteArray(password);
-		const virgilKeys = generate(passwordByteArray);
+		const virgilKeys = generateKeyPair(bufferToByteArray(password));
 
-		publicKey = virgilKeys.publicKey().toUTF8();
-		privateKey = virgilKeys.privateKey().toUTF8();
+		publicKey = byteArrayToBuffer(virgilKeys.publicKey());
+		privateKey = byteArrayToBuffer(virgilKeys.privateKey());
 
-		// cleanup memory to avoid memory leaks
-		passwordByteArray.delete();
 		virgilKeys.delete();
 	} catch (e) {
-		throwVirgilError('90007', { password: password });
+		throwVirgilError('90007', { error: e.message });
 	}
 
 	return { publicKey, privateKey };

@@ -1,7 +1,7 @@
-import { VirgilCrypto } from '../../../browser';
+import { VirgilCrypto, Buffer } from '../../../browser';
 
 const KEYS_TYPES_ENUM = VirgilCrypto.KeysTypesEnum;
-const PASSWORD = 'veryStrongPa$$0rd';
+const PASSWORD = Buffer.from('veryStrongPa$$0rd', 'utf8');
 
 describe('generaKeyPair', () => {
 	let keyPair = {};
@@ -20,7 +20,7 @@ describe('generaKeyPair', () => {
 		});
 
 		it('"privateKey" is not encrypted', () => {
-			expect(keyPair.privateKey).not.toContain('ENCRYPTED');
+			expect(keyPair.privateKey.toString('utf8')).not.toContain('ENCRYPTED');
 		});
 	});
 
@@ -38,7 +38,7 @@ describe('generaKeyPair', () => {
 		});
 
 		it('"privateKey" encrypted', () => {
-			expect(keyPair.privateKey).toContain('ENCRYPTED');
+			expect(keyPair.privateKey.toString('utf8')).toContain('ENCRYPTED');
 		});
 	});
 
@@ -56,7 +56,7 @@ describe('generaKeyPair', () => {
 		});
 
 		it('"privateKey" encrypted', () => {
-			expect(keyPair.privateKey).not.toContain('ENCRYPTED');
+			expect(keyPair.privateKey.toString('utf8')).not.toContain('ENCRYPTED');
 		});
 	});
 
@@ -77,7 +77,7 @@ describe('generaKeyPair', () => {
 		});
 
 		it('"privateKey" encrypted', () => {
-			expect(keyPair.privateKey).toContain('ENCRYPTED');
+			expect(keyPair.privateKey.toString('utf8')).toContain('ENCRYPTED');
 		});
 	});
 
@@ -96,22 +96,22 @@ describe('generaKeyPair', () => {
 			});
 
 			it('`privateKey` not encrypted', () => {
-				expect(keyPair.privateKey).not.toContain('ENCRYPTED');
+				expect(keyPair.privateKey.toString('utf8')).not.toContain('ENCRYPTED');
 			});
 		});
 	});
 
 	describe('change private key password', () => {
 		it('Default', function () {
-			var firstPassword = 'qwerty1';
-			var secondPassword = 'qwerty2';
-			var data = 'abc';
-			var recipientId = 'im id';
+			var firstPassword = Buffer.from('qwerty1', 'utf8');
+			var secondPassword = Buffer.from('qwerty2', 'utf8');
+			var data = Buffer.from('abc', 'utf8');
+			var recipientId = Buffer.from('im id', 'utf8');
 			var keyPair = VirgilCrypto.generateKeyPair({ password: firstPassword });
 			var updatedPrivateKey = VirgilCrypto.changePrivateKeyPassword(keyPair.privateKey, firstPassword, secondPassword);
 			var encryptedData = VirgilCrypto.encrypt(data, recipientId, keyPair.publicKey, secondPassword);
 			var decryptedData = VirgilCrypto.decrypt(encryptedData, recipientId, updatedPrivateKey, secondPassword);
-			expect(decryptedData.toString('utf8')).toContain(data);
+			expect(decryptedData.equals(data)).toBe(true);
 		});
 	});
 });

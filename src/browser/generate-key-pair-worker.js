@@ -1,9 +1,10 @@
 export default function(password, keysType) {
 	const deferred = this.deferred();
 	const KeyPair = VirgilCryptoWorkerContext.VirgilKeyPair;
+	const base64decode = VirgilCryptoWorkerContext.VirgilBase64.decode;
 
 	try {
-		const passwordByteArray = VirgilCryptoWorkerContext.VirgilByteArray.fromUTF8(password);
+		const passwordByteArray = base64decode(password);
 		let virgilKeys;
 		if (keysType) {
 			virgilKeys = KeyPair.generate(KeyPair.Type[keysType], passwordByteArray);

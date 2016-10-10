@@ -1,43 +1,52 @@
 import browser from 'bowser';
 import KeysTypesEnum from '../lib/keys-types-enum';
 import CryptoWorkerApi from './crypto-worker-api';
-import { throwVirgilError, throwValidationError } from './utils/crypto-errors';
+import { throwVirgilError, throwValidationError, checkIsBuffer } from './utils/crypto-errors';
+import { toBase64 } from './utils/crypto-utils';
 import { generateKeyPair } from './generate-key-pair';
 
 /**
  * Asynchronously generate the key pair - public and private keys.
  *
  * @param {Object} [options={}] - Keys options.
- * @param {string=} options.password - Private key password (Optional).
+ * @param {Buffer=} options.password - Private key password (Optional).
  * @param {string=} options.type - Keys type identifier (Optional). If provided must be one of KeysTypesEnum values.
- * @returns {Promise<{publicKey: *, privateKey: *}>}
+ * @returns {Promise<{publicKey: Buffer, privateKey: Buffer}>}
  */
 export function generateKeyPairAsync (options = {}) {
-	const password = options.password || '';
-	let keysType = options.type;
+	let { type, password } = options;
 
-	if (keysType && !KeysTypesEnum.hasOwnProperty(keysType)) {
-		throwValidationError('00003', {
-			arg: 'keysType',
-			text: `must be one of ${_.values(KeysTypesEnum).join(', ')} - use the KeysTypesEnum to get it.`
+	if (type && !KeysTypesEnum.hasOwnProperty(type)) {
+		throwValidationError('00002', {
+			arg: 'type',
+			type: `one of ${_.values(KeysTypesEnum).join(', ')} - use the KeysTypesEnum to get it.`
 		});
 	}
 
-	if (!_.isString(password)) {
-		throwValidationError('00001', { arg: 'password', type: 'String' });
+	if (password) {
+		checkIsBuffer(password);
+	} else {
+		password = new Buffer(0);
 	}
+
 
 	if (browser.msie || browser.msedge) {
 		return new Promise((resolve, reject) => {
 			try {
-				resolve(generateKeyPair({ password, type: KeysTypesEnum[keysType] }));
+				resolve(generateKeyPair({ password, type: KeysTypesEnum[type] }));
 			} catch (e) {
 				reject(e.message);
 			}
 		});
 	} else {
-		return CryptoWorkerApi.generateKeyPair(password, KeysTypesEnum[keysType])
-			.catch(() => throwVirgilError('90007', { password: password }));
+		return CryptoWorkerApi.generateKeyPair(toBase64(password), KeysTypesEnum[type])
+			.then(({ privateKey, publicKey }) => {
+				return {
+					privateKey: new Buffer(privateKey, 'utf8'),
+					publicKey: new Buffer(publicKey, 'utf8')
+				};
+			})
+			.catch((e) => throwVirgilError('90007', { error: e }));
 	}
 }
 

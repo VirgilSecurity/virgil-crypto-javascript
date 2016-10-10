@@ -1,7 +1,7 @@
-import { VirgilCrypto } from '../../../browser';
+import { VirgilCrypto, Buffer } from '../../../browser';
 
 const KEYS_TYPES_ENUM = VirgilCrypto.KeysTypesEnum;
-const PASSWORD = 'veryStrongPa$$0rd';
+const PASSWORD = Buffer.from('veryStrongPa$$0rd');
 
 describe('generaKeyPairAsync', () => {
 	let keyPair = {};
@@ -21,7 +21,7 @@ describe('generaKeyPairAsync', () => {
 		});
 
 		it('"privateKey" is not encrypted', () => {
-			expect(keyPair.privateKey).not.toContain('ENCRYPTED');
+			expect(keyPair.privateKey.toString('utf8')).not.toContain('ENCRYPTED');
 		});
 	});
 
@@ -40,7 +40,7 @@ describe('generaKeyPairAsync', () => {
 		});
 
 		it('"privateKey" encrypted', () => {
-			expect(keyPair.privateKey).toContain('ENCRYPTED');
+			expect(keyPair.privateKey.toString('utf8')).toContain('ENCRYPTED');
 		});
 	});
 
@@ -59,15 +59,15 @@ describe('generaKeyPairAsync', () => {
 		});
 
 		it('"privateKey" encrypted', () => {
-			expect(keyPair.privateKey).not.toContain('ENCRYPTED');
+			expect(keyPair.privateKey.toString('utf8')).not.toContain('ENCRYPTED');
 		});
 	});
 
-	describe('with specific type "EC_CURVE25519" and password', () => {
+	describe('with specific type "FAST_EC_X25519" and password', () => {
 		beforeEach(async (cb) => {
 			keyPair = await VirgilCrypto.generateKeyPairAsync({
 				password: PASSWORD,
-				type: KEYS_TYPES_ENUM.EC_CURVE25519
+				type: KEYS_TYPES_ENUM.FAST_EC_X25519
 			});
 			cb();
 		});
@@ -81,7 +81,7 @@ describe('generaKeyPairAsync', () => {
 		});
 
 		it('"privateKey" encrypted', () => {
-			expect(keyPair.privateKey).toContain('ENCRYPTED');
+			expect(keyPair.privateKey.toString('utf8')).toContain('ENCRYPTED');
 		});
 	});
 

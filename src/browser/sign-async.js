@@ -1,27 +1,21 @@
-import _ from 'lodash';
-export { Buffer } from 'buffer';
 import browser from 'bowser';
-import * as CryptoUtils from './utils/crypto-utils';
 import CryptoWorkerApi from './crypto-worker-api';
-import { throwVirgilError, throwValidationError } from './utils/crypto-errors';
 import { sign } from './sign';
+import { toBase64, base64ToBuffer } from './utils/crypto-utils';
+import { throwVirgilError, checkIsBuffer } from './utils/crypto-errors';
 
 /**
  * Sign the encrypted data using private key using workers
  *
- * @param data {string|Buffer}
- * @param privateKey {string}
- * @param [privateKeyPassword = ''] {string}
+ * @param data {Buffer}
+ * @param privateKey {Buffer}
+ * @param [privateKeyPassword] {Buffer}
  * @returns {Promise}
  */
-export function signAsync (data, privateKey, privateKeyPassword = '') {
-	if (!(_.isString(data) || Buffer.isBuffer(data))) {
-		throwValidationError('00001', { arg: 'data', type: 'String or Buffer' });
-	}
-
-	if (!(_.isString(privateKey) || Buffer.isBuffer(privateKey))) {
-		throwValidationError('00001', { arg: 'privateKey', type: 'String or Buffer' });
-	}
+export function signAsync (data, privateKey, privateKeyPassword = new Buffer(0)) {
+	checkIsBuffer(data, 'data');
+	checkIsBuffer(privateKey, 'privateKey');
+	checkIsBuffer(privateKeyPassword, 'privateKeyPassword');
 
 	if (browser.msie || browser.msedge) {
 		return new Promise((resolve, reject) => {
@@ -32,11 +26,12 @@ export function signAsync (data, privateKey, privateKeyPassword = '') {
 			}
 		});
 	} else {
-		return CryptoWorkerApi.sign(CryptoUtils.toBase64(data), CryptoUtils.toBase64(privateKey), privateKeyPassword).then(
-			// convert the base64 response to Buffer for support new interface
-			(result) => CryptoUtils.base64ToBuffer(result),
-			() => throwVirgilError('90005', { initialData: data, key: privateKey, password: privateKeyPassword })
-		);
+		return CryptoWorkerApi.sign(
+				toBase64(data),
+				toBase64(privateKey),
+				toBase64(privateKeyPassword))
+			.then(base64ToBuffer)
+			.catch((e) => throwVirgilError('90005', { error: e }));
 	}
 }
 

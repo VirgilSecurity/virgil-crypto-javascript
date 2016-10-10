@@ -1,21 +1,17 @@
 export default function(initialData, privateKeyBase64, privateKeyPassword) {
-	let deferred = this.deferred();
-	let virgilSigner = new VirgilCryptoWorkerContext.VirgilSigner();
+	const deferred = this.deferred();
+	const virgilSigner = new VirgilCryptoWorkerContext.VirgilSigner();
+	const base64decode = VirgilCryptoWorkerContext.VirgilBase64.decode;
+	const base64encode = VirgilCryptoWorkerContext.VirgilBase64.encode;
 
 	try {
-		let dataByteArray = VirgilCryptoWorkerContext.VirgilBase64.decode(initialData);
-		let privateKeyByteArray = VirgilCryptoWorkerContext.VirgilBase64.decode(privateKeyBase64);
-		let privateKeyPasswordByteArray = VirgilCryptoWorkerContext.VirgilByteArray.fromUTF8(privateKeyPassword);
+		let sign = base64encode(
+			virgilSigner.sign(
+				base64decode(initialData),
+				base64decode(privateKeyBase64),
+				base64decode(privateKeyPassword)));
 
-		let sign = virgilSigner.sign(dataByteArray, privateKeyByteArray, privateKeyPasswordByteArray);
-		let signBase64 = VirgilCryptoWorkerContext.VirgilBase64.encode(sign);
-
-		// cleanup memory to avoid memory leaks
-		dataByteArray.delete();
-		privateKeyByteArray.delete();
-		privateKeyPasswordByteArray.delete();
-
-		deferred.resolve(signBase64);
+		deferred.resolve(sign);
 	} catch (e) {
 		deferred.reject(e.message);
 	} finally {

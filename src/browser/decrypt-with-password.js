@@ -1,23 +1,19 @@
 import VirgilCrypto from './utils/crypto-module';
-import * as CryptoUtils from './utils/crypto-utils';
+import { bufferToByteArray, byteArrayToBuffer } from './utils/crypto-utils';
 import { throwVirgilError } from './utils/crypto-errors';
 
-export function decryptWithPassword (initialEncryptedData, password = '') {
+export function decryptWithPassword (encryptedData, password) {
 	let virgilCipher = new VirgilCrypto.VirgilCipher();
 	let decryptedDataBuffer;
 
 	try {
-		let dataByteArray = CryptoUtils.toByteArray(initialEncryptedData);
-		let passwordByteArray = CryptoUtils.toByteArray(password);
-		let decryptedDataByteArray = virgilCipher.decryptWithPassword(dataByteArray, passwordByteArray);
-		decryptedDataBuffer = CryptoUtils.byteArrayToBuffer(decryptedDataByteArray);
-
-		// cleanup memory to avoid memory leaks
-		dataByteArray.delete();
-		passwordByteArray.delete();
-		decryptedDataByteArray.delete();
+		decryptedDataBuffer = byteArrayToBuffer(
+			virgilCipher.decryptWithPassword(
+				bufferToByteArray(encryptedData),
+				bufferToByteArray(password))
+		);
 	} catch (e) {
-		throwVirgilError('90004', { initialData: initialEncryptedData, password: password });
+		throwVirgilError('90004', { error: e.message });
 	} finally {
 		virgilCipher.delete();
 	}

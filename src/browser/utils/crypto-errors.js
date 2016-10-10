@@ -25,3 +25,9 @@ export function throwVirgilError (code, tokens) {
 export function throwValidationError (code, tokens) {
 	throwVirgilError(code, tokens);
 }
+
+export function checkIsBuffer (arg, name) {
+	if (!Buffer.isBuffer(arg)) {
+		throwValidationError('00001', { arg: name, type: 'Buffer' });
+	}
+}

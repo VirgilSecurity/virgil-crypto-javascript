@@ -1,24 +1,15 @@
 export default function(initialData, password, isEmbeddedContentInfo) {
-	let deferred = this.deferred();
-	let virgilCipher = new VirgilCryptoWorkerContext.VirgilCipher();
+	const deferred = this.deferred();
+	const virgilCipher = new VirgilCryptoWorkerContext.VirgilCipher();
+	const base64decode = VirgilCryptoWorkerContext.VirgilBase64.decode;
+	const base64encode = VirgilCryptoWorkerContext.VirgilBase64.encode;
 
 	try {
-		let dataByteArray = VirgilCryptoWorkerContext.VirgilBase64.decode(initialData);
-		let passwordByteArray;
-
 		if (password) {
-			passwordByteArray = VirgilCryptoWorkerContext.VirgilByteArray.fromUTF8(password);
-			virgilCipher.addPasswordRecipient(passwordByteArray);
+			virgilCipher.addPasswordRecipient(base64decode(password));
 		}
 
-		let encryptedDataByteArray = virgilCipher.encrypt(dataByteArray, isEmbeddedContentInfo);
-		let encryptedDataBase64 = VirgilCryptoWorkerContext.VirgilBase64.encode(encryptedDataByteArray);
-
-		// cleanup memory to avoid memory leaks
-		dataByteArray.delete();
-		if (passwordByteArray) {
-			passwordByteArray.delete();
-		}
+		let encryptedDataBase64 = base64encode(virgilCipher.encrypt(base64decode(initialData), isEmbeddedContentInfo));
 
 		deferred.resolve(encryptedDataBase64);
 	} catch (e) {

@@ -1,12 +1,14 @@
 export default function(initialEncryptedData, password) {
-	let deferred = this.deferred();
-	let virgilCipher = new VirgilCryptoWorkerContext.VirgilCipher();
+	const deferred = this.deferred();
+	const virgilCipher = new VirgilCryptoWorkerContext.VirgilCipher();
+	const b64decode = VirgilCryptoWorkerContext.VirgilBase64.decode;
+	const b64encode = VirgilCryptoWorkerContext.VirgilBase64.encode;
 
 	try {
-		let dataByteArray = VirgilCryptoWorkerContext.VirgilBase64.decode(initialEncryptedData);
-		let passwordByteArray = VirgilCryptoWorkerContext.VirgilByteArray.fromUTF8(password);
+		let dataByteArray = b64decode(initialEncryptedData);
+		let passwordByteArray = b64decode(password);
 		let decryptedDataByteArray = virgilCipher.decryptWithPassword(dataByteArray, passwordByteArray);
-		let decryptedData = VirgilCryptoWorkerContext.VirgilBase64.encode(decryptedDataByteArray);
+		let decryptedData = b64encode(decryptedDataByteArray);
 
 		// cleanup memory to avoid memory leaks
 		dataByteArray.delete();

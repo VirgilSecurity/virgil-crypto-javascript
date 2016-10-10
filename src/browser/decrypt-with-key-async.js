@@ -1,24 +1,26 @@
 import browser from 'bowser';
-import * as CryptoUtils from './utils/crypto-utils';
+import { toBase64, base64ToBuffer } from './utils/crypto-utils';
 import CryptoWorkerApi from './crypto-worker-api';
 import { throwVirgilError } from './utils/crypto-errors';
 import { decryptWithKey } from './decrypt-with-key';
 
-export function decryptWithKeyAsync (initialEncryptedData, recipientId, privateKey, privateKeyPassword) {
+export function decryptWithKeyAsync (encryptedData, recipientId, privateKey, privateKeyPassword = new Buffer(0)) {
 	if (browser.msie || browser.msedge) {
 		return new Promise((resolve, reject) => {
 			try {
-				resolve(decryptWithKey(initialEncryptedData, recipientId, privateKey, privateKeyPassword));
+				resolve(decryptWithKey(encryptedData, recipientId, privateKey, privateKeyPassword));
 			} catch (e) {
 				reject(e.message);
 			}
 		});
 	} else {
-		return CryptoWorkerApi.decryptWithKey(CryptoUtils.toBase64(initialEncryptedData), recipientId, CryptoUtils.toBase64(privateKey), privateKeyPassword).then(
-			// convert the base64 response to Buffer for support new interface
-			(result) => CryptoUtils.base64ToBuffer(result),
-			() => throwVirgilError('90002', { initialData: initialEncryptedData, key: privateKey })
-		);
+		return CryptoWorkerApi.decryptWithKey(
+			toBase64(encryptedData),
+			toBase64(recipientId),
+			toBase64(privateKey),
+			toBase64(privateKeyPassword))
+		.then(base64ToBuffer)
+		.catch((e) => throwVirgilError('90002', { error: e }));
 	}
 }
 

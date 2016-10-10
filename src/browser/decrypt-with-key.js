@@ -1,27 +1,22 @@
 import VirgilCrypto from './utils/crypto-module';
-import * as CryptoUtils from './utils/crypto-utils';
+import { bufferToByteArray, byteArrayToBuffer } from './utils/crypto-utils';
 import { throwVirgilError } from './utils/crypto-errors';
 
-export function decryptWithKey (initialEncryptedData, recipientId, privateKey, privateKeyPassword = '') {
+export function decryptWithKey (encryptedData, recipientId, privateKey, privateKeyPassword = new Buffer(0)) {
 	let virgilCipher = new VirgilCrypto.VirgilCipher();
 	let decryptedDataBuffer;
 
 	try {
-		let recipientIdByteArray = CryptoUtils.toByteArray(recipientId);
-		let dataByteArray = CryptoUtils.toByteArray(initialEncryptedData);
-		let privateKeyByteArray = CryptoUtils.toByteArray(privateKey);
-		let privateKeyPasswordByteArray = CryptoUtils.toByteArray(privateKeyPassword);
-		let decryptedDataByteArray = virgilCipher.decryptWithKey(dataByteArray, recipientIdByteArray, privateKeyByteArray, privateKeyPasswordByteArray);
-		decryptedDataBuffer = CryptoUtils.byteArrayToBuffer(decryptedDataByteArray);
+		decryptedDataBuffer = byteArrayToBuffer(
+			virgilCipher.decryptWithKey(
+				bufferToByteArray(encryptedData),
+				bufferToByteArray(recipientId),
+				bufferToByteArray(privateKey),
+				bufferToByteArray(privateKeyPassword))
+		);
 
-		// cleanup memory to avoid memory leaks
-		recipientIdByteArray.delete();
-		dataByteArray.delete();
-		privateKeyByteArray.delete();
-		decryptedDataByteArray.delete();
-		privateKeyPasswordByteArray.delete();
 	} catch (e) {
-		throwVirgilError('90002', { initialData: initialEncryptedData, key: privateKey });
+		throwVirgilError('90002', { error: e.message });
 	} finally {
 		virgilCipher.delete();
 	}

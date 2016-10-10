@@ -1,35 +1,29 @@
-import _ from 'lodash';
-export { Buffer } from 'buffer';
 import { decryptWithPasswordAsync } from './decrypt-with-password-async';
 import { decryptWithKeyAsync } from './decrypt-with-key-async';
-import { throwValidationError } from './utils/crypto-errors';
+import { checkIsBuffer } from './utils/crypto-errors';
 
 /**
  * Decrypt data async
  *
- * @param initialEncryptedData {Buffer}
- * @param recipientId {string}
- * @param [privateKey] {string}
- * @param [privateKeyPassword = ''] {string}
+ * @param encryptedData {Buffer}
+ * @param recipientId {Buffer}
+ * @param [privateKey] {Buffer}
+ * @param [privateKeyPassword] {Buffer}
  * @returns {Promise}
  */
-export function decryptAsync (initialEncryptedData, recipientId, privateKey, privateKeyPassword = '') {
-	if (!Buffer.isBuffer(initialEncryptedData)) {
-		throwValidationError('00001', { arg: 'initialEncryptedData', type: 'Buffer' });
-	}
-
-	if (!_.isString(recipientId)) {
-		throwValidationError('00001', { arg: 'recipientId', type: 'String' });
-	}
+export function decryptAsync (encryptedData, recipientId, privateKey, privateKeyPassword) {
+	checkIsBuffer(encryptedData, 'encryptedData');
+	checkIsBuffer(recipientId, 'recipientId');
+	privateKey && checkIsBuffer(privateKey, 'privateKey');
+	privateKeyPassword && checkIsBuffer(privateKeyPassword, 'privateKeyPassword');
 
 	let decryptedDataPromise;
 
 	if (arguments.length === 2) {
 		let password = recipientId;
-
-		decryptedDataPromise = decryptWithPasswordAsync(initialEncryptedData, password);
+		decryptedDataPromise = decryptWithPasswordAsync(encryptedData, password);
 	} else {
-		decryptedDataPromise = decryptWithKeyAsync(initialEncryptedData, recipientId, privateKey, privateKeyPassword);
+		decryptedDataPromise = decryptWithKeyAsync(encryptedData, recipientId, privateKey, privateKeyPassword);
 	}
 
 	return decryptedDataPromise;

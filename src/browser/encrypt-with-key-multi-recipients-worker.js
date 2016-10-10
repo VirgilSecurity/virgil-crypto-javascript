@@ -1,32 +1,14 @@
 export default function(initialData, recipients) {
-	let deferred = this.deferred();
-	let virgilCipher = new VirgilCryptoWorkerContext.VirgilCipher();
-	let dataByteArray = VirgilCryptoWorkerContext.VirgilBase64.decode(initialData);
+	const deferred = this.deferred();
+	const virgilCipher = new VirgilCryptoWorkerContext.VirgilCipher();
+	const base64decode = VirgilCryptoWorkerContext.VirgilBase64.decode;
+	const base64encode = VirgilCryptoWorkerContext.VirgilBase64.encode;
 
 	try {
-		let recipientIdsByteArrays = [];
-
-		for (let i = 0, l = recipients.length; i < l; i++) {
-			var recipient = recipients[i];
-
-			let recipientIdByteArray = VirgilCryptoWorkerContext.VirgilByteArray.fromUTF8(recipient.recipientId);
-			let publicKeyByteArray = VirgilCryptoWorkerContext.VirgilByteArray.fromUTF8(recipient.publicKey);
-
-			virgilCipher.addKeyRecipient(recipientIdByteArray, publicKeyByteArray);
-			recipientIdsByteArrays.push(recipientIdByteArray);
-		}
-
-		let encryptedDataByteArray = virgilCipher.encrypt(dataByteArray, true);
-		let encryptedDataBase64 = VirgilCryptoWorkerContext.VirgilBase64.encode(encryptedDataByteArray);
-
-		// cleanup memory to avoid memory leaks
-		dataByteArray.delete();
-		encryptedDataByteArray.delete();
-
-		for (let j = 0, rsl = recipientIdsByteArrays.length; j < rsl; j++) {
-			recipientIdsByteArrays[j].delete();
-		}
-
+		recipients.forEach((recipient) => {
+			virgilCipher.addKeyRecipient(base64decode(recipient.recipientId), base64decode(recipient.publicKey));
+		});
+		const encryptedDataBase64 = base64encode(virgilCipher.encrypt(base64decode(initialData), true));
 		deferred.resolve(encryptedDataBase64);
 	} catch (e) {
 		deferred.reject(e.message);

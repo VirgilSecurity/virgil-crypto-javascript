@@ -1,6 +1,6 @@
 import browser from 'bowser';
-import * as CryptoUtils from './utils/crypto-utils';
 import CryptoWorkerApi from './crypto-worker-api';
+import { toBase64, base64ToBuffer } from './utils/crypto-utils';
 import { throwVirgilError } from './utils/crypto-errors';
 import { encryptWithKey } from './encrypt-with-key';
 
@@ -14,11 +14,10 @@ export function encryptWithKeyAsync (initialData, recipientId, publicKey) {
 			}
 		});
 	} else {
-		return CryptoWorkerApi.encryptWithKey(CryptoUtils.toBase64(initialData), recipientId, publicKey).then(
-			// convert the base64 response to Buffer for support new interface
-			(result) => CryptoUtils.base64ToBuffer(result),
-			() => throwVirgilError('90001', { initialData: initialData, key: publicKey })
-		);
+		return CryptoWorkerApi
+			.encryptWithKey(toBase64(initialData), toBase64(recipientId), toBase64(publicKey))
+			.then(base64ToBuffer)
+			.catch((e) => throwVirgilError('90001', { error: e }));
 	}
 }
 

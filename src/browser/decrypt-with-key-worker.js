@@ -1,14 +1,20 @@
 export default function(initialEncryptedData, recipientId, privateKeyBase64, privateKeyPassword) {
-	let deferred = this.deferred();
-	let virgilCipher = new VirgilCryptoWorkerContext.VirgilCipher();
+	const deferred = this.deferred();
+	const virgilCipher = new VirgilCryptoWorkerContext.VirgilCipher();
+	const b64decode = VirgilCryptoWorkerContext.VirgilBase64.decode;
+	const b64encode = VirgilCryptoWorkerContext.VirgilBase64.encode;
 
 	try {
-		let recipientIdByteArray = VirgilCryptoWorkerContext.VirgilByteArray.fromUTF8(recipientId);
-		let dataByteArray = VirgilCryptoWorkerContext.VirgilBase64.decode(initialEncryptedData);
-		let privateKeyByteArray = VirgilCryptoWorkerContext.VirgilBase64.decode(privateKeyBase64);
-		let privateKeyPasswordByteArray = VirgilCryptoWorkerContext.VirgilByteArray.fromUTF8(privateKeyPassword);
-		let decryptedDataByteArray = virgilCipher.decryptWithKey(dataByteArray, recipientIdByteArray, privateKeyByteArray, privateKeyPasswordByteArray);
-		let decryptedDataBase64 = VirgilCryptoWorkerContext.VirgilBase64.encode(decryptedDataByteArray);
+		let recipientIdByteArray = b64decode(recipientId);
+		let dataByteArray = b64decode(initialEncryptedData);
+		let privateKeyByteArray = b64decode(privateKeyBase64);
+		let privateKeyPasswordByteArray = b64decode(privateKeyPassword);
+		let decryptedDataByteArray = virgilCipher.decryptWithKey(
+			dataByteArray,
+			recipientIdByteArray,
+			privateKeyByteArray,
+			privateKeyPasswordByteArray);
+		let decryptedDataBase64 = b64encode(decryptedDataByteArray);
 
 		// cleanup memory to avoid memory leaks
 		recipientIdByteArray.delete();

@@ -31,7 +31,6 @@
   ],
   "license": "BSD",
   "dependencies": {
-    "lodash": "^4.0.0",
     "node-uuid": "^1.4.7"
   },
   "devDependencies": {

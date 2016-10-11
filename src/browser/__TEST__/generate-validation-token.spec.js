@@ -1,22 +1,44 @@
 import { VirgilCrypto, Buffer } from '../../../browser';
 
-const identity = 'alice@example.com';
-const identityType = 'email';
-const PASSWORD = Buffer.from('veryStrongPa$$0rd', 'utf8');
-const tokenRegexp = /^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}\.(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+const IDENTITY_VALUE = 'alice@example.com';
+const IDENTITY_TYPE = 'email';
+const PASSWORD = new Buffer('veryStrongPa$$0rd');
 
 describe('generate validation token', () => {
-	it('it should generate validation token with plain key', () => {
+	it('should generate validation token with plain key', () => {
 		const keyPair = VirgilCrypto.generateKeyPair();
-		const token = VirgilCrypto.generateValidationToken(identity, identityType, keyPair.privateKey);
-		expect(token).toBeDefined();
-		expect(Buffer.from(token, 'base64').toString('utf8')).toMatch(tokenRegexp);
+		const validationToken = VirgilCrypto.generateValidationToken(
+			IDENTITY_VALUE,
+			IDENTITY_TYPE,
+			keyPair.privateKey
+		);
+
+		expect(typeof validationToken).toEqual('string');
+
+		validateToken(validationToken, keyPair.publicKey);
 	});
 
-	it('it should generate validation token with encrypted key', () => {
+	it('should generate validation token with encrypted key', () => {
 		const keyPair = VirgilCrypto.generateKeyPair({ password: PASSWORD });
-		const token = VirgilCrypto.generateValidationToken(identity, identityType, keyPair.privateKey, PASSWORD);
-		expect(token).toBeDefined();
-		expect(Buffer.from(token, 'base64').toString('utf8')).toMatch(tokenRegexp);
+		const validationToken = VirgilCrypto.generateValidationToken(
+			IDENTITY_VALUE,
+			IDENTITY_TYPE,
+			keyPair.privateKey,
+			PASSWORD
+		);
+
+		expect(typeof validationToken).toEqual('string');
+
+		validateToken(validationToken, keyPair.publicKey);
 	});
 });
+
+function validateToken(validationToken, publicKey) {
+	const decodedToken = new Buffer(validationToken, 'base64').toString('utf8');
+	const parts = decodedToken.split('.');
+	const uid = parts[0];
+	const sign = parts[1];
+	const signedData = new Buffer(uid + IDENTITY_TYPE + IDENTITY_VALUE);
+
+	expect(VirgilCrypto.verify(signedData, new Buffer(sign, 'base64'), publicKey)).toEqual(true);
+}

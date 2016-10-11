@@ -25,8 +25,6 @@ export const byteArrayToBuffer = (byteArray) => {
 
 export const stringToByteArray = (string) => bufferToByteArray(new Buffer(string, 'utf8'));
 
-export const byteArrayToString = (byteArray) => byteArrayToBuffer(byteArray).toString('utf8');
-
 export const toByteArray = (data) => {
 	switch (true) {
 		case Buffer.isBuffer(data):
@@ -41,7 +39,5 @@ export const toByteArray = (data) => {
 export const toBase64 = (data) => VirgilCrypto.VirgilBase64.encode(toByteArray(data));
 
 export const base64ToBuffer = (data) => byteArrayToBuffer(VirgilCrypto.VirgilBase64.decode(data));
-
-export const stringToBuffer = (data) => byteArrayToBuffer(toByteArray(data));
 
 export const wrapper = createWrapper({ toByteArray, byteArrayToBuffer });

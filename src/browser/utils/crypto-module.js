@@ -1,7 +1,5 @@
-import _ from 'lodash';
-
 window.Module = window.Module || {};
-window.Module.onRuntimeInitialized = _.noop;
+window.Module.onRuntimeInitialized = function () {};
 
 require('script!../../lib/virgil-emscripten');
 

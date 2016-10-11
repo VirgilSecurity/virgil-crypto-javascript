@@ -1,15 +1,14 @@
 var VirgilCrypto = require('../../virgil_js.node');
 var u = require('./utils');
 
-module.exports = function decryptWithPassword (initialEncryptedData, password) {
-	password = password || '';
+module.exports = function decryptWithPassword (encryptedData, password) {
+	password = password || new Buffer(0);
 
 	var virgilCipher = new VirgilCrypto.VirgilCipher();
 
-	var dataByteArray = u.toByteArray(initialEncryptedData);
-	var passwordByteArray = u.toByteArray(password);
-
-	var decryptedDataByteArray = virgilCipher.decryptWithPassword(dataByteArray, passwordByteArray);
+	var decryptedDataByteArray = virgilCipher.decryptWithPassword(
+		u.bufferToByteArray(encryptedData),
+		u.bufferToByteArray(password));
 
 	return u.byteArrayToBuffer(decryptedDataByteArray);
 };

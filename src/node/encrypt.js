@@ -1,33 +1,32 @@
-var _ = require('lodash');
 var encryptWithKeyMultiRecipients = require('./encrypt-with-key-multi-recipients');
 var encryptWithKey = require('./encrypt-with-key');
 var encryptWithPassword = require('./encrypt-with-password');
+var u = require('./utils');
 
 /**
- * Encrypt data
+ * Encrypts data with either single public key, list of public keys or password
  *
- * @param initialData {string|Buffer}
- * @param recipientId {string|Array} - [{ recipientId: <string>, publicKey: <string> }]
- * @param [publicKey] {string}
+ * @param {Buffer} initialData - Data to encrypt
+ * @param {Buffer|Array<{ recipientId: <Buffer>, publicKey: <Buffer> }>} recipientId|recipients|password -
+ * Recipient ID if encrypting for single recipient OR Array of recipientId - publicKey pairs if encrypting
+ * for multiple recipients OR password to encrypt with
+ * @param {Buffer} [publicKey] - Public key
  *
- * @returns {Buffer}
+ * @returns {Buffer} - Encrypted data
  */
 module.exports = function encrypt (initialData, recipientId, publicKey) {
-	if (!(_.isString(initialData) || Buffer.isBuffer(initialData))) {
-		throw new TypeError('The argument `password` must be a String or Buffer');
+	var encryptedData, recipients;
+
+	u.checkIsBuffer(initialData, 'initialData');
+	if (Array.isArray(recipientId)) {
+		recipients = recipientId;
+	} else {
+		u.checkIsBuffer(recipientId, 'recipientId|password');
 	}
 
-	if (!(_.isString(recipientId) || _.isArray(recipientId))) {
-		throw new TypeError('The argument `password` must be a String or Array');
-	}
-
-	var encryptedData;
-
-	if (_.isArray(recipientId)) {
-		var recipients = recipientId;
-
+	if (recipients) {
 		encryptedData = encryptWithKeyMultiRecipients(initialData, recipients);
-	} else if (_.isString(recipientId) && _.isString(publicKey)) {
+	} else if (Buffer.isBuffer(recipientId) && Buffer.isBuffer(publicKey)) {
 		encryptedData = encryptWithKey(initialData, recipientId, publicKey);
 	} else {
 		var password = recipientId;

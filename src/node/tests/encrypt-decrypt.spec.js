@@ -2,26 +2,25 @@
 var VirgilCrypto = require('../');
 var expect = require('expect');
 
-var PASSWORD = 'veryStrongPa$$0rd';
-var INITIAL_DATA = 'initial data';
+var PASSWORD = new Buffer('veryStrongPa$$0rd', 'utf8');
+var INITIAL_DATA = new Buffer('initial data', 'utf8');
 
 describe('encrypt/decrypt', function () {
+	this.timeout(5000);
 
 	function encryptDecryptUsingKeyPair(initialData, keysType, password) {
-		password = password || '';
-
 		var keyPair = VirgilCrypto.generateKeyPair({ password: password, type: keysType });
 		var encryptedData = VirgilCrypto.encrypt(initialData, keyPair.publicKey, keyPair.publicKey);
 		var decryptedData = VirgilCrypto.decrypt(encryptedData, keyPair.publicKey, keyPair.privateKey, password);
 
-		return decryptedData.toString('utf8');
+		return decryptedData;
 	}
 
 	it('using password', function () {
 		var encryptedData = VirgilCrypto.encrypt(INITIAL_DATA, PASSWORD);
 		var decryptedData = VirgilCrypto.decrypt(encryptedData, PASSWORD);
 
-		expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
+		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 	});
 
 	Object.keys(VirgilCrypto.KeysTypesEnum)
@@ -31,12 +30,12 @@ describe('encrypt/decrypt', function () {
 	.forEach(function (keyType) {
 		it('using keys \''+keyType+'\' without password', function () {
 			var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum[keyType]);
-			expect(decryptedData).toEqual(INITIAL_DATA);
+			expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		});
 
 		it('using keys \''+keyType+'\' with password', function () {
 			var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum[keyType], PASSWORD);
-			expect(decryptedData.toString('utf8')).toEqual(INITIAL_DATA);
+			expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		});
 	});
 
@@ -51,5 +50,24 @@ describe('encrypt/decrypt', function () {
 		decryptTiny.addPackage(encryptedPackage);
 		expect(decryptTiny.isPackagesAccumulated()).toEqual(true);
 		expect(decryptTiny.decrypt(keyPair.privateKey).toString('utf8')).toEqual(data);
+	});
+
+	it('should encrypt and decrypt data for multiple recipients', () => {
+		var numRecipients = 3;
+		var recipients = Array(numRecipients).fill(0).map(function () {
+			var keyPair = VirgilCrypto.generateKeyPair();
+			return {
+				recipientId: VirgilCrypto.hash(keyPair.publicKey),
+				publicKey: keyPair.publicKey,
+				privateKey: keyPair.privateKey
+			};
+		});
+
+		var encryptedData = VirgilCrypto.encrypt(INITIAL_DATA, recipients);
+
+		recipients.forEach((r) => {
+			var decryptedData = VirgilCrypto.decrypt(encryptedData, r.recipientId, r.privateKey);
+			expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
+		});
 	});
 });

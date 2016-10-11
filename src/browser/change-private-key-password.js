@@ -1,23 +1,23 @@
-import _ from 'lodash';
 import VirgilCrypto from './utils/crypto-module';
-import * as u from './utils/crypto-utils';
+import { byteArrayToBuffer, bufferToByteArray } from './utils/crypto-utils';
+import { checkIsBuffer } from './utils/crypto-errors';
 
+/**
+ * Changes the password private key is encrypted with
+ * @param {Buffer} privateKey - Private key to change password on
+ * @param {Buffer} oldPassword - Old password
+ * @param {Buffer} newPassword - New password
+ *
+ * @returns {Buffer} - Private key
+ * */
 export function changePrivateKeyPassword (privateKey, oldPassword, newPassword) {
-	if (!_.isString(privateKey)) {
-		throw new TypeError('Private key must be string');
-	}
+	checkIsBuffer(privateKey, 'privateKey');
+	checkIsBuffer(oldPassword, 'oldPassword');
+	checkIsBuffer(newPassword, 'newPassword');
 
-	if (!_.isString(oldPassword)) {
-		throw new TypeError('Old password must be string');
-	}
-
-	if (!_.isString(newPassword)) {
-		throw new TypeError('New password must be string');
-	}
-
-	return u.byteArrayToBuffer(VirgilCrypto.VirgilKeyPair.resetPrivateKeyPassword(
-		u.toByteArray(privateKey),
-		u.toByteArray(oldPassword),
-		u.toByteArray(newPassword)
-	)).toString('utf8');
-};
+	return byteArrayToBuffer(VirgilCrypto.VirgilKeyPair.resetPrivateKeyPassword(
+		bufferToByteArray(privateKey),
+		bufferToByteArray(oldPassword),
+		bufferToByteArray(newPassword)
+	));
+}

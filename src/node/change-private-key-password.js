@@ -1,23 +1,23 @@
-var _ = require('lodash');
 var VirgilCrypto = require('../../virgil_js.node');
 var u = require('./utils');
 
+/**
+ * Changes the password used to encrypt the private key
+ *
+ * @param {Buffer} privateKey - The private key
+ * @param {Buffer} oldPassword - Old password
+ * @param {Buffer} newPassword - New password
+ *
+ * @returns {Buffer} Encrypted private key
+ * */
 module.exports = function changePrivateKeyPassword (privateKey, oldPassword, newPassword) {
-	if (!_.isString(privateKey)) {
-		throw new TypeError('Private key must be string');
-	}
-
-	if (!_.isString(oldPassword)) {
-		throw new TypeError('Old password must be string');
-	}
-
-	if (!_.isString(newPassword)) {
-		throw new TypeError('New password must be string');
-	}
+	u.checkIsBuffer(privateKey, 'privateKey');
+	u.checkIsBuffer(oldPassword, 'oldPassword');
+	u.checkIsBuffer(newPassword, 'newPassword');
 
 	return u.byteArrayToBuffer(VirgilCrypto.VirgilKeyPair.resetPrivateKeyPassword(
-		u.toByteArray(privateKey),
-		u.toByteArray(oldPassword),
-		u.toByteArray(newPassword)
-	)).toString('utf8');
+		u.bufferToByteArray(privateKey),
+		u.bufferToByteArray(oldPassword),
+		u.bufferToByteArray(newPassword)
+	));
 };

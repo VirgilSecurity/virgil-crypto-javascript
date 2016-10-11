@@ -1,4 +1,3 @@
-var _ = require('lodash');
 var VirgilKeyPair = require('../../virgil_js.node').VirgilKeyPair;
 var KeysTypesEnum = require('../lib/keys-types-enum');
 var u = require('./utils');
@@ -11,33 +10,31 @@ function isValidKeysType(keysType) {
  * Generate the key pair - public and private keys
  *
  * @param {Object} [options={}] - Keys options.
- * @param {string=} options.password - Private key password (Optional).
+ * @param {Buffer=} options.password - Private key password (Optional).
  * @param {string=} options.type - Keys type identifier (Optional). If provided must be one of KeysTypesEnum values.
- * @returns {{publicKey: *, privateKey: *}}
+ * @returns {{publicKey: <Buffer>, privateKey: <Buffer>}}
  */
 module.exports = function generateKeyPair (options) {
 	options = options || {};
-	var password = options.password || '';
+	var password = options.password || new Buffer(0);
 	var keysType = options.type;
 
 	if (keysType && !isValidKeysType(keysType)) {
-		throw new TypeError('The value `' + keysType + '` is not a valid type identifier. Must be one of ' +
-			_.keys(KeysTypesEnum).join(', ') + ' - use the KeysTypesEnum to get it.');
+		throw new TypeError('The value `' + keysType + '` is not a valid keys type. Must be one of ' +
+			Object.keys(KeysTypesEnum).join(', ') + ' - use KeysTypesEnum.');
 	}
 
-	if (!_.isString(password)) {
-		throw new TypeError('The argument `password` must be a String');
-	}
-	
+	u.checkIsBuffer(password, 'password');
+
 	var generate = keysType ?
-		VirgilKeyPair.generate.bind(VirgilKeyPair, VirgilKeyPair['Type_' + KeysTypesEnum[keysType]]) :
-		VirgilKeyPair.generateRecommended.bind(VirgilKeyPair);
+		VirgilKeyPair.generate.bind(null, VirgilKeyPair['Type_' + KeysTypesEnum[keysType]]) :
+		VirgilKeyPair.generateRecommended;
 
 
-	var virgilKeys = generate(u.stringToByteArray(password));
+	var virgilKeys = generate(u.bufferToByteArray(password));
 
 	return {
-		privateKey: u.byteArrayToString(virgilKeys.privateKey()),
-		publicKey: u.byteArrayToString(virgilKeys.publicKey())
+		privateKey: u.byteArrayToBuffer(virgilKeys.privateKey()),
+		publicKey: u.byteArrayToBuffer(virgilKeys.publicKey())
 	};
 };

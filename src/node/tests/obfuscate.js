@@ -3,18 +3,19 @@ var VirgilCrypto = require('../');
 var expect = require('expect');
 
 describe('obfuscate', function () {
-	it('it obfuscates strings', function () {
-		var o1 = VirgilCrypto.obfuscate('asfasfas', 'qwqeqwe');
-		var o2 = VirgilCrypto.obfuscate('asfasfas', 'qwqeqwe');
-		expect(typeof o1).toEqual('string');
-		expect(o1).toEqual(o2);
+	it('should obfuscate data', function () {
+		var o1 = VirgilCrypto.obfuscate(new Buffer('obfuscate me'), new Buffer('salt'));
+		var o2 = VirgilCrypto.obfuscate(new Buffer('obfuscate me'), new Buffer('salt'));
+		expect(Buffer.isBuffer(o1)).toBe(true);
+		expect(Buffer.isBuffer(o2)).toBe(true);
+		expect(o1.equals(o2)).toBe(true);
 	});
 
-	it('different salt -> different result', function () {
-		var o1 = VirgilCrypto.obfuscate('asfasfas', 'qwqeqwe');
-		var o2 = VirgilCrypto.obfuscate('asfasfas', 'qwqeqwe2');
-		expect(typeof o1).toEqual('string');
-		expect(typeof o2).toEqual('string');
-		expect(o1).toNotEqual(o2);
+	it('should produce different result depending on salt', function () {
+		var o1 = VirgilCrypto.obfuscate(new Buffer('obfuscate me'), new Buffer('salt1'));
+		var o2 = VirgilCrypto.obfuscate(new Buffer('obfuscate me'), new Buffer('salt2'));
+		expect(Buffer.isBuffer(o1)).toBe(true);
+		expect(Buffer.isBuffer(o2)).toBe(true);
+		expect(o1.equals(o2)).toBe(false);
 	});
 });

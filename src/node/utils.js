@@ -41,6 +41,12 @@ var utils = {
 			default:
 				throw new Error('Can\'t convert ' + typeof data + ' to ByteArray.');
 		}
+	},
+
+	checkIsBuffer: function checkIsBuffer (arg, name) {
+		if (!Buffer.isBuffer(arg)) {
+			throw new TypeError('Unexpected type of "' + name + '" argument, use Buffer');
+		}
 	}
 };
 

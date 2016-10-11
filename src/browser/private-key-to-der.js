@@ -1,15 +1,19 @@
-import isString from 'lodash/isString';
 import VirgilCrypto from './utils/crypto-module';
-import * as CryptoUtils from './utils/crypto-utils';
-import { throwValidationError } from './utils/crypto-errors';
+import { bufferToByteArray, byteArrayToBuffer } from './utils/crypto-utils';
+import { checkIsBuffer } from './utils/crypto-errors';
 
-export function privateKeyToDER(privateKey, privateKeyPassword = '') {
-	if (!isString(privateKey) && !Buffer.isBuffer(privateKey)) {
-		throwValidationError('00003', { arg: 'privateKey s', text: 'must be a string or Buffer.'});
-	}
+/**
+ * Converts PEM formatted private key to DER format.
+ * @param {Buffer} privateKey - Private key in PEM format
+ * @param {Buffer} [privateKeyPassword] - Private key password, if encrypted.
+ * @returns {Buffer}
+ * */
+export function privateKeyToDER(privateKey, privateKeyPassword = new Buffer(0)) {
+	checkIsBuffer(privateKey, 'privateKey');
+	checkIsBuffer(privateKeyPassword);
 
-	const privateKeyByteArray = CryptoUtils.toByteArray(privateKey);
-	const passwordByteArray = CryptoUtils.toByteArray(privateKeyPassword);
-	const derByteArray = VirgilCrypto.VirgilKeyPair.privateKeyToDER(privateKeyByteArray, passwordByteArray);
-	return CryptoUtils.byteArrayToBuffer(derByteArray);
+	return byteArrayToBuffer(
+		VirgilCrypto.VirgilKeyPair.privateKeyToDER(
+			bufferToByteArray(privateKey),
+			bufferToByteArray(privateKeyPassword)));
 }

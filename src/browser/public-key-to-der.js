@@ -1,14 +1,13 @@
-import isString from 'lodash/isString';
 import VirgilCrypto from './utils/crypto-module';
-import * as CryptoUtils from './utils/crypto-utils';
-import { throwValidationError } from './utils/crypto-errors';
+import { bufferToByteArray, byteArrayToBuffer } from './utils/crypto-utils';
+import { checkIsBuffer } from './utils/crypto-errors';
 
+/**
+ * Converts PEM formatted public key to DER format.
+ * @param {Buffer} publicKey - Public key in PEM format
+ * @returns {Buffer}
+ * */
 export function publicKeyToDER(publicKey) {
-	if (!isString(publicKey) && !Buffer.isBuffer(publicKey)) {
-		throwValidationError('00003', { arg: 'publicKey', text: 'must be a string or Buffer.'});
-	}
-
-	const publicKeyByteArray = CryptoUtils.toByteArray(publicKey);
-	const derByteArray = VirgilCrypto.VirgilKeyPair.publicKeyToDER(publicKeyByteArray);
-	return CryptoUtils.byteArrayToBuffer(derByteArray);
+	checkIsBuffer(publicKey, 'publicKey');
+	return byteArrayToBuffer(VirgilCrypto.VirgilKeyPair.publicKeyToDER(bufferToByteArray(publicKey)));
 }

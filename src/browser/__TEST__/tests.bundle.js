@@ -9,3 +9,7 @@ import './sign-verify.spec';
 import './sign-verify-async.spec';
 import './obfuscate.spec';
 import './hash.spec';
+import './keys-format-convert.spec';
+import './extract-public-key.spec';
+import './encrypt-decrypt-private-key.spec';
+import './generate-validation-token.spec';

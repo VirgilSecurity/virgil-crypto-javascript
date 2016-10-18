@@ -23,73 +23,63 @@
 
 			var virgilCrypto = window.VirgilCrypto;
 			var keysTypesEnum = virgilCrypto.KeysTypesEnum;
-			var privateKeyPassword = 'veryStrongPa$$0rd';
+			var privateKeyPassword = new virgilCrypto.Buffer('veryStrongPa$$0rd');
 
 			var keyPair = virgilCrypto.generateKeyPair({ password: privateKeyPassword });
+			var initialData = new virgilCrypto.Buffer('initial data');
 
-			var initialData = 'initial data';
-
-			console.log('initialData', initialData);
-
-			console.log('keyPair', JSON.stringify(keyPair));
 
 			var privateKeyDER = virgilCrypto.privateKeyToDER(keyPair.privateKey, privateKeyPassword);
 			console.log('private key in DER: ', privateKeyDER.toString('base64'));
+
 			var publicKeyDER = virgilCrypto.publicKeyToDER(keyPair.publicKey);
 			console.log('public key in DER: ', publicKeyDER.toString('base64'));
 
 			var keyPairDefaultParams = virgilCrypto.generateKeyPair();
 			console.log('keyPairDefaultParams', keyPairDefaultParams);
-			var keyPairOnlyPassword = virgilCrypto.generateKeyPair({ password: 'password' });
+
+			var keyPairOnlyPassword = virgilCrypto.generateKeyPair({
+				password: privateKeyPassword
+			});
 			console.log('keyPairOnlyPassword', keyPairOnlyPassword);
-			var keyPairPasswordAndType = virgilCrypto.generateKeyPair({ type: keysTypesEnum.EC_SECP256K1,  password: 'password' });
+
+			var keyPairPasswordAndType = virgilCrypto.generateKeyPair({
+				type: keysTypesEnum.EC_SECP256K1,
+				password: privateKeyPassword
+			});
 			console.log('keyPairPasswordAndType', keyPairPasswordAndType);
-			var keyPairOnlyType = virgilCrypto.generateKeyPair({ type: keysTypesEnum.EC_SECP256K1 });
+
+			var keyPairOnlyType = virgilCrypto.generateKeyPair({
+				type: keysTypesEnum.EC_SECP256K1
+			});
 			console.log('keyPairOnlyType', keyPairOnlyType);
 
 			virgilCrypto.generateKeyPairAsync({
 				type: keysTypesEnum.EC_SECP256K1,
-				password: 'password'
+				password: privateKeyPassword
 			}).then(function(keyPairAsyncPasswordAndType) {
 				console.log('keyPairAsyncPasswordAndType', keyPairAsyncPasswordAndType);
 			});
+
 			virgilCrypto.generateKeyPairAsync({
 				type: keysTypesEnum.EC_SECP256K1
 			}).then(function(keyPairAsyncOnlyType) {
 				console.log('keyPairAsyncOnlyType', keyPairAsyncOnlyType);
 			});
 
-			var encryptedStringToBase64Data = virgilCrypto.encryptStringToBase64(initialData, 'password');
-			console.log('encryptedStringToBase64Data', encryptedStringToBase64Data);
-			var decryptedStringToBase64Data = virgilCrypto.decryptStringFromBase64(encryptedStringToBase64Data, 'password');
-			console.log('decryptedStringToBase64Data', decryptedStringToBase64Data);
-
-			virgilCrypto.encryptStringToBase64Async(initialData, 'password').
-			then(function(encryptedStringToBase64DataAsync) {
-				console.log('encryptedStringToBase64DataAsync', encryptedStringToBase64DataAsync);
-
-				virgilCrypto.decryptStringFromBase64Async(encryptedStringToBase64Data, 'password').
-				then(function(decryptedStringToBase64DataAsync) {
-					console.log('decryptedStringToBase64DataAsync', decryptedStringToBase64DataAsync);
-				});
-			});
-
-			var encryptedData = virgilCrypto.encrypt(initialData, 'password');
+			var encryptedData = virgilCrypto.encrypt(initialData, new Buffer('password'));
 			console.log('encryptedData base64', encryptedData.toString('base64'));
 
-			var decryptedData = virgilCrypto.decrypt(encryptedData, 'password');
+			var decryptedData = virgilCrypto.decrypt(encryptedData, new Buffer('password'));
 			console.log('decryptedData string', decryptedData.toString());
-			console.log('decryptedData base64', decryptedData.toString('base64'));
 
-			virgilCrypto.encryptAsync(initialData, 'password').
+			virgilCrypto.encryptAsync(initialData, new Buffer('password')).
 			then(function(encryptedData) {
-				console.log('async encryptedData string', encryptedData.toString());
 				console.log('async encryptedData base64', encryptedData.toString('base64'));
 
-				virgilCrypto.decryptAsync(encryptedData, 'password').
+				virgilCrypto.decryptAsync(encryptedData, new Buffer('password')).
 				then(function(decryptedData) {
 					console.log('async decryptedData', decryptedData.toString());
-					console.log('async decryptedData base64', encryptedData.toString('base64'));
 				});
 			});
 
@@ -98,48 +88,39 @@
 
 			var decryptedDataByKey = virgilCrypto.decrypt(encryptedDataByKey, keyPair.publicKey, keyPair.privateKey, privateKeyPassword);
 			console.log('decryptedDataByKey', decryptedDataByKey.toString());
-			console.log('decryptedDataByKey base64', decryptedDataByKey.toString('base64'));
 
-			virgilCrypto.decryptAsync(encryptedDataByKey, keyPair.publicKey, keyPair.privateKey, privateKeyPassword).then(function(decryptedDataByKey) {
+			virgilCrypto.decryptAsync(encryptedDataByKey, keyPair.publicKey, keyPair.privateKey, privateKeyPassword).
+			then(function(decryptedDataByKey) {
 				console.log('async decryptedDataByKey', decryptedDataByKey.toString());
-				console.log('async decryptedDataByKey base64', decryptedDataByKey.toString('base64'));
 			});
 
 			var sign = virgilCrypto.sign(encryptedDataByKey, keyPair.privateKey, privateKeyPassword);
 			console.log('sign base64', sign.toString('base64'));
 
-			var verified = virgilCrypto.verify(encryptedDataByKey, keyPair.publicKey, sign);
+			var verified = virgilCrypto.verify(encryptedDataByKey, sign, keyPair.publicKey);
 			console.log('verified', verified);
 
-			virgilCrypto.signAsync(encryptedDataByKey, keyPair.privateKey, privateKeyPassword).then(function(sign) {
+			virgilCrypto.signAsync(encryptedDataByKey, keyPair.privateKey, privateKeyPassword).
+			then(function(sign) {
 				console.log('async sign base64', sign.toString('base64'));
 
-				virgilCrypto.verifyAsync(encryptedDataByKey, keyPair.publicKey, sign).then(function(verified) {
+				virgilCrypto.verifyAsync(encryptedDataByKey, sign, keyPair.publicKey).
+				then(function(verified) {
 					console.log('async verified', verified);
-				});
-
-				virgilCrypto.verifyAsync(encryptedDataByKey, keyPair.publicKey, sign.toString('base64')).then(function(verifiedBase64) {
-					console.log('async verified sign as base64', verifiedBase64);
 				});
 			});
 
-			var verifiedBase64 = virgilCrypto.verify(encryptedDataByKey, keyPair.publicKey, sign.toString('base64'));
-			console.log('verified sign as base64', verifiedBase64);
-
 			var encryptedDataMulti = virgilCrypto.encrypt(initialData, [{ recipientId: keyPair.publicKey, publicKey: keyPair.publicKey }]);
-			console.log('encryptedDataMulti string', encryptedDataMulti.toString());
 			console.log('encryptedDataMulti base64', encryptedDataMulti.toString('base64'));
 
 			virgilCrypto.encryptAsync(
 				initialData,
 				[{ recipientId: keyPair.publicKey, publicKey: keyPair.publicKey }]
 			).then(function(encryptedDataMulti) {
-				console.log('async encryptedDataMulti string', encryptedDataMulti.toString());
 				console.log('async encryptedDataMulti base64', encryptedDataMulti.toString('base64'));
 
 				var decryptedDataMulti = virgilCrypto.decrypt(encryptedDataMulti, keyPair.publicKey, keyPair.privateKey, privateKeyPassword);
 				console.log('decryptedDataMulti string', decryptedDataMulti.toString());
-				console.log('decryptedDataMulti base64', decryptedDataMulti.toString('base64'));
 			});
 		</script>
 	</body>

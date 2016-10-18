@@ -1,7 +1,6 @@
 import 'babel-core/external-helpers';
 
 import gulp from 'gulp';
-import gulpUtil from 'gulp-util';
 import gulpPlumber from 'gulp-plumber';
 import vinylNamed from 'vinyl-named';
 import webpackStream from 'webpack-stream';
@@ -10,7 +9,6 @@ import path, { join as pathJoin } from 'path';
 import webpack, { DefinePlugin } from 'webpack';
 import packageJson from './package.json';
 import yargs from 'yargs';
-import _ from 'lodash';
 
 import { Server as KarmaServer } from 'karma';
 import karmaWebpack from 'karma-webpack';
@@ -170,7 +168,7 @@ gulp.task('test', function(done) {
 });
 
 gulp.task('build', () => {
-	return gulp.src(_.values(WEBPACK_CONFIG.entry))
+	return gulp.src(Object.values(WEBPACK_CONFIG.entry))
 		.pipe(vinylNamed())
 		.pipe(gulpPlumber(handleError))
 		.pipe(webpackStream(WEBPACK_CONFIG, webpack))

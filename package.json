@@ -1,10 +1,11 @@
 {
   "name": "virgil-crypto",
-  "version": "1.6.1",
+  "version": "4.0.0-beta.0",
   "description": "Virgil Crypto",
   "contributors": [
     "Eugene Baranov <ebaranov.dev@gmail.com> (https://github.com/ebaranov/)",
-    "Egor Gumenyuk <boo1ean0807@gmail.com> (https://github.com/boo1ean/)"
+    "Egor Gumenyuk <boo1ean0807@gmail.com> (https://github.com/boo1ean/)",
+    "Vadim Avdeiev <v.avdeiev@gmail.com> (https://github.com/vadimavdeev/)"
   ],
   "repository": {
     "type": "git",

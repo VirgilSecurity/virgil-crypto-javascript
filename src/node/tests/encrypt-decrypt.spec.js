@@ -52,7 +52,7 @@ describe('encrypt/decrypt', function () {
 		expect(decryptTiny.decrypt(keyPair.privateKey).toString('utf8')).toEqual(data);
 	});
 
-	it('should encrypt and decrypt data for multiple recipients', () => {
+	it('should encrypt and decrypt data for multiple recipients', function () {
 		var numRecipients = 3;
 		var recipients = Array(numRecipients).fill(0).map(function () {
 			var keyPair = VirgilCrypto.generateKeyPair();
@@ -65,7 +65,7 @@ describe('encrypt/decrypt', function () {
 
 		var encryptedData = VirgilCrypto.encrypt(INITIAL_DATA, recipients);
 
-		recipients.forEach((r) => {
+		recipients.forEach(function (r) {
 			var decryptedData = VirgilCrypto.decrypt(encryptedData, r.recipientId, r.privateKey);
 			expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		});

@@ -36,11 +36,11 @@ describe('generateValidationToken', function () {
 });
 
 function validateToken(validationToken, publicKey) {
-	const decodedToken = new Buffer(validationToken, 'base64').toString('utf8');
-	const parts = decodedToken.split('.');
-	const uid = parts[0];
-	const sign = parts[1];
-	const signedData = new Buffer(uid + IDENTITY_TYPE + IDENTITY_VALUE);
+	var decodedToken = new Buffer(validationToken, 'base64').toString('utf8');
+	var parts = decodedToken.split('.');
+	var uid = parts[0];
+	var sign = parts[1];
+	var signedData = new Buffer(uid + IDENTITY_TYPE + IDENTITY_VALUE);
 
 	expect(VirgilCrypto.verify(signedData, new Buffer(sign, 'base64'), publicKey)).toEqual(true);
 }

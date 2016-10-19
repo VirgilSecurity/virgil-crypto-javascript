@@ -54,14 +54,16 @@ describe('encrypt/decrypt', function () {
 
 	it('should encrypt and decrypt data for multiple recipients', function () {
 		var numRecipients = 3;
-		var recipients = Array(numRecipients).fill(0).map(function () {
-			var keyPair = VirgilCrypto.generateKeyPair();
-			return {
+		var recipients = [];
+		var keyPair;
+		for (var i = 0; i < numRecipients; i++) {
+			keyPair = VirgilCrypto.generateKeyPair();
+			recipients.push({
 				recipientId: VirgilCrypto.hash(keyPair.publicKey),
 				publicKey: keyPair.publicKey,
 				privateKey: keyPair.privateKey
-			};
-		});
+			});
+		}
 
 		var encryptedData = VirgilCrypto.encrypt(INITIAL_DATA, recipients);
 

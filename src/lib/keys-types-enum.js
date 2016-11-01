@@ -1,4 +1,4 @@
-var Enum = require('./enum');
+var Enum = require('../lib/Enum');
 
 module.exports = Enum({
 	Default: 'FAST_EC_ED25519',

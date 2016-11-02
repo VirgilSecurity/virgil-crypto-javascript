@@ -1,6 +1,6 @@
 import ExtendableError from 'es6-error';
 
-class VirgilError extends ExtendableError {
+class VirgilCryptoError extends ExtendableError {
 
   _code;
   _message;
@@ -30,4 +30,4 @@ class VirgilError extends ExtendableError {
 
 }
 
-export default VirgilError;
+export default VirgilCryptoError;

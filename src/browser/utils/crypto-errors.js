@@ -1,9 +1,10 @@
-import VirgilError from '../../lib/Error';
+import VirgilCryptoError from '../../lib/Error';
 
 export const errors = {
 	'00000': _ => 'An error occurred',
 	'00001': ({arg, type}) => `The "${arg}" must be a "${type}"`,
 	'00002': ({arg, type}) => `The "${arg}" must be "${type}"`,
+	'10000': ({error}) => error,
 	'90001': ({error}) => `Unable to ENCRYPT the given data. ${error}`,
 	'90002': ({error}) => `Unable to DECRYPT the given data. ${error}`,
 	'90003': ({error}) => `Unable to ENCRYPT the given data. ${error}`,
@@ -17,7 +18,7 @@ export const errors = {
 };
 
 export function throwVirgilError (code, tokens) {
-	throw new VirgilError((errors[code])(tokens), code);
+	throw new VirgilCryptoError((errors[code])(tokens), code);
 }
 
 export function throwValidationError (code, tokens) {
@@ -26,6 +27,6 @@ export function throwValidationError (code, tokens) {
 
 export function checkIsBuffer (arg, name) {
 	if (!Buffer.isBuffer(arg)) {
-		throwValidationError('00001', { arg: name, type: 'Buffer' });
+		throwVirgilError('00001', { arg: name, type: 'Buffer' });
 	}
 }

@@ -19,5 +19,8 @@ module.exports = {
 	changePrivateKeyPassword: require('./change-private-key-password'),
 	encryptPrivateKey: require('./encrypt-private-key'),
 	decryptPrivateKey: require('./decrypt-private-key'),
-	VirgilTinyCipher: Virgil.VirgilTinyCipher
+	signThenEncrypt: require('./sign-then-encrypt'),
+	decryptThenVerify: require('./decrypt-then-verify'),
+	VirgilTinyCipher: Virgil.VirgilTinyCipher,
+	VirgilCryptoError: require('./virgil-crypto-error')
 };

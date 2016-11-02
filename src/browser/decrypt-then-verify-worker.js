@@ -17,7 +17,7 @@ export default function(cipherData, recipientId, privateKey, publicKey) {
 
 		let signature = cipher
 			.customParams()
-			.getData(ByteArray.fromUTF8('VIRGIL_DATA_SIGN'));
+			.getData(ByteArray.fromUTF8('VIRGIL-DATA-SIGNATURE'));
 
 		let isValid = signer.verify(plainData, signature, b64decode(publicKey));
 		if (!isValid) {

@@ -17,7 +17,7 @@ export default function(data, privateKey, recipients) {
 
 		cipher
 			.customParams()
-			.setData(ByteArray.fromUTF8('VIRGIL_DATA_SIGN'), signature);
+			.setData(ByteArray.fromUTF8('VIRGIL-DATA-SIGNATURE'), signature);
 
 		recipients.forEach(function (recipient) {
 			cipher.addKeyRecipient(

@@ -6,7 +6,7 @@ var format = require('util').format;
 var destFilePath = path.resolve(__dirname + '/../virgil_js.node');
 var file = fs.createWriteStream(destFilePath);
 
-var url = 'https://cdn.virgilsecurity.com/packages/nodejs/virgil-crypto-%s-nodejs-%s-%s-%s.node';
+var url = '/packages/nodejs/virgil-crypto-%s-nodejs-%s-%s-%s.node';
 
 var cryptoVersion = '2.0.2';
 var nodeVersion = getNodeVersion();
@@ -17,7 +17,14 @@ url = format(url, cryptoVersion, nodeVersion, platform, arch);
 
 console.log('Downloading native build.... %s', url);
 
-https.get(url, function(res) {
+var options = {
+	protocol: 'https:',
+	hostname: 'cdn.virgilsecurity.com',
+	path: url,
+	agent: new https.Agent({ keepAlive: true })
+};
+
+https.get(options, function(res) {
 	if (res.statusCode != 200) {
 		noSupport();
 	}
@@ -25,11 +32,12 @@ https.get(url, function(res) {
 	res.pipe(file);
 	res.on('error', abortWithError);
 	res.on('end', assertFile);
-});
+}).on('error', abortWithError);
 
 function abortWithError (error) {
 	console.error('Download error.');
 	console.error(error);
+	process.exit(1);
 }
 
 function assertFile () {
@@ -55,6 +63,10 @@ function getPlatform () {
 function getArch () {
 	if (process.arch === 'x64' && process.platform !== 'win32') {
 		return 'x86_64';
+	}
+
+	if (process.arch === 'ia32' && process.platform === 'win32') {
+		return 'x86';
 	}
 
 	return process.arch;

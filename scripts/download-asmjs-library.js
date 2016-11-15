@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var del = require('del');
 var request = require('request');
+var https = require('https');
 
 var cryptoVersion = '2.0.2';
 var downloadUrl = 'https://cdn.virgilsecurity.com/packages/asmjs/virgil-crypto-' + cryptoVersion + '-asmjs.js';
@@ -9,7 +10,12 @@ var downloadFilePath = path.join(__dirname, '../', 'virgil-emscripten.js');
 var libPath = path.resolve(path.join(__dirname, '../src/lib/virgil-emscripten.js'));
 
 request
-	.get(downloadUrl)
+	.get({
+		url: downloadUrl,
+		agent: new https.Agent({
+			keepAlive: true
+		})
+	})
 	.on('response', function(res) {
 		if (res.statusCode != 200) {
 			abortWithError(res.statusMessage);

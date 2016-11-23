@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import uuid from 'node-uuid';
+import uuid from 'uuid';
 import sign from './sign';
 import VirgilCrypto from './utils/crypto-module';
 import * as CryptoUtils from './utils/crypto-utils';

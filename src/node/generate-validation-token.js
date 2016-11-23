@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var uuid = require('node-uuid');
+var uuid = require('uuid');
 var sign = require('./sign');
 var IdentityTypes = require('../lib/identity-types');
 

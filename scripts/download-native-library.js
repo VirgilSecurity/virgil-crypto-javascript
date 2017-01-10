@@ -8,7 +8,7 @@ var file = fs.createWriteStream(destFilePath);
 
 var url = '/packages/nodejs/virgil-crypto-%s-nodejs-%s-%s-%s.node';
 
-var cryptoVersion = '2.0.2';
+var cryptoVersion = '2.0.4';
 var nodeVersion = getNodeVersion();
 var platform = getPlatform();
 var arch = getArch();
@@ -50,7 +50,7 @@ function assertFile () {
 
 function getPlatform () {
 	if (process.platform === 'darwin') {
-		return 'darwin-14.5';
+		return 'darwin-16.3';
 	}
 
 	if (process.platform === 'win32') {

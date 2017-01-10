@@ -1,5 +1,3 @@
-import 'babel-core/external-helpers';
-
 import gulp from 'gulp';
 import gulpPlumber from 'gulp-plumber';
 import vinylNamed from 'vinyl-named';

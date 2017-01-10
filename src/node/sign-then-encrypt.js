@@ -39,9 +39,11 @@ module.exports = function signThenEncrypt (data, privateKey, recipientId, public
 	var cipher = new VirgilCrypto.VirgilCipher();
 	var signature;
 	var customData;
+	var dataByteArray = u.bufferToByteArray(data);
 
 	try {
-		signature = signer.sign(u.bufferToByteArray(data), u.bufferToByteArray(privateKey));
+		signature = signer.sign(dataByteArray, u.bufferToByteArray(privateKey));
+
 		customData = cipher.customParams();
 		customData.setData(u.stringToByteArray(constants.DATA_SIGNATURE_KEY), signature);
 
@@ -49,10 +51,9 @@ module.exports = function signThenEncrypt (data, privateKey, recipientId, public
 			cipher.addKeyRecipient(u.bufferToByteArray(recipient.recipientId), u.bufferToByteArray(recipient.publicKey));
 		});
 
-		return u.byteArrayToBuffer(cipher.encrypt(u.bufferToByteArray(data), true));
+		return u.byteArrayToBuffer(cipher.encrypt(dataByteArray, true));
 
 	} catch (e) {
 		throw new VirgilCryptoError(e.message);
 	}
 };
-

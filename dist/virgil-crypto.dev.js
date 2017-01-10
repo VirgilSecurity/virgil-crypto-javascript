@@ -3524,8 +3524,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function encryptWithPassword(initialData, password) {
-		var isEmbeddedContentInfo = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-
+		var embedContentInfo = true;
 		var virgilCipher = new _cryptoModule2.default.VirgilCipher();
 		var encryptedDataBuffer = void 0;
 
@@ -3534,7 +3533,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				virgilCipher.addPasswordRecipient((0, _cryptoUtils.bufferToByteArray)(password));
 			}
 
-			encryptedDataBuffer = (0, _cryptoUtils.byteArrayToBuffer)(virgilCipher.encrypt((0, _cryptoUtils.bufferToByteArray)(initialData), isEmbeddedContentInfo));
+			encryptedDataBuffer = (0, _cryptoUtils.byteArrayToBuffer)(virgilCipher.encrypt((0, _cryptoUtils.bufferToByteArray)(initialData), embedContentInfo));
 		} catch (e) {
 			(0, _cryptoErrors.throwVirgilError)('90003', { error: e.message });
 		} finally {
@@ -4723,9 +4722,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			encryptedDataPromise = (0, _encryptWithKeyAsync.encryptWithKeyAsync)(initialData, recipientId, publicKey);
 		} else {
 			var password = recipientId;
-			var isEmbeddedContentInfo = publicKey;
 
-			encryptedDataPromise = (0, _encryptWithPasswordAsync.encryptWithPasswordAsync)(initialData, password, isEmbeddedContentInfo);
+			encryptedDataPromise = (0, _encryptWithPasswordAsync.encryptWithPasswordAsync)(initialData, password);
 		}
 
 		return encryptedDataPromise;
@@ -4974,18 +4972,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function encryptWithPasswordAsync(initialData, password) {
-		var isEmbeddedContentInfo = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-
 		if (_bowser2.default.msie || _bowser2.default.msedge) {
 			return new _promise2.default(function (resolve, reject) {
 				try {
-					resolve((0, _encryptWithPassword.encryptWithPassword)(initialData, password, isEmbeddedContentInfo));
+					resolve((0, _encryptWithPassword.encryptWithPassword)(initialData, password));
 				} catch (e) {
 					reject(e.message);
 				}
 			});
 		} else {
-			return _cryptoWorkerApi2.default.encryptWithPassword((0, _cryptoUtils.toBase64)(initialData), (0, _cryptoUtils.toBase64)(password), isEmbeddedContentInfo).then(_cryptoUtils.base64ToBuffer).catch(function (e) {
+			return _cryptoWorkerApi2.default.encryptWithPassword((0, _cryptoUtils.toBase64)(initialData), (0, _cryptoUtils.toBase64)(password)).then(_cryptoUtils.base64ToBuffer).catch(function (e) {
 				return (0, _cryptoErrors.throwVirgilError)('90003', { error: e });
 			});
 		}
@@ -5003,8 +4999,9 @@ return /******/ (function(modules) { // webpackBootstrap
 		value: true
 	});
 
-	exports.default = function (initialData, password, isEmbeddedContentInfo) {
+	exports.default = function (initialData, password) {
 		var deferred = this.deferred();
+		var embedContentInfo = true;
 		var virgilCipher = new VirgilCryptoWorkerContext.VirgilCipher();
 		var base64decode = VirgilCryptoWorkerContext.VirgilBase64.decode;
 		var base64encode = VirgilCryptoWorkerContext.VirgilBase64.encode;
@@ -5014,7 +5011,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				virgilCipher.addPasswordRecipient(base64decode(password));
 			}
 
-			var encryptedDataBase64 = base64encode(virgilCipher.encrypt(base64decode(initialData), isEmbeddedContentInfo));
+			var encryptedDataBase64 = base64encode(virgilCipher.encrypt(base64decode(initialData), embedContentInfo));
 
 			deferred.resolve(encryptedDataBase64);
 		} catch (e) {
@@ -5069,9 +5066,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			encryptedData = (0, _encryptWithKey.encryptWithKey)(initialData, recipientId, publicKey);
 		} else {
 			var password = recipientId;
-			var isEmbeddedContentInfo = publicKey;
 
-			encryptedData = (0, _encryptWithPassword.encryptWithPassword)(initialData, password, isEmbeddedContentInfo);
+			encryptedData = (0, _encryptWithPassword.encryptWithPassword)(initialData, password);
 		}
 
 		return encryptedData;

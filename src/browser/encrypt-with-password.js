@@ -2,7 +2,8 @@ import VirgilCrypto from './utils/crypto-module';
 import { bufferToByteArray, byteArrayToBuffer } from './utils/crypto-utils';
 import { throwVirgilError } from './utils/crypto-errors';
 
-export function encryptWithPassword (initialData, password, isEmbeddedContentInfo = true) {
+export function encryptWithPassword (initialData, password) {
+	const embedContentInfo = true;
 	const virgilCipher = new VirgilCrypto.VirgilCipher();
 	let encryptedDataBuffer;
 
@@ -12,7 +13,7 @@ export function encryptWithPassword (initialData, password, isEmbeddedContentInf
 		}
 
 		encryptedDataBuffer = byteArrayToBuffer(
-			virgilCipher.encrypt(bufferToByteArray(initialData), isEmbeddedContentInfo));
+			virgilCipher.encrypt(bufferToByteArray(initialData), embedContentInfo));
 	} catch (e) {
 		throwVirgilError('90003', { error: e.message });
 	} finally {

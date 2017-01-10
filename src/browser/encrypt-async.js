@@ -28,9 +28,8 @@ export function encryptAsync (initialData, recipientId, publicKey) {
 		encryptedDataPromise = encryptWithKeyAsync(initialData, recipientId, publicKey);
 	} else {
 		let password = recipientId;
-		let isEmbeddedContentInfo = publicKey;
 
-		encryptedDataPromise = encryptWithPasswordAsync(initialData, password, isEmbeddedContentInfo);
+		encryptedDataPromise = encryptWithPasswordAsync(initialData, password);
 	}
 
 	return encryptedDataPromise;

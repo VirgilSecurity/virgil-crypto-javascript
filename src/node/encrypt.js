@@ -30,9 +30,7 @@ module.exports = function encrypt (initialData, recipientId, publicKey) {
 		encryptedData = encryptWithKey(initialData, recipientId, publicKey);
 	} else {
 		var password = recipientId;
-		var isEmbeddedContentInfo = publicKey;
-
-		encryptedData = encryptWithPassword(initialData, password, isEmbeddedContentInfo);
+		encryptedData = encryptWithPassword(initialData, password);
 	}
 
 	return encryptedData;

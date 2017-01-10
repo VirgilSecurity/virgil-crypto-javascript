@@ -15,7 +15,7 @@
   "browser": "dist/virgil-crypto.dev.js",
   "scripts": {
     "postinstall": "node scripts/download-native-library.js",
-    "build": "gulp build --debug && gulp build --production",
+    "build": "gulp build --development && gulp build --production",
     "asm-update": "node scripts/download-asmjs-library.js",
     "test": "./node_modules/.bin/mocha src/node/tests",
     "test-watch": "gulp test --debug --watch"

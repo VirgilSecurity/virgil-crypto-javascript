@@ -10,7 +10,6 @@ module.exports = {
 	decrypt: require('./decrypt'),
 	sign: require('./sign'),
 	verify: require('./verify'),
-	generateValidationToken: require('./generate-validation-token'),
 	obfuscate: require('./obfuscate'),
 	hash: require('./hash'),
 	privateKeyToDER: require('./private-key-to-der'),

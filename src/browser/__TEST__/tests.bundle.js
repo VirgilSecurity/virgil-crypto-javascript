@@ -12,6 +12,5 @@ import './hash.spec';
 import './keys-format-convert.spec';
 import './extract-public-key.spec';
 import './encrypt-decrypt-private-key.spec';
-import './generate-validation-token.spec';
 import './sign-encrypt-decrypt-verify.spec';
 import './sign-encrypt-decrypt-verify-async.spec';

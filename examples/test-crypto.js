@@ -1,8 +1,8 @@
 var virgilCrypto = require('../index');
 
 var keysTypesEnum = virgilCrypto.KeysTypesEnum;
-var privateKeyPassword = 'veryStrongPa$$0rd';
-var initialData = 'initial data';
+var privateKeyPassword = new Buffer('veryStrongPa$$0rd');
+var initialData = new Buffer('initial data');
 
 var keyPair = virgilCrypto.generateKeyPair({ password: privateKeyPassword });
 console.log('Recommended type with password key pair', JSON.stringify(keyPair));
@@ -25,37 +25,26 @@ try {
 	console.log('Trying to generate key pair with unsupported type', e.message);
 }
 
-var encryptedStringToBase64Data = virgilCrypto.encryptStringToBase64(initialData, 'password');
-console.log('encryptedStringToBase64Data', encryptedStringToBase64Data);
-var decryptedStringToBase64Data = virgilCrypto.decryptStringFromBase64(encryptedStringToBase64Data, 'password');
-console.log('decryptedStringToBase64Data', decryptedStringToBase64Data);
-
-var encryptedData = virgilCrypto.encrypt(initialData, 'password');
+var encryptedData = virgilCrypto.encrypt(initialData, new Buffer('password'));
 console.log('encryptedData base64', encryptedData.toString('base64'));
 
-var decryptedData = virgilCrypto.decrypt(encryptedData, 'password');
+var decryptedData = virgilCrypto.decrypt(encryptedData, new Buffer('password'));
 console.log('decryptedData string', decryptedData.toString('utf8'));
-console.log('decryptedData base64', decryptedData.toString('base64'));
 
 var encryptedDataByKey = virgilCrypto.encrypt(initialData, keyPair.publicKey, keyPair.publicKey);
 console.log('encryptedDataByKey base64', encryptedDataByKey.toString('base64'));
 
 var decryptedDataByKey = virgilCrypto.decrypt(encryptedDataByKey, keyPair.publicKey, keyPair.privateKey, privateKeyPassword);
 console.log('decryptedDataByKey', decryptedDataByKey.toString());
-console.log('decryptedDataByKey base64', decryptedDataByKey.toString('base64'));
 
 var encryptedDataMulti = virgilCrypto.encrypt(initialData, [{ recipientId: keyPair.publicKey, publicKey: keyPair.publicKey }]);
 console.log('encryptedDataMulti base64', encryptedDataMulti.toString('base64'));
 
 var decryptedDataMulti = virgilCrypto.decrypt(encryptedDataMulti, keyPair.publicKey, keyPair.privateKey, privateKeyPassword);
 console.log('decryptedDataMulti string', decryptedDataMulti.toString());
-console.log('decryptedDataMulti base64', decryptedDataMulti.toString('base64'));
 
 var sign = virgilCrypto.sign(encryptedDataByKey, keyPair.privateKey, privateKeyPassword);
 console.log('sign base64', sign.toString('base64'));
 
-var verified = virgilCrypto.verify(encryptedDataByKey, keyPair.publicKey, sign);
+var verified = virgilCrypto.verify(encryptedDataByKey, sign, keyPair.publicKey);
 console.log('verified', verified);
-
-var verifiedBase64 = virgilCrypto.verify(encryptedDataByKey, keyPair.publicKey, sign.toString('base64'));
-console.log('verified sign as base64', verifiedBase64);

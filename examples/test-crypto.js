@@ -1,6 +1,6 @@
 var virgilCrypto = require('../index');
 
-var keysTypesEnum = virgilCrypto.KeysTypesEnum;
+var keysTypesEnum = virgilCrypto.KeyPairTypes;
 var privateKeyPassword = new Buffer('veryStrongPa$$0rd');
 var initialData = new Buffer('initial data');
 

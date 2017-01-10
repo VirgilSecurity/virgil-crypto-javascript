@@ -1,6 +1,6 @@
 import VirgilCrypto from './utils/crypto-module';
 import { bufferToByteArray, byteArrayToBuffer } from './utils/crypto-utils';
-import KeysTypesEnum from '../lib/keys-types-enum';
+import KeyPairTypes from '../lib/key-pair-types';
 import { throwVirgilError, throwValidationError, checkIsBuffer } from './utils/crypto-errors';
 
 /**
@@ -8,16 +8,16 @@ import { throwVirgilError, throwValidationError, checkIsBuffer } from './utils/c
  *
  * @param {Object} [options={}] - Keys options.
  * @param {Buffer} [options.password] - Private key password (Optional).
- * @param {string} [options.type=] - Keys type identifier (Optional). If provided must be one of KeysTypesEnum values.
+ * @param {string} [options.type=] - Keys type identifier (Optional). If provided must be one of KeyPairTypes values.
  * @returns {{publicKey: Buffer, privateKey: Buffer}}
  */
 export function generateKeyPair (options = {}) {
 	let { type, password } = options;
 
-	if (type && !KeysTypesEnum.hasOwnProperty(type)) {
+	if (type && !KeyPairTypes.hasOwnProperty(type)) {
 		throwValidationError('00002', {
 			arg: 'keysType',
-			type: `one of ${_.values(KeysTypesEnum).join(', ')} - use the KeysTypesEnum to get it.`
+			type: `one of ${_.values(KeyPairTypes).join(', ')} - use the KeyPairTypes to get it.`
 		});
 	}
 
@@ -30,7 +30,7 @@ export function generateKeyPair (options = {}) {
 	const KeyPair = VirgilCrypto.VirgilKeyPair;
 
 	const generateKeyPair = type ?
-		KeyPair.generate.bind(null, KeyPair.Type[KeysTypesEnum[type]]) :
+		KeyPair.generate.bind(null, KeyPair.Type[KeyPairTypes[type]]) :
 		KeyPair.generateRecommended;
 
 	let publicKey;

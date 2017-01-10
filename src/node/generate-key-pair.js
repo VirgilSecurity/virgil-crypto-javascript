@@ -1,9 +1,9 @@
 var VirgilKeyPair = require('../../virgil_js.node').VirgilKeyPair;
-var KeysTypesEnum = require('../lib/keys-types-enum');
+var KeyPairTypes = require('../lib/key-pair-types');
 var u = require('./utils');
 
 function isValidKeysType(keysType) {
-	return KeysTypesEnum.hasOwnProperty(keysType);
+	return KeyPairTypes.hasOwnProperty(keysType);
 }
 
 /**
@@ -11,7 +11,7 @@ function isValidKeysType(keysType) {
  *
  * @param {Object} [options={}] - Keys options.
  * @param {Buffer=} options.password - Private key password (Optional).
- * @param {string=} options.type - Keys type identifier (Optional). If provided must be one of KeysTypesEnum values.
+ * @param {string=} options.type - Keys type identifier (Optional). If provided must be one of KeyPairTypes values.
  * @returns {{publicKey: <Buffer>, privateKey: <Buffer>}}
  */
 module.exports = function generateKeyPair (options) {
@@ -21,13 +21,13 @@ module.exports = function generateKeyPair (options) {
 
 	if (keysType && !isValidKeysType(keysType)) {
 		throw new TypeError('The value `' + keysType + '` is not a valid keys type. Must be one of ' +
-			Object.keys(KeysTypesEnum).join(', ') + ' - use KeysTypesEnum.');
+			Object.keys(KeyPairTypes).join(', ') + ' - use KeyPairTypes.');
 	}
 
 	u.checkIsBuffer(password, 'password');
 
 	var generate = keysType ?
-		VirgilKeyPair.generate.bind(null, VirgilKeyPair['Type_' + KeysTypesEnum[keysType]]) :
+		VirgilKeyPair.generate.bind(null, VirgilKeyPair['Type_' + KeyPairTypes[keysType]]) :
 		VirgilKeyPair.generateRecommended;
 
 

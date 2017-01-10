@@ -22,7 +22,7 @@
 			};
 
 			var virgilCrypto = window.VirgilCrypto;
-			var keysTypesEnum = virgilCrypto.KeysTypesEnum;
+			var keysTypesEnum = virgilCrypto.KeyPairTypes;
 			var privateKeyPassword = new virgilCrypto.Buffer('veryStrongPa$$0rd');
 
 			var keyPair = virgilCrypto.generateKeyPair({ password: privateKeyPassword });

@@ -35,109 +35,109 @@ describe('encrypt/decrypt', () => {
 	});
 
 	it('using keys "EC_BP256R1" without password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_BP256R1);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.EC_BP256R1);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});
 
 	it('using keys "EC_BP256R1" with password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_BP256R1, PASSWORD);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.EC_BP256R1, PASSWORD);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});
 
 	it('using keys "EC_BP384R1" without password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_BP384R1);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.EC_BP384R1);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});
 
 	it('using keys "EC_BP384R1" with password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_BP384R1, PASSWORD);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.EC_BP384R1, PASSWORD);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});
 
 	it('using keys "EC_BP512R1" without password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_BP512R1);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.EC_BP512R1);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});
 
 	it('using keys "EC_BP512R1" with password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_BP512R1, PASSWORD);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.EC_BP512R1, PASSWORD);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});
 
 	it('using keys "EC_SECP256K1" without password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP256K1);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.EC_SECP256K1);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});
 
 	it('using keys "EC_SECP256K1" with password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP256K1, PASSWORD);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.EC_SECP256K1, PASSWORD);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});
 
 	it('using keys "EC_SECP256R1" without password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP256R1);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.EC_SECP256R1);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});
 
 	it('using keys "EC_SECP256R1" with password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP256R1, PASSWORD);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.EC_SECP256R1, PASSWORD);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});
 
 	it('using keys "EC_SECP384R1" without password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP384R1);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.EC_SECP384R1);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});
 
 	it('using keys "EC_SECP384R1" with password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP384R1, PASSWORD);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.EC_SECP384R1, PASSWORD);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});
 
 	it('using keys "EC_SECP521R1" without password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP521R1);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.EC_SECP521R1);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});
 
 	it('using keys "EC_SECP521R1" with password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.EC_SECP521R1, PASSWORD);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.EC_SECP521R1, PASSWORD);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});
 
 	it('using keys "FAST_EC_X25519" without password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.FAST_EC_X25519);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.FAST_EC_X25519);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});
 
 	it('using keys "FAST_EC_X25519" with password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.FAST_EC_X25519, PASSWORD);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.FAST_EC_X25519, PASSWORD);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});
 
 	it('using keys "FAST_EC_ED25519" without password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.FAST_EC_ED25519);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.FAST_EC_ED25519);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});
 
 	it('using keys "FAST_EC_ED25519" with password', async (cb) => {
-		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum.FAST_EC_ED25519, PASSWORD);
+		let decryptedData = await encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes.FAST_EC_ED25519, PASSWORD);
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		cb();
 	});

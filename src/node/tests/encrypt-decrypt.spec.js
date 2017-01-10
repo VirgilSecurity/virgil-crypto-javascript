@@ -23,18 +23,18 @@ describe('encrypt/decrypt', function () {
 		expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 	});
 
-	Object.keys(VirgilCrypto.KeysTypesEnum)
+	Object.keys(VirgilCrypto.KeyPairTypes)
 	.filter(function (keyType) {
 		return keyType !== 'RSA_8192' && keyType !== 'RSA_4096';
 	})
 	.forEach(function (keyType) {
 		it('using keys \''+keyType+'\' without password', function () {
-			var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum[keyType]);
+			var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes[keyType]);
 			expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		});
 
 		it('using keys \''+keyType+'\' with password', function () {
-			var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeysTypesEnum[keyType], PASSWORD);
+			var decryptedData = encryptDecryptUsingKeyPair(INITIAL_DATA, VirgilCrypto.KeyPairTypes[keyType], PASSWORD);
 			expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		});
 	});

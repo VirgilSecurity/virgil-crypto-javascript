@@ -1,5 +1,5 @@
 import browser from 'bowser';
-import KeysTypesEnum from '../lib/keys-types-enum';
+import KeyPairTypes from '../lib/key-pair-types';
 import CryptoWorkerApi from './crypto-worker-api';
 import { throwVirgilError, throwValidationError, checkIsBuffer } from './utils/crypto-errors';
 import { toBase64 } from './utils/crypto-utils';
@@ -10,16 +10,16 @@ import { generateKeyPair } from './generate-key-pair';
  *
  * @param {Object} [options={}] - Keys options.
  * @param {Buffer=} options.password - Private key password (Optional).
- * @param {string=} options.type - Keys type identifier (Optional). If provided must be one of KeysTypesEnum values.
+ * @param {string=} options.type - Keys type identifier (Optional). If provided must be one of KeyPairTypes values.
  * @returns {Promise<{publicKey: Buffer, privateKey: Buffer}>}
  */
 export function generateKeyPairAsync (options = {}) {
 	let { type, password } = options;
 
-	if (type && !KeysTypesEnum.hasOwnProperty(type)) {
+	if (type && !KeyPairTypes.hasOwnProperty(type)) {
 		throwValidationError('00002', {
 			arg: 'type',
-			type: `one of ${_.values(KeysTypesEnum).join(', ')} - use the KeysTypesEnum to get it.`
+			type: `one of ${_.values(KeyPairTypes).join(', ')} - use the KeyPairTypes to get it.`
 		});
 	}
 
@@ -33,13 +33,13 @@ export function generateKeyPairAsync (options = {}) {
 	if (browser.msie || browser.msedge) {
 		return new Promise((resolve, reject) => {
 			try {
-				resolve(generateKeyPair({ password, type: KeysTypesEnum[type] }));
+				resolve(generateKeyPair({ password, type: KeyPairTypes[type] }));
 			} catch (e) {
 				reject(e.message);
 			}
 		});
 	} else {
-		return CryptoWorkerApi.generateKeyPair(toBase64(password), KeysTypesEnum[type])
+		return CryptoWorkerApi.generateKeyPair(toBase64(password), KeyPairTypes[type])
 			.then(({ privateKey, publicKey }) => {
 				return {
 					privateKey: new Buffer(privateKey, 'utf8'),

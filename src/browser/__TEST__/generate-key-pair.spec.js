@@ -1,6 +1,6 @@
 import { VirgilCrypto, Buffer } from '../../../browser';
 
-const KEYS_TYPES_ENUM = VirgilCrypto.KeysTypesEnum;
+const KEY_PAIR_TYPES = VirgilCrypto.KeyPairTypes;
 const PASSWORD = Buffer.from('veryStrongPa$$0rd', 'utf8');
 
 describe('generaKeyPair', () => {
@@ -44,7 +44,7 @@ describe('generaKeyPair', () => {
 
 	describe('with specific type "Default"', () => {
 		beforeEach(() => {
-			keyPair = VirgilCrypto.generateKeyPair({ type: KEYS_TYPES_ENUM.Default });
+			keyPair = VirgilCrypto.generateKeyPair({ type: KEY_PAIR_TYPES.Default });
 		});
 
 		it('"publicKey" should be defined', () => {
@@ -64,7 +64,7 @@ describe('generaKeyPair', () => {
 		beforeEach(() => {
 			keyPair = VirgilCrypto.generateKeyPair({
 				password: PASSWORD,
-				type: KEYS_TYPES_ENUM.Default
+				type: KEY_PAIR_TYPES.Default
 			});
 		});
 
@@ -82,9 +82,9 @@ describe('generaKeyPair', () => {
 	});
 
 	describe('with specific type', () => {
-		describe(`"${KEYS_TYPES_ENUM.EC_SECP256R1}"`, () => {
+		describe(`"${KEY_PAIR_TYPES.EC_SECP256R1}"`, () => {
 			beforeAll(() => {
-				keyPair = VirgilCrypto.generateKeyPair({ type: KEYS_TYPES_ENUM.EC_SECP256R1 });
+				keyPair = VirgilCrypto.generateKeyPair({ type: KEY_PAIR_TYPES.EC_SECP256R1 });
 			});
 
 			it('`publicKey` should be defined', () => {

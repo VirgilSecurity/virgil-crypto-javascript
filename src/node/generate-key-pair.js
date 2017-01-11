@@ -1,9 +1,9 @@
 var VirgilKeyPair = require('../../virgil_js.node').VirgilKeyPair;
-var KeyPairTypes = require('../lib/key-pair-types');
+var KeyPairType = require('../lib/key-pair-type');
 var u = require('./utils');
 
 function isValidKeysType(keysType) {
-	return KeyPairTypes.hasOwnProperty(keysType);
+	return KeyPairType.hasOwnProperty(keysType);
 }
 
 /**
@@ -11,7 +11,7 @@ function isValidKeysType(keysType) {
  *
  * @param {Object} [options={}] - Keys options.
  * @param {Buffer=} options.password - Private key password (Optional).
- * @param {string=} options.type - Keys type identifier (Optional). If provided must be one of KeyPairTypes values.
+ * @param {string=} options.type - Keys type identifier (Optional). If provided must be one of KeyPairType values.
  * @returns {{publicKey: <Buffer>, privateKey: <Buffer>}}
  */
 module.exports = function generateKeyPair (options) {
@@ -21,13 +21,13 @@ module.exports = function generateKeyPair (options) {
 
 	if (keysType && !isValidKeysType(keysType)) {
 		throw new TypeError('The value `' + keysType + '` is not a valid keys type. Must be one of ' +
-			Object.keys(KeyPairTypes).join(', ') + ' - use KeyPairTypes.');
+			Object.keys(KeyPairType).join(', ') + ' - use KeyPairType.');
 	}
 
 	u.checkIsBuffer(password, 'password');
 
 	var generate = keysType ?
-		VirgilKeyPair.generate.bind(null, VirgilKeyPair['Type_' + KeyPairTypes[keysType]]) :
+		VirgilKeyPair.generate.bind(null, VirgilKeyPair['Type_' + KeyPairType[keysType]]) :
 		VirgilKeyPair.generateRecommended;
 
 

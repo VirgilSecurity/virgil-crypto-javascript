@@ -2,7 +2,7 @@
 var VirgilCrypto = require('../');
 var expect = require('expect');
 
-var KEY_PAIR_TYPES = VirgilCrypto.KeyPairTypes;
+var KEY_PAIR_TYPE = VirgilCrypto.KeyPairType;
 var PASSWORD = new Buffer('veryStrongPa$$0rd');
 
 describe('generaKeyPair', function () {
@@ -46,7 +46,7 @@ describe('generaKeyPair', function () {
 
 	describe('with specific type "Default"', function () {
 		beforeEach(function () {
-			keyPair = VirgilCrypto.generateKeyPair({ type: KEY_PAIR_TYPES.Default });
+			keyPair = VirgilCrypto.generateKeyPair({ type: KEY_PAIR_TYPE.Default });
 		});
 
 		it('"publicKey" should be defined', function () {
@@ -64,7 +64,7 @@ describe('generaKeyPair', function () {
 
 	describe('with specific type "Default" and password', function () {
 		beforeEach(function () {
-			keyPair = VirgilCrypto.generateKeyPair({ password: PASSWORD, type: KEY_PAIR_TYPES.Default });
+			keyPair = VirgilCrypto.generateKeyPair({ password: PASSWORD, type: KEY_PAIR_TYPE.Default });
 		});
 
 		it('"publicKey" should be defined', function () {
@@ -81,9 +81,9 @@ describe('generaKeyPair', function () {
 	});
 
 	describe('with specific type', function () {
-		describe(KEY_PAIR_TYPES.EC_SECP384R1, function () {
+		describe(KEY_PAIR_TYPE.EC_SECP384R1, function () {
 			beforeEach(function () {
-				keyPair = VirgilCrypto.generateKeyPair({ type: KEY_PAIR_TYPES.EC_SECP384R1 });
+				keyPair = VirgilCrypto.generateKeyPair({ type: KEY_PAIR_TYPE.EC_SECP384R1 });
 			});
 
 			it('`publicKey` should be defined', function () {
@@ -101,9 +101,9 @@ describe('generaKeyPair', function () {
 	});
 
 	describe('with specific type and password', function () {
-		describe(KEY_PAIR_TYPES.EC_SECP384R1, function () {
+		describe(KEY_PAIR_TYPE.EC_SECP384R1, function () {
 			beforeEach(function () {
-				keyPair = VirgilCrypto.generateKeyPair({ type: KEY_PAIR_TYPES.EC_SECP384R1, password: PASSWORD });
+				keyPair = VirgilCrypto.generateKeyPair({ type: KEY_PAIR_TYPE.EC_SECP384R1, password: PASSWORD });
 			});
 
 			it('`publicKey` should be defined', function () {

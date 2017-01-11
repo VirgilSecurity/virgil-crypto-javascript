@@ -1,6 +1,6 @@
 import { VirgilCrypto, Buffer } from '../../../browser';
 
-const KEY_PAIR_TYPES = VirgilCrypto.KeyPairTypes;
+const KEY_PAIR_TYPE = VirgilCrypto.KeyPairType;
 const PASSWORD = Buffer.from('veryStrongPa$$0rd');
 
 describe('generaKeyPairAsync', () => {
@@ -46,7 +46,7 @@ describe('generaKeyPairAsync', () => {
 
 	describe('with specific type "Default"', () => {
 		beforeEach(async (cb) => {
-			keyPair = await VirgilCrypto.generateKeyPairAsync({ type: KEY_PAIR_TYPES.Default });
+			keyPair = await VirgilCrypto.generateKeyPairAsync({ type: KEY_PAIR_TYPE.Default });
 			cb();
 		});
 
@@ -67,7 +67,7 @@ describe('generaKeyPairAsync', () => {
 		beforeEach(async (cb) => {
 			keyPair = await VirgilCrypto.generateKeyPairAsync({
 				password: PASSWORD,
-				type: KEY_PAIR_TYPES.FAST_EC_X25519
+				type: KEY_PAIR_TYPE.FAST_EC_X25519
 			});
 			cb();
 		});

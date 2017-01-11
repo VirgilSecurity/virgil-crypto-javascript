@@ -3,7 +3,7 @@ var wrapper = require('../lib/wrapper')(require('./utils'));
 wrapper.wrapPrototype(Virgil, 'VirgilTinyCipher');
 
 module.exports = {
-	KeyPairTypes: require('../lib/key-pair-types'),
+	KeyPairType: require('../lib/key-pair-type'),
 	HashAlgorithm: require('./hash-algorithms'),
 	generateKeyPair: require('./generate-key-pair'),
 	encrypt: require('./encrypt'),

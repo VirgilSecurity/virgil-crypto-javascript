@@ -25,6 +25,6 @@ export { signThenEncrypt } from './sign-then-encrypt';
 export { decryptThenVerify } from './decrypt-then-verify';
 export { signThenEncryptAsync } from './sign-then-encrypt-async';
 export { decryptThenVerifyAsync } from './decrypt-then-verify-async';
-export { default as KeyPairTypes } from '../lib/key-pair-types';
+export { default as KeyPairType } from '../lib/key-pair-type';
 export const HashAlgorithm = Virgil.VirgilHashAlgorithm;
 export const VirgilTinyCipher = Virgil.VirgilTinyCipher;

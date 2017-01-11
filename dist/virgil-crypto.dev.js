@@ -3562,9 +3562,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _cryptoUtils = __webpack_require__(2);
 
-	var _keyPairTypes = __webpack_require__(31);
+	var _keyPairType = __webpack_require__(31);
 
-	var _keyPairTypes2 = _interopRequireDefault(_keyPairTypes);
+	var _keyPairType2 = _interopRequireDefault(_keyPairType);
 
 	var _cryptoErrors = __webpack_require__(1);
 
@@ -3575,7 +3575,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @param {Object} [options={}] - Keys options.
 	 * @param {Buffer} [options.password] - Private key password (Optional).
-	 * @param {string} [options.type=] - Keys type identifier (Optional). If provided must be one of KeyPairTypes values.
+	 * @param {string} [options.type=] - Keys type identifier (Optional). If provided must be one of KeyPairType values.
 	 * @returns {{publicKey: Buffer, privateKey: Buffer}}
 	 */
 	function generateKeyPair() {
@@ -3584,10 +3584,10 @@ return /******/ (function(modules) { // webpackBootstrap
 		    password = options.password;
 
 
-		if (type && !_keyPairTypes2.default.hasOwnProperty(type)) {
+		if (type && !_keyPairType2.default.hasOwnProperty(type)) {
 			(0, _cryptoErrors.throwValidationError)('00002', {
 				arg: 'keysType',
-				type: 'one of ' + _.values(_keyPairTypes2.default).join(', ') + ' - use the KeyPairTypes to get it.'
+				type: 'one of ' + _.values(_keyPairType2.default).join(', ') + ' - use the KeyPairType to get it.'
 			});
 		}
 
@@ -3599,7 +3599,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		var KeyPair = _cryptoModule2.default.VirgilKeyPair;
 
-		var generateKeyPair = type ? KeyPair.generate.bind(null, KeyPair.Type[_keyPairTypes2.default[type]]) : KeyPair.generateRecommended;
+		var generateKeyPair = type ? KeyPair.generate.bind(null, KeyPair.Type[_keyPairType2.default[type]]) : KeyPair.generateRecommended;
 
 		var publicKey = void 0;
 		var privateKey = void 0;
@@ -5135,9 +5135,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _bowser2 = _interopRequireDefault(_bowser);
 
-	var _keyPairTypes = __webpack_require__(31);
+	var _keyPairType = __webpack_require__(31);
 
-	var _keyPairTypes2 = _interopRequireDefault(_keyPairTypes);
+	var _keyPairType2 = _interopRequireDefault(_keyPairType);
 
 	var _cryptoWorkerApi = __webpack_require__(8);
 
@@ -5156,7 +5156,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @param {Object} [options={}] - Keys options.
 	 * @param {Buffer=} options.password - Private key password (Optional).
-	 * @param {string=} options.type - Keys type identifier (Optional). If provided must be one of KeyPairTypes values.
+	 * @param {string=} options.type - Keys type identifier (Optional). If provided must be one of KeyPairType values.
 	 * @returns {Promise<{publicKey: Buffer, privateKey: Buffer}>}
 	 */
 	function generateKeyPairAsync() {
@@ -5165,10 +5165,10 @@ return /******/ (function(modules) { // webpackBootstrap
 		    password = options.password;
 
 
-		if (type && !_keyPairTypes2.default.hasOwnProperty(type)) {
+		if (type && !_keyPairType2.default.hasOwnProperty(type)) {
 			(0, _cryptoErrors.throwValidationError)('00002', {
 				arg: 'type',
-				type: 'one of ' + _.values(_keyPairTypes2.default).join(', ') + ' - use the KeyPairTypes to get it.'
+				type: 'one of ' + _.values(_keyPairType2.default).join(', ') + ' - use the KeyPairType to get it.'
 			});
 		}
 
@@ -5181,13 +5181,13 @@ return /******/ (function(modules) { // webpackBootstrap
 		if (_bowser2.default.msie || _bowser2.default.msedge) {
 			return new _promise2.default(function (resolve, reject) {
 				try {
-					resolve((0, _generateKeyPair.generateKeyPair)({ password: password, type: _keyPairTypes2.default[type] }));
+					resolve((0, _generateKeyPair.generateKeyPair)({ password: password, type: _keyPairType2.default[type] }));
 				} catch (e) {
 					reject(e.message);
 				}
 			});
 		} else {
-			return _cryptoWorkerApi2.default.generateKeyPair((0, _cryptoUtils.toBase64)(password), _keyPairTypes2.default[type]).then(function (_ref) {
+			return _cryptoWorkerApi2.default.generateKeyPair((0, _cryptoUtils.toBase64)(password), _keyPairType2.default[type]).then(function (_ref) {
 				var privateKey = _ref.privateKey,
 				    publicKey = _ref.publicKey;
 
@@ -5289,7 +5289,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.VirgilTinyCipher = exports.HashAlgorithm = exports.KeyPairTypes = exports.decryptThenVerifyAsync = exports.signThenEncryptAsync = exports.decryptThenVerify = exports.signThenEncrypt = exports.decryptPrivateKey = exports.encryptPrivateKey = exports.extractPublicKey = exports.privateKeyToDER = exports.publicKeyToDER = exports.hash = exports.obfuscate = exports.changePrivateKeyPassword = exports.generateKeyPairAsync = exports.generateKeyPair = exports.verifyAsync = exports.verify = exports.signAsync = exports.sign = exports.decryptAsync = exports.decrypt = exports.encryptAsync = exports.encrypt = undefined;
+	exports.VirgilTinyCipher = exports.HashAlgorithm = exports.KeyPairType = exports.decryptThenVerifyAsync = exports.signThenEncryptAsync = exports.decryptThenVerify = exports.signThenEncrypt = exports.decryptPrivateKey = exports.encryptPrivateKey = exports.extractPublicKey = exports.privateKeyToDER = exports.publicKeyToDER = exports.hash = exports.obfuscate = exports.changePrivateKeyPassword = exports.generateKeyPairAsync = exports.generateKeyPair = exports.verifyAsync = exports.verify = exports.signAsync = exports.sign = exports.decryptAsync = exports.decrypt = exports.encryptAsync = exports.encrypt = undefined;
 
 	var _encrypt = __webpack_require__(91);
 
@@ -5489,12 +5489,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 
-	var _keyPairTypes = __webpack_require__(31);
+	var _keyPairType = __webpack_require__(31);
 
-	Object.defineProperty(exports, 'KeyPairTypes', {
+	Object.defineProperty(exports, 'KeyPairType', {
 	  enumerable: true,
 	  get: function get() {
-	    return _interopRequireDefault(_keyPairTypes).default;
+	    return _interopRequireDefault(_keyPairType).default;
 	  }
 	});
 

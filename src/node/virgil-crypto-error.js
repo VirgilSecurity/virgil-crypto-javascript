@@ -1,12 +1,22 @@
-// Custom Error class
-// Source: https://gist.github.com/justmoon/15511f92e5216fa2624b
 'use strict';
 
-module.exports = function VirgilCryptoError(message, extra) {
-	Error.captureStackTrace(this, this.constructor);
+var inherits = require('util').inherits;
+
+function VirgilCryptoError(message, extra) {
+	if (Error.captureStackTrace) {
+		Error.captureStackTrace(this, this.constructor);
+	} else {
+		var stack = new Error().stack;
+		if (stack) {
+			this.stack = stack;
+		}
+	}
+
 	this.name = this.constructor.name;
 	this.message = message;
 	this.extra = extra;
-};
+}
 
-require('util').inherits(module.exports, Error);
+inherits(VirgilCryptoError, Error);
+
+module.exports = VirgilCryptoError;

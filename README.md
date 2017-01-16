@@ -26,8 +26,9 @@ npm install virgil-crypto
 
 ### CDN
 ```html
-<script 
-src="https://cdn.virgilsecurity.com/packages/javascript/crypto/2.0.0/virgil-crypto.min.js" 
+<script
+src="https://cdn.virgilsecurity.com/packages/javascript/crypto/2.0.0/virgil-crypto.min.js"
+integrity="sha256-oJwQc439DKwfdwqVm0zSiniFFyWttnE7oenq1og2ajI="
 crossorigin="anonymous"></script>
 ```
 
@@ -40,7 +41,7 @@ In Node.js it's native [Buffer](https://nodejs.org/api/buffer.html).
 Async versions of functions are implemented using [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Worker)
 and therefore are only available in the browser. This also means that Chrome and Opera will give an error 
 `"Uncaught SecurityError: Script at '[blob url here]' cannot be accessed from origin 'null'."` when you try 
-to load VirgilCrypto from `file://` url. It needs to be on a proper domain. 
+to load VirgilCrypto from `file:///` url. It needs to be on a proper domain. 
 
 Async functions are Promise-based. Promise implementation is provided
 by [core-js](https://github.com/zloirock/core-js#ecmascript-6-promise).
@@ -56,13 +57,13 @@ of available types) and\or password to use to encrypt the private key. The keys 
 #### Arguments
 
 * \[options={}\] (Object): The options object.
-* \[options.password\] (Buffer): Password to use to encrypt the private key.
-* \[options.type\] (string): Type of keys to generate.
+* \[options.password\] (Buffer): Optional password to use to encrypt the private key.
+* \[options.type\] (string): Optional type of keys to generate.
 
 
 #### Returns
 
-* (Object.\<{privateKey: Buffer, publicKey: Buffer}\>): New key pair.
+* (Object.\<{privateKey: Buffer, publicKey: Buffer}\>): The new key pair.
 
 
 #### Available Key Pair Types
@@ -71,7 +72,7 @@ of available types) and\or password to use to encrypt the private key. The keys 
 
 | Key Type          | Description                    |
 |-------------------|--------------------------------|
-| Default      | recommended safest type        |
+| Default      | the safest recommended type        |
 | RSA_2048     | RSA 2048 bit (not recommended) |
 | RSA_3072     | RSA 3072 bit                   |
 | RSA_4096     | RSA 4096 bit                   |
@@ -120,12 +121,12 @@ var keyPairCurve25519 = VirgilCrypto.generateKeyPair({
 
 ### generateKeyPairAsync(\[options\]) (Browsers only)
 
-Same as [generateKeyPair](#generatekeypair_options) but returns a Promise that is resolved with generated
-key pair or rejected with error.
+Same as [generateKeyPair](#generatekeypairoptions) but returns the Promise that is resolved with generated
+key pair or rejected with an error.
 
 #### Returns
 
-* (Promise\<Object.\<{privateKey: Buffer, publicKey: Buffer}\>\>): Promise that will be resolved with the new key pair.
+* (Promise\<Object.\<{privateKey: Buffer, publicKey: Buffer}\>\>): The Promise that will be resolved with the new key pair.
 
 #### Examples
 
@@ -134,8 +135,8 @@ key pair or rejected with error.
 VirgilCrypto.generateKeyPairAsync()
 	.then(function (keyPair) {
 		//{
-        //   publicKey: ...,  // Buffer with public key
-        //   privateKey: ...  // Buffer with private key
+        //   publicKey: ...,  // Buffer with public key material
+        //   privateKey: ...  // Buffer with private key material
         //}
 	});
 ```
@@ -149,18 +150,18 @@ VirgilCrypto.generateKeyPairAsync()
 Encrypts the data with single recipient's public key, multiple recipients' public keys or password depending 
 on the number and types of arguments passed.
 
-* data (Buffer): Data to encrypt.
+* data (Buffer): The data to encrypt.
 * recipientId|recipients|password: Either one of the following
-	- recipientId (Buffer): Identifier of intended recipient.
+	- recipientId (Buffer): The identifier of the intended recipient.
 	- recipients (Array.\<{recipientId: Buffer, publicKey: Buffer}\>): Array of recipient ids with corresponding 
 	public keys to use for encryption. 
-	- password (Buffer): Password to use for encryption.
-* \[publicKey\] (Buffer): Public key to use for encryption. Used when encrypting for single recipient (i.e. when 
-	second argument is recipientId)
+	- password (Buffer): The password to use for encryption.
+* \[publicKey\] (Buffer): The public key to use for encryption. Used when encrypting for single recipient (i.e. when 
+	the second argument is recipientId).
 
 #### Returns
 
-* (Buffer): Encrypted data.
+* (Buffer): Returns encrypted data.
 
 #### Examples
 
@@ -183,7 +184,7 @@ var recipientId = new Buffer('<SOME_RECIPIENT_ID>');
 
 var keyPair = VirgilCrypto.generateKeyPair();
 // using newly generated key pair and random recipient id here 
-// as an example. In a real app the key would have been provided 
+// as an example. In a real app, the key would have been provided 
 // externally (e.g. from web service, database, file, etc.)
 var encryptedData = VirgilCrypto.encrypt(
 					plainText, recipientId, keyPair.publicKey);
@@ -202,7 +203,7 @@ var keyPair1 = VirgilCrypto.generateKeyPair();
 var keyPair2 = VirgilCrypto.generateKeyPair();
 
 // using newly generated key pairs and random recipient ids here 
-// as an example. In a real app the keys would have been provided 
+// as an example. In a real app, the keys would have been provided 
 // externally (e.g. from web service, database, file, etc.)
 
 var recipientsList = [{ 
@@ -224,12 +225,12 @@ console.log('Encrypted data: ' + encryptedData.toString('base64'));
 
 ### encryptAsync(data, recipientId | recipients | password, \[publicKey\]) (Browsers only)
 
-Same as [encrypt](#encrypt_data_recipientid_recipients_password_publickey) but returns a Promise 
-that is resolved with encrypted data or rejected with error.
+Same as [encrypt](#encryptdata-recipientid--recipients--password-publickey) but returns the Promise 
+that is resolved with encrypted data or rejected with an error.
 
 #### Returns
 
-* (Promise.\<Buffer\>): Promise that will be resolved with encrypted data.
+* (Promise.\<Buffer\>): The Promise that will be resolved with encrypted data.
 
 #### Examples
 
@@ -257,7 +258,7 @@ var recipientId = new VirgilCrypto.Buffer('<SOME_RECIPIENT_ID>');
 
 var keyPair = VirgilCrypto.generateKeyPair();
 // using newly generated key pair and random recipient id here 
-// as an example. In a real app the key would have been provided 
+// as an example. In a real app, the key would have been provided 
 // externally (e.g. from web service, database, file, etc.)
 
 VirgilCrypto.encryptAsync(plainText, recipientId, keyPair.publicKey)
@@ -283,7 +284,7 @@ var keyPair1 = VirgilCrypto.generateKeyPair();
 var keyPair2 = VirgilCrypto.generateKeyPair();
 
 // using newly generated key pairs and random recipient ids here 
-// as an example. In a real app the keys would have been provided 
+// as an example. In a real app, the keys would have been provided 
 // externally (e.g. from web service, database, file, etc.)
 
 var recipientsList = [{ 
@@ -314,16 +315,16 @@ Decrypts the data using password or private key depending on the number of argum
 
 #### Arguments
 
-* encryptedData (Buffer): Data to decrypt.
+* encryptedData (Buffer): The data to decrypt.
 * recipientId|password: Either one of the following
-	- recipientId (Buffer): Recipient id used for encryption.
-	- password (Buffer): Password to use for decryption.
-* \[privateKey\] (Buffer): Private key to use for decryption.
-* \[privateKeyPassword\] (Buffer): Password used to encrypt the private key.
+	- recipientId (Buffer): The recipient id used for encryption.
+	- password (Buffer): The password to use for decryption.
+* \[privateKey\] (Buffer): The private key to use for decryption.
+* \[privateKeyPassword\] (Buffer): Optional password used to encrypt the private key.
 
 #### Returns
 
-* (Buffer): Decrypted data.
+* (Buffer): Returns decrypted data.
 
 #### Examples
 
@@ -345,7 +346,7 @@ var recipientId = new Buffer('<SOME_RECIPIENT_ID>');
 
 var keyPair = VirgilCrypto.generateKeyPair();
 // using newly generated key pair and random recipient id here 
-// as an example. In a real app the keys would have been provided 
+// as an example. In a real app, the keys would have been provided 
 // externally (e.g. from web service, database, file, etc.)
 var encryptedData = VirgilCrypto.encrypt(
 					plainText, recipientId, keyPair.publicKey);
@@ -368,7 +369,7 @@ var keyPair = VirgilCrypto.generateKeyPair({
 });
 
 // using newly generated key pair and random recipient id here 
-// as an example. In a real app the keys would have been provided 
+// as an example. In a real app, the keys would have been provided 
 // externally (e.g. from web service, database, file, etc.)
 
 var encryptedData = VirgilCrypto.encrypt(
@@ -386,12 +387,12 @@ console.log('Decrypted data: ' + decryptedData.toString('utf8'));
 
 ### decryptAsync(encryptedData, recipientId | password, \[privateKey\], \[privateKeyPassword\]) (Browsers only)
 
-Same as [decrypt](#decrypt_encrypteddata_recipientid_password_privatekey_privatekeypassword) but returns a 
-Promise that is resolved with decrypted data or rejected with error.
+Same as [decrypt](#decryptencrypteddata-recipientid--password-privatekey-privatekeypassword) but returns a 
+Promise that is resolved with decrypted data or rejected with an error.
 
 #### Returns
 
-* (Promise.\<Buffer\>): Decrypted data.
+* (Promise.\<Buffer\>): The Promise that will be resolved with decrypted data.
 
 #### Examples
 
@@ -421,7 +422,7 @@ var recipientId = new Buffer('<SOME_RECIPIENT_ID>');
 
 var keyPair = VirgilCrypto.generateKeyPair();
 // using newly generated key pair and random recipient id here 
-// as an example. In a real app the keys would have been provided 
+// as an example. In a real app, the keys would have been provided 
 // externally (e.g. from web service, database, file, etc.)
 
 VirgilCrypto.encryptAsync(plainText, recipientId, keyPair.publicKey)
@@ -452,7 +453,7 @@ var keyPair = VirgilCrypto.generateKeyPair({
 });
 
 // using newly generated key pair and random recipient id here 
-// as an example. In a real app the keys would have been provided 
+// as an example. In a real app, the keys would have been provided 
 // externally (e.g. from web service, database, file, etc.)
 
 VirgilCrypto.encryptAsync(plainText, recipientId, keyPair.publicKey)
@@ -480,17 +481,17 @@ originated from you and was not altered after you signed it.
 
 ### sign(data, privateKey, \[privateKeyPassword\])
 
-Signs the data using private key and returns the signature.
+Signs the data using the private key and returns the signature.
 
 #### Arguments
 
-* data (Buffer): Data to sign
-* privateKey (Buffer): Private key to use for signing.
-* \[privateKeyPassword\]: Password used to encrypt the private key.
+* data (Buffer): The data to sign
+* privateKey (Buffer): The private key to use for signing.
+* \[privateKeyPassword\]: Optional password used to encrypt the private key.
 
 #### Returns
 
-* (Buffer): Signature.
+* (Buffer): Returns the signature.
 
 #### Examples
 
@@ -525,12 +526,12 @@ console.log(signature.toString('base64'));
 
 ### signAsync(data, privateKey, \[privateKeyPassword\]) (Browsers only)
 
-Same as [sign](#sign_data_privatekey_privatekeypassword) but returns a Promise that will be 
-resolved with the signature or rejected with error.
+Same as [sign](#signdata-privatekey-privatekeypassword) but returns the Promise that will be 
+resolved with the signature or rejected with an error.
 
 #### Returns
 
-* (Promise.\<Buffer\>): Promise that will be resolved with the signature.
+* (Promise.\<Buffer\>): The Promise that will be resolved with the signature.
 
 #### Examples
 
@@ -571,13 +572,13 @@ Verifies the signature for the data and returns `true` if verification succeeded
 
 #### Arguments
 
-* data (Buffer): Signed data.
-* sign (Buffer): Digital signature.
-* publicKey (Buffer): Public key of the party that signed the data.
+* data (Buffer): The signed data.
+* sign (Buffer): The signature.
+* publicKey (Buffer): The public key of the party that signed the data.
 
 #### Returns
 
-* (boolean): `true` if verification succeeded or `false` if it failed.
+* (boolean): Returns `true` if verification succeeded or `false` if it failed.
 
 #### Examples
 
@@ -588,12 +589,12 @@ console.log('Is signature valid: ' + isVerified);
 
 ### verifyAsync(data, sign, publicKey) (Browsers only)
 
-Same as [verify](#verify_data_sign_publickey) but returns a Promise that will be resolved with `true` if verification 
-succeeded or `false` if it failed, or rejected with error.
+Same as [verify](#verifydata-sign-publickey) but returns the Promise that will be resolved with `true` if verification 
+succeeded or `false` if it failed, or rejected with an error.
 
 #### Returns
 
-* (Promise.\<boolean\>): Promise that will be resolved with `true` if verification succeeded or `false` if it failed.
+* (Promise.\<boolean\>): The Promise that will be resolved with `true` if verification succeeded or `false` if it failed.
 
 #### Examples
 
@@ -615,18 +616,18 @@ the signed message using the public key (or public keys depending on the number 
 
 #### Arguments
 
-* data (Buffer): Data to sign and encrypt.
-* privateKey (Buffer): Private key to use for signature generation.
+* data (Buffer): The data to sign and encrypt.
+* privateKey (Buffer): The private key to use for signature generation.
 * recipientId|recipients: Either one of the following
-	- recipientId (Buffer): Identifier of intended recipient.
+	- recipientId (Buffer): The identifier of the intended recipient.
 	- recipients (Array.\<{recipientId: Buffer, publicKey: Buffer}\>): Array of recipient ids with corresponding 
 	public keys to use for encryption. 
-* \[publicKey\] (Buffer): Public key to use for encryption. Used when encrypting for single recipient (i.e. when 
-	second argument is recipientId)
+* \[publicKey\] (Buffer): The public key to use for encryption. Used when encrypting for single recipient (i.e. when 
+	the second argument is recipientId)
 
 #### Returns
 
-* (Buffer): Encrypted signed data.
+* (Buffer): Returns encrypted signed data.
 
 #### Examples
 
@@ -638,7 +639,7 @@ var senderKeyPair = VirgilCrypto.generateKeyPair();
 var recipientKeyPair = VirgilCrypto.generateKeyPair();
 
 // using newly generated key pair and random recipient id here 
-// as an example. In a real app the key would have been provided 
+// as an example. In a real app, the key would have been provided 
 // externally (e.g. from web service, database, file, etc.)
 
 var encryptedSignedData = VirgilCrypto.signThenEncrypt(
@@ -653,12 +654,12 @@ console.log('Encrypted data: ' + encryptedSignedData.toString('base64'));
 
 ### signThenEncryptAsync(data, privateKey, recipientId | recipients, [publicKey]) (Browsers only)
 
-Same as [signThenEncrypt](#signThenEncrypt_data_privateKey_recipientId_recipients_publicKey) but returns a Promise
-that will be resolved with encrypted data or rejected with error.
+Same as [signThenEncrypt](#signthenencryptdata-privatekey-recipientid--recipients-publickey) but returns the Promise
+that will be resolved with encrypted data or rejected with an error.
 
 #### Returns
 
-* (Promise.\<Buffer\>): Promise that will be resolved with encrypted signed data.
+* (Promise.\<Buffer\>): The Promise that will be resolved with encrypted signed data.
 
 #### Examples
 
@@ -670,7 +671,7 @@ var senderKeyPair = VirgilCrypto.generateKeyPair();
 var recipientKeyPair = VirgilCrypto.generateKeyPair();
 
 // using newly generated key pair and random recipient id here 
-// as an example. In a real app the key would have been provided 
+// as an example. In a real app, the key would have been provided 
 // externally (e.g. from web service, database, file, etc.)
 
 VirgilCrypto.signThenEncryptAsync(
@@ -687,19 +688,19 @@ VirgilCrypto.signThenEncryptAsync(
 
 ### decryptThenVerify(cipherData, recipientId, privateKey, publicKey)
 
-Combines decryption in a single step with integrity verification. Decrypts the data and verifies attached signature.
+Combines decryption in a single step with integrity verification. Decrypts the data and verifies the attached signature.
 Returns decrypted data if verification succeeded or throws `VirgilCrypto.VirgilCryptoError` if it failed.
 
 #### Arguments
 
-* cipherData (Buffer): Encrypted signed data.
-* recipientId (Buffer): Recipient id used for encryption.
-* privateKey (Buffer): Private key to use for decryption.
-* publicKey (Buffer): Sender's public key to use for signature verification.
+* cipherData (Buffer): The data to decrypt and verify.
+* recipientId (Buffer): The recipient id used for encryption.
+* privateKey (Buffer): The private key to use for decryption.
+* publicKey (Buffer): The sender's public key to use for signature verification.
 
 #### Returns
 
-* (Buffer): Decrypted data.
+* (Buffer): Returns decrypted data.
 
 #### Examples
 
@@ -711,7 +712,7 @@ var senderKeyPair = VirgilCrypto.generateKeyPair();
 var recipientKeyPair = VirgilCrypto.generateKeyPair();
 
 // using newly generated key pair and random recipient id here 
-// as an example. In a real app the keys would have been provided 
+// as an example. In a real app, the keys would have been provided 
 // externally (e.g. from web service, database, file, etc.)
 
 var encryptedData = VirgilCrypto.signThenEncrypt(
@@ -737,12 +738,12 @@ console.log('Decrypted data: ' + decryptedData.toString('utf8'));
 
 ### decryptThenVerifyAsync(cipherData, recipientId, privateKey, publicKey) (Browsers only)
 
-Same as [decryptThenVerify](#decryptThenVerify_cipherData_recipientId_privateKey_publicKey) but returns a Promise
+Same as [decryptThenVerify](#decryptthenverifycipherdata-recipientid-privatekey-publickey) but returns the Promise
 that will be resolved with decrypted data or rejected with `VirgilCrypto.VirgilCryptoError`.
 
 #### Returns
 
-* (Promise.\<Buffer\>): Decrypted data.
+* (Promise.\<Buffer\>): The Promise that will be resolved with decrypted data or rejected with an error.
 
 #### Examples
 
@@ -754,7 +755,7 @@ var senderKeyPair = VirgilCrypto.generateKeyPair();
 var recipientKeyPair = VirgilCrypto.generateKeyPair();
 
 // using newly generated key pair and random recipient id here 
-// as an example. In a real app the keys would have been provided 
+// as an example. In a real app, the keys would have been provided 
 // externally (e.g. from web service, database, file, etc.)
 
 VirgilCrypto.signThenEncrypt(
@@ -783,16 +784,16 @@ VirgilCrypto.signThenEncrypt(
 
 ### hash(data, \[algorithm = VirgilCrypto.HashAlgorithm.SHA256\])
 
-Returns cryptographic hash of the message.
+Returns a cryptographic hash of the message.
 
 ### Arguments
 
-* data (Buffer): Data to compute the hash for.
-* \[algorithm=VirgilCrypto.HashAlgorithm.SHA256\] (string): Name of hash algorithm to use (Default - SHA-256).
+* data (Buffer): The data to compute the hash for.
+* \[algorithm=VirgilCrypto.HashAlgorithm.SHA256\] (string): Optional name of the hash algorithm to use (Default - SHA-256).
 
 ### Returns
 
-* (Buffer): Computed hash.
+* (Buffer): Returns the hash.
 
 ### Supported hash algorithms
 
@@ -804,7 +805,7 @@ Returns cryptographic hash of the message.
 | SHA384     |
 | SHA512     |
 
-e.g. `VirgilCrypto.HashAlgorithm.SHA1` for SHA1 hash.
+e.g. `VirgilCrypto.HashAlgorithm.SHA1` for the SHA1 hash.
 
 
 ### obfuscate(value, salt, \[algorithm = VirgilCrypto.HashAlgorithm.SHA384\], \[iterations = 2048\])
@@ -813,31 +814,31 @@ Returns an obfuscated value derived with PBKDF using the given salt, hash algori
 
 #### Arguments
 
-* value (Buffer): Value to obfuscate.
-* salt (Buffer): Salt for PBKDF.
-* \[algorithm=VirgilCrypto.HashAlgorithm.SHA384\] (string): Name of hash algorithm to use (Default - SHA-384).
-* \[iterations\] (iterations): Number of iterations for PBKDF.
+* value (Buffer): The value to obfuscate.
+* salt (Buffer): The salt for PBKDF.
+* \[algorithm=VirgilCrypto.HashAlgorithm.SHA384\] (string): Optional name of the hash algorithm to use (Default - SHA-384).
+* \[iterations\] (iterations): Optional number of iterations for PBKDF (Default - 2048).
 
 #### Returns
 
-* (Buffer): Obfuscated value.
+* (Buffer): Returns the obfuscated value.
 
 
 ## Key pair utils
 
 ### changePrivateKeyPassword(privateKey, oldPassword, newPassword)
 
-Changes the password used to encrypt the private key. Returns private key encrypted using new password.
+Changes the password used to encrypt the private key. Returns the private key encrypted using the new password.
 
 #### Arguments
 
-* privateKey (Buffer): Private key.
-* oldPassword (Buffer): Old password.
-* newPassword (Buffer): New password.
+* privateKey (Buffer): The private key.
+* oldPassword (Buffer): The old password.
+* newPassword (Buffer): The new password.
 
 #### Returns
 
-* (Buffer): Private key encrypted using new password.
+* (Buffer): Returns the private key encrypted using the new password.
 
 
 ### decryptPrivateKey(privateKey, privateKeyPassword)
@@ -846,12 +847,12 @@ Decrypts and returns the private key.
 
 #### Arguments
 
-* privateKey (Buffer): Private key to decrypt.
-* privateKeyPassword (Buffer): Password used to encrypt the private key.
+* privateKey (Buffer): The private key to decrypt.
+* privateKeyPassword (Buffer): The password used to encrypt the private key.
 
 #### Returns
 
-* (Buffer): Unencrypted private key.
+* (Buffer): Returns the unencrypted private key.
 
 
 ### encryptPrivateKey(privateKey, privateKeyPassword)
@@ -860,26 +861,26 @@ Encrypts and returns the private key.
 
 #### Arguments
 
-* privateKey (Buffer): Private key to encrypt.
-* privateKeyPassword (Buffer): Password to use for encryption. 
+* privateKey (Buffer): The private key to encrypt.
+* privateKeyPassword (Buffer): The password to use for encryption. 
 
 #### Returns
 
-* (Buffer): Encrypted private key.
+* (Buffer): Returns the encrypted private key.
 
 
-### VirgilCrypto.extractPrivateKey(privateKey, \[privateKeyPassword\])
+### extractPrivateKey(privateKey, \[privateKeyPassword\])
 
-Returns public key computed from private key.
+Returns the public key computed from the private key.
 
 #### Arguments
 
-* privateKey (Buffer): Private key from which public key is computed.
-* \[privateKeyPassword\] (Buffer): Password used for private key encryption if applicable.
+* privateKey (Buffer): The private key from which the public key is computed.
+* \[privateKeyPassword\] (Buffer): Optional password used for the private key encryption if applicable.
 
 #### Returns
 
-* (Buffer): Public key.
+* (Buffer): Returns the public key.
 
 
 ### privateKeyToDER(privateKey, \[privateKeyPassword\])
@@ -888,12 +889,12 @@ Returns the private key in DER format.
 
 #### Arguments
 
-* privateKey (Buffer): Private key to convert to DER format.
-* \[privateKeyPassword\] (Buffer): Password used for private key encryption if applicable.
+* privateKey (Buffer): The private key to convert to DER format.
+* \[privateKeyPassword\] (Buffer): Optional password used for the private key encryption if applicable.
 
 #### Returns
 
-* (Buffer): Private key in DER format.
+* (Buffer): Returns the private key in DER format.
 
 ### publicKeyToDER(publicKey)
 
@@ -901,11 +902,11 @@ Returns the public key in DER format.
 
 #### Arguments
 
-* publicKey (Buffer): Public key to convert to DER format.
+* publicKey (Buffer): The public key to convert to DER format.
 
 #### Returns
 
-* (Buffer): Public key in DER format.
+* (Buffer): Returns the public key in DER format.
 
 
 ## Resources

@@ -1,6 +1,6 @@
 {
   "name": "virgil-crypto",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Virgil Crypto",
   "contributors": [
     "Eugene Baranov <ebaranov.dev@gmail.com> (https://github.com/ebaranov/)",
@@ -13,6 +13,9 @@
   },
   "main": "index.js",
   "browser": "dist/virgil-crypto.dev.js",
+  "engines": {
+    "node": ">=0.12 <7.0.0"
+  },
   "scripts": {
     "postinstall": "node scripts/download-native-library.js",
     "build": "gulp build --development && gulp build --production",
@@ -41,7 +44,6 @@
     "babel-preset-es2015": "^6.18.0",
     "babel-preset-stage-2": "^6.18.0",
     "bowser": "^1.0.0",
-    "buffer": "^4.0.0",
     "del": "^2.2.0",
     "es6-error": "^2.0.2",
     "expect": "^1.14.0",

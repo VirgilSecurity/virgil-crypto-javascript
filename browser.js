@@ -1,5 +1,6 @@
 import * as VirgilCryptoAPI from './src/browser';
 
-export { Buffer } from 'buffer';
 export const Version = PACKAGE_VERSION;
+export { Buffer as Buffer };
 export const VirgilCrypto = { ...{ Buffer: Buffer }, ...VirgilCryptoAPI };
+export default VirgilCrypto;

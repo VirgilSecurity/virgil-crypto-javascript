@@ -1,5 +1,4 @@
 import VirgilCrypto from './crypto-module';
-import { Buffer } from 'buffer';
 import createWrapper from '../../lib/wrapper';
 
 export const bufferToByteArray = (buffer) => {

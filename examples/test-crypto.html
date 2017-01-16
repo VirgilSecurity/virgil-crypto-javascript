@@ -67,17 +67,17 @@
 				console.log('keyPairAsyncOnlyType', keyPairAsyncOnlyType);
 			});
 
-			var encryptedData = virgilCrypto.encrypt(initialData, new Buffer('password'));
+			var encryptedData = virgilCrypto.encrypt(initialData, new VirgilCrypto.Buffer('password'));
 			console.log('encryptedData base64', encryptedData.toString('base64'));
 
-			var decryptedData = virgilCrypto.decrypt(encryptedData, new Buffer('password'));
+			var decryptedData = virgilCrypto.decrypt(encryptedData, new VirgilCrypto.Buffer('password'));
 			console.log('decryptedData string', decryptedData.toString());
 
-			virgilCrypto.encryptAsync(initialData, new Buffer('password')).
+			virgilCrypto.encryptAsync(initialData, new VirgilCrypto.Buffer('password')).
 			then(function(encryptedData) {
 				console.log('async encryptedData base64', encryptedData.toString('base64'));
 
-				virgilCrypto.decryptAsync(encryptedData, new Buffer('password')).
+				virgilCrypto.decryptAsync(encryptedData, new VirgilCrypto.Buffer('password')).
 				then(function(decryptedData) {
 					console.log('async decryptedData', decryptedData.toString());
 				});

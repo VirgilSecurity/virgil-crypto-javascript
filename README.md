@@ -214,7 +214,7 @@ var recipientsList = [{
 	publicKey: keyPair2.publicKey
 }];
 
-var encryptedData = VirgilCrypto.encrypt(plaintText, recipientsList);
+var encryptedData = VirgilCrypto.encrypt(plainText, recipientsList);
 
 // encrypted data now can be decrypted by either keyPair1.privateKey 
 // or keyPair2.privateKey
@@ -295,7 +295,7 @@ var recipientsList = [{
 	publicKey: keyPair2.publicKey
 }];
 
-VirgilCrypto.encryptAsync(plaintText, recipientsList)
+VirgilCrypto.encryptAsync(plainText, recipientsList)
 	.then(function (encryptedData) {
 		// encrypted data now can be decrypted by either keyPair1.privateKey 
 		// or keyPair2.privateKey
@@ -437,8 +437,6 @@ VirgilCrypto.encryptAsync(plainText, recipientId, keyPair.publicKey)
 		// handle error
 		console.log(err);
 	});
-
-console.log('Decrypted data: ' + decryptedData.toString('utf8'));
 ```
 
 Using private key with password:
@@ -607,7 +605,7 @@ VirgilCrypto.verifyAsync(encryptedData, signature, keyPair.publicKey)
 
 ## Authenticated Encryption
 
-Form of encryption which simultaneously provides confidentiality, integrity, and authenticity assurances on the data.
+A form of encryption which simultaneously provides confidentiality, integrity, and authenticity assurances on the data.
 
 ### signThenEncrypt(data, privateKey, recipientId | recipients, [publicKey])
 
@@ -622,7 +620,7 @@ the signed message using the public key (or public keys depending on the number 
 	- recipientId (Buffer): The identifier of the intended recipient.
 	- recipients (Array.\<{recipientId: Buffer, publicKey: Buffer}\>): Array of recipient ids with corresponding 
 	public keys to use for encryption. 
-* \[publicKey\] (Buffer): The public key to use for encryption. Used when encrypting for single recipient (i.e. when 
+* \[publicKey\] (Buffer): The public key to use for encryption. Used when encrypting for a single recipient (i.e. when 
 	the second argument is recipientId)
 
 #### Returns

@@ -642,7 +642,7 @@ var recipientKeyPair = VirgilCrypto.generateKeyPair();
 
 var encryptedSignedData = VirgilCrypto.signThenEncrypt(
 					plainText, 
-					senderKeyPair, 
+					senderKeyPair.privateKey, 
 					recipientId, 
 					recipientKeyPair.publicKey);
 
@@ -673,7 +673,7 @@ var recipientKeyPair = VirgilCrypto.generateKeyPair();
 // externally (e.g. from web service, database, file, etc.)
 
 VirgilCrypto.signThenEncryptAsync(
-	plainText, senderKeyPair, recipientId, recipientKeyPair.publicKey)
+	plainText, senderKeyPair.privateKey, recipientId, recipientKeyPair.publicKey)
 .then(function (encryptedSignedData) {
 	console.log('Encrypted data: ' + encryptedSignedData.toString('base64'));
 })
@@ -725,7 +725,7 @@ try {
     					encryptedData, 
     					recipientId, 
     					recipientKeyPair.privateKey, 
-    					senderKeyPair.pubicKey);
+    					senderKeyPair.publicKey);
 } catch (err) {
 	// Message integrity\authenticity verification failed
 	console.log(err);
@@ -756,17 +756,17 @@ var recipientKeyPair = VirgilCrypto.generateKeyPair();
 // as an example. In a real app, the keys would have been provided 
 // externally (e.g. from web service, database, file, etc.)
 
-VirgilCrypto.signThenEncrypt(
+VirgilCrypto.signThenEncryptAsync(
 	plainText, 
 	senderKeyPair.privateKey, 
 	recipientId, 
 	recipientKeyPair.publicKey)
 	.then(function (encryptedData) {
-		return VirgilCrypto.decryptThenVerify(
+		return VirgilCrypto.decryptThenVerifyAsync(
 			encryptedData, 
 			recipientId, 
 			recipientKeyPair.privateKey, 
-			senderKeyPair.pubicKey);
+			senderKeyPair.publicKey);
 	})
 	.then(function (decryptedData) {
 		console.log('Decrypted data: ' + decryptedData.toString('utf8'));

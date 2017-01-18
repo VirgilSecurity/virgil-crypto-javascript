@@ -404,7 +404,7 @@ var plainText = new VirgilCrypto.Buffer('data to be encrypted');
 VirgilCrypto.encryptAsync(plainText, password)
 	.then(function (encryptedData) {
 		return VirgilCrypto.decryptAsync(encryptedData, password);
-	});
+	})
 	.then(function (decryptedData) {
 		console.log('Decrypted data: ' + decryptedData.toString('utf8'));	
 	})
@@ -429,7 +429,7 @@ VirgilCrypto.encryptAsync(plainText, recipientId, keyPair.publicKey)
 	.then(function (encryptedData) {
 		return VirgilCrypto.decryptAsync(
 				encryptedData, recipientId, keyPair.privateKey);
-	});
+	})
 	.then(function (decryptedData) {
 		console.log('Decrypted data: ' + decryptedData.toString('utf8'));	
 	})
@@ -461,7 +461,7 @@ VirgilCrypto.encryptAsync(plainText, recipientId, keyPair.publicKey)
 				recipientId, 
 				keyPair.privateKey, 
 				privateKeyPassword);
-	});
+	})
 	.then(function (decryptedData) {
 		console.log('Decrypted data: ' + decryptedData.toString('utf8'));	
 	})

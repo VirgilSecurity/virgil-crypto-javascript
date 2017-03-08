@@ -47,6 +47,10 @@ var utils = {
 		if (!Buffer.isBuffer(arg)) {
 			throw new TypeError('Unexpected type of "' + name + '" argument, use Buffer');
 		}
+	},
+
+	isVirgilByteArray: function isVirgilByteArray(obj) {
+		return obj && obj.constructor && obj.constructor.name === 'VirgilByteArray';
 	}
 };
 

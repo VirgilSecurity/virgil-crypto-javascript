@@ -1,6 +1,7 @@
 var Virgil = require('../../virgil_js');
 var wrapper = require('../lib/wrapper')(require('./utils'));
-wrapper.wrapPrototype(Virgil, 'VirgilTinyCipher');
+
+wrapper.wrapMethods(Virgil.VirgilTinyCipher.prototype.__proto__);
 
 module.exports = {
 	KeyPairType: require('../lib/key-pair-type'),

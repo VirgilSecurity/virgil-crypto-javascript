@@ -1,17 +1,12 @@
 import VirgilCrypto from './crypto-module';
 import createWrapper from '../../lib/wrapper';
 
-export const bufferToByteArray = (buffer) => {
-	let array = VirgilCrypto.VirgilBase64.decode(buffer.toString('base64'));
+export function bufferToByteArray(buffer) {
+	// Buffers are backed by Uint8Array
+	return VirgilCrypto.VirgilByteArray.fromUint8Array(buffer);
+}
 
-	for (let i = 0, bl = buffer.length; i < bl; ++i) {
-		array.set(i, buffer[i]);
-	}
-
-	return array;
-};
-
-export const byteArrayToBuffer = (byteArray) => {
+export function byteArrayToBuffer(byteArray) {
 	let size = byteArray.size();
 	let buffer = new Buffer(size);
 
@@ -20,11 +15,13 @@ export const byteArrayToBuffer = (byteArray) => {
 	}
 
 	return buffer;
-};
+}
 
-export const stringToByteArray = (string) => bufferToByteArray(new Buffer(string, 'utf8'));
+export function stringToByteArray(string) {
+	return bufferToByteArray(new Buffer(string, 'utf8'));
+}
 
-export const toByteArray = (data) => {
+export function toByteArray(data) {
 	switch (true) {
 		case Buffer.isBuffer(data):
 			return bufferToByteArray(data);
@@ -33,10 +30,24 @@ export const toByteArray = (data) => {
 		default:
 			throw new Error(`Can't convert ${typeof data} to ByteArray.`);
 	}
-};
+}
 
-export const toBase64 = (data) => VirgilCrypto.VirgilBase64.encode(toByteArray(data));
+export function toBase64(data) {
+	return data.toString('base64');
+}
 
-export const base64ToBuffer = (data) => byteArrayToBuffer(VirgilCrypto.VirgilBase64.decode(data));
+export function base64ToBuffer(data) {
+	return new Buffer(data, 'base64');
+}
 
-export const wrapper = createWrapper({ toByteArray, byteArrayToBuffer });
+export function isVirgilByteArray(obj) {
+	return obj
+		&& obj.constructor
+		&& obj.constructor.name === 'VirgilByteArray';
+}
+
+export const wrapper = createWrapper({
+	toByteArray,
+	byteArrayToBuffer,
+	isVirgilByteArray
+});

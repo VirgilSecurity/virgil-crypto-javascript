@@ -17,7 +17,8 @@ export function generateKeyPair (options = {}) {
 	if (type && !KeyPairType.hasOwnProperty(type)) {
 		throwValidationError('00002', {
 			arg: 'keysType',
-			type: `one of ${_.values(KeyPairType).join(', ')} - use the KeyPairType to get it.`
+			type: `one of ${Object.values(KeyPairType).join(', ')} - 
+			use the KeyPairType to get it.`
 		});
 	}
 

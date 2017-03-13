@@ -16,20 +16,20 @@ export function verify (data, sign, publicKey) {
 	checkIsBuffer(sign, 'sign');
 
 	const virgilSigner = new VirgilCrypto.VirgilSigner();
-	let isVerified;
+	const dataArr = bufferToByteArray(data);
+	const signArr = bufferToByteArray(sign);
+	const publicKeyArr = bufferToByteArray(publicKey);
 
 	try {
-		isVerified = virgilSigner.verify(
-			bufferToByteArray(data),
-			bufferToByteArray(sign),
-			bufferToByteArray(publicKey));
+		return virgilSigner.verify(dataArr, signArr, publicKeyArr);
 	} catch (e) {
 		throwVirgilError('90006', { error: e.message });
 	} finally {
 		virgilSigner.delete();
+		dataArr.delete();
+		signArr.delete();
+		publicKeyArr.delete();
 	}
-
-	return isVerified;
 }
 
 export default verify;

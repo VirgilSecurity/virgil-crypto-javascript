@@ -1,3 +1,4 @@
+var isBuffer = require('is-buffer');
 var Virgil = require('../../virgil_js.node');
 
 var utils = {
@@ -47,7 +48,13 @@ var utils = {
 		if (!Buffer.isBuffer(arg)) {
 			throw new TypeError('Unexpected type of "' + name + '" argument, use Buffer');
 		}
-	}
+	},
+
+	isVirgilByteArray: function isVirgilByteArray(obj) {
+		return obj && obj.constructor && obj.constructor.name === '_exports_VirgilByteArray';
+	},
+
+	isBuffer: isBuffer
 };
 
 module.exports = utils;

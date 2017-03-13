@@ -4,15 +4,15 @@ export default function(initialEncryptedData, password) {
 	const b64decode = VirgilCryptoWorkerContext.VirgilBase64.decode;
 	const b64encode = VirgilCryptoWorkerContext.VirgilBase64.encode;
 
+	const dataByteArray = b64decode(initialEncryptedData);
+	const passwordByteArray = b64decode(password);
+
 	try {
-		let dataByteArray = b64decode(initialEncryptedData);
-		let passwordByteArray = b64decode(password);
+
 		let decryptedDataByteArray = virgilCipher.decryptWithPassword(dataByteArray, passwordByteArray);
 		let decryptedData = b64encode(decryptedDataByteArray);
 
 		// cleanup memory to avoid memory leaks
-		dataByteArray.delete();
-		passwordByteArray.delete();
 		decryptedDataByteArray.delete();
 
 		deferred.resolve(decryptedData);
@@ -20,5 +20,7 @@ export default function(initialEncryptedData, password) {
 		deferred.reject(e.message);
 	} finally {
 		virgilCipher.delete();
+		dataByteArray.delete();
+		passwordByteArray.delete();
 	}
 };

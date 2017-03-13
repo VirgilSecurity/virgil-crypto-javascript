@@ -1,6 +1,8 @@
 import VirgilCrypto from './utils/crypto-module';
-import { bufferToByteArray, byteArrayToBuffer } from './utils/crypto-utils';
-import { checkIsBuffer } from './utils/crypto-errors';
+import {
+	bufferToByteArray,
+	convertToBufferAndRelease } from './utils/crypto-utils';
+import { checkIsBuffer, throwVirgilError } from './utils/crypto-errors';
 
 /**
  * Extracts public key out of private key
@@ -14,8 +16,18 @@ export function extractPublicKey(privateKey, privateKeyPassword = new Buffer(0))
 	checkIsBuffer(privateKey, 'privateKey');
 	checkIsBuffer(privateKeyPassword, 'privateKeyPassword');
 
-	return byteArrayToBuffer(
-		VirgilCrypto.VirgilKeyPair.extractPublicKey(
-			bufferToByteArray(privateKey),
-			bufferToByteArray(privateKeyPassword)));
+	const privateKeyArr = bufferToByteArray(privateKey);
+	const passwordArr = bufferToByteArray(privateKeyPassword);
+
+	try {
+		return convertToBufferAndRelease(
+			VirgilCrypto.VirgilKeyPair.extractPublicKey(
+				privateKeyArr, passwordArr
+			));
+	} catch (e) {
+		throwVirgilError('10000', { error: e.message });
+	} finally {
+		privateKeyArr.delete();
+		passwordArr.delete();
+	}
 }

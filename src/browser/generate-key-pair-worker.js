@@ -3,8 +3,10 @@ export default function(password, keysType) {
 	const KeyPair = VirgilCryptoWorkerContext.VirgilKeyPair;
 	const base64decode = VirgilCryptoWorkerContext.VirgilBase64.decode;
 
+	const passwordByteArray = base64decode(password);
+
 	try {
-		const passwordByteArray = base64decode(password);
+
 		let virgilKeys;
 		if (keysType) {
 			virgilKeys = KeyPair.generate(KeyPair.Type[keysType], passwordByteArray);
@@ -16,11 +18,12 @@ export default function(password, keysType) {
 		const privateKey = virgilKeys.privateKey().toUTF8();
 
 		// cleanup memory to avoid memory leaks
-		passwordByteArray.delete();
 		virgilKeys.delete();
 
 		deferred.resolve({ publicKey: publicKey, privateKey: privateKey });
 	} catch (e) {
 		deferred.reject(e.message);
+	} finally {
+		passwordByteArray.delete();
 	}
 };

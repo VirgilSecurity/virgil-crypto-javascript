@@ -1,6 +1,8 @@
 import VirgilCrypto from './utils/crypto-module';
-import { bufferToByteArray, byteArrayToBuffer } from './utils/crypto-utils';
-import { checkIsBuffer } from './utils/crypto-errors';
+import {
+	bufferToByteArray,
+	convertToBufferAndRelease } from './utils/crypto-utils';
+import { checkIsBuffer, throwVirgilError } from './utils/crypto-errors';
 
 /**
  * Converts PEM formatted public key to DER format.
@@ -9,5 +11,13 @@ import { checkIsBuffer } from './utils/crypto-errors';
  * */
 export function publicKeyToDER(publicKey) {
 	checkIsBuffer(publicKey, 'publicKey');
-	return byteArrayToBuffer(VirgilCrypto.VirgilKeyPair.publicKeyToDER(bufferToByteArray(publicKey)));
+	const publicKeyArr = bufferToByteArray(publicKey);
+	try {
+		return convertToBufferAndRelease(
+			VirgilCrypto.VirgilKeyPair.publicKeyToDER(publicKeyArr));
+	} catch (e) {
+		throwVirgilError('10000', { error: e.message });
+	} finally {
+		publicKeyArr.delete();
+	}
 }

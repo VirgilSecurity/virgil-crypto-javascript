@@ -1,7 +1,7 @@
 import { wrapper } from './utils/crypto-utils';
 import Virgil from './utils/crypto-module';
 
-wrapper.wrapPrototype(Virgil, 'VirgilTinyCipher');
+wrapper.wrapMethods(Virgil.VirgilTinyCipher.prototype);
 
 export { encrypt } from './encrypt';
 export { encryptAsync } from './encrypt-async';

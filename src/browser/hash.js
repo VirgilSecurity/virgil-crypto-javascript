@@ -1,6 +1,8 @@
 import VirgilCrypto from './utils/crypto-module';
-import { bufferToByteArray, byteArrayToBuffer } from './utils/crypto-utils';
-import { checkIsBuffer } from './utils/crypto-errors';
+import {
+	bufferToByteArray,
+	convertToBufferAndRelease } from './utils/crypto-utils';
+import { checkIsBuffer, throwVirgilError } from './utils/crypto-errors';
 
 /**
  * Produces a hash of given data
@@ -13,7 +15,16 @@ import { checkIsBuffer } from './utils/crypto-errors';
 export function hash(data, algorithm) {
 	checkIsBuffer(data, 'data');
 	algorithm = algorithm || VirgilCrypto.VirgilHashAlgorithm.SHA256;
+	const dataArr = bufferToByteArray(data);
 	const virgilHash = new VirgilCrypto.VirgilHash(algorithm);
-	const hash = virgilHash.hash(bufferToByteArray(data));
-	return byteArrayToBuffer(hash);
+
+	try {
+		const hash = virgilHash.hash(dataArr);
+		return convertToBufferAndRelease(hash);
+	} catch (e) {
+		throwVirgilError('10000', { error: e.message });
+	} finally {
+		virgilHash.delete();
+		dataArr.delete();
+	}
 }

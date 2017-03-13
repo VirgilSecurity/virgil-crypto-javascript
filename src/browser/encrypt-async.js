@@ -2,6 +2,7 @@ import { encryptWithPasswordAsync } from './encrypt-with-password-async';
 import { encryptWithKeyAsync } from './encrypt-with-key-async';
 import { encryptWithKeyMultiRecipientsAsync } from './encrypt-with-key-multi-recipients-async';
 import { checkIsBuffer } from './utils/crypto-errors';
+import { isBuffer } from './utils/crypto-utils';
 
 /**
  * Encrypt data async
@@ -24,7 +25,7 @@ export function encryptAsync (initialData, recipientId, publicKey) {
 
 	if (recipients) {
 		encryptedDataPromise = encryptWithKeyMultiRecipientsAsync(initialData, recipients);
-	} else if (Buffer.isBuffer(recipientId) && Buffer.isBuffer(publicKey)) {
+	} else if (isBuffer(recipientId) && isBuffer(publicKey)) {
 		encryptedDataPromise = encryptWithKeyAsync(initialData, recipientId, publicKey);
 	} else {
 		let password = recipientId;

@@ -1,26 +1,35 @@
 import VirgilCrypto from './utils/crypto-module';
-import { bufferToByteArray, byteArrayToBuffer } from './utils/crypto-utils';
+import {
+	bufferToByteArray,
+	convertToBufferAndRelease } from './utils/crypto-utils';
 import { throwVirgilError } from './utils/crypto-errors';
 
 export function encryptWithKeyMultiRecipients (initialData, recipients) {
 	const virgilCipher = new VirgilCrypto.VirgilCipher();
-	let encryptedDataBuffer;
+	const dataArr = bufferToByteArray(initialData);
+	const transformedRecipients = recipients.map(recipient => ({
+		recipientId: bufferToByteArray(recipient.recipientId),
+		publicKey: bufferToByteArray(recipient.publicKey)
+	}));
 
 	try {
-		recipients.forEach((recipient) => {
+		transformedRecipients.forEach(recipient => {
 			virgilCipher.addKeyRecipient(
-				bufferToByteArray(recipient.recipientId),
-				bufferToByteArray(recipient.publicKey));
+				recipient.recipientId,
+				recipient.publicKey);
 		});
 
-		encryptedDataBuffer = byteArrayToBuffer(virgilCipher.encrypt(bufferToByteArray(initialData), true));
+		return convertToBufferAndRelease(virgilCipher.encrypt(dataArr, true));
 	} catch (e) {
 		throwVirgilError('90008', { error: e.message });
 	} finally {
 		virgilCipher.delete();
+		dataArr.delete();
+		transformedRecipients.forEach(recipient => {
+			recipient.recipientId.delete();
+			recipient.publicKey.delete();
+		});
 	}
-
-	return encryptedDataBuffer;
 }
 
 export default encryptWithKeyMultiRecipients;

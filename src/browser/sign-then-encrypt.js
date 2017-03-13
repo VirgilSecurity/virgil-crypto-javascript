@@ -1,5 +1,9 @@
 import VirgilCrypto from './utils/crypto-module';
-import { bufferToByteArray, byteArrayToBuffer, stringToByteArray } from './utils/crypto-utils';
+import {
+	bufferToByteArray,
+	convertToBufferAndRelease,
+	stringToByteArray
+} from './utils/crypto-utils';
 import { checkIsBuffer, throwVirgilError } from './utils/crypto-errors';
 import * as constants from '../lib/constants';
 
@@ -37,31 +41,43 @@ export function signThenEncrypt (data, privateKey, recipientId, publicKey) {
 
 	const signer = new VirgilCrypto.VirgilSigner();
 	const cipher = new VirgilCrypto.VirgilCipher();
-
-	const dataBuf = bufferToByteArray(data);
+	const dataArr = bufferToByteArray(data);
+	const privateKeyArr = bufferToByteArray(privateKey);
+	const passwordArr = stringToByteArray('');
+	const signatureKeyArr = stringToByteArray(constants.DATA_SIGNATURE_KEY);
+	const recipientsTransformed = recipients.map(r => ({
+		id: bufferToByteArray(r.recipientId),
+		publicKey: bufferToByteArray(r.publicKey)
+	}));
 
 	try {
 		let signature = signer.sign(
-			dataBuf,
-			bufferToByteArray(privateKey),
-			stringToByteArray(''));
+			dataArr,
+			privateKeyArr,
+			passwordArr);
 
 		cipher
 			.customParams()
-			.setData(stringToByteArray(constants.DATA_SIGNATURE_KEY), signature);
+			.setData(signatureKeyArr, signature);
 
-		recipients.forEach(function (recipient) {
-			cipher.addKeyRecipient(
-				bufferToByteArray(recipient.recipientId),
-				bufferToByteArray(recipient.publicKey));
-		});
+		recipientsTransformed.forEach(recipient =>
+			cipher.addKeyRecipient(recipient.id, recipient.publicKey)
+		);
 
-		return byteArrayToBuffer(cipher.encrypt(dataBuf, true));
+		return convertToBufferAndRelease(cipher.encrypt(dataArr, true));
 	} catch (e) {
 		throwVirgilError('10000', { error: e.message });
 	} finally {
 		signer.delete();
 		cipher.delete();
+		dataArr.delete();
+		privateKeyArr.delete();
+		passwordArr.delete();
+		signatureKeyArr.delete();
+		recipientsTransformed.forEach(recipient => {
+			recipient.id.delete();
+			recipient.publicKey.delete();
+		});
 	}
 }
 

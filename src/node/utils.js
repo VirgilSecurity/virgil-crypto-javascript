@@ -1,3 +1,4 @@
+var isBuffer = require('is-buffer');
 var Virgil = require('../../virgil_js.node');
 
 var utils = {
@@ -51,7 +52,9 @@ var utils = {
 
 	isVirgilByteArray: function isVirgilByteArray(obj) {
 		return obj && obj.constructor && obj.constructor.name === '_exports_VirgilByteArray';
-	}
+	},
+
+	isBuffer: isBuffer
 };
 
 module.exports = utils;

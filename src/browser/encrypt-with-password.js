@@ -1,26 +1,30 @@
 import VirgilCrypto from './utils/crypto-module';
-import { bufferToByteArray, byteArrayToBuffer } from './utils/crypto-utils';
+import {
+	bufferToByteArray,
+	convertToBufferAndRelease } from './utils/crypto-utils';
 import { throwVirgilError } from './utils/crypto-errors';
 
 export function encryptWithPassword (initialData, password) {
 	const embedContentInfo = true;
 	const virgilCipher = new VirgilCrypto.VirgilCipher();
-	let encryptedDataBuffer;
+
+	const dataArr = bufferToByteArray(initialData);
+	const passwordArr = password && bufferToByteArray(password);
 
 	try {
-		if (password) {
-			virgilCipher.addPasswordRecipient(bufferToByteArray(password));
+		if (passwordArr) {
+			virgilCipher.addPasswordRecipient(passwordArr);
 		}
 
-		encryptedDataBuffer = byteArrayToBuffer(
-			virgilCipher.encrypt(bufferToByteArray(initialData), embedContentInfo));
+		return convertToBufferAndRelease(
+			virgilCipher.encrypt(dataArr, embedContentInfo));
 	} catch (e) {
 		throwVirgilError('90003', { error: e.message });
 	} finally {
 		virgilCipher.delete();
+		dataArr.delete();
+		passwordArr && passwordArr.delete();
 	}
-
-	return encryptedDataBuffer;
 }
 
 export default encryptWithPassword;

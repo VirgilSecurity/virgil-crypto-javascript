@@ -2,6 +2,7 @@ import { encryptWithPassword } from './encrypt-with-password';
 import { encryptWithKey } from './encrypt-with-key';
 import { encryptWithKeyMultiRecipients } from './encrypt-with-key-multi-recipients';
 import { checkIsBuffer } from './utils/crypto-errors';
+import { isBuffer } from './utils/crypto-utils';
 
 /**
  * Encrypt data
@@ -26,7 +27,7 @@ export function encrypt (initialData, recipientId, publicKey) {
 
 	if (recipients) {
 		encryptedData = encryptWithKeyMultiRecipients(initialData, recipients);
-	} else if (Buffer.isBuffer(recipientId) && Buffer.isBuffer(publicKey)) {
+	} else if (isBuffer(recipientId) && isBuffer(publicKey)) {
 		encryptedData = encryptWithKey(initialData, recipientId, publicKey);
 	} else {
 		let password = recipientId;

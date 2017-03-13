@@ -1,9 +1,22 @@
+import isBuffer from 'is-buffer';
 import VirgilCrypto from './crypto-module';
 import createWrapper from '../../lib/wrapper';
 
 export function bufferToByteArray(buffer) {
 	// Buffers are backed by Uint8Array
 	return VirgilCrypto.VirgilByteArray.fromUint8Array(buffer);
+}
+
+/**
+ * Converts the given {VirgilByteArray} to {Buffer} and releases the
+ * memory held by the array.
+ *
+ * @param {VirgilByteArray} byteArray - Byte array to transform.
+ */
+export function convertToBufferAndRelease(byteArray) {
+	const buf = byteArrayToBuffer(byteArray);
+	byteArray.delete();
+	return buf;
 }
 
 export function byteArrayToBuffer(byteArray) {
@@ -46,8 +59,11 @@ export function isVirgilByteArray(obj) {
 		&& obj.constructor.name === 'VirgilByteArray';
 }
 
+export { isBuffer as isBuffer };
+
 export const wrapper = createWrapper({
 	toByteArray,
 	byteArrayToBuffer,
-	isVirgilByteArray
+	isVirgilByteArray,
+	isBuffer
 });

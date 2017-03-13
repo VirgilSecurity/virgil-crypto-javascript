@@ -1,5 +1,3 @@
-var isBuffer = require('is-buffer');
-
 module.exports = function createWrapper (utils) {
 	return {
 		wrapMethods: wrapMethods,
@@ -24,7 +22,7 @@ module.exports = function createWrapper (utils) {
 
 			for (var i = 0; i < args.length; ++i) {
 				// Convert strings and Buffer to VirgilByteArray
-				if (typeof args[i] === 'string' || isBuffer(args[i])) {
+				if (typeof args[i] === 'string' || utils.isBuffer(args[i])) {
 					args[i] = utils.toByteArray(args[i]);
 				}
 			}

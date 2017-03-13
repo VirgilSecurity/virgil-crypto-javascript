@@ -7,30 +7,49 @@ export default function(data, privateKey, recipients) {
 	const signer = new VirgilCryptoWorkerContext.VirgilSigner();
 	const cipher = new VirgilCryptoWorkerContext.VirgilCipher();
 
-	const dataByteArray = base64decode(data);
+	const dataArr = base64decode(data);
+	const privateKeyArr = base64decode(privateKey);
+	const passwordArr = ByteArray.fromUTF8('');
+	const signatureKeyArr = ByteArray.fromUTF8('VIRGIL-DATA-SIGNATURE');
+	const transformedRecipients = recipients.map(recipient => ({
+		id: base64decode(recipient.recipientId),
+		publicKey: base64decode(recipient.publicKey)
+	}));
 
 	try {
-		let signature = signer.sign(
-			dataByteArray,
-			base64decode(privateKey),
-			ByteArray.fromUTF8(''));
+		const signatureArr = signer.sign(
+			dataArr,
+			privateKeyArr,
+			passwordArr);
 
 		cipher
 			.customParams()
-			.setData(ByteArray.fromUTF8('VIRGIL-DATA-SIGNATURE'), signature);
+			.setData(signatureKeyArr, signatureArr);
 
-		recipients.forEach(function (recipient) {
-			cipher.addKeyRecipient(
-				base64decode(recipient.recipientId),
-				base64decode(recipient.publicKey));
+		transformedRecipients.forEach(recipient => {
+			cipher.addKeyRecipient(recipient.id, recipient.publicKey);
 		});
 
-		deferred.resolve(base64encode(cipher.encrypt(dataByteArray, true)));
+		const cipherDataArr = cipher.encrypt(dataArr, true);
+		const cipherData = base64encode(cipherDataArr);
+
+		 signatureArr.delete();
+		cipherDataArr.delete();
+
+		deferred.resolve(cipherData);
 	} catch (e) {
 		deferred.reject(e.message);
 	} finally {
 		signer.delete();
 		cipher.delete();
+		dataArr.delete();
+		privateKeyArr.delete();
+		passwordArr.delete();
+		signatureKeyArr.delete();
+		transformedRecipients.forEach(recipient => {
+			recipient.id.delete();
+			recipient.publicKey.delete();
+		});
 	}
 }
 

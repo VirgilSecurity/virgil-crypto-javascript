@@ -5,17 +5,23 @@ export default function(initialData, password) {
 	const base64decode = VirgilCryptoWorkerContext.VirgilBase64.decode;
 	const base64encode = VirgilCryptoWorkerContext.VirgilBase64.encode;
 
+	const dataArr = base64decode(initialData);
+	const passwordArr = password && base64decode(password);
+
 	try {
-		if (password) {
-			virgilCipher.addPasswordRecipient(base64decode(password));
+		if (passwordArr) {
+			virgilCipher.addPasswordRecipient(passwordArr);
 		}
 
-		let encryptedDataBase64 = base64encode(virgilCipher.encrypt(base64decode(initialData), embedContentInfo));
-
+		let encryptedData = virgilCipher.encrypt(dataArr, embedContentInfo);
+		let encryptedDataBase64 = base64encode(encryptedData);
+		encryptedData.delete();
 		deferred.resolve(encryptedDataBase64);
 	} catch (e) {
 		deferred.reject(e.message);
 	} finally {
 		virgilCipher.delete();
+		dataArr.delete();
+		password && passwordArr.delete();
 	}
 }

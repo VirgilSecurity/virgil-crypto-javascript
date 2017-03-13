@@ -1,6 +1,8 @@
 import VirgilCrypto from './utils/crypto-module';
-import { bufferToByteArray, byteArrayToBuffer } from './utils/crypto-utils';
-import { checkIsBuffer } from './utils/crypto-errors';
+import {
+	bufferToByteArray,
+	convertToBufferAndRelease } from './utils/crypto-utils';
+import { checkIsBuffer, throwVirgilError } from './utils/crypto-errors';
 
 /**
  * Converts PEM formatted private key to DER format.
@@ -8,12 +10,23 @@ import { checkIsBuffer } from './utils/crypto-errors';
  * @param {Buffer} [privateKeyPassword] - Private key password, if encrypted.
  * @returns {Buffer}
  * */
-export function privateKeyToDER(privateKey, privateKeyPassword = new Buffer(0)) {
+export function privateKeyToDER(
+	privateKey, privateKeyPassword = new Buffer(0)) {
+
 	checkIsBuffer(privateKey, 'privateKey');
 	checkIsBuffer(privateKeyPassword);
 
-	return byteArrayToBuffer(
-		VirgilCrypto.VirgilKeyPair.privateKeyToDER(
-			bufferToByteArray(privateKey),
-			bufferToByteArray(privateKeyPassword)));
+	const privateKeyArr = bufferToByteArray(privateKey);
+	const passwordArr = bufferToByteArray(privateKeyPassword);
+	try {
+		return convertToBufferAndRelease(
+			VirgilCrypto.VirgilKeyPair.privateKeyToDER(
+				privateKeyArr, passwordArr
+			));
+	} catch (e) {
+		throwVirgilError('10000', { error: e.message });
+	} finally {
+		privateKeyArr.delete();
+		passwordArr.delete();
+	}
 }

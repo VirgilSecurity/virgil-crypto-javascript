@@ -1,5 +1,7 @@
 import VirgilCrypto from './utils/crypto-module';
-import { bufferToByteArray, byteArrayToBuffer } from './utils/crypto-utils';
+import {
+	bufferToByteArray,
+	convertToBufferAndRelease } from './utils/crypto-utils';
 import { checkIsBuffer, throwVirgilError } from './utils/crypto-errors';
 
 /**
@@ -16,22 +18,22 @@ export function sign (data, privateKey, privateKeyPassword = new Buffer(0)) {
 	checkIsBuffer(privateKeyPassword, 'privateKeyPassword');
 
 	const virgilSigner = new VirgilCrypto.VirgilSigner();
-	let sign;
+	const dataArr = bufferToByteArray(data);
+	const privateKeyArr = bufferToByteArray(privateKey);
+	const passwordArr = bufferToByteArray(privateKeyPassword);
 
 	try {
-		sign = byteArrayToBuffer(
-			virgilSigner.sign(
-				bufferToByteArray(data),
-				bufferToByteArray(privateKey),
-				bufferToByteArray(privateKeyPassword)));
-
+		return convertToBufferAndRelease(
+			virgilSigner.sign(dataArr, privateKeyArr, passwordArr)
+		);
 	} catch (e) {
 		throwVirgilError('90005', { error: e.message });
 	} finally {
 		virgilSigner.delete();
+		dataArr.delete();
+		privateKeyArr.delete();
+		passwordArr.delete();
 	}
-
-	return sign;
 }
 
 export default sign;

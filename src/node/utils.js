@@ -50,7 +50,7 @@ var utils = {
 	},
 
 	isVirgilByteArray: function isVirgilByteArray(obj) {
-		return obj && obj.constructor && obj.constructor.name === 'VirgilByteArray';
+		return obj && obj.constructor && obj.constructor.name === '_exports_VirgilByteArray';
 	}
 };
 

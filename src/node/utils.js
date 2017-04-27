@@ -46,7 +46,7 @@ var utils = {
 
 	checkIsBuffer: function checkIsBuffer (arg, name) {
 		if (!Buffer.isBuffer(arg)) {
-			throw new TypeError('Unexpected type of "' + name + '" argument, use Buffer');
+			throw new TypeError('Unexpected type of "' + name + '" argument, expected Buffer');
 		}
 	},
 
@@ -54,7 +54,28 @@ var utils = {
 		return obj && obj.constructor && obj.constructor.name === '_exports_VirgilByteArray';
 	},
 
-	isBuffer: isBuffer
+	isBuffer: isBuffer,
+
+	toArray: function toArray(obj) {
+		return Array.isArray(obj) ? obj : (obj ? [obj] : obj);
+	},
+
+	byteArraysEqual: function byteArraysEqual(a, b) {
+		var aLen = a.size();
+		var bLen = b.size();
+
+		if (aLen !== bLen) {
+			return false;
+		}
+
+		for (var i = 0; i < aLen; i++) {
+			if (a.get(i) !== b.get(i)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 };
 
 module.exports = utils;

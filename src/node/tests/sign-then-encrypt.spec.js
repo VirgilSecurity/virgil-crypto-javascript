@@ -47,4 +47,29 @@ describe('signThenEncrypt -> decryptThenVerify', function () {
 				wrongPubkey);
 		}).toThrow(VirgilCrypto.VirgilCryptoError, /Signature verification has failed/);
 	});
+
+	it('should sign with password-protected key', function () {
+		var password = new Buffer('pa$$w0rd');
+		var keyPair = VirgilCrypto.generateKeyPair({ password: password });
+		var plainData = new Buffer('Secret message');
+		var encryptedData = VirgilCrypto.signThenEncrypt(
+			plainData,
+			{
+				privateKey: keyPair.privateKey,
+				password: password
+			},
+			recipientId,
+			keyPair.publicKey);
+
+		var decryptedData = VirgilCrypto.decryptThenVerify(
+			encryptedData,
+			recipientId,
+			{
+				privateKey: keyPair.privateKey,
+				password: password
+			},
+			keyPair.publicKey);
+
+		expect(decryptedData.equals(plainData)).toEqual(true);
+	});
 });

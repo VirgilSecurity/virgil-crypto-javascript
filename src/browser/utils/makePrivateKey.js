@@ -4,15 +4,15 @@ import { throwVirgilError } from './crypto-errors';
 /**
  * Converts the privateKey argument to canonical private key representation.
  *
- * @param {(Buffer|PrivateKey)} privateKey
+ * @param {(Buffer|PrivateKeyInfo)} privateKey
  * @param {Buffer} [password]
  * @param {Buffer} [recipientId]
  *
  * @private
  *
- * @returns {InternalPrivateKey}
+ * @returns {PrivateKey}
  */
-export function makeInternalPrivateKey(privateKey, password, recipientId) {
+export function makePrivateKey(privateKey, password, recipientId) {
 	if (isBuffer(privateKey)) {
 		if (!!password && !isBuffer(password)) {
 			throwVirgilError('10000', {
@@ -28,25 +28,25 @@ export function makeInternalPrivateKey(privateKey, password, recipientId) {
 			});
 		}
 
-		return new InternalPrivateKey(privateKey, password, recipientId);
+		return new PrivateKey(privateKey, password, recipientId);
 	}
 
 	if (isObjectLike(privateKey) && !!privateKey.privateKey) {
 		if (!!privateKey.password && !isBuffer(privateKey.password)) {
 			throwVirgilError('10000', {
-				error: 'Unexpected type of private key password. ' +
-				'Expected password to be a Buffer.'
+				error: 'Unexpected type of "privateKey" argument. ' +
+				'Expected "password" property to be a Buffer.'
 			});
 		}
 
 		if (!!privateKey.recipientId && !isBuffer(privateKey.recipientId)) {
 			throwVirgilError('10000', {
-				error: 'Unexpected type of private key recipient id. ' +
-				'Expected recipient id to be a Buffer.'
+				error: 'Unexpected type of "privateKey" argument. ' +
+				'Expected "recipientId" property to be a Buffer.'
 			});
 		}
 
-		return new InternalPrivateKey(
+		return new PrivateKey(
 			privateKey.privateKey,
 			privateKey.password,
 			privateKey.recipientId
@@ -60,13 +60,15 @@ export function makeInternalPrivateKey(privateKey, password, recipientId) {
 }
 
 /**
- * Creates a new InternalPrivateKey.
+ * Creates a new PrivateKey.
  *
  * @private
  * @class
- * @classdesc Represents a private key consumable by native VirgilCrypto.
+ * @classdesc A wrapper around the private key value password and id.
+ * 		Byte array properties of instances are represented as
+ * 		VirgilByteArray - type consumable by native VirgilCrypto.
  */
-function InternalPrivateKey(key, password, recipientId) {
+function PrivateKey(key, password, recipientId) {
 	/** @type {VirgilByteArray} */
 	this.privateKey = bufferToByteArray(key);
 	/** @type {VirgilByteArray} */
@@ -79,7 +81,7 @@ function InternalPrivateKey(key, password, recipientId) {
  * Frees the memory held by the key's private members. The instance can no
  * longer be used after this method is called.
  */
-InternalPrivateKey.prototype.delete = function deletePrivateKey() {
+PrivateKey.prototype.delete = function deletePrivateKey() {
 	this.privateKey.delete();
 	this.password.delete();
 	this.recipientId && this.recipientId.delete();
@@ -91,7 +93,7 @@ InternalPrivateKey.prototype.delete = function deletePrivateKey() {
  *
  * @returns {{privateKey: string, password: string, [recipientId]: string}}
  */
-InternalPrivateKey.prototype.marshall = function marshall() {
+PrivateKey.prototype.marshall = function marshall() {
 	var res = {
 		privateKey: byteArrayToBuffer(this.privateKey).toString('base64'),
 		password: byteArrayToBuffer(this.password).toString('base64'),

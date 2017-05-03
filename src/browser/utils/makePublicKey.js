@@ -4,11 +4,11 @@ import { throwVirgilError } from './crypto-errors';
 /**
  * Converts the publicKey argument to canonical public key representation.
  *
- * @param {(Buffer|PublicKey)} publicKey
+ * @param {(Buffer|PublicKeyInfo)} publicKey
  * @param {Buffer} [recipientId]
- * @returns {InternalPublicKey}
+ * @returns {PublicKey}
  */
-export function makeInternalPublicKey(publicKey, recipientId) {
+export function makePublicKey(publicKey, recipientId) {
 	if (isBuffer(publicKey)) {
 		if (!!recipientId && !isBuffer(recipientId)) {
 			throwVirgilError('10000', {
@@ -17,11 +17,11 @@ export function makeInternalPublicKey(publicKey, recipientId) {
 			});
 		}
 
-		return new InternalPublicKey(publicKey, recipientId);
+		return new PublicKey(publicKey, recipientId);
 	}
 
 	if (isObjectLike(publicKey) && !!publicKey.publicKey) {
-		return new InternalPublicKey(publicKey.publicKey, publicKey.recipientId);
+		return new PublicKey(publicKey.publicKey, publicKey.recipientId);
 	}
 
 	throwVirgilError('10000', {
@@ -31,12 +31,14 @@ export function makeInternalPublicKey(publicKey, recipientId) {
 }
 
 /**
- * Creates a new InternalPublicKey.
+ * Creates a new PublicKey.
  *
  * @class
- * @classdesc Represents a public key consumable by native VirgilCrypto.
+ * @classdesc A wrapper around the public key value and id.
+ * 		Byte array properties of instances are represented as
+ * 		VirgilByteArray - type consumable by native VirgilCrypto.
  */
-function InternalPublicKey(key, recipientId) {
+function PublicKey(key, recipientId) {
 	this.publicKey = bufferToByteArray(key);
 	this.recipientId = recipientId ? bufferToByteArray(recipientId) : null;
 }
@@ -45,7 +47,7 @@ function InternalPublicKey(key, recipientId) {
  * Frees the memory held by the key's private members. The instance can no
  * longer be used after this method is called.
  */
-InternalPublicKey.prototype.delete = function deletePublicKey() {
+PublicKey.prototype.delete = function deletePublicKey() {
 	this.publicKey.delete();
 	this.recipientId && this.recipientId.delete();
 };
@@ -56,7 +58,7 @@ InternalPublicKey.prototype.delete = function deletePublicKey() {
  *
  * @returns {{publicKey: string, [recipientId]: string}}
  */
-InternalPublicKey.prototype.marshall = function marshall() {
+PublicKey.prototype.marshall = function marshall() {
 	var res = {
 		publicKey: byteArrayToBuffer(this.publicKey).toString('base64'),
 		recipientId: this.recipientId ?

@@ -61,6 +61,28 @@ export function isVirgilByteArray(obj) {
 
 export { isBuffer as isBuffer };
 
+export function byteArraysEqual(a, b) {
+	const aLen = a.size();
+	const bLen = b.size();
+
+	if (aLen !== bLen) {
+		return false;
+	}
+
+	for (let i = 0; i < aLen; i++) {
+		if (a.get(i) !== b.get(i)) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+export function isObjectLike(value) {
+	return !!value && typeof value == 'object';
+}
+
 export const wrapper = createWrapper({
 	toByteArray,
 	byteArrayToBuffer,

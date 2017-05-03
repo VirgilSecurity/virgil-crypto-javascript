@@ -1,23 +1,23 @@
-import { VirgilCrypto, Buffer } from '../../../browser';
+import expect from 'expect';
+import { generateKeyPair } from '../generate-key-pair';
+import { signThenEncrypt } from '../sign-then-encrypt';
+import { signThenEncryptAsync } from '../sign-then-encrypt-async';
+import { decryptThenVerify } from '../decrypt-then-verify';
+import { decryptThenVerifyAsync } from '../decrypt-then-verify-async';
 
 describe('signThenEncryptAsync -> decryptThenVerifyAsync', () => {
-	var keyPair;
-	var recipientId;
-
-	beforeEach(function () {
-		keyPair = VirgilCrypto.generateKeyPair();
-		recipientId = VirgilCrypto.hash(keyPair.publicKey);
-	});
 
 	it('should decrypt and verify data successfully given right keys', async (done) => {
+		var keyPair = generateKeyPair();
+		var recipientId = new Buffer('RECIPIENT_ID');
 		var plainData = new Buffer('Secret message');
-		var encryptedData = await VirgilCrypto.signThenEncryptAsync(
+		var encryptedData = await signThenEncryptAsync(
 			plainData,
 			keyPair.privateKey,
 			recipientId,
 			keyPair.publicKey);
 
-		var decryptedData = await VirgilCrypto.decryptThenVerifyAsync(
+		var decryptedData = await decryptThenVerifyAsync(
 			encryptedData,
 			recipientId,
 			keyPair.privateKey,
@@ -29,17 +29,19 @@ describe('signThenEncryptAsync -> decryptThenVerifyAsync', () => {
 	});
 
 	it('should fail verification given the wrong public key', async (done) => {
+		var keyPair = generateKeyPair();
+		var recipientId = new Buffer('RECIPIENT_ID');
 		var plainData = new Buffer('Secret message');
-		var encryptedData = await VirgilCrypto.signThenEncryptAsync(
+		var encryptedData = await signThenEncryptAsync(
 			plainData,
 			keyPair.privateKey,
 			recipientId,
 			keyPair.publicKey);
 
-		var wrongPubkey = VirgilCrypto.generateKeyPair().publicKey;
-		
+		var wrongPubkey = generateKeyPair().publicKey;
+
 		try {
-			await VirgilCrypto.decryptThenVerifyAsync(
+			await decryptThenVerifyAsync(
 				encryptedData,
 				recipientId,
 				keyPair.privateKey,
@@ -52,14 +54,16 @@ describe('signThenEncryptAsync -> decryptThenVerifyAsync', () => {
 	});
 
 	it('should asynchronously decrypt and verify data signed and encrypted synchronously', async (done) => {
+		var keyPair = generateKeyPair();
+		var recipientId = new Buffer('RECIPIENT_ID');
 		var plainData = new Buffer('Secret message');
-		var encryptedData = VirgilCrypto.signThenEncrypt(
+		var encryptedData = signThenEncrypt(
 			plainData,
 			keyPair.privateKey,
 			recipientId,
 			keyPair.publicKey);
 
-		var decryptedData = await VirgilCrypto.decryptThenVerifyAsync(
+		var decryptedData = await decryptThenVerifyAsync(
 			encryptedData,
 			recipientId,
 			keyPair.privateKey,
@@ -70,18 +74,47 @@ describe('signThenEncryptAsync -> decryptThenVerifyAsync', () => {
 	});
 
 	it('should synchronously decrypt and verify data signed and encrypted asynchronously', async (done) => {
+		var keyPair = generateKeyPair();
+		var recipientId = new Buffer('RECIPIENT_ID');
 		var plainData = new Buffer('Secret message');
 
-		var encryptedData = await VirgilCrypto.signThenEncryptAsync(
+		var encryptedData = await signThenEncryptAsync(
 			plainData,
 			keyPair.privateKey,
 			recipientId,
 			keyPair.publicKey);
 
-		var decryptedData = VirgilCrypto.decryptThenVerify(
+		var decryptedData = decryptThenVerify(
 			encryptedData,
 			recipientId,
 			keyPair.privateKey,
+			keyPair.publicKey);
+
+		expect(decryptedData.equals(plainData)).toEqual(true);
+		done();
+	});
+
+	it('should sign with password-protected key', async function (done) {
+		var password = new Buffer('pa$$w0rd');
+		var keyPair = generateKeyPair({ password: password });
+		var recipientId = new Buffer('RECIPIENT_ID');
+		var plainData = new Buffer('Secret message');
+		var encryptedData = await signThenEncryptAsync(
+			plainData,
+			{
+				privateKey: keyPair.privateKey,
+				password: password
+			},
+			recipientId,
+			keyPair.publicKey);
+
+		var decryptedData = await decryptThenVerifyAsync(
+			encryptedData,
+			recipientId,
+			{
+				privateKey: keyPair.privateKey,
+				password: password
+			},
 			keyPair.publicKey);
 
 		expect(decryptedData.equals(plainData)).toEqual(true);

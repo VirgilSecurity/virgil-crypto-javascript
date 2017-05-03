@@ -8,11 +8,15 @@ export default function(data, privateKey, recipients) {
 	const cipher = new VirgilCryptoWorkerContext.VirgilCipher();
 
 	const dataArr = base64decode(data);
-	const privateKeyArr = base64decode(privateKey);
-	const passwordArr = ByteArray.fromUTF8('');
+	const privateKeyArr = base64decode(privateKey.privateKey);
+	const privateKeyPasswordArr = base64decode(privateKey.password);
+	const privateKeyIdArr = base64decode(privateKey.recipientId || '');
+
 	const signatureKeyArr = ByteArray.fromUTF8('VIRGIL-DATA-SIGNATURE');
+	const signerIdKeyArr = ByteArray.fromUTF8('VIRGIL-DATA-SIGNER-ID');
+
 	const transformedRecipients = recipients.map(recipient => ({
-		id: base64decode(recipient.recipientId),
+		recipientId: base64decode(recipient.recipientId),
 		publicKey: base64decode(recipient.publicKey)
 	}));
 
@@ -20,20 +24,25 @@ export default function(data, privateKey, recipients) {
 		const signatureArr = signer.sign(
 			dataArr,
 			privateKeyArr,
-			passwordArr);
+			privateKeyPasswordArr);
 
 		cipher
 			.customParams()
 			.setData(signatureKeyArr, signatureArr);
 
+		if (privateKeyIdArr) {
+			cipher.customParams()
+				.setData(signerIdKeyArr, privateKeyIdArr);
+		}
+
 		transformedRecipients.forEach(recipient => {
-			cipher.addKeyRecipient(recipient.id, recipient.publicKey);
+			cipher.addKeyRecipient(recipient.recipientId, recipient.publicKey);
 		});
 
 		const cipherDataArr = cipher.encrypt(dataArr, true);
 		const cipherData = base64encode(cipherDataArr);
 
-		 signatureArr.delete();
+		signatureArr.delete();
 		cipherDataArr.delete();
 
 		deferred.resolve(cipherData);
@@ -44,10 +53,12 @@ export default function(data, privateKey, recipients) {
 		cipher.delete();
 		dataArr.delete();
 		privateKeyArr.delete();
-		passwordArr.delete();
+		privateKeyPasswordArr.delete();
+		privateKeyIdArr && privateKeyIdArr.delete();
 		signatureKeyArr.delete();
+		signerIdKeyArr.delete();
 		transformedRecipients.forEach(recipient => {
-			recipient.id.delete();
+			recipient.recipientId.delete();
 			recipient.publicKey.delete();
 		});
 	}

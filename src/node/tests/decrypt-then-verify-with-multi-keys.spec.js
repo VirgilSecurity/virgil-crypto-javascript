@@ -27,7 +27,7 @@ describe('signThenEncrypt -> decryptThenVerify with multiple keys', function () 
 			plainData,
 			{
 				privateKey: senderKeyPair.privateKey,
-				id: senderId
+				recipientId: senderId
 			},
 			recipientId,
 			recipientKeyPair.publicKey
@@ -40,13 +40,13 @@ describe('signThenEncrypt -> decryptThenVerify with multiple keys', function () 
 			[
 				{
 					publicKey: additionalKeyPair.publicKey,
-					id: additionalId
+					recipientId: additionalId
 				}, {
 					publicKey: anotherKeyPair.publicKey,
-					id: anotherId
+					recipientId: anotherId
 				}, {
 					publicKey: senderKeyPair.publicKey,
-					id: senderId
+					recipientId: senderId
 				}
 			]
 		);
@@ -74,7 +74,7 @@ describe('signThenEncrypt -> decryptThenVerify with multiple keys', function () 
 			plainData,
 			{
 				privateKey: senderKeyPair.privateKey,
-				id: senderId
+				recipientId: senderId
 			},
 			recipientId,
 			recipientKeyPair.publicKey
@@ -88,10 +88,10 @@ describe('signThenEncrypt -> decryptThenVerify with multiple keys', function () 
 				[
 					{
 						publicKey: additionalKeyPair.publicKey,
-						id: additionalId
+						recipientId: additionalId
 					}, {
 						publicKey: anotherKeyPair.publicKey,
-						id: anotherId
+						recipientId: anotherId
 					}
 				]
 			);
@@ -127,13 +127,13 @@ describe('signThenEncrypt -> decryptThenVerify with multiple keys', function () 
 			[
 				{
 					publicKey: additionalKeyPair.publicKey,
-					id: additionalId
+					recipientId: additionalId
 				}, {
 					publicKey: anotherKeyPair.publicKey,
-					id: anotherId
+					recipientId: anotherId
 				}, {
 					publicKey: senderKeyPair.publicKey,
-					id: senderId
+					recipientId: senderId
 				}
 			]
 		);

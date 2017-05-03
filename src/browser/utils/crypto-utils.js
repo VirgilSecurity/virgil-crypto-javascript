@@ -78,7 +78,6 @@ export function byteArraysEqual(a, b) {
 	return true;
 }
 
-
 export function isObjectLike(value) {
 	return !!value && typeof value == 'object';
 }

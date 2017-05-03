@@ -1,13 +1,13 @@
 import VirgilCrypto from './utils/crypto-module';
 import { bufferToByteArray, convertToBufferAndRelease, stringToByteArray } from './utils/crypto-utils';
 import { checkIsBuffer, throwVirgilError } from './utils/crypto-errors';
-import { makeInternalPrivateKey } from './utils/makeInternalPrivateKey';
-import { makeInternalPublicKey } from './utils/makeInternalPublicKey';
+import { makePrivateKey } from './utils/makePrivateKey';
+import { makePublicKey } from './utils/makePublicKey';
 import * as constants from '../lib/constants';
 
 /**
  * An object representing a private key with metadata.
- * @typedef {Object} PrivateKey
+ * @typedef {Object} PrivateKeyInfo
  * @property {Buffer} privateKey
  * @property {Buffer} recipientId - Id of the key. Can be any value.
  * 		Must be the same for the public and private keys of the same pair.
@@ -16,7 +16,7 @@ import * as constants from '../lib/constants';
 
 /**
  * An object representing a public key with an identifier.
- * @typedef {Object} PublicKey
+ * @typedef {Object} PublicKeyInfo
  * @property {Buffer} publicKey
  * @property {Buffer} recipientId - Id of the key. Can be any value.
  * 		Must be the same for the public and private keys of the same pair.
@@ -26,12 +26,12 @@ import * as constants from '../lib/constants';
  * Signs and encrypts the data.
  *
  * @param {Buffer} data
- * @param {Buffer|PrivateKey} privateKey - The `privateKey` can be an
+ * @param {Buffer|PrivateKeyInfo} privateKey - The `privateKey` can be an
  * 		object or a Buffer. If `privateKey` is a Buffer, it is treated as a
  * 		raw key without password. If it is an object, it is interpreted as a
  * 		hash containing three properties: `privateKey`, optional `recipientId`
  * 		and optional `password`.
- * @param {Buffer|PublicKey} recipientId -
+ * @param {Buffer|PublicKeyInfo} recipientId -
  * 		Recipient ID if encrypting for single recipient OR
  * 		Array of recipientId - publicKey pairs if encrypting for multiple recipients
  * @param {Buffer} [publicKey] - Public key if encrypting for single recipient.
@@ -42,10 +42,13 @@ import * as constants from '../lib/constants';
 export function signThenEncrypt (data, privateKey, recipientId, publicKey) {
 	checkIsBuffer(data, 'data');
 
-	const signingKey = makeInternalPrivateKey(privateKey);
+	const signingKey = makePrivateKey(privateKey);
 	const recipients = Array.isArray(recipientId) ?
-		recipientId.map(makeInternalPublicKey) :
-		[makeInternalPublicKey(publicKey, recipientId)];
+		// don't pass `makePublicKey` function directly to `map`
+		// because `map` passes an index as the second argument, which
+		// might be interpreted as recipientId by `makePublicKey`
+		recipientId.map(pubkey => makePublicKey(pubkey)) :
+		[ makePublicKey(publicKey, recipientId) ];
 
 	if (recipients.length === 0) {
 		throwVirgilError('10000', {

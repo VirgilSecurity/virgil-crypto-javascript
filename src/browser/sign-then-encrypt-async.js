@@ -3,20 +3,20 @@ import CryptoWorkerApi from './crypto-worker-api';
 import { signThenEncrypt } from './sign-then-encrypt';
 import { toBase64, base64ToBuffer } from './utils/crypto-utils';
 import { throwVirgilError, checkIsBuffer } from './utils/crypto-errors';
-import { makeInternalPrivateKey } from './utils/makeInternalPrivateKey';
-import { makeInternalPublicKey } from './utils/makeInternalPublicKey';
+import { makePrivateKey } from './utils/makePrivateKey';
+import { makePublicKey } from './utils/makePublicKey';
 
 /**
  * Signs and encrypts the data asynchronously (in a Web Worker if that is
  * supported, otherwise just defers the execution in a Promise).
  *
  * @param {Buffer} data
- * @param {Buffer|PrivateKey} privateKey - The `privateKey` can be an
+ * @param {Buffer|PrivateKeyInfo} privateKey - The `privateKey` can be an
  * 		object or a Buffer. If `privateKey` is a Buffer, it is treated as a
  * 		raw key without password. If it is an object, it is interpreted as a
  * 		hash containing three properties: `privateKey`, optional `recipientId`
  * 		and optional `password`.
- * @param {Buffer|PublicKey} recipientId -
+ * @param {Buffer|PublicKeyInfo} recipientId -
  * 		Recipient ID if encrypting for single recipient OR
  * 		Array of recipientId - publicKey pairs if encrypting for multiple recipients
  * @param {Buffer} [publicKey] - Public key if encrypting for single recipient.
@@ -36,10 +36,13 @@ export function signThenEncryptAsync (data, privateKey, recipientId, publicKey) 
 	} else {
 		checkIsBuffer(data, 'data');
 
-		let signingKey = makeInternalPrivateKey(privateKey);
+		let signingKey = makePrivateKey(privateKey);
 		let recipients = Array.isArray(recipientId) ?
-			recipientId.map(makeInternalPublicKey) :
-			[makeInternalPublicKey(publicKey, recipientId)];
+			// don't pass `makePublicKey` function directly to `map`
+			// because `map` passes an index as the second argument, which
+			// might be interpreted as recipientId by `makePublicKey`
+			recipientId.map(pubkey => makePublicKey(pubkey)) :
+			[ makePublicKey(publicKey, recipientId) ];
 
 		let recipientsMarshalled = recipients.map(r => r.marshall());
 

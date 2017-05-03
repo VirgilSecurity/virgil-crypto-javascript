@@ -4,8 +4,8 @@ import CryptoWorkerApi from './crypto-worker-api';
 import { throwVirgilError } from './utils/crypto-errors';
 import { decryptThenVerify } from './decrypt-then-verify';
 import { checkIsBuffer } from './utils/crypto-errors';
-import { makeInternalPrivateKey } from './utils/makeInternalPrivateKey';
-import { makeInternalPublicKey } from './utils/makeInternalPublicKey';
+import { makePrivateKey } from './utils/makePrivateKey';
+import { makePublicKey } from './utils/makePublicKey';
 
 /**
  * Decrypts the given data with private key and verify the signature with
@@ -14,11 +14,11 @@ import { makeInternalPublicKey } from './utils/makeInternalPublicKey';
  *
  * @param {Buffer} cipherData - Data to decrypt
  * @param {Buffer} recipientId - Recipient ID used for encryption
- * @param {Buffer|PrivateKey} privateKey - The `privateKey` can be an
+ * @param {Buffer|PrivateKeyInfo} privateKey - The `privateKey` can be an
  * 		object or a Buffer. If `privateKey` is a Buffer, it is treated as a
  * 		raw key without password. If it is an object, it is interpreted as a
  * 		hash containing two properties: `privateKey`, and `password`.
- * @param {Buffer|PublicKey[]} publicKey - Raw public key or an array of public
+ * @param {Buffer|PublicKeyInfo[]} publicKey - Raw public key or an array of public
  * 		keys with identifiers to verify the signature with. If the cipher data
  * 		contains an identifier of the private key used to calculate the signature,
  * 		then the public key with that identifier from `publicKey` array will be
@@ -41,10 +41,13 @@ export function decryptThenVerifyAsync (cipherData, recipientId, privateKey, pub
 		checkIsBuffer(cipherData, 'cipherData');
 		checkIsBuffer(recipientId, 'recipientId');
 
-		const decryptingKey = makeInternalPrivateKey(privateKey, null, recipientId);
+		const decryptingKey = makePrivateKey(privateKey, null, recipientId);
 		const verifiers = Array.isArray(publicKey) ?
-			publicKey.map(makeInternalPublicKey) :
-			[makeInternalPublicKey(publicKey)];
+			// don't pass `makePublicKey` function directly to `map`
+			// because `map` passes an index as the second argument, which
+			// might be interpreted as recipientId by `makePublicKey`
+			publicKey.map(pubkey => makePublicKey(pubkey)) :
+			[ makePublicKey(publicKey) ];
 
 		return CryptoWorkerApi.decryptThenVerify(
 			toBase64(cipherData),

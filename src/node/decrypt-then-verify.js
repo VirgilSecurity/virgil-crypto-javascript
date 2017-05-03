@@ -1,12 +1,9 @@
 var VirgilCrypto = require('../../virgil_js.node');
 var u = require('./utils');
+var makePrivateKey = require('./helpers/makePrivateKey');
+var makePublicKey = require('./helpers/makePublicKey');
 var VirgilCryptoError = require('./virgil-crypto-error');
 var constants = require('../lib/constants');
-
-/**
- * Represents a public key with an identifier.
- * @typedef {{publicKey: Buffer, id: Buffer}} PublicKey
- */
 
 /**
  * Decrypts the given data with private key and verify the signature with
@@ -14,11 +11,11 @@ var constants = require('../lib/constants');
  *
  * @param {Buffer} cipherData - Data to decrypt
  * @param {Buffer} recipientId - Recipient ID used for encryption
- * @param {Buffer|PrivateKey} privateKey - The `privateKey` can be an
+ * @param {Buffer|PrivateKeyInfo} privateKey - The `privateKey` can be an
  * 		object or a Buffer. If `privateKey` is a Buffer, it is treated as a
  * 		raw key without password. If it is an object, it is interpreted as a
- * 		hash containing three properties: `privateKey`, and `password`.
- * @param {Buffer|PublicKey[]} publicKey - Raw public key or an array of public
+ * 		hash containing two properties: `privateKey`, and `password`.
+ * @param {Buffer|PublicKeyInfo[]} publicKey - Raw public key or an array of public
  * 		keys with identifiers to verify the signature with. If the cipher data
  * 		contains an identifier of the private key used to calculate the signature,
  * 		then the public key with that identifier from `publicKey` array will be
@@ -31,36 +28,22 @@ var constants = require('../lib/constants');
 module.exports = function decryptThenVerify (cipherData, recipientId, privateKey, publicKey) {
 	u.checkIsBuffer(cipherData, 'cipherData');
 	u.checkIsBuffer(recipientId, 'recipientId');
-	validatePrivateKey(privateKey);
-	validatePublicKey(publicKey);
 
-	var decryptingKey, decryptingKeyPassword;
-	if (u.isBuffer(privateKey)) {
-		decryptingKey = u.bufferToByteArray(privateKey);
-		decryptingKeyPassword = u.bufferToByteArray(new Buffer(''));
-	} else {
-		decryptingKey = u.bufferToByteArray(privateKey.privateKey);
-		decryptingKeyPassword = u.bufferToByteArray(privateKey.password || new Buffer(''));
-	}
+	var decryptingKey = makePrivateKey(privateKey, null, recipientId);
 
-	var publicKeys;
-	if (u.isBuffer(publicKey)) {
-		publicKeys = [{ publicKey: publicKey, id: null }];
-	} else {
-		publicKeys = publicKey;
-	}
+	var publicKeys = Array.isArray(publicKey) ?
+		publicKey.map(function (publicKey) {
+			// don't pass `makePublicKey` function directly to `map`
+			// because `map` passes an index as the second argument, which
+			// might be interpreted as recipientId by `makePublicKey`
+			return makePublicKey(publicKey);
+		}) :
+		[ makePublicKey(publicKey) ];
 
 	if (publicKeys.length === 0) {
 		throw new VirgilCryptoError('Unexpected argument "publicKey". ' +
 			'At least one public key must be provided.');
 	}
-
-	publicKeys = publicKeys.map(function (publicKey) {
-		return {
-			publicKey: u.bufferToByteArray(publicKey.publicKey),
-			id: publicKey.id ? u.bufferToByteArray(publicKey.id) : null
-		};
-	});
 
 	var plainData;
 	var signature;
@@ -72,8 +55,8 @@ module.exports = function decryptThenVerify (cipherData, recipientId, privateKey
 		plainData = cipher.decryptWithKey(
 			u.bufferToByteArray(cipherData),
 			u.bufferToByteArray(recipientId),
-			decryptingKey,
-			decryptingKeyPassword
+			decryptingKey.privateKey,
+			decryptingKey.password
 		);
 
 		signature = cipher.customParams()
@@ -97,40 +80,6 @@ module.exports = function decryptThenVerify (cipherData, recipientId, privateKey
 	return u.byteArrayToBuffer(plainData);
 };
 
-function validatePrivateKey(key) {
-	if (u.isBuffer(key)) {
-		return;
-	}
-
-	if (u.isBuffer(key.privateKey) &&
-		(!key.password || u.isBuffer(key.password)) &&
-		(!key.id || u.isBuffer(key.id))) {
-		return;
-	}
-
-	throw new VirgilCryptoError('Unexpected type of "privateKey" argument. ' +
-		'Expected privateKey to be a Buffer or an hash with "privateKey" property.');
-}
-
-function validatePublicKey(publicKey) {
-	if (u.isBuffer(publicKey)) {
-		return;
-	}
-
-	if (Array.isArray(publicKey)) {
-		var publicKeys = publicKey;
-		publicKeys.forEach(function (publicKey) {
-			u.checkIsBuffer(publicKey.id, 'publicKey[].id');
-			u.checkIsBuffer(publicKey.publicKey, 'publicKey[].publicKey');
-		});
-
-		return;
-	}
-
-	throw new VirgilCryptoError('Unexpected type of "publicKey" argument. ' +
-		'Expected "publicKey" to be a Buffer or an array.');
-}
-
 function verifyWithKey(data, signature, publicKey) {
 	var signer = new VirgilCrypto.VirgilSigner();
 	return signer.verify(data, signature, publicKey.publicKey);
@@ -142,7 +91,7 @@ function verifyWithMultipleKeys(data, signature, publicKeys, signerId) {
 	if (signerId) {
 		// find the public key corresponding to signer id from metadata
 		var signerPublicKey = publicKeys.find(function (publicKey) {
-			return u.byteArraysEqual(signerId, publicKey.id);
+			return u.byteArraysEqual(signerId, publicKey.recipientId);
 		});
 
 		if (!signerPublicKey) {

@@ -58,7 +58,10 @@ export default function(cipherData, recipientId, privateKey, publicKeys) {
 		recipientIdArr.delete();
 		privateKeyArr.delete();
 		privateKeyPasswordArr.delete();
-		verifiers.forEach(v => v.delete());
+		verifiers.forEach(verifier => {
+			verifier.publicKey.delete();
+			verifier.recipientId.delete();
+		});
 		signatureKeyArr.delete();
 	}
 

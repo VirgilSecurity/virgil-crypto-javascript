@@ -1,5 +1,5 @@
-var isBuffer = require('is-buffer');
 var Virgil = require('../../virgil_js.node');
+var sharedUtils = require('../lib/utils');
 
 var utils = {
 	bufferToByteArray: function bufferToByteArray (buffer) {
@@ -35,7 +35,7 @@ var utils = {
 
 	toByteArray: function toByteArray (data) {
 		switch (true) {
-			case Buffer.isBuffer(data):
+			case utils.isBuffer(data):
 				return utils.bufferToByteArray(data);
 			case typeof data === 'string':
 				return utils.stringToByteArray(data);
@@ -45,19 +45,13 @@ var utils = {
 	},
 
 	checkIsBuffer: function checkIsBuffer (arg, name) {
-		if (!Buffer.isBuffer(arg)) {
+		if (!utils.isBuffer(arg)) {
 			throw new TypeError('Unexpected type of "' + name + '" argument, expected Buffer');
 		}
 	},
 
 	isVirgilByteArray: function isVirgilByteArray(obj) {
 		return obj && obj.constructor && obj.constructor.name === '_exports_VirgilByteArray';
-	},
-
-	isBuffer: isBuffer,
-
-	toArray: function toArray(obj) {
-		return Array.isArray(obj) ? obj : (obj ? [obj] : obj);
 	},
 
 	byteArraysEqual: function byteArraysEqual(a, b) {
@@ -77,9 +71,10 @@ var utils = {
 		return true;
 	},
 
-	isObjectLike: function isObjectLike(value) {
-		return !!value && typeof value == 'object';
-	}
+	isBuffer: sharedUtils.isBuffer,
+	toArray: sharedUtils.toArray,
+	isObjectLike: sharedUtils.isObjectLike,
+	find: sharedUtils.find
 };
 
 module.exports = utils;

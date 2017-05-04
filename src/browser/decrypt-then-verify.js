@@ -3,7 +3,8 @@ import {
 	bufferToByteArray,
 	convertToBufferAndRelease,
 	stringToByteArray,
-	byteArraysEqual
+	byteArraysEqual,
+	find
 } from './utils/crypto-utils';
 import { checkIsBuffer, throwVirgilError } from './utils/crypto-errors';
 import { makePrivateKey } from './utils/makePrivateKey';
@@ -109,9 +110,7 @@ function verifyWithSingleKey(signer, data, signature, key) {
 function verifyWithMultipleKeys(signer, data, signature, keys, signerId) {
 	if (signerId) {
 		// find the public key corresponding to signer id from metadata
-		var signerPublicKey = keys.find(function (key) {
-			return byteArraysEqual(signerId, key.recipientId);
-		});
+		var signerPublicKey = find(keys, key => byteArraysEqual(signerId, key.recipientId));
 
 		return signerPublicKey ?
 			signer.verify(data, signature, signerPublicKey.publicKey) :

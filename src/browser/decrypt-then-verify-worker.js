@@ -72,9 +72,8 @@ export default function(cipherData, recipientId, privateKey, publicKeys) {
 	function verifyWithMultipleKeys(signer, data, signature, keys, signerId) {
 		if (signerId) {
 			// find the public key corresponding to signer id from metadata
-			var signerPublicKey = keys.find(function (key) {
-				return b64encode(signerId) === b64encode(key.recipientId);
-			});
+			var signerPublicKey = find(keys, key =>
+				b64encode(signerId) === b64encode(key.recipientId));
 
 			return signerPublicKey ?
 				signer.verify(data, signature, signerPublicKey.publicKey) :
@@ -97,5 +96,20 @@ export default function(cipherData, recipientId, privateKey, publicKeys) {
 		} finally {
 			signerIdKeyArr.delete();
 		}
+	}
+
+	function find(array, predicate) {
+		const list = Object(array);
+		const length = list.length >>> 0;
+		let value;
+
+		for (let i = 0; i < length; i++) {
+			value = list[i];
+			if (predicate.call(null, value, i, list)) {
+				return value;
+			}
+		}
+
+		return undefined;
 	}
 }

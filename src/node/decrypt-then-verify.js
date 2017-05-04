@@ -90,7 +90,7 @@ function verifyWithMultipleKeys(data, signature, publicKeys, signerId) {
 
 	if (signerId) {
 		// find the public key corresponding to signer id from metadata
-		var signerPublicKey = publicKeys.find(function (publicKey) {
+		var signerPublicKey = u.find(publicKeys, function (publicKey) {
 			return u.byteArraysEqual(signerId, publicKey.recipientId);
 		});
 

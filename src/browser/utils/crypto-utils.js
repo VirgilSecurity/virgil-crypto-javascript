@@ -1,6 +1,11 @@
-import isBuffer from 'is-buffer';
+import sharedUtils from '../../lib/utils';
 import VirgilCrypto from './crypto-module';
 import createWrapper from '../../lib/wrapper';
+
+export const isBuffer = sharedUtils.isBuffer;
+export const toArray = sharedUtils.toArray;
+export const isObjectLike = sharedUtils.isObjectLike;
+export const find = sharedUtils.find;
 
 export function bufferToByteArray(buffer) {
 	// Buffers are backed by Uint8Array
@@ -36,7 +41,7 @@ export function stringToByteArray(string) {
 
 export function toByteArray(data) {
 	switch (true) {
-		case Buffer.isBuffer(data):
+		case isBuffer(data):
 			return bufferToByteArray(data);
 		case typeof data === 'string':
 			return stringToByteArray(data);
@@ -59,8 +64,6 @@ export function isVirgilByteArray(obj) {
 		&& obj.constructor.name === 'VirgilByteArray';
 }
 
-export { isBuffer as isBuffer };
-
 export function byteArraysEqual(a, b) {
 	const aLen = a.size();
 	const bLen = b.size();
@@ -76,10 +79,6 @@ export function byteArraysEqual(a, b) {
 	}
 
 	return true;
-}
-
-export function isObjectLike(value) {
-	return !!value && typeof value == 'object';
 }
 
 export const wrapper = createWrapper({

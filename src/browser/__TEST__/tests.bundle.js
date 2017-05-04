@@ -12,3 +12,5 @@ import './extract-public-key.spec';
 import './encrypt-decrypt-private-key.spec';
 import './sign-encrypt-decrypt-verify.spec';
 import './sign-encrypt-decrypt-verify-async.spec';
+import './decrypt-then-verify-multi-keys.spec';
+import './decrypt-then-verify-multi-keys-async.spec';

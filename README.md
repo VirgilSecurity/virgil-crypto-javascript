@@ -27,7 +27,7 @@ npm install virgil-crypto
 ### CDN
 ```html
 <script
-src="https://cdn.virgilsecurity.com/packages/javascript/crypto/2.0.0/virgil-crypto.min.js"
+src="https://cdn.virgilsecurity.com/packages/javascript/crypto/2.1.0/virgil-crypto.min.js"
 integrity="sha256-oJwQc439DKwfdwqVm0zSiniFFyWttnE7oenq1og2ajI="
 crossorigin="anonymous"></script>
 ```
@@ -612,11 +612,22 @@ A form of encryption which simultaneously provides confidentiality, integrity, a
 Combines encryption in a single step with message authentication. Signs the data using the private key and encrypts
 the signed message using the public key (or public keys depending on the number of arguments passed).
 
+The `privateKey` argument can be a Buffer or an object. If `privateKey` is a Buffer, it is treated as a raw private key 
+with no password. If `privateKey` is an object it is interpreted as a hash containing three properties:
+
+- privateKey (Buffer): The private key value.
+- \[password\] (Buffer): Optional password if the private key is encrypted.
+- \[recipientId\] (Buffer): Optional. Recipient Id is used to identify the signing key for cases when you later want 
+to verify the signature with any of the several possible public keys.
+
 #### Arguments
 
 * data (Buffer): The data to sign and encrypt.
-* privateKey (Buffer): The private key to use for signature generation.
-* recipientId|recipients: Either one of the following
+* privateKey | privateKeyInfo: Either one of the following 
+	- privateKey (Buffer): The raw private key with no password.
+	- privateKeyInfo ({privateKey: Buffer, password: Buffer, recipientId: Buffer}): A hash with three properties: 
+	`privateKey`, `password` and `recipientId`.
+* recipientId | recipients: Either one of the following
 	- recipientId (Buffer): The identifier of the intended recipient.
 	- recipients (Array.\<{recipientId: Buffer, publicKey: Buffer}\>): Array of recipient ids with corresponding 
 	public keys to use for encryption. 
@@ -648,6 +659,47 @@ var encryptedSignedData = VirgilCrypto.signThenEncrypt(
 
 console.log('Encrypted data: ' + encryptedSignedData.toString('base64'));
 
+```
+
+With encrypted private key:
+
+```javascript
+var plainText = new Buffer('data to be encrypted');
+var recipientId = new Buffer('<SOME_RECIPIENT_ID>');
+
+var password = new Buffer('super_secret');
+var senderKeyPair = VirgilCrypto.generateKeyPair({
+	password: password 
+});
+var recipientKeyPair = VirgilCrypto.generateKeyPair();
+
+var encryptedSignedData = VirgilCrypto.signThenEncrypt(
+					plainText,
+					{ privateKey: senderKeyPair.privateKey, password: password }, 
+					recipientId, 
+					recipientKeyPair.publicKey);
+
+console.log('Encrypted data: ' + encryptedSignedData.toString('base64'));
+```
+
+With private key identifier:
+
+```javascript
+var plainText = new Buffer('data to be encrypted');
+var recipientId = new Buffer('<SOME_RECIPIENT_ID>');
+
+var senderKeyPair = VirgilCrypto.generateKeyPair();
+var senderKeyPairId = VirgilCrypto.hash(senderKeyPair.publicKey);
+
+var recipientKeyPair = VirgilCrypto.generateKeyPair();
+
+var encryptedSignedData = VirgilCrypto.signThenEncrypt(
+					plainText,
+					{ privateKey: senderKeyPair.privateKey, recipientId: senderKeyPairId }, 
+					recipientId, 
+					recipientKeyPair.publicKey);
+
+console.log('Encrypted data: ' + encryptedSignedData.toString('base64'));
 ```
 
 ### signThenEncryptAsync(data, privateKey, recipientId | recipients, [publicKey]) (Browsers only)
@@ -689,13 +741,29 @@ VirgilCrypto.signThenEncryptAsync(
 Combines decryption in a single step with integrity verification. Decrypts the data and verifies the attached signature.
 Returns decrypted data if verification succeeded or throws `VirgilCrypto.VirgilCryptoError` if it failed.
 
+The `privateKey` argument can be a Buffer or an object. If `privateKey` is a Buffer, it is treated as a raw private key 
+with no password. If `privateKey` is an object it is interpreted as a hash containing two properties:
+
+- privateKey (Buffer): The private key value.
+- \[password\] (Buffer): Optional password if the private key is encrypted.
+
+The `publicKey` argument can be a Buffer or an array. If `publicKey` is a Buffer, it is treated as a raw public key. If 
+`publicKey` is an array, it is interpreted as an array of objects each of which contains two properties:
+ 
+- publicKey (Buffer): The public key value.
+- recipientId (Buffer): The identifier used during the signing phase to identify the private key used to calculate the 
+signature. If the cipher data contains an identifier of the private key used to calculate the signature, then the 
+public key with that identifier from `publicKey` array will be used to verify the signature, otherwise all of the 
+keys are tried in sequence. See [signThenEncrypt](#signthenencryptdata-privatekey-recipientid--recipients-publickey).
+
 #### Arguments
 
 * cipherData (Buffer): The data to decrypt and verify.
 * recipientId (Buffer): The recipient id used for encryption.
 * privateKey (Buffer): The private key to use for decryption.
-* publicKey (Buffer): The sender's public key to use for signature verification.
-
+* publicKey | publicKeys: Either one of the following:
+ 	- publicKey (Buffer): The sender's public key to use for signature verification.
+	- publicKeys (Array.\<{recipientId: Buffer, publicKey: Buffer}\>): The list of public keys with identifiers.
 #### Returns
 
 * (Buffer): Returns decrypted data.
@@ -726,6 +794,78 @@ try {
     					recipientId, 
     					recipientKeyPair.privateKey, 
     					senderKeyPair.publicKey);
+} catch (err) {
+	// Message integrity\authenticity verification failed
+	console.log(err);
+}
+
+console.log('Decrypted data: ' + decryptedData.toString('utf8'));
+```
+
+With encrypted private key:
+
+```javascript
+var plainText = new Buffer('data to be encrypted');
+var recipientId = new Buffer('<SOME_RECIPIENT_ID>');
+
+var senderKeyPair = VirgilCrypto.generateKeyPair();
+var password = new Buffer('super_secret');
+var recipientKeyPair = VirgilCrypto.generateKeyPair({ password: password });
+
+var encryptedData = VirgilCrypto.signThenEncrypt(
+					plainText, 
+					senderKeyPair.privateKey, 
+					recipientId, 
+					recipientKeyPair.publicKey);
+var decryptedData = null;
+
+try {
+	decryptedData = VirgilCrypto.decryptThenVerify(
+    					encryptedData, 
+    					recipientId, 
+    					{ privateKey: recipientKeyPair.privateKey: password: password }, 
+    					senderKeyPair.publicKey);
+} catch (err) {
+	// Message integrity\authenticity verification failed
+	console.log(err);
+}
+
+console.log('Decrypted data: ' + decryptedData.toString('utf8'));
+```
+
+With multiple public keys:
+
+```javascript
+var plainText = new Buffer('data to be encrypted');
+
+var senderKeyPair = VirgilCrypto.generateKeyPair();
+var senderKeyPairId = VirgilCrypto.hash(senderKeyPair.publicKey);
+
+var recipientKeyPair = VirgilCrypto.generateKeyPair();
+var recipientKeyPairId = VirgilCrypto.hash(recipientKeyPair.publicKey);
+
+var anotherKeyPair = VirgilCrypto.generateKeyPair();
+var anotherKeyPairId = VirgilCrypto.hash(anotherKeyPair.publicKey);
+
+
+var encryptedData = VirgilCrypto.signThenEncrypt(
+					plainText, 
+					{ privateKey: senderKeyPair.privateKey, recipientId: senderKeyPairId }, 
+					\[ 
+						{ publicKey: recipientKeyPair.publicKey, recipientId: recipientKeyPairId },
+						{ publicKey: anotherKeyPair.publicKey, recipientId: anotherKeyPairId }
+					\]);
+var decryptedData = null;
+
+try {
+	decryptedData = VirgilCrypto.decryptThenVerify(
+    					encryptedData, 
+    					recipientKeyPairId, 
+    					recipientKeyPair.privateKey, 
+    					\[
+    						{ publicKey: senderKeyPair.publicKey, recipientId: senderKeyPairId },
+    						{ publicKey: anotherKeyPair.publicKey, recipientId: anotherKeyPairId }
+    					\]);
 } catch (err) {
 	// Message integrity\authenticity verification failed
 	console.log(err);

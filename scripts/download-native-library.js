@@ -4,7 +4,6 @@ var path = require('path');
 var format = require('util').format;
 
 var destFilePath = path.resolve(__dirname + '/../virgil_js.node');
-var file = fs.createWriteStream(destFilePath);
 
 var url = '/packages/nodejs/virgil-crypto-%s-nodejs-%s-%s-%s.node';
 
@@ -15,7 +14,7 @@ var arch = getArch();
 
 url = format(url, cryptoVersion, nodeVersion, platform, arch);
 
-console.log('Downloading native build.... %s', url);
+console.log('Downloading C++ Addon.... %s', url);
 
 var options = {
 	protocol: 'https:',
@@ -24,28 +23,35 @@ var options = {
 	agent: new https.Agent({ keepAlive: true })
 };
 
-https.get(options, function(res) {
-	if (res.statusCode != 200) {
-		noSupport();
+var file = fs.createWriteStream(destFilePath);
+
+var req = https.get(options, function(res) {
+	if (res.statusCode === 404) {
+		abortWithError(
+			'Platform "nodejs-' + nodeVersion + '-' + platform + '-' + arch + '" is not supported.'
+		);
+	}
+
+	if (res.statusCode !== 200) {
+		abortWithError('Unexpected server response: ' + res.statusCode + '.');
 	}
 
 	res.pipe(file);
 	res.on('error', abortWithError);
-	res.on('end', assertFile);
-}).on('error', abortWithError);
+	res.on('end', function () {
+		console.log('C++ Addon downloaded successfully.');
+	});
+});
+
+req.on('error', abortWithError);
 
 function abortWithError (error) {
-	console.error('Download error.');
+	file.close();
+	fs.unlinkSync(destFilePath);
+
+	console.error('\x1b[31m', 'Failed to download Virgil Crypto C++ Addon', '\x1b[0m');
 	console.error(error);
 	process.exit(1);
-}
-
-function assertFile () {
-	if (fs.existsSync(destFilePath)) {
-		console.log('Successfully downloaded native build.');
-	} else {
-		noSupport();
-	}
 }
 
 function getPlatform () {
@@ -96,11 +102,4 @@ function getNodeVersion () {
 	}
 
 	return process.version.slice(1);
-}
-
-function noSupport () {
-	console.error('\n\n========== WARNING ==========\n');
-	console.error('Platform "nodejs-%s-%s-%s" is not supported yet', nodeVersion, platform, arch);
-	console.error('\n=============================\n\n');
-	process.exit(0);
 }

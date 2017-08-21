@@ -7,7 +7,7 @@ var destFilePath = path.resolve(__dirname + '/../virgil_js.node');
 
 var url = '/packages/nodejs/virgil-crypto-%s-nodejs-%s-%s-%s.node';
 
-var cryptoVersion = '2.1.2';
+var cryptoVersion = '2.2.3';
 var nodeVersion = getNodeVersion();
 var platform = getPlatform();
 var arch = getArch();

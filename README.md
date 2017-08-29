@@ -27,7 +27,8 @@ npm install virgil-crypto
 ### CDN
 ```html
 <script
-src="https://cdn.virgilsecurity.com/packages/javascript/crypto/2.1.1/virgil-crypto.min.js"
+src="https://cdn.virgilsecurity.com/packages/javascript/crypto/2.1.2/virgil-crypto.min.js"
+integrity="sha256-A6ALjVdclreu4EAm1HYLayuDoI3IVKPhgysHMqRSia8="
 crossorigin="anonymous"></script>
 ```
 

@@ -17,6 +17,17 @@ describe('encrypt/decrypt', () => {
 		return decryptedData;
 	}
 
+	let originalTimeout;
+
+	beforeEach(() => {
+		originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+		jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+	});
+
+	afterEach(() => {
+		jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+	});
+
 	it('using password', () => {
 		let encryptedData = VirgilCrypto.encrypt(INITIAL_DATA, PASSWORD);
 		let decryptedData = VirgilCrypto.decrypt(encryptedData, PASSWORD);

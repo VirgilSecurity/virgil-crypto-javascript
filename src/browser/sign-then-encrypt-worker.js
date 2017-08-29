@@ -10,7 +10,7 @@ export default function(data, privateKey, recipients) {
 	const dataArr = base64decode(data);
 	const privateKeyArr = base64decode(privateKey.privateKey);
 	const privateKeyPasswordArr = base64decode(privateKey.password);
-	const privateKeyIdArr = base64decode(privateKey.recipientId || '');
+	const privateKeyIdArr = privateKey.recipientId && base64decode(privateKey.recipientId);
 
 	const signatureKeyArr = ByteArray.fromUTF8('VIRGIL-DATA-SIGNATURE');
 	const signerIdKeyArr = ByteArray.fromUTF8('VIRGIL-DATA-SIGNER-ID');

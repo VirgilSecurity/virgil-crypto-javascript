@@ -52,7 +52,7 @@ describe('signThenEncryptAsync -> decryptThenVerifyAsync with multiple keys', fu
 		done();
 	});
 
-	it('should fail verification given the wrong public key', async function () {
+	it('should fail verification given the wrong public key', async function (done) {
 		var plainData = new Buffer('Secret message');
 
 		var senderKeyPair = generateKeyPair();
@@ -100,7 +100,7 @@ describe('signThenEncryptAsync -> decryptThenVerifyAsync with multiple keys', fu
 		}
 	});
 
-	it('should decrypt and verify without signer id in metadata', async function () {
+	it('should decrypt and verify without signer id in metadata', async function (done) {
 		var plainData = new Buffer('Secret message');
 
 		var senderKeyPair = generateKeyPair();

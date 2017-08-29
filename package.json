@@ -21,7 +21,9 @@
     "build": "gulp build --development && gulp build --production",
     "asm-update": "node scripts/download-asmjs-library.js",
     "test": "./node_modules/.bin/mocha src/node/tests",
-    "test-watch": "gulp test --debug --watch"
+    "test-watch": "gulp test --debug --watch",
+    "preversion": "npm test && gulp test",
+    "version": "npm run build && node scripts/updateReadme.js && git add dist README.md"
   },
   "author": "Virgil Security Inc. <support@virgilsecurity.com>",
   "keywords": [

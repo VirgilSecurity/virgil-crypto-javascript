@@ -14,3 +14,4 @@ import './sign-encrypt-decrypt-verify.spec';
 import './sign-encrypt-decrypt-verify-async.spec';
 import './decrypt-then-verify-multi-keys.spec';
 import './decrypt-then-verify-multi-keys-async.spec';
+import './VirgilPFS.spec';

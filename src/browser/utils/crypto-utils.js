@@ -50,6 +50,17 @@ export function toByteArray(data) {
 	}
 }
 
+export function toByteArraySafe(data) {
+	switch (true) {
+		case isBuffer(data):
+			return bufferToByteArray(data);
+		case typeof data === 'string':
+			return stringToByteArray(data);
+		default:
+			return null;
+	}
+}
+
 export function toBase64(data) {
 	return data.toString('base64');
 }

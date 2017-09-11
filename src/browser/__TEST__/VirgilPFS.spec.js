@@ -163,6 +163,39 @@ describe('VirgilPFS', function() {
 		expect(session.additionalData.equals(data)).toBeFalse();
 	});
 
+	it('sets initiator session', function () {
+		const pfs = new VirgilPFS();
+		pfs.startInitiatorSession({
+			initiatorPrivateInfo: getInitiatorPrivateInfo(),
+			responderPublicInfo: getResponderPublicInfoWithOTK()
+		});
+
+		const session = pfs.getSession();
+		pfs.destroy();
+
+		const newPfs = new VirgilPFS();
+		expect(newPfs.getSessionId()).toBeNull();
+		newPfs.setSession(session);
+		expect(newPfs.getSessionId().equals(session.id)).toBeTrue();
+	});
+
+	it('sets responder session', function () {
+		const pfs = new VirgilPFS();
+
+		pfs.startResponderSession({
+			responderPrivateInfo: getResponderPrivateInfoWithOTK(),
+			initiatorPublicInfo: getInitiatorPublicInfo()
+		});
+
+		const session = pfs.getSession();
+		pfs.destroy();
+
+		const newPfs = new VirgilPFS();
+		expect(newPfs.getSessionId()).toBeNull();
+		newPfs.setSession(session);
+		expect(newPfs.getSessionId().equals(session.id)).toBeTrue();
+	});
+
 	it('encrypts message with initiator session', function() {
 		const pfs = new VirgilPFS();
 		pfs.startInitiatorSession({

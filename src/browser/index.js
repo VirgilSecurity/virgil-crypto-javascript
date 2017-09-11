@@ -28,3 +28,4 @@ export { decryptThenVerifyAsync } from './decrypt-then-verify-async';
 export { default as KeyPairType } from '../lib/key-pair-type';
 export const HashAlgorithm = Virgil.VirgilHashAlgorithm;
 export const VirgilTinyCipher = Virgil.VirgilTinyCipher;
+export { default as VirgilPFS } from './pfs/VirgilPFS';

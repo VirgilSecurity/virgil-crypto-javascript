@@ -182,7 +182,7 @@ export default class VirgilPFS {
 	 * @param {InitiatorPublicInfo} initiatorPublicInfo - Initiator's public data.
 	 * @param {Buffer} [additionalData] - Optional additional authentication data.
 	 */
-	startResponderSession({ responderPrivateInfo, initiatorPublicInfo, additionalData }) {
+	startResponderSession({ responderPrivateInfo, initiatorPublicInfo, additionalData = null }) {
 		const responderIdentityKey = makePFSPrivateKey(responderPrivateInfo.identityPrivateKey);
 		assert(
 			responderIdentityKey !== null,
@@ -360,6 +360,40 @@ export default class VirgilPFS {
 	}
 
 	/**
+	 * Sets the active session.
+	 *
+	 * @param {PFSSession} session - The new active session.
+	 */
+	setSession(session) {
+		assert(session != null, 'setSession(): Invalid argument "session"');
+
+		const identifier = bufferToByteArray(session.id);
+		const encryptionKey = bufferToByteArray(session.encryptionSecretKey);
+		const decryptionKey = bufferToByteArray(session.decryptionSecretKey);
+		const additionalData = bufferToByteArray(session.additionalData);
+
+		let nativeSession;
+		try {
+			nativeSession = new VC.VirgilPFSSession(
+				identifier,
+				encryptionKey,
+				decryptionKey,
+				additionalData
+			);
+
+			this.pfs.setSession(nativeSession);
+		} catch(err) {
+			throw generateErrorFromNativeError(err);
+		} finally {
+			identifier.delete();
+			encryptionKey.delete();
+			decryptionKey.delete();
+			additionalData.delete();
+			nativeSession && nativeSession.delete();
+		}
+	}
+
+	/**
 	 * Frees the memory used to store internal object's state. Manual memory
 	 * freeing is required because GC cannot collect objects in Emscripten's
 	 * Module memory. Make sure to call this method when the pfs object is
@@ -367,6 +401,45 @@ export default class VirgilPFS {
 	 */
 	destroy() {
 		this.pfs.delete();
+	}
+
+	/**
+	 * Creates and returns an "initiator" session.
+	 *
+	 * @param {Object} config - Session configuration data.
+	 * @param {InitiatorPrivateInfo} config.initiatorPrivateInfo - Initiator's private data.
+	 * @param {ResponderPublicInfo} config.responderPublicInfo - Responder's public data.
+	 * @param {Buffer} [config.additionalData] - Optional additional authentication data.
+	 */
+	static createInitiatorSession(config) {
+		const pfs = new VirgilPFS();
+		try {
+			pfs.startInitiatorSession(config);
+			return pfs.getSession();
+		} finally {
+			pfs.destroy();
+		}
+
+	}
+
+	/**
+	 * Creates and returns a "responder" session object.
+	 *
+	 * @param {Object} config - Session configuration data.
+	 * @param {ResponderPrivateInfo} config.responderPrivateInfo - Responder's private data.
+	 * @param {InitiatorPublicInfo} config.initiatorPublicInfo - Initiator's public data.
+	 * @param {Buffer} [config.additionalData] - Optional additional authentication data.
+	 *
+	 * @returns {PFSSession}
+	 */
+	static createResponderSession(config) {
+		const pfs = new VirgilPFS();
+		try {
+			pfs.startResponderSession(config);
+			return pfs.getSession();
+		} finally {
+			pfs.destroy();
+		}
 	}
 }
 

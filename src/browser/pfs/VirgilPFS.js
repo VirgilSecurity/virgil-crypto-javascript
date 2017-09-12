@@ -70,7 +70,7 @@ import {
  *
  * @description Object representing encrypted message with metadata.
  *
- * @property {Buffer} sessionId
+ * @property {Buffer} session_id
  * @property {Buffer} salt
  * @property {Buffer} ciphertext
  */
@@ -274,13 +274,13 @@ export default class VirgilPFS {
 			dataBytes.delete();
 		}
 
-		const sessionId = convertToBufferAndRelease(encryptedMessage.getSessionIdentifier());
+		const session_id = convertToBufferAndRelease(encryptedMessage.getSessionIdentifier());
 		const salt = convertToBufferAndRelease(encryptedMessage.getSalt());
 		const ciphertext = convertToBufferAndRelease(encryptedMessage.getCipherText());
 
 		encryptedMessage.delete();
 
-		return { sessionId, salt, ciphertext };
+		return { session_id, salt, ciphertext };
 	}
 
 	/**
@@ -293,8 +293,8 @@ export default class VirgilPFS {
 	 *
 	 * @throws {VirgilCryptoError} In cases when message cannot be decrypted.
 	 */
-	decrypt({ sessionId, salt, ciphertext}) {
-		const sessionIdArray = bufferToByteArray(sessionId);
+	decrypt({ session_id, salt, ciphertext}) {
+		const sessionIdArray = bufferToByteArray(session_id);
 		const saltArray = bufferToByteArray(salt);
 		const ciphertextArray = bufferToByteArray(ciphertext);
 
@@ -321,7 +321,7 @@ export default class VirgilPFS {
 	 * Returns internal session's identifier, or null if no session
 	 * has been started.
 	 *
-	 * @returns {Buffer}
+	 * @returns {Buffer|null}
 	 */
 	getSessionId() {
 		const session = this.pfs.getSession();
@@ -339,7 +339,7 @@ export default class VirgilPFS {
 	/**
 	 * Returns internal session state, or null if no session has been started.
 	 *
-	 * @returns {PFSSession}
+	 * @returns {PFSSession|null}
 	 */
 	getSession() {
 		const session = this.pfs.getSession();

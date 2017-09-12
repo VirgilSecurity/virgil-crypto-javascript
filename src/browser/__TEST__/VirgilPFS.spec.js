@@ -207,11 +207,11 @@ describe('VirgilPFS', function() {
 		const encryptedMessage = pfs.encrypt(message);
 
 		expect(encryptedMessage).toEqual(jasmine.objectContaining({
-			sessionId: jasmine.any(Buffer),
+			session_id: jasmine.any(Buffer),
 			salt: jasmine.any(Buffer),
 			ciphertext: jasmine.any(Buffer)
 		}));
-		expect(encryptedMessage.sessionId.length).toBeGreaterThan(0);
+		expect(encryptedMessage.session_id.length).toBeGreaterThan(0);
 		expect(encryptedMessage.salt.length).toBeGreaterThan(0);
 		expect(encryptedMessage.ciphertext.length).toBeGreaterThan(0);
 	});
@@ -227,11 +227,11 @@ describe('VirgilPFS', function() {
 		const encryptedMessage = pfs.encrypt(message);
 
 		expect(encryptedMessage).toEqual(jasmine.objectContaining({
-			sessionId: jasmine.any(Buffer),
+			session_id: jasmine.any(Buffer),
 			salt: jasmine.any(Buffer),
 			ciphertext: jasmine.any(Buffer)
 		}));
-		expect(encryptedMessage.sessionId.length).toBeGreaterThan(0);
+		expect(encryptedMessage.session_id.length).toBeGreaterThan(0);
 		expect(encryptedMessage.salt.length).toBeGreaterThan(0);
 		expect(encryptedMessage.ciphertext.length).toBeGreaterThan(0);
 	});

@@ -14,7 +14,7 @@
   "main": "index.js",
   "browser": "dist/virgil-crypto.dev.js",
   "engines": {
-    "node": ">=0.12 <7.0.0"
+    "node": ">= 4 < 7"
   },
   "scripts": {
     "postinstall": "node scripts/download-native-library.js",

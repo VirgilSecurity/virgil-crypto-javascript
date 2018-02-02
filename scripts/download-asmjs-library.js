@@ -4,7 +4,7 @@ var del = require('del');
 var request = require('request');
 var https = require('https');
 
-var cryptoVersion = '2.1.2';
+var cryptoVersion = '2.2.5';
 var downloadUrl = 'https://cdn.virgilsecurity.com/packages/asmjs/virgil-crypto-' + cryptoVersion + '-asmjs.js';
 var downloadFilePath = path.join(__dirname, '../', 'virgil-emscripten.js');
 var libPath = path.resolve(path.join(__dirname, '../src/lib/virgil-emscripten.js'));
@@ -39,11 +39,11 @@ request
 	.pipe(fs.createWriteStream(downloadFilePath));
 
 function abortWithError(error) {
-	console.log('Something goes wrong, the Virgil Crypto asmjs build is not downloaded yet.');
+	console.error('\x1b[31m', 'Failed to download asmjs build of Virgil Crypto', '\x1b[0m');
 
 	if (error) {
 		console.log(error);
 	}
 
-	process.exit(-1);
+	process.exit(1);
 }

@@ -23,7 +23,8 @@
     "test": "./node_modules/.bin/mocha src/node/tests",
     "test-watch": "gulp test --debug --watch",
     "preversion": "npm test && gulp test",
-    "version": "npm run build && node scripts/updateReadme.js && git add dist README.md"
+    "version": "npm run build && node scripts/updateReadme.js && git add dist README.md",
+    "gulp": "gulp --"
   },
   "author": "Virgil Security Inc. <support@virgilsecurity.com>",
   "keywords": [

@@ -7,7 +7,7 @@ var destFilePath = path.resolve(__dirname + '/../virgil_js.node');
 
 var url = '/packages/nodejs/virgil-crypto-%s-nodejs-%s-%s-%s.node';
 
-var cryptoVersion = '2.1.2';
+var cryptoVersion = '2.2.5';
 var nodeVersion = getNodeVersion();
 var platform = getPlatform();
 var arch = getArch();
@@ -50,13 +50,14 @@ function abortWithError (error) {
 	fs.unlinkSync(destFilePath);
 
 	console.error('\x1b[31m', 'Failed to download Virgil Crypto C++ Addon', '\x1b[0m');
+	console.error('\x1b[31m', 'Your Node.js version or OS is not supported by virgil-crypto', '\x1b[0m');
 	console.error(error);
 	process.exit(1);
 }
 
 function getPlatform () {
 	if (process.platform === 'darwin') {
-		return 'darwin-16.3';
+		return 'darwin-16.7';
 	}
 
 	if (process.platform === 'win32') {

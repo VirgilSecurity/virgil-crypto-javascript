@@ -24,6 +24,13 @@ for modern browsers and Node.js.
 npm install virgil-crypto
 ```
 
+> **Important!** virgil-crypto only works with Node.js versions 4 to 6. 
+This is due to Node.js bindings being generated using a tool called [SWIG](http://www.swig.org/index.php) which 
+does't support versions of V8 used in Node 7 and higher.  
+We are working hard on fixing this, meanwhile you can use [nvm](https://github.com/creationix/nvm) 
+(or a similar tool) to install Node.js v6.x alongside your current installation.  
+If you only intend to use virgil-crypto in a browser environment, you can ignore this warning.
+
 ### CDN
 ```html
 <script

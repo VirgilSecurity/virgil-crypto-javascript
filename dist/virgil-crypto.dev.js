@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var Version = exports.Version = ("2.1.2");
+	var Version = exports.Version = ("2.1.3");
 	exports.Buffer = Buffer;
 	var VirgilCrypto = exports.VirgilCrypto = (0, _extends3.default)({ Buffer: Buffer }, VirgilCryptoAPI);
 	exports.default = VirgilCrypto;

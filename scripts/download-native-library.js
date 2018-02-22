@@ -7,10 +7,19 @@ var destFilePath = path.resolve(__dirname + '/../virgil_js.node');
 
 var url = '/packages/nodejs/virgil-crypto-%s-nodejs-%s-%s-%s.node';
 
-var cryptoVersion = '2.2.5';
+var cryptoVersion;
 var nodeVersion = getNodeVersion();
 var platform = getPlatform();
 var arch = getArch();
+
+if (nodeVersion.indexOf('5') === 0) {
+	cryptoVersion = '2.2.5';
+	if (process.platform === 'darwin') {
+		platform = 'darwin-16.7';
+	}
+} else {
+	cryptoVersion = '2.3.0'
+}
 
 url = format(url, cryptoVersion, nodeVersion, platform, arch);
 
@@ -57,7 +66,7 @@ function abortWithError (error) {
 
 function getPlatform () {
 	if (process.platform === 'darwin') {
-		return 'darwin-16.7';
+		return 'darwin-17.4';
 	}
 
 	if (process.platform === 'win32') {
@@ -84,7 +93,7 @@ function getNodeVersion () {
 
 	// Use same build for node 4.*.*
 	if (versionTokens[0] == 'v4') {
-		return '4.4.4';
+		return '4.8.7';
 	}
 
 	// Use same build for node 5.*.*
@@ -94,12 +103,22 @@ function getNodeVersion () {
 
 	// Use same build for node 6.*.*
 	if (versionTokens[0] == 'v6') {
-		return '6.1.0';
+		return '6.13.0';
 	}
 
-	// Use same build for node 0.12.*
-	if (versionTokens[0] === 'v0' && versionTokens[1] === '12') {
-		return '0.12.7';
+	// Use same build for node 7.*.*
+	if (versionTokens[0] == 'v7') {
+		return '7.10.1';
+	}
+
+	// Use same build for node 8.*.*
+	if (versionTokens[0] == 'v8') {
+		return '8.9.4';
+	}
+
+	// Use same build for node 9.*.*
+	if (versionTokens[0] == 'v9') {
+		return '9.5.0';
 	}
 
 	return process.version.slice(1);

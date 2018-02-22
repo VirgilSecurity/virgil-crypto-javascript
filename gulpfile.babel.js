@@ -100,7 +100,7 @@ const WEBPACK_CONFIG = {
 		loaders: [
 			{
 				test: /\.js$/,
-				exclude: /node_modules|virgil-emscripten\.js/,
+				exclude: /node_modules|virgil_crypto_asmjs\.js/,
 				// use runtime to optimize the code, but it make sense when you have a lot of ES6 files
 				loader: 'babel-loader'
 			}

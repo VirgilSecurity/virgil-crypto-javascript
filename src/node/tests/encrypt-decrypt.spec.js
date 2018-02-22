@@ -72,4 +72,12 @@ describe('encrypt/decrypt', function () {
 			expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		});
 	});
+
+	it('encrypt should throw when passed empty array of recipients', function () {
+		var recipients = [];
+
+		expect(function () {
+			VirgilCrypto.encrypt(INITIAL_DATA, recipients);
+		}).toThrow(VirgilCrypto.VirgilCryptoError);
+	});
 });

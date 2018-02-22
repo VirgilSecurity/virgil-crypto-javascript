@@ -1,4 +1,5 @@
 import { VirgilCrypto, Buffer } from '../../../browser';
+import VirgilCryptoError from '../../lib/Error';
 
 const PASSWORD = Buffer.from('veryStrongPa$$0rd', 'utf8');
 const INITIAL_DATA = Buffer.from('initial data', 'utf8');
@@ -163,4 +164,10 @@ describe('encrypt/decrypt', () => {
 		cb();
 	});
 
+	it('encryptAsync should throw synchronous error when passed empty array of recipients', () => {
+		const recipients = [];
+		expect(() => {
+			VirgilCrypto.encryptAsync(INITIAL_DATA, recipients);
+		}).toThrowError(VirgilCryptoError);
+	})
 });

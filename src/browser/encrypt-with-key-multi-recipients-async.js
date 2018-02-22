@@ -14,6 +14,12 @@ export function encryptWithKeyMultiRecipientsAsync (initialData, recipients) {
 			}
 		});
 	} else {
+		if (recipients.length === 0) {
+			throwVirgilError('10000', {
+				error: 'Cannot encrypt data, "recipients" array is empty.'
+			});
+		}
+
 		recipients = recipients.map((r) => {
 			return {
 				recipientId: toBase64(r.recipientId),

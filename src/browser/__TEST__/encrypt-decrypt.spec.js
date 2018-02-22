@@ -1,4 +1,5 @@
 import { VirgilCrypto, Buffer } from '../../../browser';
+import VirgilCryptoError from '../../lib/Error';
 
 const PASSWORD = Buffer.from('veryStrongPa$$0rd', 'utf8');
 const INITIAL_DATA = Buffer.from('initial data', 'utf8');
@@ -162,6 +163,13 @@ describe('encrypt/decrypt', () => {
 			let decryptedData = VirgilCrypto.decrypt(encryptedData, r.recipientId, r.privateKey);
 			expect(decryptedData.equals(INITIAL_DATA)).toBe(true);
 		});
+	});
+
+	it('encrypt should throw when passed empty array of recipients', () => {
+		const recipients = [];
+		expect(() => {
+			VirgilCrypto.encrypt(INITIAL_DATA, recipients)
+		}).toThrowError(VirgilCryptoError);
 	});
 
 });

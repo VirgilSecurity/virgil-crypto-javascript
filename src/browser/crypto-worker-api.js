@@ -1,6 +1,6 @@
 import 'operative';
 import blobScript from './utils/blob-script';
-import rawVirgilEmscripten from 'raw!../lib/virgil-emscripten';
+import rawVirgilEmscripten from 'raw!../lib/virgil_crypto_asmjs';
 import rawWorkerCrypto from 'raw!./utils/worker-crypto-context';
 
 import generateKeyPairWorker from './generate-key-pair-worker';

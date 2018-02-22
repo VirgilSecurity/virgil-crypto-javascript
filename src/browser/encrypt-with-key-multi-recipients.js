@@ -5,6 +5,12 @@ import {
 import { throwVirgilError } from './utils/crypto-errors';
 
 export function encryptWithKeyMultiRecipients (initialData, recipients) {
+	if (recipients.length === 0) {
+		throwVirgilError('10000', {
+			error: 'Cannot encrypt data, "recipients" array is empty.'
+		});
+	}
+
 	const virgilCipher = new VirgilCrypto.VirgilCipher();
 	const dataArr = bufferToByteArray(initialData);
 	const transformedRecipients = recipients.map(recipient => ({

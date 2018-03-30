@@ -1,0 +1,38 @@
+{
+  "name": "virgil-crypto",
+  "version": "2.2.0",
+  "description": "Virgil Crypto",
+  "main": "dist/virgil-crypto.cjs.js",
+  "browser": {
+    "./dist/virgil-crypto.cjs.js": "./dist/virgil-crypto.browser.cjs.js",
+    "./dist/virgil-crypto.es.js": "./dist/virgil-crypto.browser.es.js",
+    "./src/index.ts": "./src/browser.ts"
+  },
+  "module": "dist/virgil-crypto.es.js",
+  "typings": "dist/types/virgil-crypto.d.ts",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VirgilSecurity/virgil-crypto-javascript"
+  },
+  "author": "Virgil Security Inc. <support@virgilsecurity.com>",
+  "keywords": [
+    "security",
+    "elliptic",
+    "elliptic curve",
+    "virgil",
+    "virgilsecurity",
+    "encryption",
+    "crypto"
+  ],
+  "license": "BSD-3-Clause",
+  "engines": {
+    "node": "4.0.0 - 9.9999.9999"
+  },
+  "dependencies": {
+    "virgil-crypto-browser": "2.2.0",
+    "virgil-crypto-node": "2.2.0"
+  }
+}

@@ -1054,8 +1054,8 @@ Returns the public key in DER format.
 
 ## Resources
 
-* [Crypto Library](https://github.com/VirgilSecurity/virgil/blob/master/javascript/crypto-library/readme.md)
-* [SDK](https://github.com/VirgilSecurity/virgil/blob/master/javascript/keys-sdk/readme.md)
+* [Crypto Library](https://github.com/VirgilSecurity/virgil-crypto)
+* [SDK](https://github.com/VirgilSecurity/virgil-sdk-javascript)
 
 ## License
 BSD 3-Clause. See [LICENSE](https://github.com/VirgilSecurity/virgil/blob/master/LICENSE) for details.

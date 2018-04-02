@@ -1,5 +1,5 @@
 /// <reference path="./declarations.d.ts" />
-import { createNativeFunctionWrapper } from 'virgil-crypto-utils';
+import { createNativeWrapper } from 'virgil-crypto-utils';
 import lib from '../virgil_crypto_node.node';
 
 export function isBuffer (obj: any) {
@@ -38,7 +38,7 @@ export function virgilByteArrayToBuffer(byteArray: any) {
 	return buffer;
 }
 
-export const wrapFunction = createNativeFunctionWrapper({
+export const wrapper = createNativeWrapper({
 	isBuffer,
 	bufferToVirgilByteArray,
 	isVirgilByteArray,

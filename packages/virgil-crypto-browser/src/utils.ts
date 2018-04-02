@@ -1,4 +1,4 @@
-import { createNativeFunctionWrapper } from 'virgil-crypto-utils';
+import { createNativeWrapper } from 'virgil-crypto-utils';
 import { lib } from './asmjs';
 
 export function isBuffer (obj: any) {
@@ -24,7 +24,7 @@ export function virgilByteArrayToBuffer(byteArray: any) {
 	return buffer;
 }
 
-export const wrapFunction = createNativeFunctionWrapper({
+export const wrapper = createNativeWrapper({
 	isBuffer,
 	bufferToVirgilByteArray,
 	isVirgilByteArray,

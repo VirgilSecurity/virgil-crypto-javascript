@@ -82,7 +82,6 @@ function assert(condition, message) {
     KeyPairType["FAST_EC_ED25519"] = "FAST_EC_ED25519";
 })(exports.KeyPairType || (exports.KeyPairType = {}));
 
-/// <reference path="./declarations.d.ts" />
 var apply = Function.prototype.apply;
 
 function toArray(val) {

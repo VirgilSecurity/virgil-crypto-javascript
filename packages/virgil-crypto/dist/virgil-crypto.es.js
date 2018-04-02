@@ -78,7 +78,6 @@ var KeyPairType;
     KeyPairType["FAST_EC_ED25519"] = "FAST_EC_ED25519";
 })(KeyPairType || (KeyPairType = {}));
 
-/// <reference path="./declarations.d.ts" />
 var apply = Function.prototype.apply;
 
 function toArray(val) {

@@ -1,5 +1,5 @@
-import * as cryptoApi from 'virgil-crypto-browser';
-import { KeyPairType, HashAlgorithm } from 'virgil-crypto-utils';
+import * as cryptoApi from './browser/api';
+import { KeyPairType, HashAlgorithm } from './common';
 import { createVirgilCrypto, PrivateKey, PublicKey } from './createVirgilCrypto';
 
 export { KeyPairType, HashAlgorithm };

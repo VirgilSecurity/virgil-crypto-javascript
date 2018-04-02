@@ -1,5 +1,6 @@
-import { KeyPairType, HashAlgorithm, toArray, assert } from 'virgil-crypto-utils';
+import { KeyPairType, HashAlgorithm, assert } from './common';
 import { IVirgilCryptoApi } from './IVirgilCryptoApi';
+import { toArray } from './utils/toArray';
 
 export type KeyPair = {
 	privateKey: PrivateKey,

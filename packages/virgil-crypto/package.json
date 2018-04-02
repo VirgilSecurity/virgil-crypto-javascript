@@ -32,7 +32,5 @@
     "node": "4.0.0 - 9.9999.9999"
   },
   "dependencies": {
-    "virgil-crypto-browser": "2.2.0",
-    "virgil-crypto-node": "2.2.0"
   }
 }

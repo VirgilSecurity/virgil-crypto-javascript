@@ -5,3 +5,4 @@ export declare class VirgilCryptoError extends Error {
     toString(): string;
 }
 export declare function errorFromNativeError(err: Error): Error;
+export declare function assert(condition: boolean, message: string): void;

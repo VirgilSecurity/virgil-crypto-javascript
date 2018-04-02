@@ -16,12 +16,15 @@ function bufferToVirgilByteArray(buffer: Buffer) {
 	return array;
 }
 
-const EXPORTED_BYTE_ARRAY = lib.VirgilByteArrayUtils.stringToBytes('');
+const toString = Object.prototype.toString;
 
 function isVirgilByteArray(obj: any) {
-	return obj != null &&
-		obj.constructor === lib.VirgilByteArray ||
-		obj.constructor === EXPORTED_BYTE_ARRAY.constructor;
+	if (obj == null) {
+		return false;
+	}
+
+	const tag = toString.call(obj);
+	return tag === '[object _exports_VirgilByteArray]' || tag === '[object VirgilByteArray]';
 }
 
 export function virgilByteArrayToBuffer(byteArray: any) {

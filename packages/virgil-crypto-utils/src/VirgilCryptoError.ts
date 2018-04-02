@@ -31,13 +31,19 @@ export function errorFromNativeError(err: Error) {
 	}
 
 	// Expected message format is as follows:
-	// "Module: virgil/crypto. Error code: {code}. {name}. {message}."
+	// "Module: virgil/crypto. Error code: {code}. {message}."
 	const parts = virgilCryptoMessage.split(/\s*\.\s*/);
 	if (parts.length === 1) {
 		// Error message didn't match what we expected.
 		return err;
 	}
 
-	const [, code, name, message ] = parts;
+	const [, code, message ] = parts;
 	return new VirgilCryptoError(message, code, name);
+}
+
+export function assert(condition: boolean, message: string) {
+	if (!condition) {
+		throw new VirgilCryptoError(message);
+	}
 }

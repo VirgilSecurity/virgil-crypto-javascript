@@ -2019,14 +2019,19 @@ function errorFromNativeError(err) {
         return err;
     }
     // Expected message format is as follows:
-    // "Module: virgil/crypto. Error code: {code}. {name}. {message}."
+    // "Module: virgil/crypto. Error code: {code}. {message}."
     var parts = virgilCryptoMessage.split(/\s*\.\s*/);
     if (parts.length === 1) {
         // Error message didn't match what we expected.
         return err;
     }
-    var code = parts[1], name = parts[2], message = parts[3];
+    var code = parts[1], message = parts[2];
     return new VirgilCryptoError(message, code, name);
+}
+function assert(condition, message) {
+    if (!condition) {
+        throw new VirgilCryptoError(message);
+    }
 }
 
 var HashAlgorithm;
@@ -2076,6 +2081,12 @@ function createNativeFunctionWrapper(utils) {
             return result;
         };
     }
+}
+
+function toArray(val) {
+    return Array.isArray(val)
+        ? val
+        : val === undefined ? val : [val];
 }
 
 function createCommonjsModule(fn, module) {
@@ -2155,12 +2166,8 @@ var generateRecommended = wrapFunction(lib.VirgilKeyPair.generateRecommended, li
 function generateKeyPair(options) {
     if (options === void 0) { options = {}; }
     var type = options.type, _a = options.password, password = _a === void 0 ? new Buffer$1(0) : _a;
-    if (type && Object.keys(KeyPairType).indexOf(type) === -1) {
-        throw new VirgilCryptoError('Cannot generate keypair. Parameter "type" is invalid');
-    }
-    if (!isBuffer$1(password)) {
-        throw new VirgilCryptoError('Cannot generate keypair. Parameter "password" must be a Buffer');
-    }
+    assert(type === undefined || Object.keys(KeyPairType).indexOf(type) !== -1, 'Cannot generate keypair. Parameter "type" is invalid');
+    assert(isBuffer$1(password), 'Cannot generate keypair. Parameter "password" must be a Buffer');
     var keypair;
     try {
         if (type) {
@@ -2195,12 +2202,8 @@ var toDer = wrapFunction(lib.VirgilKeyPair.privateKeyToDER, lib.VirgilKeyPair);
  * */
 function privateKeyToDer(privateKey, password) {
     if (password === void 0) { password = new Buffer$1(0); }
-    if (!isBuffer$1(privateKey)) {
-        throw new VirgilCryptoError('Cannot convert private key to DER. Argument "privateKey" must be a Buffer');
-    }
-    if (!isBuffer$1(password)) {
-        throw new VirgilCryptoError('Cannot convert private key to DER. Argument "password" must be a Buffer');
-    }
+    assert(isBuffer$1(privateKey), 'Cannot convert private key to DER. Argument "privateKey" must be a Buffer');
+    assert(isBuffer$1(password), 'Cannot convert private key to DER. Argument "password" must be a Buffer');
     try {
         return toDer(privateKey, password);
     }
@@ -2213,12 +2216,10 @@ var toDer$1 = wrapFunction(lib.VirgilKeyPair.publicKeyToDER, lib.VirgilKeyPair);
 /**
  * Converts PEM formatted public key to DER format.
  * @param {Buffer} publicKey - Public key in PEM format
- * @returns {Buffer} Public key in DER fromat.
+ * @returns {Buffer} Public key in DER format.
  * */
 function publicKeyToDer(publicKey) {
-    if (!isBuffer$1(publicKey)) {
-        throw new VirgilCryptoError('Cannot convert private key to DER. Argument "publicKey" must be a Buffer');
-    }
+    assert(isBuffer$1(publicKey), 'Cannot convert private key to DER. Argument "publicKey" must be a Buffer');
     try {
         return toDer$1(publicKey);
     }
@@ -2237,9 +2238,7 @@ function publicKeyToDer(publicKey) {
  * */
 function hash(data, algorithm) {
     if (algorithm === void 0) { algorithm = HashAlgorithm.SHA256; }
-    if (!isBuffer$1(data)) {
-        throw new VirgilCryptoError('Cannot calculate hash. Argument "data" must be a Buffer');
-    }
+    assert(isBuffer$1(data), 'Cannot calculate hash. Argument "data" must be a Buffer');
     var virgilHash = new lib.VirgilHash(lib.VirgilHashAlgorithm[algorithm]);
     var hashFn = wrapFunction(virgilHash.hash, virgilHash);
     try {
@@ -2253,4 +2252,175 @@ function hash(data, algorithm) {
     }
 }
 
-export { generateKeyPair, privateKeyToDer, publicKeyToDer, hash };
+/**
+ * Encrypt data.
+ *
+ * @param data {Buffer} - Data to encrypt.
+ * @param encryptionKey {EncryptionKey|EncryptionKey[]} - Public key with identifier or an array of
+ * public keys with identifiers to encrypt with.
+ *
+ * @returns {Buffer} - Encrypted data.
+ */
+function encrypt(data, encryptionKey) {
+    var encryptionKeys = toArray(encryptionKey);
+    assert(isBuffer$1(data), 'Cannot encrypt. `data` must be a Buffer');
+    assert(encryptionKey !== undefined, 'Cannot encrypt. `encryptionKey` is required');
+    assert(encryptionKeys.length > 0, 'Cannot encrypt. `encryptionKey` must not be empty');
+    encryptionKeys.forEach(function (_a) {
+        var identifier = _a.identifier, publicKey = _a.publicKey;
+        assert(isBuffer$1(identifier), 'Cannot encrypt. Public key identifier must be a Buffer.');
+        assert(isBuffer$1(publicKey), 'Cannot encrypt. Public key must me a Buffer');
+    });
+    var cipher = new lib.VirgilCipher();
+    var addKeyRecipientFn = wrapFunction(cipher.addKeyRecipient, cipher);
+    var encryptFn = wrapFunction(cipher.encrypt, cipher);
+    try {
+        encryptionKeys.forEach(function (_a) {
+            var identifier = _a.identifier, publicKey = _a.publicKey;
+            addKeyRecipientFn(identifier, publicKey);
+        });
+        return encryptFn(data, true);
+    }
+    catch (e) {
+        throw errorFromNativeError(e);
+    }
+    finally {
+        cipher.delete();
+    }
+}
+
+/**
+ * Decrypt data
+ *
+ * @param encryptedData {Buffer} - The data to decrypt.
+ * @param decryptionKey {DecryptionKey} - Private key with identifier and optional password.
+ * @returns {Buffer} - Decrypted data.
+ */
+function decrypt(encryptedData, decryptionKey) {
+    assert(isBuffer$1(encryptedData), 'Cannot decrypt. `encryptedData` must be a Buffer');
+    assert(decryptionKey !== undefined, 'Cannot decrypt. `decryptionKey` is required');
+    var identifier = decryptionKey.identifier, privateKey = decryptionKey.privateKey, _a = decryptionKey.privateKeyPassword, privateKeyPassword = _a === void 0 ? new Buffer$1(0) : _a;
+    assert(isBuffer$1(identifier) &&
+        isBuffer$1(privateKey) &&
+        (privateKeyPassword === undefined || isBuffer$1(privateKeyPassword)), 'Cannot decrypt. `decryptionKey` is invalid');
+    var cipher = new lib.VirgilCipher();
+    var decryptWithKeyFn = wrapFunction(cipher.decryptWithKey, cipher);
+    try {
+        return decryptWithKeyFn(encryptedData, identifier, privateKey, privateKeyPassword);
+    }
+    catch (e) {
+        throw errorFromNativeError(e);
+    }
+    finally {
+        cipher.delete();
+    }
+}
+
+var encryptPrivateKeyFn = wrapFunction(lib.VirgilKeyPair.encryptPrivateKey, lib.VirgilKeyPair);
+/**
+ * Encrypts the private key with password
+ *
+ * @param {Buffer} privateKey - Private key to encrypt
+ * @param {Buffer} password - Password to encrypt the private key with
+ *
+ * @returns {Buffer} - Encrypted private key
+ * */
+function encryptPrivateKey(privateKey, password) {
+    assert(isBuffer$1(privateKey), 'Cannot encrypt private key. `privateKey` must be a Buffer');
+    assert(isBuffer$1(password), 'Cannot encrypt private key. `password` must be a Buffer');
+    try {
+        return encryptPrivateKeyFn(privateKey, password);
+    }
+    catch (e) {
+        throw errorFromNativeError(e);
+    }
+}
+
+var decryptPrivateKeyFn = wrapFunction(lib.VirgilKeyPair.decryptPrivateKey, lib.VirgilKeyPair);
+/**
+ * Decrypts encrypted private key.
+ * @param {Buffer} privateKey - Private key to decrypt.
+ * @param {Buffer} [password] - Private key password.
+ *
+ * @returns {Buffer} - Decrypted private key
+ * */
+function decryptPrivateKey(privateKey, password) {
+    assert(isBuffer$1(privateKey), 'Cannot decrypt private key. `privateKey` must be a Buffer');
+    assert(isBuffer$1(password), 'Cannot decrypt private key. `password` must be a Buffer');
+    try {
+        return decryptPrivateKeyFn(privateKey, password);
+    }
+    catch (e) {
+        throw errorFromNativeError(e);
+    }
+}
+
+var extractPublicKeyFn = wrapFunction(lib.VirgilKeyPair.extractPublicKey, lib.VirgilKeyPair);
+/**
+ * Extracts public key out of private key.
+ *
+ * @param {Buffer} privateKey - Private key to extract from.
+ * @param {Buffer} [password] - Private key password if private key is encrypted.
+ *
+ * @returns {Buffer} - Extracted public key
+ * */
+function extractPublicKey(privateKey, password) {
+    if (password === void 0) { password = new Buffer$1(0); }
+    assert(isBuffer$1(privateKey), 'Cannot extract public key. `privateKey` must be a Buffer');
+    assert(isBuffer$1(password), 'Cannot extract public key. `password` must be a Buffer');
+    try {
+        return extractPublicKeyFn(privateKey, password);
+    }
+    catch (e) {
+        throw errorFromNativeError(e);
+    }
+}
+
+/**
+ * Calculates the digital signature of the given data using the given private key.
+ *
+ * @param data {Buffer} - Data to sign.
+ * @param privateKey {Buffer} - Private key to use.
+ * @param [privateKeyPassword] {Buffer} - Optional password the private key is encrypted with.
+ * @returns {Buffer} - Digital signature.
+ */
+function sign(data, privateKey, privateKeyPassword) {
+    if (privateKeyPassword === void 0) { privateKeyPassword = new Buffer$1(0); }
+    var signer = new lib.VirgilSigner();
+    var signFn = wrapFunction(signer.sign, signer);
+    try {
+        return signFn(data, privateKey, privateKeyPassword);
+    }
+    catch (e) {
+        throw errorFromNativeError(e);
+    }
+    finally {
+        signer.delete();
+    }
+}
+
+/**
+ * Verifies digital signature of the given data for the given public key.
+ *
+ * @param data {Buffer} - Data to verify.
+ * @param signature {Buffer} - The signature.
+ * @param publicKey {Buffer} - The public key.
+ *
+ * @returns {boolean} - True if signature is valid for the given public key and data,
+ * otherwise False.
+ */
+function verify(data, signature, publicKey) {
+    var signer = new lib.VirgilSigner();
+    var verifyFn = wrapFunction(signer.verify, signer);
+    try {
+        return verifyFn(data, signature, publicKey);
+    }
+    catch (e) {
+        throw errorFromNativeError(e);
+    }
+    finally {
+        signer.delete();
+    }
+}
+
+export { generateKeyPair, privateKeyToDer, publicKeyToDer, hash, encrypt, decrypt, encryptPrivateKey, decryptPrivateKey, extractPublicKey, sign, verify };

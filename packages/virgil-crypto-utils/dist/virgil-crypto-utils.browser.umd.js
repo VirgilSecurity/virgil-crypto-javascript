@@ -60,14 +60,19 @@
             return err;
         }
         // Expected message format is as follows:
-        // "Module: virgil/crypto. Error code: {code}. {name}. {message}."
+        // "Module: virgil/crypto. Error code: {code}. {message}."
         var parts = virgilCryptoMessage.split(/\s*\.\s*/);
         if (parts.length === 1) {
             // Error message didn't match what we expected.
             return err;
         }
-        var code = parts[1], name = parts[2], message = parts[3];
+        var code = parts[1], message = parts[2];
         return new VirgilCryptoError(message, code, name);
+    }
+    function assert(condition, message) {
+        if (!condition) {
+            throw new VirgilCryptoError(message);
+        }
     }
 
     (function (HashAlgorithm) {
@@ -149,9 +154,17 @@
         }
     }
 
+    function toArray(val) {
+        return Array.isArray(val)
+            ? val
+            : val === undefined ? val : [val];
+    }
+
     exports.createNativeFunctionWrapper = createNativeFunctionWrapper;
+    exports.toArray = toArray;
     exports.VirgilCryptoError = VirgilCryptoError;
     exports.errorFromNativeError = errorFromNativeError;
+    exports.assert = assert;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 

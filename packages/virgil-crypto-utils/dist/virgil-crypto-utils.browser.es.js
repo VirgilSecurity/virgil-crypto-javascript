@@ -54,14 +54,19 @@ function errorFromNativeError(err) {
         return err;
     }
     // Expected message format is as follows:
-    // "Module: virgil/crypto. Error code: {code}. {name}. {message}."
+    // "Module: virgil/crypto. Error code: {code}. {message}."
     var parts = virgilCryptoMessage.split(/\s*\.\s*/);
     if (parts.length === 1) {
         // Error message didn't match what we expected.
         return err;
     }
-    var code = parts[1], name = parts[2], message = parts[3];
+    var code = parts[1], message = parts[2];
     return new VirgilCryptoError(message, code, name);
+}
+function assert(condition, message) {
+    if (!condition) {
+        throw new VirgilCryptoError(message);
+    }
 }
 
 var HashAlgorithm;
@@ -145,4 +150,10 @@ function createNativeFunctionWrapper(utils) {
     }
 }
 
-export { HashAlgorithm, KeyPairType, createNativeFunctionWrapper, VirgilCryptoError, errorFromNativeError };
+function toArray(val) {
+    return Array.isArray(val)
+        ? val
+        : val === undefined ? val : [val];
+}
+
+export { HashAlgorithm, KeyPairType, createNativeFunctionWrapper, toArray, VirgilCryptoError, errorFromNativeError, assert };

@@ -1,4 +1,4 @@
-import { VirgilCryptoError, KeyPairType, errorFromNativeError } from 'virgil-crypto-utils';
+import { KeyPairType, errorFromNativeError, assert } from 'virgil-crypto-utils';
 import lib from '../../virgil_crypto_node.node';
 import { wrapFunction, isBuffer, virgilByteArrayToBuffer } from '../utils';
 
@@ -22,23 +22,16 @@ export type KeyPairOptions = {
 export function generateKeyPair (options: KeyPairOptions = {}) {
 	let { type, password = new Buffer(0) } = options;
 
-
-	if (type && Object.keys(KeyPairType).indexOf(type) === -1) {
-		throw new VirgilCryptoError(
-			'Cannot generate keypair. Parameter "type" is invalid'
-		);
-	}
-
-	if (!isBuffer(password)) {
-		throw new VirgilCryptoError(
-			'Cannot generate keypair. Parameter "password" must be a Buffer'
-		);
-	}
+	assert(
+		type === undefined || Object.keys(KeyPairType).indexOf(type) !== -1,
+		'Cannot generate keypair. Parameter "type" is invalid'
+	);
+	assert(isBuffer(password), 'Cannot generate keypair. Parameter "password" must be a Buffer');
 
 	let keypair;
 	try {
 		if (type) {
-			keypair = generate(lib.VirgilKeyPair.Type[type], password)
+			keypair = generate(lib.VirgilKeyPair[`Type_${type}`], password);
 		} else {
 			keypair = generateRecommended(password);
 		}

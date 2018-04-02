@@ -92,7 +92,7 @@ function createBundle(bundle) {
 
 						replace({ 'process.browser': JSON.stringify(isBrowser) }),
 
-						...(isBrowser && bundle.browserOnly ? BROWSER_ONLY_PLUGINS : []),
+						...(isBrowser ? BROWSER_ONLY_PLUGINS : []),
 
 						resolve({
 							browser: isBrowser,

@@ -1,4 +1,4 @@
-import { VirgilCryptoError, errorFromNativeError } from 'virgil-crypto-utils';
+import { assert, errorFromNativeError } from 'virgil-crypto-utils';
 import lib from '../../virgil_crypto_node.node';
 import { wrapFunction, isBuffer } from '../utils';
 
@@ -11,17 +11,8 @@ const toDer = wrapFunction(lib.VirgilKeyPair.privateKeyToDER, lib.VirgilKeyPair)
  * @returns {Buffer} - Private key in DER format.
  * */
 export function privateKeyToDer(privateKey: Buffer, password: Buffer = new Buffer(0)) {
-	if (!isBuffer(privateKey)) {
-		throw new VirgilCryptoError(
-			'Cannot convert private key to DER. Argument "privateKey" must be a Buffer'
-		);
-	}
-
-	if (!isBuffer(password)) {
-		throw new VirgilCryptoError(
-			'Cannot convert private key to DER. Argument "password" must be a Buffer'
-		);
-	}
+	assert(isBuffer(privateKey), 'Cannot convert private key to DER. Argument "privateKey" must be a Buffer');
+	assert(isBuffer(password), 'Cannot convert private key to DER. Argument "password" must be a Buffer');
 
 	try {
 		return toDer(privateKey, password);

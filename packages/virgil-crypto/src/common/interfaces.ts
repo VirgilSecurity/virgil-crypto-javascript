@@ -8,3 +8,7 @@ export type DecryptionKey = {
 	privateKey: Buffer,
 	privateKeyPassword?: Buffer
 }
+
+export type SigningKey = DecryptionKey;
+
+export type VerificationKey = EncryptionKey;

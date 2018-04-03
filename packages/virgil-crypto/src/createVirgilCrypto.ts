@@ -8,15 +8,15 @@ export type KeyPair = {
 }
 
 const _privateKeys = new WeakMap();
-const _setPrivateKeyValue = WeakMap.prototype.set;
-const _getPrivateKeyValue = WeakMap.prototype.get;
+const _setValue = WeakMap.prototype.set;
+const _getValue = WeakMap.prototype.get;
 
 export class PrivateKey {
 	identifier: Buffer;
 
 	constructor(identifier: Buffer, value: Buffer) {
 		this.identifier = identifier;
-		_setPrivateKeyValue.call(_privateKeys, this, value);
+		setPrivateKeyBytes(this, value);
 	}
 }
 export class PublicKey {
@@ -27,6 +27,14 @@ export class PublicKey {
 		this.identifier = identifier;
 		this.value = value;
 	}
+}
+
+function getPrivateKeyBytes(privateKey: PrivateKey) {
+	return _getValue.call(_privateKeys, privateKey);
+}
+
+function setPrivateKeyBytes(privateKey: PrivateKey, bytes: Buffer) {
+	_setValue.call(_privateKeys, privateKey, bytes);
 }
 
 export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
@@ -42,7 +50,9 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 		decrypt,
 		calculateSignature,
 		verifySignature,
-		calculateHash
+		calculateHash,
+		signThenEncrypt,
+		decryptThenVerify
 	};
 
 	/**
@@ -105,7 +115,7 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 	 * @returns {Buffer} - The private key bytes.
 	 * */
 	function exportPrivateKey(privateKey: PrivateKey, password?: string) {
-		const privateKeyValue = _getPrivateKeyValue.call(_privateKeys, privateKey);
+		const privateKeyValue = getPrivateKeyBytes(privateKey);
 		assert(privateKeyValue !== undefined, 'Cannot export private key. `privateKey` is invalid');
 
 		if (password == null) {
@@ -201,7 +211,7 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 		);
 
 		encryptedData = Buffer.isBuffer(encryptedData) ? encryptedData : Buffer.from(encryptedData, 'base64');
-		const privateKeyValue = _getPrivateKeyValue.call(_privateKeys, privateKey);
+		const privateKeyValue = getPrivateKeyBytes(privateKey);
 		assert(privateKeyValue !== undefined, 'Cannot decrypt. `privateKey` is invalid');
 		return cryptoApi.decrypt(encryptedData, {
 			identifier: privateKey.identifier,
@@ -236,7 +246,7 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 	 * @returns {PublicKey} - The handle to the extracted public key.
 	 * */
 	function extractPublicKey(privateKey: PrivateKey) {
-		const privateKeyValue = _getPrivateKeyValue.call(_privateKeys, privateKey);
+		const privateKeyValue = getPrivateKeyBytes(privateKey);
 
 		assert(
 			privateKeyValue !== undefined,
@@ -261,7 +271,7 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 			'Cannot calculate signature. `data` must be a Buffer or a string'
 		);
 
-		const privateKeyValue = _getPrivateKeyValue.call(_privateKeys, privateKey);
+		const privateKeyValue = getPrivateKeyBytes(privateKey);
 
 		assert(
 			privateKeyValue !== undefined,
@@ -306,5 +316,95 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 
 
 		return cryptoApi.verify(data, signature, publicKey.value);
+	}
+
+	/**
+	 * Calculates the signature on the data using the private key,
+	 * 		then encrypts the data along with the signature using
+	 * 		the public key(s).
+	 * @param {Buffer|string} data - The data to sign and encrypt as a Buffer or a string in UTF-8.
+	 * @param {PrivateKey} signingKey - The private key to use to calculate signature.
+	 * @param {PublicKey|PublicKey[]} encryptionKey - The public key of the intended recipient or an array
+	 * of public keys of multiple recipients.
+	 *
+	 * 	@returns {Buffer} Encrypted data with attached signature.
+	 * */
+	function signThenEncrypt(data: Buffer|string, signingKey: PrivateKey, encryptionKey: PublicKey|PublicKey[]) {
+		assert(
+			Buffer.isBuffer(data) || typeof data === 'string',
+			'Cannot sign then encrypt. `data` must be a Buffer or a string'
+		);
+
+		const signingKeyValue = getPrivateKeyBytes(signingKey);
+
+		assert(signingKeyValue !== undefined, 'Cannot sign then encrypt. `signingKey` is invalid');
+
+		data = Buffer.isBuffer(data) ? data : Buffer.from(data, 'utf8');
+
+		const encryptionKeys = toArray(encryptionKey);
+		assert(
+			encryptionKeys != null && encryptionKeys.length > 0,
+			'Cannot sign then encrypt. `encryptionKey` must not be empty'
+		);
+
+		return cryptoApi.signThenEncrypt(
+			data,
+			{
+				privateKey: signingKeyValue,
+				identifier: signingKey.identifier
+			},
+			encryptionKeys.map((key: PublicKey) => ({
+				identifier: key.identifier,
+				publicKey: key.value
+			}))
+		);
+	}
+
+	/**
+	 * Decrypts the data using the private key, then verifies decrypted data
+	 * 		using the attached signature and the given public key.
+	 *
+	 * 	@param {Buffer|string} cipherData - The data to be decrypted and
+	 * 			verified as a Buffer or a string in base64.
+	 * 	@param {PrivateKey} decryptionKey - The private key object to use for decryption.
+	 * 	@param {(PublicKey|PublicKey[])} verificationKey - The public
+	 * 		key object or an array of public key object to use to verify data integrity.
+	 * 		If `verificationKey` is an array, the attached signature must be valid for any
+	 * 		one of them.
+	 *
+	 * 	@returns {Buffer} - Decrypted data iff verification is successful,
+	 * 			otherwise throws VirgilCryptoError.
+	 * */
+	function decryptThenVerify(cipherData: Buffer|string, decryptionKey: PrivateKey, verificationKey: PublicKey|PublicKey[]) {
+		assert(
+			Buffer.isBuffer(cipherData) || typeof cipherData === 'string',
+			'Cannot decrypt then verify. `cipherData` must be a Buffer of a string in base64'
+		);
+
+		const verificationKeys = toArray(verificationKey);
+		assert(
+			verificationKeys != null && verificationKeys.length > 0,
+			'Cannot decrypt then verify. `verificationKey` must not be empty'
+		);
+
+		const decryptionKeyValue = getPrivateKeyBytes(decryptionKey);
+		assert(
+			decryptionKeyValue !== undefined,
+			'Cannot decrypt then verify. `decryptionKey` is invalid'
+		);
+
+		cipherData = Buffer.isBuffer(cipherData) ? cipherData : Buffer.from(cipherData, 'base64');
+
+		return cryptoApi.decryptThenVerify(
+			cipherData,
+			{
+				identifier: decryptionKey.identifier,
+				privateKey: decryptionKeyValue
+			},
+			verificationKeys.map((key: PublicKey) => ({
+				identifier: key.identifier,
+				publicKey: key.value
+			}))
+		);
 	}
 }

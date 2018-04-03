@@ -1,6 +1,14 @@
-import { DecryptionKey, EncryptionKey, HashAlgorithm, KeyPairType } from '../common';
+import {
+	DecryptionKey,
+	EncryptionKey,
+	HashAlgorithm,
+	KeyPairType, SigningKey,
+	VerificationKey,
+	VirgilCryptoError
+} from '../common';
 import { lib } from './lib';
 import { toArray } from '../utils/toArray';
+import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from '../common/constants';
 
 /**
  * Decrypt data
@@ -158,4 +166,112 @@ export function verify (data: Buffer, signature: Buffer, publicKey: Buffer) {
 	return signer.verifySafe(data, signature, publicKey);
 }
 
+/**
+ * Signs and encrypts the data.
+ *
+ * @param {Buffer} data - Data to sign and encrypt.
+ * @param {SigningKey} signingKey - The private key to use for signature calculation.
+ * @param {EncryptionKey|EncryptionKey[]} encryptionKey - Public key with identifier or an array of
+ * public keys with identifiers to use for encryption.
+ *
+ * @returns {Buffer} Signed and encrypted data.
+ */
+export function signThenEncrypt(data: Buffer, signingKey: SigningKey, encryptionKey: EncryptionKey|EncryptionKey[]) {
+	const encryptionKeys = toArray(encryptionKey);
+
+	const signer = new lib.VirgilSigner();
+	const cipher = new lib.VirgilCipher();
+	const signatureKey = Buffer.from(DATA_SIGNATURE_KEY);
+	const signerIdKey = Buffer.from(DATA_SIGNER_ID_KEY);
+	const customParams = cipher.customParams();
+
+	let signature = signer.signSafe(
+		data,
+		signingKey.privateKey,
+		signingKey.privateKeyPassword || new Buffer(0)
+	);
+	customParams.setDataSafe(signatureKey, signature);
+
+	if (signingKey.identifier) {
+		customParams.setDataSafe(signerIdKey, signingKey.identifier);
+	}
+
+	encryptionKeys.forEach((key: EncryptionKey) =>
+		cipher.addKeyRecipientSafe(key.identifier, key.publicKey)
+	);
+
+	return cipher.encryptSafe(data, true);
+}
+
+/**
+ * Decrypts the given data with private key and verify the signature with
+ * public key.
+ *
+ * @param {Buffer} cipherData - Data to decrypt.
+ * @param {DecryptionKey} decryptionKey - The private key to use for decryption.
+ * @param {VerificationKey|VerificationKey[]} verificationKey - Public key or an array of public
+ * 		keys to use to to verify the signature. If the cipher data
+ * 		contains an identifier of the private key used to calculate the signature,
+ * 		then the public key with that identifier from `verificationKey` array will be
+ * 		used to validate the signature, otherwise ANY one of the keys can validate
+ * 		the signature. If the signature is not valid for ALL of the keys,
+ * 		an exception is thrown.
+ *
+ * @returns {Buffer} Decrypted data
+ * */
+export function decryptThenVerify(
+	cipherData: Buffer, decryptionKey: DecryptionKey, verificationKey: VerificationKey|VerificationKey[]
+) {
+	const verificationKeys = toArray(verificationKey);
+	const signer = new lib.VirgilSigner();
+	const cipher = new lib.VirgilCipher();
+	const signatureKey = Buffer.from(DATA_SIGNATURE_KEY);
+
+	const plainData = cipher.decryptWithKeySafe(
+		cipherData,
+		decryptionKey.identifier,
+		decryptionKey.privateKey,
+		decryptionKey.privateKeyPassword || new Buffer(0)
+	);
+	const customParams = cipher.customParams();
+	const signature = customParams.getDataSafe(signatureKey);
+
+	let isValid;
+
+	if (verificationKeys.length === 1) {
+		isValid = signer.verifySafe(plainData, signature, verificationKeys[0].publicKey);
+	} else {
+		const signerId = tryGetSignerId(customParams);
+		if (signerId !== null) {
+			const theKey = verificationKeys.find(
+				(key: VerificationKey) => key.identifier.equals(signerId)
+			);
+			if (theKey === undefined) {
+				isValid = false;
+			} else {
+				isValid = signer.verifySafe(plainData, signature, theKey.publicKey);
+			}
+		} else {
+			// no signer id in metadata, try all public keys in sequence
+			isValid = verificationKeys.some(
+				(key: VerificationKey) => signer.verifySafe(plainData, signature, key.publicKey)
+			);
+		}
+	}
+
+	if (!isValid) {
+		throw new VirgilCryptoError('Signature verification has failed.');
+	}
+
+	return plainData;
+}
+
+function tryGetSignerId(customParams: any): Buffer|null {
+	const signerIdKey = Buffer.from(DATA_SIGNER_ID_KEY);
+	try {
+		return customParams.getDataSafe(signerIdKey);
+	} catch (e) {
+		return null;
+	}
+}
 

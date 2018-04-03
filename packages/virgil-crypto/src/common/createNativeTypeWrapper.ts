@@ -52,14 +52,14 @@ export function createNativeTypeWrapper (utils: WrapperUtils) {
 
 	function wrapNativeFunction(fn: Function, target?: any) {
 		return function (this: any, ...args: any[]) {
-			let allocations: any[] = [];
+			let deletionQueue: any[] = [];
 			const transformedArgs: any[] = [];
 
 			for (let i = 0; i < args.length; i++) {
 				if (utils.isBuffer(args[i])) {
 					const arr = utils.bufferToVirgilByteArray(args[i]);
 					if (process.browser) {
-						allocations.push(arr);
+						deletionQueue.push(arr);
 					}
 
 					transformedArgs[i] = arr;
@@ -73,7 +73,7 @@ export function createNativeTypeWrapper (utils: WrapperUtils) {
 				result = apply.call(fn, target || this, transformedArgs);
 				if (utils.isVirgilByteArray(result)) {
 					if (process.browser) {
-						allocations.push(result);
+						deletionQueue.push(result);
 					}
 
 					result = utils.virgilByteArrayToBuffer(result);
@@ -82,7 +82,10 @@ export function createNativeTypeWrapper (utils: WrapperUtils) {
 				return result;
 			} finally {
 				if (process.browser) {
-					allocations.forEach(a => a.delete());
+					while (deletionQueue.length > 0) {
+						let item = deletionQueue.pop();
+						item.delete();
+					}
 				}
 			}
 		}

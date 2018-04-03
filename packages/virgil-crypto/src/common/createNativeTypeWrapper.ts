@@ -9,8 +9,10 @@ export interface WrapperUtils {
 
 const apply = Function.prototype.apply;
 const hasOwn = Object.prototype.hasOwnProperty;
+const toString = Object.prototype.toString;
 
-export function createNativeTypeWrapper (utils: WrapperUtils) {
+export function createNativeTypeWrapper (lib: any) {
+	const utils = createUtils(lib);
 
 	return {
 		createSafeInstanceMethods,
@@ -90,4 +92,50 @@ export function createNativeTypeWrapper (utils: WrapperUtils) {
 			}
 		}
 	}
+}
+
+function createUtils(lib: any): WrapperUtils {
+	return {
+		isBuffer (obj: any) {
+			return Buffer.isBuffer(obj);
+		},
+
+		bufferToVirgilByteArray(buffer: Buffer) {
+			if (process.browser) {
+				return lib.VirgilByteArray.fromUint8Array(buffer);
+			} else {
+				const array = new lib.VirgilByteArray(buffer.byteLength);
+
+				for (let i = 0; i < buffer.length; ++i) {
+					array.set(i, buffer[i]);
+				}
+
+				return array;
+			}
+		},
+
+		isVirgilByteArray(obj: any) {
+			if (process.browser) {
+				return obj != null && obj.constructor === lib.VirgilByteArray;
+			} else {
+				if (obj == null) {
+					return false;
+				}
+
+				const tag = toString.call(obj);
+				return tag === '[object _exports_VirgilByteArray]' || tag === '[object VirgilByteArray]';
+			}
+		},
+
+		virgilByteArrayToBuffer(byteArray: any) {
+			const size = byteArray.size();
+			const buffer = new Buffer(size);
+
+			for (let i = 0; i < size; ++i) {
+				buffer[i] = byteArray.get(i);
+			}
+
+			return buffer;
+		}
+	};
 }

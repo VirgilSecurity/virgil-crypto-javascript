@@ -10,6 +10,7 @@ import {
 import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
 import { toArray } from '../utils/toArray';
 import { IVirgilCryptoApi } from './IVirgilCryptoApi';
+import { createNativeTypeWrapper } from './createNativeTypeWrapper';
 
 export type KeyPairOptions = {
 	type?: KeyPairType,
@@ -17,6 +18,39 @@ export type KeyPairOptions = {
 };
 
 export function createCryptoApi (lib: any): IVirgilCryptoApi {
+
+	const wrapper = createNativeTypeWrapper(lib);
+
+	wrapper.createSafeInstanceMethods(lib.VirgilCipher, [ 'addKeyRecipient', 'encrypt', 'decryptWithKey' ]);
+	wrapper.createSafeInstanceMethods(lib.VirgilSigner, [ 'sign', 'verify' ]);
+	wrapper.createSafeInstanceMethods(lib.VirgilHash, [ 'hash' ]);
+	wrapper.createSafeInstanceMethods(lib.VirgilCustomParams, [ 'setData', 'getData' ]);
+	wrapper.createSafeInstanceMethods(lib.VirgilKeyPair, [ 'privateKey', 'publicKey' ]);
+	wrapper.createSafeStaticMethods(lib.VirgilKeyPair, [
+		'generate',
+		'generateRecommended',
+		'decryptPrivateKey',
+		'encryptPrivateKey',
+		'extractPublicKey',
+		'privateKeyToDER',
+		'publicKeyToDER'
+	]);
+
+	lib.createVirgilCipher = () => {
+		const cipher = new lib.VirgilCipher();
+		if (process.browser) cipher.deleteLater();
+		return cipher;
+	};
+	lib.createVirgilSigner = () => {
+		const signer = new lib.VirgilSigner();
+		if (process.browser) signer.deleteLater();
+		return signer;
+	};
+	lib.createVirgilHash = (...args: any[]) => {
+		const hash = new lib.VirgilHash(...args);
+		if (process.browser) hash.deleteLater();
+		return hash;
+	};
 
 	return {
 		generateKeyPair (options: KeyPairOptions = {}) {

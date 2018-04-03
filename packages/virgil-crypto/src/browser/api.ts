@@ -1,5 +1,5 @@
 import { lib } from './lib';
-import { createCryptoApi } from '../common/createCryptoApi';
 import { IVirgilCryptoApi } from '../common/IVirgilCryptoApi';
+import { createCryptoApi } from '../common/createCryptoApi';
 
 export const cryptoApi: IVirgilCryptoApi = createCryptoApi(lib);

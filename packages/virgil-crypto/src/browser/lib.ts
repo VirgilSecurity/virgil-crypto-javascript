@@ -16,5 +16,16 @@ wrapper.createSafeStaticMethods(lib.VirgilKeyPair, [
 	'publicKeyToDER'
 ]);
 
+// creates instances of VirgilCipher that will be automatically
+// deleted on the next tick of the event loop
+lib.createVirgilCipher = () => new lib.VirgilCipher().deleteLater();
+
+// creates instances of VirgilSigner that will be automatically
+// deleted on the next tick of the event loop
+lib.createVirgilSigner = () => new lib.VirgilSigner().deleteLater();
+
+// creates instances of VirgilHash that will be automatically
+// deleted on the next tick of the event loop
+lib.createVirgilHash = (...args: any[]) => new lib.VirgilHash(...args).deleteLater();
 
 export { lib };

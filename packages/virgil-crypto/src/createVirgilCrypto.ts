@@ -1,5 +1,5 @@
 import { KeyPairType, HashAlgorithm, assert } from './common';
-import { IVirgilCryptoApi } from './IVirgilCryptoApi';
+import { IVirgilCryptoApi } from './common/IVirgilCryptoApi';
 import { toArray } from './utils/toArray';
 
 export type KeyPair = {

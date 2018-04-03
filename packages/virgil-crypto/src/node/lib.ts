@@ -17,4 +17,8 @@ wrapper.createSafeStaticMethods(lib.VirgilKeyPair, [
 	'publicKeyToDER'
 ]);
 
+lib.createVirgilCipher = () => new lib.VirgilCipher();
+lib.createVirgilSigner = () => new lib.VirgilSigner();
+lib.createVirgilHash = (...args: any[]) => new lib.VirgilHash(...args);
+
 export { lib };

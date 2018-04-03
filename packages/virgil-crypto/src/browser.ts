@@ -1,4 +1,4 @@
-import * as cryptoApi from './browser/api';
+import { cryptoApi } from './browser/api';
 import { KeyPairType, HashAlgorithm } from './common';
 import { createVirgilCrypto, PrivateKey, PublicKey } from './createVirgilCrypto';
 

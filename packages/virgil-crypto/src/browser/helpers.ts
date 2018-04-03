@@ -1,4 +1,4 @@
-import { createNativeTypeWrapper } from '../common/createNativeTypeWrapper';
+import { createNativeTypeWrapper } from '../common';
 import { lib } from './asmjs';
 
 export function isBuffer (obj: any) {

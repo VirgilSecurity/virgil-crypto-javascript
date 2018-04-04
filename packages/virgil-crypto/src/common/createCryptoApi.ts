@@ -6,7 +6,7 @@ import {
 	IVirgilCryptoApi,
 	KeyPairType,
 	HashAlgorithm,
-	VirgilCryptoError
+	IntegrityCheckFailedError
 } from './index';
 import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
 import { toArray } from '../utils/toArray';
@@ -197,7 +197,7 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 
 
 			if (!isValid) {
-				throw new VirgilCryptoError('Signature verification has failed.');
+				throw new IntegrityCheckFailedError('Signature verification has failed.');
 			}
 
 			return plainData;

@@ -1,18 +1,22 @@
 export class VirgilCryptoError extends Error {
 	public name: string = 'VirgilCryptoError';
-	public code?: string;
 
 	constructor(message: string, code?: string, name?: string) {
 		super(message);
 		Object.setPrototypeOf(this, VirgilCryptoError.prototype);
-		this.code = code;
 		if (name !== undefined) {
 			this.name = name;
 		}
 	}
 
 	toString() {
-		return `${this.name}: ${this.code !== undefined ? this.code : 'UNKNOWN'}: ${this.message}.`;
+		return `${this.name}: ${this.message}.`;
+	}
+}
+
+export class IntegrityCheckFailedError extends VirgilCryptoError {;
+	constructor(message: string) {
+		super(message, 'IntegrityCheckFailedError');
 	}
 }
 

@@ -1,4 +1,4 @@
-import { lib } from './lib';
+import { lib } from './asmjs';
 import { IVirgilCryptoApi } from '../common/IVirgilCryptoApi';
 import { createCryptoApi } from '../common/createCryptoApi';
 

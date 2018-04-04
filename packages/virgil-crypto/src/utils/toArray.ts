@@ -1,5 +1,9 @@
-export function toArray(val: any) {
-	return Array.isArray(val)
+export function toArray<T>(val?: T|T[]): T[]|undefined|null {
+	return val == null
 		? val
-		: val === undefined ? val : [ val ];
+		: isArray(val) ? val : [ val ];
+}
+
+function isArray<T>(obj: T|T[]): obj is T[] {
+	return Array.isArray(obj);
 }

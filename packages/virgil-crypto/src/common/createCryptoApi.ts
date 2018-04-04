@@ -1,15 +1,15 @@
 import {
 	DecryptionKey,
 	EncryptionKey,
-	KeyPairType,
-	HashAlgorithm,
 	SigningKey,
 	VerificationKey,
+	IVirgilCryptoApi,
+	KeyPairType,
+	HashAlgorithm,
 	VirgilCryptoError
 } from './index';
 import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
 import { toArray } from '../utils/toArray';
-import { IVirgilCryptoApi } from './IVirgilCryptoApi';
 import { createNativeTypeWrapper } from './createNativeTypeWrapper';
 
 export type KeyPairOptions = {
@@ -71,24 +71,24 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 			};
 		},
 
-		privateKeyToDer(privateKey: Buffer, password: Buffer = new Buffer(0)) {
-			return lib.VirgilKeyPair.privateKeyToDERSafe(privateKey, password);
+		privateKeyToDer(privateKey: Buffer, privateKeyPassword: Buffer = new Buffer(0)) {
+			return lib.VirgilKeyPair.privateKeyToDERSafe(privateKey, privateKeyPassword);
 		},
 
 		publicKeyToDer(publicKey: Buffer) {
 			return lib.VirgilKeyPair.publicKeyToDERSafe(publicKey);
 		},
 
-		extractPublicKey(privateKey: Buffer, password: Buffer = new Buffer(0)) {
-			return lib.VirgilKeyPair.extractPublicKeySafe(privateKey, password);
+		extractPublicKey(privateKey: Buffer, privateKeyPassword: Buffer = new Buffer(0)) {
+			return lib.VirgilKeyPair.extractPublicKeySafe(privateKey, privateKeyPassword);
 		},
 
-		encryptPrivateKey(privateKey: Buffer, password: Buffer) {
-			return lib.VirgilKeyPair.encryptPrivateKeySafe(privateKey, password);
+		encryptPrivateKey(privateKey: Buffer, privateKeyPassword: Buffer) {
+			return lib.VirgilKeyPair.encryptPrivateKeySafe(privateKey, privateKeyPassword);
 		},
 
-		decryptPrivateKey(privateKey: Buffer, password: Buffer) {
-			return lib.VirgilKeyPair.decryptPrivateKeySafe(privateKey, password);
+		decryptPrivateKey(privateKey: Buffer, privateKeyPassword: Buffer) {
+			return lib.VirgilKeyPair.decryptPrivateKeySafe(privateKey, privateKeyPassword);
 		},
 
 		hash(data: Buffer, algorithm: HashAlgorithm = HashAlgorithm.SHA256) {
@@ -101,33 +101,35 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 		},
 
 		encrypt(data: Buffer, encryptionKey: EncryptionKey|EncryptionKey[] ) {
-			const encryptionKeys = toArray(encryptionKey);
+			const encryptionKeys = toArray(encryptionKey)!;
 			const cipher = lib.createVirgilCipher();
 
-			encryptionKeys.forEach(({ identifier, publicKey }: EncryptionKey)  => {
-				cipher.addKeyRecipientSafe(identifier, publicKey);
+			encryptionKeys.forEach(({ identifier, key }: EncryptionKey) => {
+				cipher.addKeyRecipientSafe(identifier, key);
 			});
 			return cipher.encryptSafe(data, true);
 		},
 
 		decrypt(encryptedData: Buffer, decryptionKey: DecryptionKey) {
-			const { identifier, privateKey, privateKeyPassword = new Buffer(0) } = decryptionKey;
+			const { identifier, key, password = new Buffer(0) } = decryptionKey;
 			const cipher = lib.createVirgilCipher();
-			return cipher.decryptWithKeySafe(encryptedData, identifier, privateKey, privateKeyPassword);
+			return cipher.decryptWithKeySafe(encryptedData, identifier, key, password);
 		},
 
-		sign (data: Buffer, privateKey: Buffer, privateKeyPassword = new Buffer(0)) {
+		sign (data: Buffer, signingKey: SigningKey) {
+			const { key, password = new Buffer(0) } = signingKey;
 			const signer = lib.createVirgilSigner();
-			return signer.signSafe(data, privateKey, privateKeyPassword);
+			return signer.signSafe(data, key, password);
 		},
 
-		verify (data: Buffer, signature: Buffer, publicKey: Buffer) {
+		verify (data: Buffer, signature: Buffer, verificationKey: VerificationKey) {
+			const { key } = verificationKey;
 			const signer = lib.createVirgilSigner();
-			return signer.verifySafe(data, signature, publicKey);
+			return signer.verifySafe(data, signature, key);
 		},
 
 		signThenEncrypt(data: Buffer, signingKey: SigningKey, encryptionKey: EncryptionKey|EncryptionKey[]) {
-			const encryptionKeys = toArray(encryptionKey);
+			const encryptionKeys = toArray(encryptionKey)!;
 
 			const signer = lib.createVirgilSigner();
 			const cipher = lib.createVirgilCipher();
@@ -137,17 +139,17 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 
 			const signature = signer.signSafe(
 				data,
-				signingKey.privateKey,
-				signingKey.privateKeyPassword || new Buffer(0)
+				signingKey.key,
+				signingKey.password || new Buffer(0)
 			);
 			customParams.setDataSafe(signatureKey, signature);
 
-			if (signingKey.identifier) {
+			if (signingKey.identifier != null) {
 				customParams.setDataSafe(signerIdKey, signingKey.identifier);
 			}
 
-			encryptionKeys.forEach((key: EncryptionKey) =>
-				cipher.addKeyRecipientSafe(key.identifier, key.publicKey)
+			encryptionKeys.forEach(({ identifier, key }: EncryptionKey) =>
+				cipher.addKeyRecipientSafe(identifier, key)
 			);
 
 			return cipher.encryptSafe(data, true);
@@ -156,7 +158,7 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 		decryptThenVerify(
 			cipherData: Buffer, decryptionKey: DecryptionKey, verificationKey: VerificationKey|VerificationKey[]
 		) {
-			const verificationKeys = toArray(verificationKey);
+			const verificationKeys = toArray(verificationKey)!;
 			const signer = lib.createVirgilSigner();
 			const cipher = lib.createVirgilCipher();
 			const signatureKey = Buffer.from(DATA_SIGNATURE_KEY);
@@ -164,8 +166,8 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 			const plainData = cipher.decryptWithKeySafe(
 				cipherData,
 				decryptionKey.identifier,
-				decryptionKey.privateKey,
-				decryptionKey.privateKeyPassword || new Buffer(0)
+				decryptionKey.key,
+				decryptionKey.password || new Buffer(0)
 			);
 			const customParams = cipher.customParams();
 			const signature = customParams.getDataSafe(signatureKey);
@@ -173,22 +175,22 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 			let isValid;
 
 			if (verificationKeys.length === 1) {
-				isValid = signer.verifySafe(plainData, signature, verificationKeys[0].publicKey);
+				isValid = signer.verifySafe(plainData, signature, verificationKeys[0].key);
 			} else {
 				const signerId = tryGetSignerId(customParams);
 				if (signerId !== null) {
 					const theKey = verificationKeys.find(
-						(key: VerificationKey) => key.identifier.equals(signerId)
+						(key: VerificationKey) => key.identifier != null && key.identifier.equals(signerId)
 					);
 					if (theKey === undefined) {
 						isValid = false;
 					} else {
-						isValid = signer.verifySafe(plainData, signature, theKey.publicKey);
+						isValid = signer.verifySafe(plainData, signature, theKey.key);
 					}
 				} else {
 					// no signer id in metadata, try all public keys in sequence
 					isValid = verificationKeys.some(
-						(key: VerificationKey) => signer.verifySafe(plainData, signature, key.publicKey)
+						(key: VerificationKey) => signer.verifySafe(plainData, signature, key.key)
 					);
 				}
 			}

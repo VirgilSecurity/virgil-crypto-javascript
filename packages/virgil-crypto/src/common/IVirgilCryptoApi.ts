@@ -1,10 +1,41 @@
-import {
-	KeyPairType,
-	DecryptionKey,
-	EncryptionKey,
-	SigningKey,
-	VerificationKey
-} from './index';
+import { KeyPairType } from './index';
+
+export type KeyPair = { privateKey: Buffer, publicKey: Buffer };
+
+/**
+ * Public key with identifier.
+ * */
+export type EncryptionKey = {
+	identifier: Buffer,
+	key: Buffer
+}
+
+/**
+ * Private key with identifier and optional password.
+ * */
+export type DecryptionKey = {
+	identifier: Buffer,
+	key: Buffer,
+	password?: Buffer
+}
+
+/**
+ * Same as {DecryptionKey} but identifier field is optional
+ */
+export type SigningKey = {
+	identifier?: Buffer
+	key: Buffer,
+	password?: Buffer
+}
+
+/**
+ * Same as {EncryptionKey} but identifier field is optional
+ */
+export type VerificationKey = {
+	identifier?: Buffer,
+	key: Buffer
+};
+
 
 export interface IVirgilCryptoApi {
 
@@ -17,22 +48,51 @@ export interface IVirgilCryptoApi {
 	 * 		If provided must be one of KeyPairType values.
 	 * @returns {{publicKey: Buffer, privateKey: Buffer}}
 	 */
-	generateKeyPair(options: { type?: KeyPairType, password?: Buffer }): { privateKey: Buffer, publicKey: Buffer };
+	generateKeyPair(options: { type?: KeyPairType, password?: Buffer }): KeyPair;
 
 	/**
 	 * Converts PEM formatted private key to DER format.
 	 * @param {Buffer} privateKey - Private key in PEM format
-	 * @param {Buffer} [password] - Private key password, if encrypted.
+	 * @param {Buffer} [privateKeyPassword] - Private key password, if encrypted.
 	 * @returns {Buffer} - Private key in DER format.
 	 * */
-	privateKeyToDer(privateKey: Buffer, password?: Buffer): Buffer;
+	privateKeyToDer(privateKey: Buffer, privateKeyPassword?: Buffer): Buffer;
 
 	/**
 	 * Converts PEM formatted public key to DER format.
 	 * @param {Buffer} publicKey - Public key in PEM format
-	 * @returns {Buffer} Public key in DER fromat.
+	 * @returns {Buffer} Public key in DER format.
 	 * */
 	publicKeyToDer(publicKey: Buffer): Buffer;
+
+	/**
+	 * Decrypts encrypted private key.
+	 * @param {Buffer} privateKey - Private key to decrypt.
+	 * @param {Buffer} [privateKeyPassword] - Private key password.
+	 *
+	 * @returns {Buffer} - Decrypted private key
+	 * */
+	decryptPrivateKey(privateKey: Buffer, privateKeyPassword: Buffer): Buffer;
+
+	/**
+	 * Extracts public key out of private key.
+	 *
+	 * @param {Buffer} privateKey - Private key to extract from.
+	 * @param {Buffer} [privateKeyPassword] - Private key password if private key is encrypted.
+	 *
+	 * @returns {Buffer} - Extracted public key
+	 * */
+	extractPublicKey(privateKey: Buffer, privateKeyPassword?: Buffer): Buffer;
+
+	/**
+	 * Encrypts the private key with password
+	 *
+	 * @param {Buffer} privateKey - Private key to encrypt
+	 * @param {Buffer} privateKeyPassword - Password to encrypt the private key with
+	 *
+	 * @returns {Buffer} - Encrypted private key
+	 * */
+	encryptPrivateKey(privateKey: Buffer, privateKeyPassword: Buffer): Buffer;
 
 	/**
 	 * Produces a hash of given data
@@ -65,55 +125,25 @@ export interface IVirgilCryptoApi {
 	decrypt(encryptedData: Buffer, decryptionKey: DecryptionKey): Buffer;
 
 	/**
-	 * Decrypts encrypted private key.
-	 * @param {Buffer} privateKey - Private key to decrypt.
-	 * @param {Buffer} [password] - Private key password.
-	 *
-	 * @returns {Buffer} - Decrypted private key
-	 * */
-	decryptPrivateKey(privateKey: Buffer, password: Buffer): Buffer;
-
-	/**
-	 * Extracts public key out of private key.
-	 *
-	 * @param {Buffer} privateKey - Private key to extract from.
-	 * @param {Buffer} [password] - Private key password if private key is encrypted.
-	 *
-	 * @returns {Buffer} - Extracted public key
-	 * */
-	extractPublicKey(privateKey: Buffer): Buffer;
-
-	/**
-	 * Encrypts the private key with password
-	 *
-	 * @param {Buffer} privateKey - Private key to encrypt
-	 * @param {Buffer} password - Password to encrypt the private key with
-	 *
-	 * @returns {Buffer} - Encrypted private key
-	 * */
-	encryptPrivateKey(privateKey: Buffer, password: Buffer): Buffer;
-
-	/**
 	 * Calculates the digital signature of the given data using the given private key.
 	 *
 	 * @param data {Buffer} - Data to sign.
-	 * @param privateKey {Buffer} - Private key to use.
-	 * @param [privateKeyPassword] {Buffer} - Optional password the private key is encrypted with.
+	 * @param signingKey {SigningKey} - Private key to use.
 	 * @returns {Buffer} - Digital signature.
 	 */
-	sign(data: Buffer, privateKey: Buffer, privateKeyPassword?: Buffer): Buffer;
+	sign(data: Buffer, signingKey: SigningKey): Buffer;
 
 	/**
 	 * Verifies digital signature of the given data for the given public key.
 	 *
 	 * @param data {Buffer} - Data to verify.
 	 * @param signature {Buffer} - The signature.
-	 * @param publicKey {Buffer} - The public key.
+	 * @param verificationKey {Buffer} - The public key.
 	 *
 	 * @returns {boolean} - True if signature is valid for the given public key and data,
 	 * otherwise False.
 	 */
-	verify(data: Buffer, signature: Buffer, publicKey: Buffer): boolean;
+	verify(data: Buffer, signature: Buffer, verificationKey: VerificationKey): boolean;
 
 	/**
 	 * Signs and encrypts the data.

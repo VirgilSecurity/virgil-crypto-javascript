@@ -1,5 +1,4 @@
-import { KeyPairType, HashAlgorithm, assert } from './common';
-import { IVirgilCryptoApi } from './common/IVirgilCryptoApi';
+import { KeyPairType, HashAlgorithm, assert, IVirgilCryptoApi } from './common';
 import { toArray } from './utils/toArray';
 
 export type KeyPair = {
@@ -14,22 +13,22 @@ const _getValue = WeakMap.prototype.get;
 export class PrivateKey {
 	identifier: Buffer;
 
-	constructor(identifier: Buffer, value: Buffer) {
+	constructor(identifier: Buffer, key: Buffer) {
 		this.identifier = identifier;
-		setPrivateKeyBytes(this, value);
+		setPrivateKeyBytes(this, key);
 	}
 }
 export class PublicKey {
 	identifier: Buffer;
-	value: Buffer;
+	key: Buffer;
 
-	constructor(identifier: Buffer, value: Buffer) {
+	constructor(identifier: Buffer, key: Buffer) {
 		this.identifier = identifier;
-		this.value = value;
+		this.key = key;
 	}
 }
 
-function getPrivateKeyBytes(privateKey: PrivateKey) {
+function getPrivateKeyBytes(privateKey: PrivateKey): Buffer {
 	return _getValue.call(_privateKeys, privateKey);
 }
 
@@ -155,11 +154,11 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 	 * */
 	function exportPublicKey(publicKey: PublicKey) {
 		assert(
-			publicKey !== undefined && publicKey.value !== undefined,
+			publicKey != null && publicKey.key != null,
 			'Cannot import public key. `publicKey` is invalid'
 		);
 
-		return publicKey.value;
+		return publicKey.key;
 	}
 
 	/**
@@ -180,19 +179,13 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 
 		const publicKeys = toArray(publicKey);
 		assert(
-			publicKeys !== undefined && publicKeys.length > 0,
+			publicKeys != null && publicKeys.length > 0,
 			'Cannot encrypt. `publicKey` must not be empty'
 		);
 
 		data = Buffer.isBuffer(data) ? data : Buffer.from(data);
 
-		return cryptoApi.encrypt(
-			data,
-			publicKeys.map((pubkey: PublicKey) => ({
-				identifier: pubkey.identifier,
-				publicKey: pubkey.value
-			}))
-		);
+		return cryptoApi.encrypt(data, publicKeys!);
 	}
 
 	/**
@@ -215,7 +208,7 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 		assert(privateKeyValue !== undefined, 'Cannot decrypt. `privateKey` is invalid');
 		return cryptoApi.decrypt(encryptedData, {
 			identifier: privateKey.identifier,
-			privateKey: privateKeyValue
+			key: privateKeyValue
 		});
 	}
 
@@ -280,7 +273,7 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 
 		data = Buffer.isBuffer(data) ? data : Buffer.from(data, 'utf8');
 
-		return cryptoApi.sign(data, privateKeyValue);
+		return cryptoApi.sign(data, { key: privateKeyValue });
 	}
 
 	/**
@@ -307,7 +300,7 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 			);
 
 		assert(
-			publicKey != null && Buffer.isBuffer(publicKey.value),
+			publicKey != null && Buffer.isBuffer(publicKey.key),
 			'Cannot verify signature. `publicKey` is invalid'
 		);
 
@@ -315,7 +308,7 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 		signature = Buffer.isBuffer(signature) ? signature : Buffer.from(signature, 'base64');
 
 
-		return cryptoApi.verify(data, signature, publicKey.value);
+		return cryptoApi.verify(data, signature, publicKey);
 	}
 
 	/**
@@ -350,13 +343,10 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 		return cryptoApi.signThenEncrypt(
 			data,
 			{
-				privateKey: signingKeyValue,
-				identifier: signingKey.identifier
+				identifier: signingKey.identifier,
+				key: signingKeyValue
 			},
-			encryptionKeys.map((key: PublicKey) => ({
-				identifier: key.identifier,
-				publicKey: key.value
-			}))
+			encryptionKeys!
 		);
 	}
 
@@ -399,12 +389,9 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 			cipherData,
 			{
 				identifier: decryptionKey.identifier,
-				privateKey: decryptionKeyValue
+				key: decryptionKeyValue
 			},
-			verificationKeys.map((key: PublicKey) => ({
-				identifier: key.identifier,
-				publicKey: key.value
-			}))
+			verificationKeys!
 		);
 	}
 }

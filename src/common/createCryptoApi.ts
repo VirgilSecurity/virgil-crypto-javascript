@@ -1,16 +1,10 @@
-import {
-	DecryptionKey,
-	EncryptionKey,
-	SigningKey,
-	VerificationKey,
-	IVirgilCryptoApi,
-	KeyPairType,
-	HashAlgorithm,
-	IntegrityCheckFailedError
-} from './index';
-import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
 import { toArray } from '../utils/toArray';
+import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
 import { createNativeTypeWrapper } from './createNativeTypeWrapper';
+import { KeyPairType } from './KeyPairType';
+import { DecryptionKey, EncryptionKey, IVirgilCryptoApi, SigningKey, VerificationKey } from './IVirgilCryptoApi';
+import { HashAlgorithm } from './HashAlgorithm';
+import { IntegrityCheckFailedError } from './errors';
 
 export type KeyPairOptions = {
 	type?: KeyPairType,

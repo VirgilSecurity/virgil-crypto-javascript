@@ -1,5 +1,4 @@
-import lib from '../../virgil_crypto_node.node';
-import { IVirgilCryptoApi } from '../common/IVirgilCryptoApi';
-import { createCryptoApi } from '../common/createCryptoApi';
+import * as lib from '../../virgil_crypto_node.node';
+import { IVirgilCryptoApi, createCryptoApi } from '../common';
 
 export const cryptoApi: IVirgilCryptoApi = createCryptoApi(lib);

@@ -4,125 +4,25 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Virgil Crypto Browser examples</title>
-		<script type="text/javascript" src="../dist/virgil-crypto.browser.iife.js"></script>
+		<script type="text/javascript" src="../dist/virgil-crypto.browser.umd.min.js"></script>
 	</head>
 
 	<body>
-		<!--<script type="text/javascript">-->
-			<!--var origLog = console.log;-->
-			<!--console.log = function() {-->
-				<!--for (var i = 0; i < arguments.length; i++) {-->
-					<!--var arg = arguments[i];-->
-					<!--var div = document.createElement('div');-->
-					<!--div.innerHTML = arg;-->
-					<!--document.body.appendChild(div);-->
-				<!--}-->
+	<script>
+		var vcrypto = VirgilCrypto.createVirgilCrypto();
+		var k1 = vcrypto.generateKeys();
+		console.log(k1);
+		var k2 = vcrypto.generateKeys();
+		console.log(k2);
 
-				<!--origLog.apply(console, arguments);-->
-			<!--};-->
+		var ciphertext = vcrypto.encrypt('hello', k2.publicKey);
+		console.log(ciphertext.toString('base64'));
+		console.log(vcrypto.decrypt(ciphertext, k2.privateKey).toString());
 
-			<!--var virgilCrypto = window.VirgilCrypto;-->
-			<!--var keysTypesEnum = virgilCrypto.KeyPairType;-->
-			<!--var privateKeyPassword = new virgilCrypto.Buffer('veryStrongPa$$0rd');-->
-
-			<!--var keyPair = virgilCrypto.generateKeyPair({ password: privateKeyPassword });-->
-			<!--var initialData = new virgilCrypto.Buffer('initial data');-->
-
-
-			<!--var privateKeyDER = virgilCrypto.privateKeyToDER(keyPair.privateKey, privateKeyPassword);-->
-			<!--console.log('private key in DER: ', privateKeyDER.toString('base64'));-->
-
-			<!--var publicKeyDER = virgilCrypto.publicKeyToDER(keyPair.publicKey);-->
-			<!--console.log('public key in DER: ', publicKeyDER.toString('base64'));-->
-
-			<!--var keyPairDefaultParams = virgilCrypto.generateKeyPair();-->
-			<!--console.log('keyPairDefaultParams', keyPairDefaultParams);-->
-
-			<!--var keyPairOnlyPassword = virgilCrypto.generateKeyPair({-->
-				<!--password: privateKeyPassword-->
-			<!--});-->
-			<!--console.log('keyPairOnlyPassword', keyPairOnlyPassword);-->
-
-			<!--var keyPairPasswordAndType = virgilCrypto.generateKeyPair({-->
-				<!--type: keysTypesEnum.EC_SECP256K1,-->
-				<!--password: privateKeyPassword-->
-			<!--});-->
-			<!--console.log('keyPairPasswordAndType', keyPairPasswordAndType);-->
-
-			<!--var keyPairOnlyType = virgilCrypto.generateKeyPair({-->
-				<!--type: keysTypesEnum.EC_SECP256K1-->
-			<!--});-->
-			<!--console.log('keyPairOnlyType', keyPairOnlyType);-->
-
-			<!--virgilCrypto.generateKeyPairAsync({-->
-				<!--type: keysTypesEnum.EC_SECP256K1,-->
-				<!--password: privateKeyPassword-->
-			<!--}).then(function(keyPairAsyncPasswordAndType) {-->
-				<!--console.log('keyPairAsyncPasswordAndType', keyPairAsyncPasswordAndType);-->
-			<!--});-->
-
-			<!--virgilCrypto.generateKeyPairAsync({-->
-				<!--type: keysTypesEnum.EC_SECP256K1-->
-			<!--}).then(function(keyPairAsyncOnlyType) {-->
-				<!--console.log('keyPairAsyncOnlyType', keyPairAsyncOnlyType);-->
-			<!--});-->
-
-			<!--var encryptedData = virgilCrypto.encrypt(initialData, new VirgilCrypto.Buffer('password'));-->
-			<!--console.log('encryptedData base64', encryptedData.toString('base64'));-->
-
-			<!--var decryptedData = virgilCrypto.decrypt(encryptedData, new VirgilCrypto.Buffer('password'));-->
-			<!--console.log('decryptedData string', decryptedData.toString());-->
-
-			<!--virgilCrypto.encryptAsync(initialData, new VirgilCrypto.Buffer('password')).-->
-			<!--then(function(encryptedData) {-->
-				<!--console.log('async encryptedData base64', encryptedData.toString('base64'));-->
-
-				<!--virgilCrypto.decryptAsync(encryptedData, new VirgilCrypto.Buffer('password')).-->
-				<!--then(function(decryptedData) {-->
-					<!--console.log('async decryptedData', decryptedData.toString());-->
-				<!--});-->
-			<!--});-->
-
-			<!--var encryptedDataByKey = virgilCrypto.encrypt(initialData, keyPair.publicKey, keyPair.publicKey);-->
-			<!--console.log('encryptedDataByKey base64', encryptedDataByKey.toString('base64'));-->
-
-			<!--var decryptedDataByKey = virgilCrypto.decrypt(encryptedDataByKey, keyPair.publicKey, keyPair.privateKey, privateKeyPassword);-->
-			<!--console.log('decryptedDataByKey', decryptedDataByKey.toString());-->
-
-			<!--virgilCrypto.decryptAsync(encryptedDataByKey, keyPair.publicKey, keyPair.privateKey, privateKeyPassword).-->
-			<!--then(function(decryptedDataByKey) {-->
-				<!--console.log('async decryptedDataByKey', decryptedDataByKey.toString());-->
-			<!--});-->
-
-			<!--var sign = virgilCrypto.sign(encryptedDataByKey, keyPair.privateKey, privateKeyPassword);-->
-			<!--console.log('sign base64', sign.toString('base64'));-->
-
-			<!--var verified = virgilCrypto.verify(encryptedDataByKey, sign, keyPair.publicKey);-->
-			<!--console.log('verified', verified);-->
-
-			<!--virgilCrypto.signAsync(encryptedDataByKey, keyPair.privateKey, privateKeyPassword).-->
-			<!--then(function(sign) {-->
-				<!--console.log('async sign base64', sign.toString('base64'));-->
-
-				<!--virgilCrypto.verifyAsync(encryptedDataByKey, sign, keyPair.publicKey).-->
-				<!--then(function(verified) {-->
-					<!--console.log('async verified', verified);-->
-				<!--});-->
-			<!--});-->
-
-			<!--var encryptedDataMulti = virgilCrypto.encrypt(initialData, [{ recipientId: keyPair.publicKey, publicKey: keyPair.publicKey }]);-->
-			<!--console.log('encryptedDataMulti base64', encryptedDataMulti.toString('base64'));-->
-
-			<!--virgilCrypto.encryptAsync(-->
-				<!--initialData,-->
-				<!--[{ recipientId: keyPair.publicKey, publicKey: keyPair.publicKey }]-->
-			<!--).then(function(encryptedDataMulti) {-->
-				<!--console.log('async encryptedDataMulti base64', encryptedDataMulti.toString('base64'));-->
-
-				<!--var decryptedDataMulti = virgilCrypto.decrypt(encryptedDataMulti, keyPair.publicKey, keyPair.privateKey, privateKeyPassword);-->
-				<!--console.log('decryptedDataMulti string', decryptedDataMulti.toString());-->
-			<!--});-->
-		<!--</script>-->
+		var signature = vcrypto.calculateSignature('hello', k1.privateKey);
+		console.log(signature.toString('base64'));
+		console.log(vcrypto.verifySignature('hello', signature, k1.publicKey));
+	</script>
 	</body>
 
 </html>

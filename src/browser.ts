@@ -3,5 +3,9 @@ import { makeVirgilCryptoFactory, VirgilCryptoOptions } from './createVirgilCryp
 import { IVirgilCrypto } from './IVirgilCrypto';
 
 export { KeyPairType, HashAlgorithm } from './common';
+export { VirgilAccessTokenSigner } from './VirgilAccessTokenSigner';
+export { VirgilPrivateKeyExporter } from './VirgilPrivateKeyExporter';
+export { VirgilCardCrypto } from './VirgilCardCrypto';
+
 
 export const createVirgilCrypto: (options?: VirgilCryptoOptions) => IVirgilCrypto = makeVirgilCryptoFactory(cryptoApi);

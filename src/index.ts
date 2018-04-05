@@ -1,6 +1,7 @@
 import { cryptoApi } from './node/api';
-import { KeyPairType, HashAlgorithm } from './common';
-import { createVirgilCrypto, PublicKey, PrivateKey } from './createVirgilCrypto';
+import { makeVirgilCryptoFactory, VirgilCryptoOptions } from './createVirgilCrypto';
+import { IVirgilCrypto } from './IVirgilCrypto';
 
-export { KeyPairType, HashAlgorithm };
-export const crypto = createVirgilCrypto(cryptoApi);
+export { KeyPairType, HashAlgorithm } from './common';
+
+export const createVirgilCrypto: (options?: VirgilCryptoOptions) => IVirgilCrypto = makeVirgilCryptoFactory(cryptoApi);

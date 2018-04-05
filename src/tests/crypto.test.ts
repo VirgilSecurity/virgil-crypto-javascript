@@ -1,6 +1,7 @@
-import { crypto } from '../index';
-import { EncryptionKey } from '../common';
+import { createVirgilCrypto, HashAlgorithm } from '../index';
 import { PublicKey } from '../createVirgilCrypto';
+
+const crypto = createVirgilCrypto();
 
 // private key with password = "1234"
 const PRIVATE_KEY_1234 = 'LS0tLS1CRUdJTiBFTkNSWVBURUQgUFJJVkFURSBLRVktLS' +
@@ -29,7 +30,7 @@ const PUBLIC_KEY_4321 = 'LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUNvd0JR' +
 	'WURLMlZ3QXlFQWNCTG1pZTFKam0rRC9BM0lQdVJVSUFsK0MvUlF0RWQ1cnhmb1BEM' +
 	'FlGbDQ9Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=';
 
-describe('VirgilCrypto#crypto', function () {
+describe('VirgilCrypto', function () {
 	it('sign then encrypt -> decrypt then verify', function () {
 		const senderPrivateKey = crypto.importPrivateKey(PRIVATE_KEY_1234, '1234');
 		const senderPublicKey = crypto.importPublicKey(PUBLIC_KEY_1234);
@@ -185,5 +186,23 @@ describe('VirgilCrypto#crypto', function () {
 		assert.throws(function () {
 			crypto.encrypt('secret message', recipients);
 		},/`publicKey` must not be empty/);
+	});
+
+	it('uses SHA512 identifiers by default', function () {
+		const keypair = crypto.generateKeys();
+		const publicKeyDer = crypto.exportPublicKey(keypair.publicKey);
+		const publicKeyHash = crypto.calculateHash(publicKeyDer, HashAlgorithm.SHA512);
+
+		assert.isTrue(keypair.publicKey.identifier.equals(publicKeyHash.slice(0, 8)));
+	});
+
+	it('uses SHA256 identifiers', function () {
+		const crypto256 = createVirgilCrypto({ useSha256Fingerprints: true });
+
+		const keypair = crypto256.generateKeys();
+		const publicKeyDer = crypto256.exportPublicKey(keypair.publicKey);
+		const publicKeyHash = crypto256.calculateHash(publicKeyDer, HashAlgorithm.SHA256);
+
+		assert.isTrue(keypair.publicKey.identifier.equals(publicKeyHash));
 	});
 });

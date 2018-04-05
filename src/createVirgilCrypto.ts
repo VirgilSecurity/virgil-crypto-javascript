@@ -1,5 +1,6 @@
 import { KeyPairType, HashAlgorithm, assert, IVirgilCryptoApi } from './common';
 import { toArray } from './utils/toArray';
+import { IVirgilCrypto } from './IVirgilCrypto';
 
 export type KeyPair = {
 	privateKey: PrivateKey,
@@ -36,7 +37,14 @@ function setPrivateKeyBytes(privateKey: PrivateKey, bytes: Buffer) {
 	_setValue.call(_privateKeys, privateKey, bytes);
 }
 
-export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
+export type VirgilCryptoOptions = {
+	useSha256Fingerprints?: boolean;
+	defaultKeyPairType?: KeyPairType;
+}
+
+export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
+(options: VirgilCryptoOptions = {}): IVirgilCrypto => {
+	const { useSha256Fingerprints = false, defaultKeyPairType = KeyPairType.Default } = options;
 
 	return {
 		generateKeys,
@@ -62,10 +70,12 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 	 * @returns {KeyPair} - The newly generated key pair.
 	 * */
 	function generateKeys(type?: KeyPairType) {
+		type = type != null ? type : defaultKeyPairType;
+
 		const keyPair = cryptoApi.generateKeyPair({ type });
 		const publicKeyDer = cryptoApi.publicKeyToDer(keyPair.publicKey);
 		const privateKeyDer = cryptoApi.privateKeyToDer(keyPair.privateKey);
-		const identifier = cryptoApi.hash(publicKeyDer);
+		const identifier = calculateKeypairIdentifier(publicKeyDer);
 
 		return {
 			privateKey: new PrivateKey(identifier, privateKeyDer),
@@ -94,13 +104,13 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 
 		if (password) {
 			rawPrivateKey = cryptoApi.decryptPrivateKey(
-				rawPrivateKey, Buffer.from(password, 'utf8'));
+				rawPrivateKey, Buffer.from(password, 'utf8')
+			);
 		}
 
 		const privateKeyDer = cryptoApi.privateKeyToDer(rawPrivateKey);
-		const publicKey = cryptoApi.extractPublicKey(privateKeyDer);
-		const publicKeyDer = cryptoApi.publicKeyToDer(publicKey);
-		const identifier = cryptoApi.hash(publicKeyDer);
+		const publicKeyDer = cryptoApi.extractPublicKey(privateKeyDer);
+		const identifier = calculateKeypairIdentifier(publicKeyDer);
 
 		return new PrivateKey(identifier, privateKeyDer);
 	}
@@ -141,7 +151,7 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 
 		rawPublicKey = Buffer.isBuffer(rawPublicKey) ? rawPublicKey : Buffer.from(rawPublicKey, 'base64');
 		const publicKeyDer = cryptoApi.publicKeyToDer(rawPublicKey);
-		const identifier = cryptoApi.hash(publicKeyDer);
+		const identifier = calculateKeypairIdentifier(publicKeyDer);
 		return new PublicKey(identifier, publicKeyDer);
 	}
 
@@ -393,5 +403,13 @@ export function createVirgilCrypto (cryptoApi: IVirgilCryptoApi) {
 			},
 			verificationKeys!
 		);
+	}
+
+	function calculateKeypairIdentifier(publicKeyData: Buffer) {
+		if (useSha256Fingerprints) {
+			return cryptoApi.hash(publicKeyData, HashAlgorithm.SHA256);
+		} else {
+			return cryptoApi.hash(publicKeyData, HashAlgorithm.SHA512).slice(0, 8);
+		}
 	}
 }

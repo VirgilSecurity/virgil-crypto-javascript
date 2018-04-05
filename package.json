@@ -33,8 +33,8 @@
   },
   "scripts": {
     "build": "node scripts/build.js",
-    "preversion": "npm run test:prod",
-    "version": "npm run build && node scripts/updateReadme.js && git add dist README.md",
+    "preversion": "npm run test",
+    "version": "npm run build && node scripts/updateReadme.js && git add README.md",
     "test:node": "mocha --require ts-node/register --require chai/register-assert \"src/tests/**/*.test.ts\"",
     "test:browser": "karma start",
     "test": "npm run test:node && npm run test:browser"

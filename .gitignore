@@ -2,3 +2,5 @@ node_modules
 .rpt2_cache/
 virgil_crypto_node.node
 dist/
+npm-debug.log
+yarn-error.log

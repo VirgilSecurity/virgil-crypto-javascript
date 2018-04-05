@@ -10,6 +10,7 @@ const rimraf = promisify(require('rimraf'));
 const mkdirp = promisify(require('mkdirp'));
 const path = require('path');
 const { rollup } = require('rollup');
+const myUglify = require('./rollup-plugin-my-uglify');
 
 const BROWSER_ONLY_PLUGINS = [
 	inject({
@@ -21,47 +22,21 @@ const BROWSER_ONLY_PLUGINS = [
 	}),
 
 	globals({
-		exclude: [ '**/virgil_crypto_asmjs.js', '**/virgil_crypto_webasm.js' ]
+		exclude: [ '**/virgil_crypto_asmjs.js' ]
 	})
 ];
 
-const NODE = false;
-const BROWSER = true;
-
-const bundles = [
-	{
-		path: 'packages/virgil-crypto-utils',
-		filename: 'virgil-crypto-utils',
-		global: 'VirgilCryptoUtils',
-		versions: [ BROWSER, NODE ]
-	},
-	{
-		path: 'packages/virgil-crypto-browser',
-		filename: 'virgil-crypto-browser',
-		global: 'virgilCryptoFactory',
-		versions: [ BROWSER ],
-		browserOnly: true
-	},
-	{
-		path: 'packages/virgil-crypto-node',
-		filename: 'virgil-crypto-node',
-		global: 'VirgilCrypto',
-		external: [ path.resolve('packages/virgil-crypto-node/virgil_crypto_node.node') ],
-		versions: [ NODE ]
-	}
-];
+const NODE = 'NODE';
+const BROWSER = 'BROWSER';
+const BROWSER_PROD = 'BROWSER_PROD';
 
 const virgilCrypto = {
-	path: 'packages/virgil-crypto',
+	path: '.',
 	filename: 'virgil-crypto',
-	global: 'virgilCrypto',
-	external: [ 'virgil-crypto-node' ],
-	versions: [ NODE, BROWSER ]
+	global: 'VirgilCrypto',
+	external: [ path.resolve('./virgil_crypto_node.node') ],
+	bundleTypes: [ NODE, BROWSER, BROWSER_PROD ]
 };
-
-function runSequence(factories) {
-	return factories.reduce((chain, f) => chain.then(f), Promise.resolve());
-}
 
 function createBundle(bundle) {
 	const pkg = require(path.resolve(bundle.path, 'package.json'));
@@ -70,7 +45,10 @@ function createBundle(bundle) {
 		.then(() => rimraf(path.resolve(bundle.path, 'dist')))
 		.then(() => mkdirp(path.resolve(bundle.path, 'dist')))
 		.then(() => {
-			return runSequence(bundle.versions.map(isBrowser => () => {
+			return Promise.all(bundle.bundleTypes.map(bundleType => {
+				const isBrowser = bundleType !== NODE;
+				const isProd = bundleType === BROWSER_PROD;
+
 				const browserEntry = typeof pkg.browser === 'object' && pkg.browser['./src/index.ts']
 					? pkg.browser['./src/index.ts']
 					: 'src/index.ts';
@@ -84,9 +62,8 @@ function createBundle(bundle) {
 							useTsconfigDeclarationDir: true,
 							tsconfigOverride: {
 								compilerOptions: {
-									declarationDir: bundle.path + '/dist/types'
-								},
-								include: [ bundle.path + '/src' ]
+									module: 'es2015'
+								}
 							}
 						}),
 
@@ -100,14 +77,17 @@ function createBundle(bundle) {
 						}),
 
 						commonjs({
-							ignore: [ ...builtinModules, 'virgil-crypto-browser' ]
-						})
+							ignore: [ ...builtinModules ]
+						}),
+
+						...(isProd
+							? [ myUglify({ exclude: [ '**/virgil_crypto_asmjs.js' ] }) ]
+							: [])
 					]
 				}).then(output => {
-					const formats = [ ...(isBrowser ? ['umd'] : []), 'cjs', 'es' ];
+					const formats = getOutputFormatsFromBundleType(bundleType);
 					return Promise.all(formats.map(format => {
-						const suffix = isBrowser && !bundle.browserOnly ? '.browser' : '';
-						const file = `dist/${bundle.filename}${suffix}.${format}.js`;
+						const file = getOutpupFilenameFormBundleType(bundle.filename, format, bundleType);
 						return output.write({
 							format: format,
 							name: bundle.global,
@@ -122,17 +102,34 @@ function createBundle(bundle) {
 		});
 }
 
+function getOutpupFilenameFormBundleType(filename, format, bundleType) {
+	switch (bundleType) {
+		case NODE:
+			return `dist/${filename}.${format}.js`;
+		case BROWSER:
+			return `dist/${filename}.browser.${format}.js`;
+		case BROWSER_PROD:
+			return `dist/${filename}.browser.${format}.min.js`;
+	}
+}
+
+function getOutputFormatsFromBundleType(bundleType) {
+	switch (bundleType) {
+		case NODE:
+			return [ 'cjs', 'es' ];
+		case BROWSER:
+			return [ 'umd', 'cjs', 'es' ];
+		case BROWSER_PROD:
+			return [ 'umd' ];
+	}
+}
+
 function bundleVirgilCrypto() {
 	return createBundle(virgilCrypto);
 }
 
 function build() {
-	return Promise.all(bundles.map(createBundle))
-		.then(() => {
-			console.log('Creating main bundle...');
-			return bundleVirgilCrypto();
-		})
-		.then(() => console.log('All done!'))
+	return bundleVirgilCrypto()
 		.catch(e => console.error(e));
 }
 

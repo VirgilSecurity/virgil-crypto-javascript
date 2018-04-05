@@ -114,6 +114,22 @@ export interface IVirgilCryptoApi {
 	hash(data: Buffer, algorithm?: string): Buffer;
 
 	/**
+	 * Encrypts the data using the password.
+	 * @param {Buffer} data
+	 * @param {Buffer} password
+	 * @returns {Buffer} - Encrypted data
+	 */
+	encryptWithPassword(data: Buffer, password: Buffer): Buffer;
+
+	/**
+	 * Decrypts the data encrypted with the password.
+	 * @param {Buffer} encryptedData
+	 * @param {Buffer} password
+	 * @returns {Buffer} - Decrypted data
+	 */
+	decryptWithPassword(encryptedData: Buffer, password: Buffer): Buffer;
+
+	/**
 	 * Encrypt data.
 	 *
 	 * @param data {Buffer} - Data to encrypt.

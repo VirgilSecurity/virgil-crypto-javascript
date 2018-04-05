@@ -15,7 +15,9 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 
 	const wrapper = createNativeTypeWrapper(lib);
 
-	wrapper.createSafeInstanceMethods(lib.VirgilCipher, [ 'addKeyRecipient', 'encrypt', 'decryptWithKey' ]);
+	wrapper.createSafeInstanceMethods(lib.VirgilCipher, [
+		'addKeyRecipient', 'encrypt', 'decryptWithKey', 'addPasswordRecipient', 'decryptWithPassword'
+	]);
 	wrapper.createSafeInstanceMethods(lib.VirgilSigner, [ 'sign', 'verify' ]);
 	wrapper.createSafeInstanceMethods(lib.VirgilHash, [ 'hash' ]);
 	wrapper.createSafeInstanceMethods(lib.VirgilCustomParams, [ 'setData', 'getData' ]);
@@ -97,6 +99,17 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 
 			const virgilHash = lib.createVirgilHash(libAlgorithm);
 			return virgilHash.hashSafe(data);
+		},
+
+		encryptWithPassword(data: Buffer, password: Buffer) {
+			const cipher = lib.createVirgilCipher();
+			cipher.addPasswordRecipientSafe(password);
+			return cipher.encryptSafe(data, true);
+		},
+
+		decryptWithPassword(encryptedData: Buffer, password: Buffer) {
+			const cipher = lib.createVirgilCipher();
+			return cipher.decryptWithPasswordSafe(encryptedData, password);
 		},
 
 		encrypt(data: Buffer, encryptionKey: EncryptionKey|EncryptionKey[] ) {

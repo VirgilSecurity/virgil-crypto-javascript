@@ -48,7 +48,7 @@ export interface IVirgilCryptoApi {
 	 * 		If provided must be one of KeyPairType values.
 	 * @returns {{publicKey: Buffer, privateKey: Buffer}}
 	 */
-	generateKeyPair(options: { type?: KeyPairType, password?: Buffer }): KeyPair;
+	generateKeyPair(options?: { type?: KeyPairType, password?: Buffer }): KeyPair;
 
 	/**
 	 * Converts PEM formatted private key to DER format.
@@ -93,6 +93,15 @@ export interface IVirgilCryptoApi {
 	 * @returns {Buffer} - Encrypted private key
 	 * */
 	encryptPrivateKey(privateKey: Buffer, privateKeyPassword: Buffer): Buffer;
+
+	/**
+	 * Changes the password of the private key.
+	 * @param {Buffer} privateKey
+	 * @param {Buffer} oldPassword
+	 * @param {Buffer} newPassword
+	 * @returns {Buffer} - Private key encrypted with new password.
+	 */
+	changePrivateKeyPassword(privateKey: Buffer, oldPassword: Buffer, newPassword: Buffer): Buffer;
 
 	/**
 	 * Produces a hash of given data

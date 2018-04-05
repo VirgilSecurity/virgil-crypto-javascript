@@ -27,7 +27,8 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 		'encryptPrivateKey',
 		'extractPublicKey',
 		'privateKeyToDER',
-		'publicKeyToDER'
+		'publicKeyToDER',
+		'resetPrivateKeyPassword'
 	]);
 
 	lib.createVirgilCipher = () => {
@@ -83,6 +84,10 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 
 		decryptPrivateKey(privateKey: Buffer, privateKeyPassword: Buffer) {
 			return lib.VirgilKeyPair.decryptPrivateKeySafe(privateKey, privateKeyPassword);
+		},
+
+		changePrivateKeyPassword(privateKey: Buffer, oldPassword: Buffer, newPassword: Buffer) {
+			return lib.VirgilKeyPair.resetPrivateKeyPasswordSafe(privateKey, oldPassword, newPassword);
 		},
 
 		hash(data: Buffer, algorithm: HashAlgorithm = HashAlgorithm.SHA256) {

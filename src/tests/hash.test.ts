@@ -1,6 +1,5 @@
 import { crypto, HashAlgorithm } from '../index';
 
-
 describe('calculateHash', function () {
 	it('should produce the same hash for the same data', function () {
 		const hash1 = crypto.calculateHash(new Buffer('Hash me'));

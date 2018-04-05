@@ -32,8 +32,8 @@ If you only intend to use virgil-crypto in a browser environment, you can ignore
 ### CDN
 ```html
 <script
-src="https://cdn.virgilsecurity.com/packages/javascript/crypto/2.2.0/virgil-crypto.min.js"
-integrity="sha256-7G1JZagHY56Io5CfWcVvJIW+cXnoowEhO4XtwKYEUgM="
+src="https://cdn.virgilsecurity.com/packages/javascript/crypto/3.0.0-alpha.1/virgil-crypto.browser.umd.min.js"
+integrity="sha256-TTtyoRao0dfT0t1+/EiKUWWlBlArBNUS1aSunJSg2R8="
 crossorigin="anonymous"></script>
 ```
 

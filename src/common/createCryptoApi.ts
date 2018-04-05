@@ -39,7 +39,11 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 		return cipher;
 	};
 	lib.createVirgilSigner = () => {
-		const signer = new lib.VirgilSigner();
+		const sha512 = process.browser
+			? lib.VirgilHashAlgorithm.SHA512
+			: lib.VirgilHash.Algorithm_SHA512;
+
+		const signer = new lib.VirgilSigner(sha512);
 		if (process.browser) signer.deleteLater();
 		return signer;
 	};

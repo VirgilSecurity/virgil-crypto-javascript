@@ -8,7 +8,7 @@
     "./src/index.ts": "./src/browser.ts"
   },
   "module": "dist/virgil-crypto.es.js",
-  "typings": "dist/types/virgil-crypto.d.ts",
+  "typings": "dist/types/index.d.ts",
   "files": [
     "dist",
     "scripts/download-native-library.js"

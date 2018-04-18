@@ -6,6 +6,7 @@ const PLAINTEXT = new Buffer('Plaintext secret message', 'utf8');
 
 describe('encrypt/decrypt', function () {
 	this.timeout(60 * 1000);
+	this.retries(3);
 
 	function encryptDecryptUsingKeyPair(data: Buffer, keysType: KeyPairType, password?: Buffer) {
 		const keyPair = cryptoApi.generateKeyPair({ password: password, type: keysType });

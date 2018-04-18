@@ -9,7 +9,7 @@
 
 	<body>
 	<script>
-		var vcrypto = VirgilCrypto.createVirgilCrypto();
+		var vcrypto = new VirgilCrypto.VirgilCrypto();
 		var k1 = vcrypto.generateKeys();
 		console.log(k1);
 		var k2 = vcrypto.generateKeys();

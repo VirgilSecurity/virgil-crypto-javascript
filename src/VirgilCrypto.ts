@@ -1,17 +1,18 @@
-import { KeyPairType, HashAlgorithm, assert, IVirgilCryptoApi } from './common';
+import { cryptoApi } from './node/api';
+import { KeyPairType, HashAlgorithm, assert } from './common';
 import { toArray } from './utils/toArray';
-import { IVirgilCrypto } from './IVirgilCrypto';
+import { IPrivateKey, IPublicKey, IVirgilCrypto } from './IVirgilCrypto';
 
 export type KeyPair = {
-	privateKey: PrivateKey,
-	publicKey: PublicKey
+	privateKey: VirgilPrivateKey,
+	publicKey: VirgilPublicKey
 }
 
 const _privateKeys = new WeakMap();
 const _setValue = WeakMap.prototype.set;
 const _getValue = WeakMap.prototype.get;
 
-export class PrivateKey {
+export class VirgilPrivateKey implements IPrivateKey {
 	identifier: Buffer;
 
 	constructor(identifier: Buffer, key: Buffer) {
@@ -19,7 +20,7 @@ export class PrivateKey {
 		setPrivateKeyBytes(this, key);
 	}
 }
-export class PublicKey {
+export class VirgilPublicKey implements IPublicKey {
 	identifier: Buffer;
 	key: Buffer;
 
@@ -29,11 +30,11 @@ export class PublicKey {
 	}
 }
 
-function getPrivateKeyBytes(privateKey: PrivateKey): Buffer {
+function getPrivateKeyBytes(privateKey: VirgilPrivateKey): Buffer {
 	return _getValue.call(_privateKeys, privateKey);
 }
 
-function setPrivateKeyBytes(privateKey: PrivateKey, bytes: Buffer) {
+function setPrivateKeyBytes(privateKey: VirgilPrivateKey, bytes: Buffer) {
 	_setValue.call(_privateKeys, privateKey, bytes);
 }
 
@@ -42,25 +43,15 @@ export type VirgilCryptoOptions = {
 	defaultKeyPairType?: KeyPairType;
 }
 
-export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
-(options: VirgilCryptoOptions = {}): IVirgilCrypto => {
-	const { useSha256Fingerprints = false, defaultKeyPairType = KeyPairType.Default } = options;
+export class VirgilCrypto implements IVirgilCrypto {
+	private readonly useSha256Fingerprints: boolean;
+	private readonly defaultKeyPairType: KeyPairType;
 
-	return {
-		generateKeys,
-		importPrivateKey,
-		importPublicKey,
-		exportPrivateKey,
-		exportPublicKey,
-		extractPublicKey,
-		encrypt,
-		decrypt,
-		calculateSignature,
-		verifySignature,
-		calculateHash,
-		signThenEncrypt,
-		decryptThenVerify
-	};
+	constructor (options: VirgilCryptoOptions = {}) {
+		const { useSha256Fingerprints = false, defaultKeyPairType = KeyPairType.Default } = options;
+		this.useSha256Fingerprints = useSha256Fingerprints;
+		this.defaultKeyPairType = defaultKeyPairType;
+	}
 
 	/**
 	 * Generates a new key pair.
@@ -69,17 +60,17 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 	 * 			See {code: KeyPairType} for available options.
 	 * @returns {KeyPair} - The newly generated key pair.
 	 * */
-	function generateKeys(type?: KeyPairType) {
-		type = type != null ? type : defaultKeyPairType;
+	generateKeys(type?: KeyPairType) {
+		type = type != null ? type : this.defaultKeyPairType;
 
 		const keyPair = cryptoApi.generateKeyPair({ type });
 		const publicKeyDer = cryptoApi.publicKeyToDer(keyPair.publicKey);
 		const privateKeyDer = cryptoApi.privateKeyToDer(keyPair.privateKey);
-		const identifier = calculateKeypairIdentifier(publicKeyDer);
+		const identifier = this.calculateKeypairIdentifier(publicKeyDer);
 
 		return {
-			privateKey: new PrivateKey(identifier, privateKeyDer),
-			publicKey: new PublicKey(identifier, publicKeyDer)
+			privateKey: new VirgilPrivateKey(identifier, privateKeyDer),
+			publicKey: new VirgilPublicKey(identifier, publicKeyDer)
 		};
 	}
 
@@ -92,9 +83,9 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 	 * @param {string} [password] - Optional password the key is
 	 * 			encrypted with.
 	 *
-	 * @returns {PrivateKey} - The private key object.
+	 * @returns {VirgilPrivateKey} - The private key object.
 	 * */
-	function importPrivateKey(rawPrivateKey: Buffer|string, password?: string) {
+	importPrivateKey(rawPrivateKey: Buffer|string, password?: string) {
 		assert(
 			Buffer.isBuffer(rawPrivateKey) || typeof rawPrivateKey === 'string',
 			'Cannot import private key. `rawPrivateKey` must be a Buffer or string in base64'
@@ -110,21 +101,21 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 
 		const privateKeyDer = cryptoApi.privateKeyToDer(rawPrivateKey);
 		const publicKeyDer = cryptoApi.extractPublicKey(privateKeyDer);
-		const identifier = calculateKeypairIdentifier(publicKeyDer);
+		const identifier = this.calculateKeypairIdentifier(publicKeyDer);
 
-		return new PrivateKey(identifier, privateKeyDer);
+		return new VirgilPrivateKey(identifier, privateKeyDer);
 	}
 
 	/**
 	 * Exports the private key handle into a Buffer containing the key bytes.
 	 *
-	 * @param {PrivateKey} privateKey - The private key object.
+	 * @param {VirgilPrivateKey} privateKey - The private key object.
 	 * @param {string} [password] - Optional password to encrypt the key with.
 	 *
 	 * @returns {Buffer} - The private key bytes.
 	 * */
-	function exportPrivateKey(privateKey: PrivateKey, password?: string) {
-		const privateKeyValue = getPrivateKeyBytes(privateKey);
+	exportPrivateKey(privateKey: IPrivateKey, password?: string) {
+		const privateKeyValue = getPrivateKeyBytes(privateKey as VirgilPrivateKey);
 		assert(privateKeyValue !== undefined, 'Cannot export private key. `privateKey` is invalid');
 
 		if (password == null) {
@@ -141,9 +132,9 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 	 * @param {Buffer|string} rawPublicKey - The public key material
 	 * 			as a {Buffer} or base64-encoded string.
 	 *
-	 * @returns {PublicKey} - The imported key handle.
+	 * @returns {VirgilPublicKey} - The imported key handle.
 	 * */
-	function importPublicKey(rawPublicKey: Buffer|string) {
+	importPublicKey(rawPublicKey: Buffer|string) {
 		assert(
 			Buffer.isBuffer(rawPublicKey) || typeof rawPublicKey === 'string',
 			'Cannot import public key. `rawPublicKey` must be a Buffer'
@@ -151,24 +142,25 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 
 		rawPublicKey = Buffer.isBuffer(rawPublicKey) ? rawPublicKey : Buffer.from(rawPublicKey, 'base64');
 		const publicKeyDer = cryptoApi.publicKeyToDer(rawPublicKey);
-		const identifier = calculateKeypairIdentifier(publicKeyDer);
-		return new PublicKey(identifier, publicKeyDer);
+		const identifier = this.calculateKeypairIdentifier(publicKeyDer);
+		return new VirgilPublicKey(identifier, publicKeyDer);
 	}
 
 	/**
 	 * Exports the public key object into a Buffer containing the key bytes.
 	 *
-	 * @param {PublicKey} publicKey - The public key object.
+	 * @param {VirgilPublicKey} publicKey - The public key object.
 	 *
 	 * @returns {Buffer} - The public key bytes.
 	 * */
-	function exportPublicKey(publicKey: PublicKey) {
+	exportPublicKey(publicKey: IPublicKey) {
+		const virgilPublicKey = publicKey as VirgilPublicKey;
 		assert(
-			publicKey != null && publicKey.key != null,
+			publicKey != null && virgilPublicKey.key != null,
 			'Cannot import public key. `publicKey` is invalid'
 		);
 
-		return publicKey.key;
+		return virgilPublicKey.key;
 	}
 
 	/**
@@ -176,18 +168,18 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 	 *
 	 * @param {Buffer|string} data - The data to be encrypted as a {Buffer}
 	 * 			or a {string} in UTF8.
-	 * @param {PublicKey|PublicKey[]} publicKey - Public key or an array of public keys
+	 * @param {VirgilPublicKey|VirgilPublicKey[]} publicKey - Public key or an array of public keys
 	 * of the intended recipients.
 	 *
 	 * @returns {Buffer} - Encrypted data.
 	 * */
-	function encrypt(data: string|Buffer, publicKey: PublicKey|PublicKey[]) {
+	encrypt(data: string|Buffer, publicKey: IPublicKey|IPublicKey[]) {
 		assert(
 			typeof data === 'string' || Buffer.isBuffer(data),
 			'Cannot encrypt. `data` must be a string or Buffer'
 		);
 
-		const publicKeys = toArray(publicKey);
+		const publicKeys = toArray(publicKey) as VirgilPublicKey[];
 		assert(
 			publicKeys != null && publicKeys.length > 0,
 			'Cannot encrypt. `publicKey` must not be empty'
@@ -203,21 +195,23 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 	 *
 	 * @param {Buffer|string} encryptedData - The data to be decrypted as
 	 * 			a {Buffer} or a {string} in base64.
-	 * @param {PrivateKey} privateKey - The private key to decrypt with.
+	 * @param {VirgilPrivateKey} privateKey - The private key to decrypt with.
 	 *
 	 * @returns {Buffer} - Decrypted data
 	 * */
-	function decrypt(encryptedData: string|Buffer, privateKey: PrivateKey) {
+	decrypt(encryptedData: string|Buffer, privateKey: IPrivateKey) {
+		const virgilPrivateKey = privateKey as VirgilPrivateKey;
+
 		assert(
 			typeof encryptedData === 'string' || Buffer.isBuffer(encryptedData),
 			'Cannot decrypt. `data` must be a Buffer or a string in base64'
 		);
 
 		encryptedData = Buffer.isBuffer(encryptedData) ? encryptedData : Buffer.from(encryptedData, 'base64');
-		const privateKeyValue = getPrivateKeyBytes(privateKey);
+		const privateKeyValue = getPrivateKeyBytes(virgilPrivateKey);
 		assert(privateKeyValue !== undefined, 'Cannot decrypt. `privateKey` is invalid');
 		return cryptoApi.decrypt(encryptedData, {
-			identifier: privateKey.identifier,
+			identifier: virgilPrivateKey.identifier,
 			key: privateKeyValue
 		});
 	}
@@ -233,7 +227,7 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 	 *
 	 * @returns {Buffer} - The hash.
 	 * */
-	function calculateHash(data: Buffer|string, algorithm: HashAlgorithm = HashAlgorithm.SHA256) {
+	calculateHash(data: Buffer|string, algorithm: HashAlgorithm = HashAlgorithm.SHA256) {
 		assert(Buffer.isBuffer(data) || typeof data === 'string',
 			'Cannot calculate hash. `data` must be a Buffer or a string in base64');
 
@@ -244,12 +238,13 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 	/**
 	 * Extracts a public key from the private key handle.
 	 *
-	 * @param {PrivateKey} privateKey - The private key object to extract from.
+	 * @param {VirgilPrivateKey} privateKey - The private key object to extract from.
 	 *
-	 * @returns {PublicKey} - The handle to the extracted public key.
+	 * @returns {VirgilPublicKey} - The handle to the extracted public key.
 	 * */
-	function extractPublicKey(privateKey: PrivateKey) {
-		const privateKeyValue = getPrivateKeyBytes(privateKey);
+	extractPublicKey(privateKey: IPrivateKey) {
+		const virgilPrivateKey = privateKey as VirgilPrivateKey;
+		const privateKeyValue = getPrivateKeyBytes(virgilPrivateKey);
 
 		assert(
 			privateKeyValue !== undefined,
@@ -257,24 +252,25 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 		);
 
 		const publicKey = cryptoApi.extractPublicKey(privateKeyValue);
-		return new PublicKey(privateKey.identifier, publicKey);
+		return new VirgilPublicKey(virgilPrivateKey.identifier, publicKey);
 	}
 
 	/**
 	 * Calculates the signature of the data using the private key.
 	 *
 	 * @param {Buffer|string} data - The data to be signed as a Buffer or a string in UTF-8.
-	 * @param {PrivateKey} privateKey - The private key object.
+	 * @param {VirgilPrivateKey} privateKey - The private key object.
 	 *
 	 * @returns {Buffer} - The signature.
 	 * */
-	function calculateSignature(data: Buffer|string, privateKey: PrivateKey) {
+	calculateSignature(data: Buffer|string, privateKey: IPrivateKey) {
+		const virgilPrivateKey = privateKey as VirgilPrivateKey;
 		assert(
 			Buffer.isBuffer(data) || typeof data === 'string',
 			'Cannot calculate signature. `data` must be a Buffer or a string'
 		);
 
-		const privateKeyValue = getPrivateKeyBytes(privateKey);
+		const privateKeyValue = getPrivateKeyBytes(virgilPrivateKey);
 
 		assert(
 			privateKeyValue !== undefined,
@@ -293,12 +289,13 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 	 * 			or a {string} in UTF-8.
 	 * @param {Buffer|string} signature - The signature as a {Buffer} or a
 	 * 			{string} in base64.
-	 * @param {PublicKey} publicKey - The public key object.
+	 * @param {VirgilPublicKey} publicKey - The public key object.
 	 *
 	 * @returns {boolean} - True or False depending on the
 	 * 			validity of the signature for the data and public key.
 	 * */
-	function verifySignature(data: Buffer|string, signature: Buffer|string, publicKey: PublicKey) {
+	verifySignature(data: Buffer|string, signature: Buffer|string, publicKey: IPublicKey) {
+		const virgilPublicKey = publicKey as VirgilPublicKey;
 		assert(
 			Buffer.isBuffer(data) || typeof data === 'string',
 			'Cannot verify signature. `data` must be a Buffer or a string'
@@ -307,10 +304,10 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 		assert(
 			Buffer.isBuffer(signature) || typeof signature === 'string',
 			'Cannot verify signature. `signature` must be a Buffer or a string'
-			);
+		);
 
 		assert(
-			publicKey != null && Buffer.isBuffer(publicKey.key),
+			virgilPublicKey != null && Buffer.isBuffer(virgilPublicKey.key),
 			'Cannot verify signature. `publicKey` is invalid'
 		);
 
@@ -318,7 +315,7 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 		signature = Buffer.isBuffer(signature) ? signature : Buffer.from(signature, 'base64');
 
 
-		return cryptoApi.verify(data, signature, publicKey);
+		return cryptoApi.verify(data, signature, virgilPublicKey);
 	}
 
 	/**
@@ -326,25 +323,26 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 	 * 		then encrypts the data along with the signature using
 	 * 		the public key(s).
 	 * @param {Buffer|string} data - The data to sign and encrypt as a Buffer or a string in UTF-8.
-	 * @param {PrivateKey} signingKey - The private key to use to calculate signature.
-	 * @param {PublicKey|PublicKey[]} encryptionKey - The public key of the intended recipient or an array
+	 * @param {VirgilPrivateKey} signingKey - The private key to use to calculate signature.
+	 * @param {VirgilPublicKey|VirgilPublicKey[]} encryptionKey - The public key of the intended recipient or an array
 	 * of public keys of multiple recipients.
 	 *
 	 * 	@returns {Buffer} Encrypted data with attached signature.
 	 * */
-	function signThenEncrypt(data: Buffer|string, signingKey: PrivateKey, encryptionKey: PublicKey|PublicKey[]) {
+	signThenEncrypt(data: Buffer|string, signingKey: IPrivateKey, encryptionKey: IPublicKey|IPublicKey[]) {
 		assert(
 			Buffer.isBuffer(data) || typeof data === 'string',
 			'Cannot sign then encrypt. `data` must be a Buffer or a string'
 		);
 
-		const signingKeyValue = getPrivateKeyBytes(signingKey);
+		const virgilSigningKey = signingKey as VirgilPrivateKey;
+		const signingKeyValue = getPrivateKeyBytes(virgilSigningKey);
 
 		assert(signingKeyValue !== undefined, 'Cannot sign then encrypt. `signingKey` is invalid');
 
 		data = Buffer.isBuffer(data) ? data : Buffer.from(data, 'utf8');
 
-		const encryptionKeys = toArray(encryptionKey);
+		const encryptionKeys = toArray(encryptionKey) as VirgilPublicKey[];
 		assert(
 			encryptionKeys != null && encryptionKeys.length > 0,
 			'Cannot sign then encrypt. `encryptionKey` must not be empty'
@@ -353,7 +351,7 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 		return cryptoApi.signThenEncrypt(
 			data,
 			{
-				identifier: signingKey.identifier,
+				identifier: virgilSigningKey.identifier,
 				key: signingKeyValue
 			},
 			encryptionKeys!
@@ -366,8 +364,8 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 	 *
 	 * 	@param {Buffer|string} cipherData - The data to be decrypted and
 	 * 			verified as a Buffer or a string in base64.
-	 * 	@param {PrivateKey} decryptionKey - The private key object to use for decryption.
-	 * 	@param {(PublicKey|PublicKey[])} verificationKey - The public
+	 * 	@param {VirgilPrivateKey} decryptionKey - The private key object to use for decryption.
+	 * 	@param {(VirgilPublicKey|VirgilPublicKey[])} verificationKey - The public
 	 * 		key object or an array of public key object to use to verify data integrity.
 	 * 		If `verificationKey` is an array, the attached signature must be valid for any
 	 * 		one of them.
@@ -375,19 +373,20 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 	 * 	@returns {Buffer} - Decrypted data iff verification is successful,
 	 * 			otherwise throws VirgilCryptoError.
 	 * */
-	function decryptThenVerify(cipherData: Buffer|string, decryptionKey: PrivateKey, verificationKey: PublicKey|PublicKey[]) {
+	decryptThenVerify(cipherData: Buffer|string, decryptionKey: IPrivateKey, verificationKey: IPublicKey|IPublicKey[]) {
 		assert(
 			Buffer.isBuffer(cipherData) || typeof cipherData === 'string',
 			'Cannot decrypt then verify. `cipherData` must be a Buffer of a string in base64'
 		);
 
-		const verificationKeys = toArray(verificationKey);
+		const virgilDecryptionKey = decryptionKey as VirgilPrivateKey;
+		const verificationKeys = toArray(verificationKey) as VirgilPublicKey[];
 		assert(
 			verificationKeys != null && verificationKeys.length > 0,
 			'Cannot decrypt then verify. `verificationKey` must not be empty'
 		);
 
-		const decryptionKeyValue = getPrivateKeyBytes(decryptionKey);
+		const decryptionKeyValue = getPrivateKeyBytes(virgilDecryptionKey);
 		assert(
 			decryptionKeyValue !== undefined,
 			'Cannot decrypt then verify. `decryptionKey` is invalid'
@@ -398,15 +397,15 @@ export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
 		return cryptoApi.decryptThenVerify(
 			cipherData,
 			{
-				identifier: decryptionKey.identifier,
+				identifier: virgilDecryptionKey.identifier,
 				key: decryptionKeyValue
 			},
 			verificationKeys!
 		);
 	}
 
-	function calculateKeypairIdentifier(publicKeyData: Buffer) {
-		if (useSha256Fingerprints) {
+	private calculateKeypairIdentifier(publicKeyData: Buffer) {
+		if (this.useSha256Fingerprints) {
 			return cryptoApi.hash(publicKeyData, HashAlgorithm.SHA256);
 		} else {
 			return cryptoApi.hash(publicKeyData, HashAlgorithm.SHA512).slice(0, 8);

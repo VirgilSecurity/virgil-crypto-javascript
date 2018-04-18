@@ -1,16 +1,16 @@
-const https = require('https');
-const fs = require('fs');
-const path = require('path');
-const format = require('util').format;
+var https = require('https');
+var fs = require('fs');
+var path = require('path');
+var format = require('util').format;
 
-const destFilePath = path.resolve(__dirname + '/../virgil_crypto_node.node');
+var destFilePath = path.resolve(__dirname + '/../virgil_crypto_node.node');
 
-let url = '/packages/nodejs/virgil-crypto-%s-nodejs-%s-%s-%s.node';
+var url = '/packages/nodejs/virgil-crypto-%s-nodejs-%s-%s-%s.node';
 
-let cryptoVersion;
-const nodeVersion = getNodeVersion();
-let platform = getPlatform();
-const arch = getArch();
+var cryptoVersion;
+var nodeVersion = getNodeVersion();
+var platform = getPlatform();
+var arch = getArch();
 
 if (nodeVersion.indexOf('5') === 0) {
 	cryptoVersion = '2.2.5';
@@ -25,16 +25,16 @@ url = format(url, cryptoVersion, nodeVersion, platform, arch);
 
 console.log('Downloading C++ Addon.... %s', url);
 
-const options = {
+var options = {
 	protocol: 'https:',
 	hostname: 'cdn.virgilsecurity.com',
 	path: url,
 	agent: new https.Agent({keepAlive: true})
 };
 
-const file = fs.createWriteStream(destFilePath);
+var file = fs.createWriteStream(destFilePath);
 
-const req = https.get(options, function (res) {
+var req = https.get(options, function (res) {
 	if (res.statusCode === 404) {
 		abortWithError(
 			'Platform "nodejs-' + nodeVersion + '-' + platform + '-' + arch + '" is not supported.'

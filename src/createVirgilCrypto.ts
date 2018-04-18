@@ -1,4 +1,5 @@
-import { KeyPairType, HashAlgorithm, assert, IVirgilCryptoApi } from './common';
+import { cryptoApi } from './node/api';
+import { KeyPairType, HashAlgorithm, assert } from './common';
 import { toArray } from './utils/toArray';
 import { IVirgilCrypto } from './IVirgilCrypto';
 
@@ -42,8 +43,7 @@ export type VirgilCryptoOptions = {
 	defaultKeyPairType?: KeyPairType;
 }
 
-export const makeVirgilCryptoFactory = (cryptoApi: IVirgilCryptoApi) =>
-(options: VirgilCryptoOptions = {}): IVirgilCrypto => {
+export const createVirgilCrypto = (options: VirgilCryptoOptions = {}): IVirgilCrypto => {
 	const { useSha256Fingerprints = false, defaultKeyPairType = KeyPairType.Default } = options;
 
 	return {

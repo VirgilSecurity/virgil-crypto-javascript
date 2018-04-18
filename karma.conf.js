@@ -5,20 +5,13 @@ const inject = require('rollup-plugin-inject');
 const replace = require('rollup-plugin-replace');
 const globals = require('rollup-plugin-node-globals');
 const builtinModules = require('builtin-modules');
-const path = require('path');
-
-const NODE_ENTRY_PATH = path.resolve('src/index.ts');
-const BROWSER_ENTRY_PATH = path.resolve('src/browser.ts');
-
-const NODE_API_PATH = path.resolve('src/node/api.ts');
-const BROWSER_API_PATH = path.resolve('src/browser/api.ts');
 
 module.exports = function (config) {
 	config.set({
 		frameworks: [ 'mocha', 'chai' ],
 		autoWatch: false,
 		browsers: [ 'ChromeHeadless' ],
-		files: [ { pattern: 'src/**/*.test.ts', watched: false } ],
+		files: [ { pattern: 'src/tests/index.ts', watched: false } ],
 		colors: true,
 		reporters: [ 'progress' ],
 		mime: { 'text/x-typescript': ['ts'] },
@@ -32,20 +25,13 @@ module.exports = function (config) {
 
 		rollupPreprocessor: {
 			plugins: [
-				{
-					resolveId(importee, importer) {
-						if (importer) {
-							const filename = path.resolve(path.dirname(importer), importee) + '.ts';
-							if (filename === NODE_ENTRY_PATH) {
-								return BROWSER_ENTRY_PATH;
-							}
-
-							if (filename === NODE_API_PATH) {
-								return BROWSER_API_PATH;
-							}
-						}
-					}
-				},
+				resolve({
+					browser: true,
+					jsnext: true,
+					extensions: [ '.ts', '.js' ],
+					preferBuiltins: false,
+					include: [ 'src/**' ]
+				}),
 				typescript({
 					tsconfigOverride: {
 						compilerOptions: {
@@ -66,11 +52,6 @@ module.exports = function (config) {
 
 				globals({
 					exclude: [ '**/virgil_crypto_asmjs.js' ]
-				}),
-
-				resolve({
-					browser: true,
-					jsnext: true
 				}),
 
 				commonjs({

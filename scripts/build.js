@@ -39,7 +39,6 @@ const virgilCrypto = {
 };
 
 function createBundle(bundle) {
-	const pkg = require(path.resolve(bundle.path, 'package.json'));
 
 	return Promise.resolve()
 		.then(() => rimraf(path.resolve(bundle.path, 'dist')))
@@ -49,15 +48,19 @@ function createBundle(bundle) {
 				const isBrowser = bundleType !== NODE;
 				const isProd = bundleType === BROWSER_PROD;
 
-				const browserEntry = typeof pkg.browser === 'object' && pkg.browser['./src/index.ts']
-					? pkg.browser['./src/index.ts']
-					: 'src/index.ts';
-
-				const entry = isBrowser ? browserEntry : 'src/index.ts';
+				const entry = 'src/index.ts';
 				return rollup({
 					input: path.resolve(bundle.path, entry),
 					external: [ ...builtinModules, ...(bundle.external || []) ],
 					plugins: [
+						resolve({
+							browser: isBrowser,
+							jsnext: true,
+							extensions: [ '.ts', '.js' ],
+							include: [ 'src/**' ],
+							preferBuiltins: !isBrowser
+						}),
+
 						typescript({
 							useTsconfigDeclarationDir: true,
 							tsconfigOverride: {
@@ -70,11 +73,6 @@ function createBundle(bundle) {
 						replace({ 'process.browser': JSON.stringify(isBrowser) }),
 
 						...(isBrowser ? BROWSER_ONLY_PLUGINS : []),
-
-						resolve({
-							browser: isBrowser,
-							jsnext: true
-						}),
 
 						commonjs({
 							ignore: [ ...builtinModules ]

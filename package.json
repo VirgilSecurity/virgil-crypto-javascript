@@ -1,6 +1,6 @@
 {
   "name": "virgil-crypto",
-  "version": "3.0.0-alpha.4",
+  "version": "3.0.0-alpha.5",
   "main": "dist/virgil-crypto.cjs.js",
   "browser": {
     "./dist/virgil-crypto.cjs.js": "./dist/virgil-crypto.browser.cjs.js",

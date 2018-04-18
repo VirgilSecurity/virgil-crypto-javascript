@@ -1,8 +1,6 @@
 import { IVirgilCrypto, IPrivateKey, IPublicKey } from './IVirgilCrypto';
 import { VirgilCrypto } from './VirgilCrypto';
 
-type Data = Buffer|string;
-
 export class VirgilAccessTokenSigner {
 	private readonly crypto: IVirgilCrypto;
 
@@ -14,9 +12,11 @@ export class VirgilAccessTokenSigner {
 		return 'VEDS512';
 	}
 
-	generateTokenSignature = (token: Data, privateKey: IPrivateKey) =>
-		this.crypto.calculateSignature(token, privateKey);
+	generateTokenSignature (token: Buffer|string, privateKey: IPrivateKey) {
+		return this.crypto.calculateSignature(token, privateKey);
+	}
 
-	verifyTokenSignature = (token: Data, signature: Data, publicKey: IPublicKey) =>
-		this.crypto.verifySignature(token, signature, publicKey);
+	verifyTokenSignature (token: Buffer|string, signature: Buffer|string, publicKey: IPublicKey) {
+		return this.crypto.verifySignature(token, signature, publicKey);
+	}
 }

@@ -15,7 +15,11 @@ export class VirgilPrivateKeyExporter {
 		this.password = password;
 	}
 
-	exportPrivateKey = (key: IPrivateKey) => this.crypto.exportPrivateKey(key, this.password);
+	exportPrivateKey (key: IPrivateKey) {
+		return this.crypto.exportPrivateKey(key, this.password);
+	}
 
-	importPrivateKey = (keyData: Buffer|string) => this.crypto.importPrivateKey(keyData) as IPrivateKey;
+	importPrivateKey (keyData: Buffer|string) {
+		return this.crypto.importPrivateKey(keyData) as IPrivateKey;
+	}
 }

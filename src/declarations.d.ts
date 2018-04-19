@@ -13,3 +13,5 @@ declare module '*.node' {
 	const VirgilCrypto: any;
 	export default VirgilCrypto;
 }
+
+declare var __virgilCrypto: Function;

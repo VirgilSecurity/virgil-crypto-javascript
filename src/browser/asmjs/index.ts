@@ -1,6 +1,6 @@
-import __virgilCrypto from './virgil_crypto_asmjs.js';
+import './virgil_crypto_asmjs.js';
 
-const lib = __virgilCrypto({ ENVIRONMENT: 'WEB' });
+const lib = __virgilCrypto();
 lib.setDelayFunction(function (delayed: Function) {
 	setTimeout(delayed, 0);
 });

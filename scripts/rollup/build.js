@@ -1,34 +1,15 @@
-const resolve = require('rollup-plugin-node-resolve');
-const commonjs = require('rollup-plugin-commonjs');
-const typescript = require('rollup-plugin-typescript2');
-const inject = require('rollup-plugin-inject');
-const replace = require('rollup-plugin-replace');
-const globals = require('rollup-plugin-node-globals');
 const builtinModules = require('builtin-modules');
 const { promisify } = require('util');
 const rimraf = promisify(require('rimraf'));
 const mkdirp = promisify(require('mkdirp'));
 const path = require('path');
 const { rollup } = require('rollup');
-const myUglify = require('./rollup-plugin-my-uglify');
+const bundleTypes = require('./bundle-types');
+const getRollupPlugins = require('./get-rollup-plugins');
 
-const BROWSER_ONLY_PLUGINS = [
-	inject({
-		include: '**/*.ts',
-		exclude: 'node_modules/**',
-		modules: {
-			Buffer: [ 'buffer-es6', 'Buffer' ]
-		}
-	}),
-
-	globals({
-		exclude: [ '**/virgil_crypto_asmjs.js' ]
-	})
-];
-
-const NODE = 'NODE';
-const BROWSER = 'BROWSER';
-const BROWSER_PROD = 'BROWSER_PROD';
+const NODE = bundleTypes.NODE;
+const BROWSER = bundleTypes.BROWSER;
+const BROWSER_PROD = bundleTypes.BROWSER_PROD;
 
 const virgilCrypto = {
 	path: '.',
@@ -45,43 +26,11 @@ function createBundle(bundle) {
 		.then(() => mkdirp(path.resolve(bundle.path, 'dist')))
 		.then(() => {
 			return Promise.all(bundle.bundleTypes.map(bundleType => {
-				const isBrowser = bundleType !== NODE;
-				const isProd = bundleType === BROWSER_PROD;
-
 				const entry = 'src/index.ts';
 				return rollup({
 					input: path.resolve(bundle.path, entry),
 					external: [ ...builtinModules, ...(bundle.external || []) ],
-					plugins: [
-						resolve({
-							browser: isBrowser,
-							jsnext: true,
-							extensions: [ '.ts', '.js' ],
-							include: [ 'src/**' ],
-							preferBuiltins: !isBrowser
-						}),
-
-						typescript({
-							useTsconfigDeclarationDir: true,
-							tsconfigOverride: {
-								compilerOptions: {
-									module: 'es2015'
-								}
-							}
-						}),
-
-						replace({ 'process.browser': JSON.stringify(isBrowser) }),
-
-						...(isBrowser ? BROWSER_ONLY_PLUGINS : []),
-
-						commonjs({
-							ignore: [ ...builtinModules ]
-						}),
-
-						...(isProd
-							? [ myUglify({ exclude: [ '**/virgil_crypto_asmjs.js' ] }) ]
-							: [])
-					]
+					plugins: getRollupPlugins(bundleType)
 				}).then(output => {
 					const formats = getOutputFormatsFromBundleType(bundleType);
 					return Promise.all(formats.map(format => {

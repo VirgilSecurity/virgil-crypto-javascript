@@ -1,10 +1,5 @@
-const resolve = require('rollup-plugin-node-resolve');
-const commonjs = require('rollup-plugin-commonjs');
-const typescript = require('rollup-plugin-typescript2');
-const inject = require('rollup-plugin-inject');
-const replace = require('rollup-plugin-replace');
-const globals = require('rollup-plugin-node-globals');
-const builtinModules = require('builtin-modules');
+const bundleTypes = require('./scripts/rollup/bundle-types');
+const getRollupPlugins = require('./scripts/rollup/get-rollup-plugins');
 
 module.exports = function (config) {
 	config.set({
@@ -24,41 +19,7 @@ module.exports = function (config) {
 		},
 
 		rollupPreprocessor: {
-			plugins: [
-				resolve({
-					browser: true,
-					jsnext: true,
-					extensions: [ '.ts', '.js' ],
-					preferBuiltins: false,
-					include: [ 'src/**' ]
-				}),
-				typescript({
-					tsconfigOverride: {
-						compilerOptions: {
-							module: 'es2015'
-						}
-					}
-				}),
-
-				replace({ 'process.browser': JSON.stringify(true) }),
-
-				inject({
-					include: '**/*.ts',
-					exclude: 'node_modules/**',
-					modules: {
-						Buffer: [ 'buffer-es6', 'Buffer' ]
-					}
-				}),
-
-				globals({
-					exclude: [ '**/virgil_crypto_asmjs.js' ]
-				}),
-
-				commonjs({
-					ignore: builtinModules,
-					namedExports: { chai: [ 'assert', 'expect', 'should' ] }
-				})
-			],
+			plugins: getRollupPlugins(bundleTypes.BROWSER),
 
 			output: {
 				format: 'iife',

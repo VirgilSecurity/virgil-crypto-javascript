@@ -103,10 +103,7 @@ If you only intend to use virgil-crypto in a browser environment, you can ignore
 ### CDN
 
 ```html
-<script
-src="https://cdn.virgilsecurity.com/packages/javascript/crypto/3.0.0-alpha.7/virgil-crypto.browser.umd.min.js"
-integrity="sha256-WNkuyYQsH7duZbkvQwwMW0r3gKHPb5A4eOqa7Uy8moA="
-crossorigin="anonymous"></script>
+<script src="https://unpkg.com/virgil-crypto@next/dist/virgil-crypto.browser.umd.min.js"></script>
 ```
 
 ## Docs

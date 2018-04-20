@@ -1,5 +1,3 @@
-/// <reference path="../declarations.d.ts" />
-
 export interface WrapperUtils {
 	isBuffer (obj: any): boolean;
 	bufferToVirgilByteArray (buf: Buffer): any;

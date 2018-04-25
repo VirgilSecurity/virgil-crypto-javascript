@@ -9,7 +9,7 @@ const SCRIPT_REGEX = /<script[\s\S]*?>[\s\S]*?<\/script>/gi;
 
 const getScript = ({ version, integrity }) =>
 `<script
-src="https://cdn.virgilsecurity.com/packages/javascript/crypto/${version}/virgil-crypto.min.js"
+src="https://cdn.virgilsecurity.com/packages/javascript/crypto/${version}/virgil-crypto.browser.umd.min.js"
 integrity="${integrity}"
 crossorigin="anonymous"></script>`;
 
@@ -32,7 +32,7 @@ function calculateBundleIntegrity() {
 	return new Promise((resolve, reject) => {
 		const hash = crypto.createHash('sha256');
 		const bundle = fs.createReadStream(
-			path.resolve(__dirname, '../dist/virgil-crypto.min.js')
+			path.resolve(__dirname, '../dist/virgil-crypto.browser.umd.min.js')
 		);
 
 		bundle.on('readable', () => {

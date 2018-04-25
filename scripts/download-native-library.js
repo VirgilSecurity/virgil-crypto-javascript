@@ -3,7 +3,7 @@ var fs = require('fs');
 var path = require('path');
 var format = require('util').format;
 
-var destFilePath = path.resolve(__dirname + '/../virgil_js.node');
+var destFilePath = path.resolve(__dirname + '/../virgil_crypto_node.node');
 
 var url = '/packages/nodejs/virgil-crypto-%s-nodejs-%s-%s-%s.node';
 
@@ -29,12 +29,12 @@ var options = {
 	protocol: 'https:',
 	hostname: 'cdn.virgilsecurity.com',
 	path: url,
-	agent: new https.Agent({ keepAlive: true })
+	agent: new https.Agent({keepAlive: true})
 };
 
 var file = fs.createWriteStream(destFilePath);
 
-var req = https.get(options, function(res) {
+var req = https.get(options, function (res) {
 	if (res.statusCode === 404) {
 		abortWithError(
 			'Platform "nodejs-' + nodeVersion + '-' + platform + '-' + arch + '" is not supported.'
@@ -92,32 +92,32 @@ function getNodeVersion () {
 	var versionTokens = process.version.split('.');
 
 	// Use same build for node 4.*.*
-	if (versionTokens[0] == 'v4') {
+	if (versionTokens[0] === 'v4') {
 		return '4.8.7';
 	}
 
 	// Use same build for node 5.*.*
-	if (versionTokens[0] == 'v5') {
+	if (versionTokens[0] === 'v5') {
 		return '5.9.1';
 	}
 
 	// Use same build for node 6.*.*
-	if (versionTokens[0] == 'v6') {
+	if (versionTokens[0] === 'v6') {
 		return '6.13.0';
 	}
 
 	// Use same build for node 7.*.*
-	if (versionTokens[0] == 'v7') {
+	if (versionTokens[0] === 'v7') {
 		return '7.10.1';
 	}
 
 	// Use same build for node 8.*.*
-	if (versionTokens[0] == 'v8') {
+	if (versionTokens[0] === 'v8') {
 		return '8.9.4';
 	}
 
 	// Use same build for node 9.*.*
-	if (versionTokens[0] == 'v9') {
+	if (versionTokens[0] === 'v9') {
 		return '9.5.0';
 	}
 

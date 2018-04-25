@@ -1,0 +1,10 @@
+import './crypto.test';
+import './decryptThenVerify.test';
+import './encryption.test';
+import './extractPublicKey.test';
+import './generateKeyPair.test';
+import './hash.test';
+import './keyFormats.test';
+import './privateKeyEncryption.test';
+import './signThenEncrypt.test';
+import './signVerify.test';

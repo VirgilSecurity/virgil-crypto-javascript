@@ -38,18 +38,22 @@ function setPrivateKeyBytes(privateKey: VirgilPrivateKey, bytes: Buffer) {
 	_setValue.call(_privateKeys, privateKey, bytes);
 }
 
-export type VirgilCryptoOptions = {
-	useSha256Fingerprints?: boolean;
+
+export interface VirgilCryptoOptions {
+	useSha256Identifiers?: boolean;
 	defaultKeyPairType?: KeyPairType;
 }
 
-export class VirgilCrypto implements IVirgilCrypto {
-	private readonly useSha256Fingerprints: boolean;
-	private readonly defaultKeyPairType: KeyPairType;
+export class VirgilCrypto {
 
-	constructor (options: VirgilCryptoOptions = {}) {
-		const { useSha256Fingerprints = false, defaultKeyPairType = KeyPairType.Default } = options;
-		this.useSha256Fingerprints = useSha256Fingerprints;
+	readonly useSha256Identifiers: boolean;
+
+	readonly defaultKeyPairType: KeyPairType;
+
+	constructor (
+		{ useSha256Identifiers = false, defaultKeyPairType = KeyPairType.Default }: VirgilCryptoOptions = {}
+	) {
+		this.useSha256Identifiers = useSha256Identifiers;
 		this.defaultKeyPairType = defaultKeyPairType;
 	}
 
@@ -405,7 +409,7 @@ export class VirgilCrypto implements IVirgilCrypto {
 	}
 
 	private calculateKeypairIdentifier(publicKeyData: Buffer) {
-		if (this.useSha256Fingerprints) {
+		if (this.useSha256Identifiers) {
 			return cryptoApi.hash(publicKeyData, HashAlgorithm.SHA256);
 		} else {
 			return cryptoApi.hash(publicKeyData, HashAlgorithm.SHA512).slice(0, 8);

@@ -1,3 +1,6 @@
+/**
+ * Hash algorithms supported by Virgil Crypto.
+ */
 export enum HashAlgorithm {
 	MD5 = 'MD5',
 	SHA1 = 'SHA1',

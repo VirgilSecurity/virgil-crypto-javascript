@@ -6,11 +6,31 @@ import { DecryptionKey, EncryptionKey, IVirgilCryptoApi, SigningKey, Verificatio
 import { HashAlgorithm } from './HashAlgorithm';
 import { IntegrityCheckFailedError } from './errors';
 
-export type KeyPairOptions = {
-	type?: KeyPairType,
-	password?: Buffer
-};
+/**
+ * Key pair generation options.
+ * @hidden
+ */
+export interface KeyPairOptions {
+	/**
+	 * Type of keys to generate. Optional. Default is {@link KeyPairType.Default}
+	 */
+	type?: KeyPairType;
 
+	/**
+	 * Password to encrypt the private key with. Optional. The private key
+	 * is not encrypted by default.
+	 */
+	password?: Buffer;
+}
+
+/**
+ * Creates a low level API wrapper for "native" Virgil Crypto library
+ * referenced by `lib`.
+ *
+ * @hidden
+ *
+ * @param {any} lib - Native Virgil Crypto library (browser or Node.js)
+ */
 export function createCryptoApi (lib: any): IVirgilCryptoApi {
 
 	const wrapper = createNativeTypeWrapper(lib);

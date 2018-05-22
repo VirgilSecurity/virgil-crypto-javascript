@@ -1,12 +1,15 @@
+/**
+ * Custom Error class.
+ * @hidden
+ */
 export class VirgilCryptoError extends Error {
-	public name: string = 'VirgilCryptoError';
+	name: string;
 
-	constructor(message: string, code?: string, name?: string) {
-		super(message);
+	constructor(message: string, name: string = 'VirgilCryptoError') {
+		super();
 		Object.setPrototypeOf(this, VirgilCryptoError.prototype);
-		if (name !== undefined) {
-			this.name = name;
-		}
+		this.message = message;
+		this.name = name;
 	}
 
 	toString() {
@@ -14,38 +17,22 @@ export class VirgilCryptoError extends Error {
 	}
 }
 
-export class IntegrityCheckFailedError extends VirgilCryptoError {;
+/**
+ * An error that is thrown when digital signature validation fails
+ * during {@link VirgilCrypto.decryptThenVerify} method execution.
+ */
+export class IntegrityCheckFailedError extends VirgilCryptoError {
 	constructor(message: string) {
 		super(message, 'IntegrityCheckFailedError');
 	}
 }
 
-export function errorFromNativeError(err: Error) {
-	if (!(err instanceof Error)) {
-		return err;
-	}
-
-	// Error messages from native virgil-crypto consist of two
-	// lines: one from VirgilCrypto itself, another one from
-	// mbed-tls. We are only interested in the former since it
-	// contains a friendlier message.
-	const virgilCryptoMessage = err.message.split(/\r?\n/)[0];
-	if (!virgilCryptoMessage) {
-		return err;
-	}
-
-	// Expected message format is as follows:
-	// "Module: virgil/crypto. Error code: {code}. {message}."
-	const parts = virgilCryptoMessage.split(/\s*\.\s*/);
-	if (parts.length === 1) {
-		// Error message didn't match what we expected.
-		return err;
-	}
-
-	const [, code, message ] = parts;
-	return new VirgilCryptoError(message, code, name);
-}
-
+/**
+ * Throws an error with `message` if `condition` is `false`.
+ * @hidden
+ * @param {boolean} condition - Condition to check.
+ * @param {string} message - Error message.
+ */
 export function assert(condition: boolean, message: string) {
 	if (!condition) {
 		throw new VirgilCryptoError(message);

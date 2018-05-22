@@ -38,7 +38,8 @@
     "test:node": "mocha --require ts-node/register --require chai/register-assert \"src/tests/**/*.test.ts\"",
     "test:browser": "karma start",
     "test": "npm run test:node && npm run test:browser",
-    "postinstall": "node scripts/download-native-library.js"
+    "postinstall": "node scripts/download-native-library.js",
+    "docs": "typedoc src"
   },
   "dependencies": {},
   "devDependencies": {

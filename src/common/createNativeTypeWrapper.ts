@@ -1,15 +1,46 @@
-export interface WrapperUtils {
-	isBuffer (obj: any): boolean;
-	bufferToVirgilByteArray (buf: Buffer): any;
-	isVirgilByteArray (obj: any): boolean;
-	virgilByteArrayToBuffer (arr: any): Buffer;
-}
-
 const apply = Function.prototype.apply;
 const hasOwn = Object.prototype.hasOwnProperty;
 const toString = Object.prototype.toString;
 
-export function createNativeTypeWrapper (lib: any) {
+/**
+ * Interface containing the set of functions allowing to wrap raw
+ * VirgilCrypto functions so that they are safe to call with
+ * `Buffer`s as binary data arguments and return binary data as
+ * `Buffer`s instead of VirgilByteArray.
+ * In the browser, the wrapper functions also automatically free
+ * memory allocated for VirgilByteArray instances.
+ *
+ * @hidden
+ */
+export interface NativeTypeWrapper {
+	/**
+	 * Creates "safe" versions of `methods` on the `ctor`'s prototype.
+	 * New methods will have the "Safe" suffix, original methods are
+	 * not modified.
+	 * @param {Function} ctor - Constructor function whose prototype to extend.
+	 * @param {string[]} methods - Array of method names to create "safe" versions of.
+	 */
+	createSafeInstanceMethods: (ctor: Function, methods: string[]) => void;
+
+	/**
+	 * Creates "safe" versions of `methods` on the `ctor` function (i.e. static
+	 * methods). New methods will have the "Safe" suffix, original methods are
+	 * not modified.
+	 * @param {Function} ctor - Constructor function to extend.
+	 * @param {string[]} methods - Array of static method names to create "safe" versions of.
+	 */
+	createSafeStaticMethods: (ctor: (Function & {[p: string]: any}), methods: string[]) => void;
+}
+
+/**
+ * Creates a wrapper object for the native library `lib`.
+ *
+ * @hidden
+ *
+ * @param {any} lib - Native VirgilCrypto library (browser or Node.js).
+ * @returns {NativeTypeWrapper} The wrapper object.
+ */
+export function createNativeTypeWrapper (lib: any): NativeTypeWrapper {
 	const utils = createUtils(lib);
 
 	return {
@@ -92,7 +123,7 @@ export function createNativeTypeWrapper (lib: any) {
 	}
 }
 
-function createUtils(lib: any): WrapperUtils {
+function createUtils(lib: any) {
 	return {
 		isBuffer (obj: any) {
 			return Buffer.isBuffer(obj);

@@ -4,3 +4,4 @@ virgil_crypto_node.node
 dist/
 npm-debug.log
 yarn-error.log
+docs/

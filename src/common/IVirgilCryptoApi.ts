@@ -1,9 +1,14 @@
 import { KeyPairType } from './index';
 
+/**
+ * Private and public keys.
+ * @hidden
+ */
 export type KeyPair = { privateKey: Buffer, publicKey: Buffer };
 
 /**
  * Public key with identifier.
+ * @hidden
  * */
 export type EncryptionKey = {
 	identifier: Buffer,
@@ -12,6 +17,7 @@ export type EncryptionKey = {
 
 /**
  * Private key with identifier and optional password.
+ * @hidden
  * */
 export type DecryptionKey = {
 	identifier: Buffer,
@@ -21,6 +27,7 @@ export type DecryptionKey = {
 
 /**
  * Same as {DecryptionKey} but identifier field is optional
+ * @hidden
  */
 export type SigningKey = {
 	identifier?: Buffer
@@ -30,13 +37,17 @@ export type SigningKey = {
 
 /**
  * Same as {EncryptionKey} but identifier field is optional
+ * @hidden
  */
 export type VerificationKey = {
 	identifier?: Buffer,
 	key: Buffer
 };
 
-
+/**
+ * The Virgil Crypto library api wrapper interface.
+ * @hidden
+ */
 export interface IVirgilCryptoApi {
 
 	/**

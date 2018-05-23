@@ -1,8 +1,8 @@
 import { cryptoApi } from '../node/api';
 import { KeyPairType } from '../common';
 
-const PASSWORD = new Buffer('veryStrongPa$$0rd', 'utf8');
-const PLAINTEXT = new Buffer('Plaintext secret message', 'utf8');
+const PASSWORD = Buffer.from('veryStrongPa$$0rd');
+const PLAINTEXT = Buffer.from('Plaintext secret message');
 
 describe('encrypt/decrypt', function () {
 	this.timeout(120 * 1000);

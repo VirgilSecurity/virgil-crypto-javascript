@@ -1,5 +1,5 @@
 # Virgil Security JavaScript Crypto Library 
-[![Build Status](https://travis-ci.org/VirgilSecurity/virgil-crypto-javascript.svg?branch=v2_0)](https://travis-ci.org/VirgilSecurity/virgil-crypto-javascript) 
+[![Build Status](https://travis-ci.org/VirgilSecurity/virgil-crypto-javascript.svg)](https://travis-ci.org/VirgilSecurity/virgil-crypto-javascript) 
 [![npm](https://img.shields.io/npm/v/virgil-crypto.svg)](https://www.npmjs.com/package/virgil-crypto)
 [![GitHub license](https://img.shields.io/badge/license-BSD%203--Clause-blue.svg)](https://github.com/VirgilSecurity/virgil/blob/master/LICENSE)
 
@@ -95,7 +95,7 @@ This is a pre-release version, so for now you will need to specify the `@next` t
 npm install virgil-crypto@next
 ```
 
-> **Important!** You will need Node.js version >=4 to use virgil-crypto.
+> **Important!** You will need Node.js version >= 4.5.0 < 5 or >= 6 to use virgil-crypto.
 If you have a different version, you can use [nvm](https://github.com/creationix/nvm) 
 (or a similar tool) to install Node.js of supported version alongside your current installation.  
 If you only intend to use virgil-crypto in a browser environment, you can ignore this warning.
@@ -104,6 +104,18 @@ If you only intend to use virgil-crypto in a browser environment, you can ignore
 
 ```html
 <script src="https://unpkg.com/virgil-crypto@next/dist/virgil-crypto.browser.umd.min.js"></script>
+<script>
+	// here you can use the global variable `VirgilCrypto` as a namespace object,
+	// containing all of module exports as properties
+	
+	var virgilCrypto = new VirgilCrypto.VirgilCrypto();
+	var keyPair = virgilCrypto.generateKeys();
+	console.log(keyPair);
+	
+	// note that you cannot declare a variable named `crypto` in
+	// global scope (i.e. outside of any function) in browsers that 
+	// implement Web Crypto API
+</script>
 ```
 
 ## Docs

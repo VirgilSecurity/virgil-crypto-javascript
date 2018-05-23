@@ -4,8 +4,8 @@ describe('signThenEncrypt -> decryptThenVerify', function () {
 
 	it('should decrypt and verify data successfully given right keys', function () {
 		const keyPair = cryptoApi.generateKeyPair();
-		const identifier = new Buffer('keypair_identifier');
-		const plainData = new Buffer('Secret message');
+		const identifier = Buffer.from('keypair_identifier');
+		const plainData = Buffer.from('Secret message');
 		const encryptedData = cryptoApi.signThenEncrypt(
 			plainData,
 			{
@@ -32,8 +32,8 @@ describe('signThenEncrypt -> decryptThenVerify', function () {
 
 	it('should fail verification given the wrong public key', function () {
 		const keyPair = cryptoApi.generateKeyPair();
-		const identifier = new Buffer('keypair_identifier');
-		const plainData = new Buffer('Secret message');
+		const identifier = Buffer.from('keypair_identifier');
+		const plainData = Buffer.from('Secret message');
 		const encryptedData = cryptoApi.signThenEncrypt(
 			plainData,
 			{
@@ -60,10 +60,10 @@ describe('signThenEncrypt -> decryptThenVerify', function () {
 	});
 
 	it('should sign with password-protected key', function () {
-		const password = new Buffer('pa$$w0rd');
+		const password = Buffer.from('pa$$w0rd');
 		const keyPair = cryptoApi.generateKeyPair({ password: password });
-		const identifier = new Buffer('keypair_identifier');
-		const plainData = new Buffer('Secret message');
+		const identifier = Buffer.from('keypair_identifier');
+		const plainData = Buffer.from('Secret message');
 		const encryptedData = cryptoApi.signThenEncrypt(
 			plainData,
 			{

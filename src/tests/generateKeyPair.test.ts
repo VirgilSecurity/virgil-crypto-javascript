@@ -1,7 +1,7 @@
 import { cryptoApi } from '../node/api';
 import { KeyPairType } from '../common';
 
-const PASSWORD = new Buffer('veryStrongPa$$0rd');
+const PASSWORD = Buffer.from('veryStrongPa$$0rd');
 
 describe('generateKeyPair', function () {
 
@@ -71,10 +71,10 @@ describe('generateKeyPair', function () {
 	});
 
 	it('Change private key password', function () {
-		const firstPassword = new Buffer('qwerty1');
-		const secondPassword = new Buffer('qwerty2');
-		const data = new Buffer('abc');
-		const identifier = new Buffer('keypair_identifier');
+		const firstPassword = Buffer.from('qwerty1');
+		const secondPassword = Buffer.from('qwerty2');
+		const data = Buffer.from('abc');
+		const identifier = Buffer.from('keypair_identifier');
 		const keyPair = cryptoApi.generateKeyPair({ password: firstPassword });
 
 		const updatedPrivateKey = cryptoApi.changePrivateKeyPassword(

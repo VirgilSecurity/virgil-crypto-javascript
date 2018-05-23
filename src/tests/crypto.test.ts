@@ -1,4 +1,5 @@
-import { VirgilCrypto, HashAlgorithm, IPublicKey } from '../index';
+import { VirgilCrypto, HashAlgorithm } from '../index';
+import { VirgilPublicKey } from '../VirgilCrypto';
 
 // private key with password = "1234"
 const PRIVATE_KEY_1234 = 'LS0tLS1CRUdJTiBFTkNSWVBURUQgUFJJVkFURSBLRVktLS' +
@@ -183,7 +184,7 @@ describe('VirgilCrypto', function () {
 	});
 
 	it('encrypt should throw when passed empty array of recipients', function () {
-		const recipients: IPublicKey[] = [];
+		const recipients: VirgilPublicKey[] = [];
 
 		assert.throws(function () {
 			crypto.encrypt('secret message', recipients);
@@ -199,7 +200,7 @@ describe('VirgilCrypto', function () {
 	});
 
 	it('uses SHA256 identifiers', function () {
-		const crypto256 = new VirgilCrypto({ useSha256Fingerprints: true });
+		const crypto256 = new VirgilCrypto({ useSha256Identifiers: true });
 
 		const keypair = crypto256.generateKeys();
 		const publicKeyDer = crypto256.exportPublicKey(keypair.publicKey);

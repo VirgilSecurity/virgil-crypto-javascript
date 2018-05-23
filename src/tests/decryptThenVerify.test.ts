@@ -3,19 +3,19 @@ import { cryptoApi } from '../node/api';
 describe('signThenEncrypt -> decryptThenVerify with multiple keys', function () {
 
 	it('should decrypt and verify data successfully given right keys', function () {
-		const plainData = new Buffer('Secret message');
+		const plainData = Buffer.from('Secret message');
 
 		const senderKeyPair = cryptoApi.generateKeyPair();
-		const senderIdentifier = new Buffer('SENDER');
+		const senderIdentifier = Buffer.from('SENDER');
 
 		const recipientKeyPair = cryptoApi.generateKeyPair();
-		const recipientIdentifier = new Buffer('RECIPIENT');
+		const recipientIdentifier = Buffer.from('RECIPIENT');
 
 		const additionalKeyPair = cryptoApi.generateKeyPair();
-		const additionalIdentifier = new Buffer('Additional');
+		const additionalIdentifier = Buffer.from('Additional');
 
 		const anotherKeyPair = cryptoApi.generateKeyPair();
-		const anotherIdentifier = new Buffer('Another');
+		const anotherIdentifier = Buffer.from('Another');
 
 		const encryptedData = cryptoApi.signThenEncrypt(
 			plainData,
@@ -54,19 +54,19 @@ describe('signThenEncrypt -> decryptThenVerify with multiple keys', function () 
 	});
 
 	it('should fail verification given the wrong public key', function () {
-		const plainData = new Buffer('Secret message');
+		const plainData = Buffer.from('Secret message');
 
 		const senderKeyPair = cryptoApi.generateKeyPair();
-		const senderIdentifier = new Buffer('SENDER');
+		const senderIdentifier = Buffer.from('SENDER');
 
 		const recipientKeyPair = cryptoApi.generateKeyPair();
-		const recipientIdentifier = new Buffer('RECIPIENT');
+		const recipientIdentifier = Buffer.from('RECIPIENT');
 
 		const additionalKeyPair = cryptoApi.generateKeyPair();
-		const additionalIdentifier = new Buffer('Additional');
+		const additionalIdentifier = Buffer.from('Additional');
 
 		const anotherKeyPair = cryptoApi.generateKeyPair();
-		const anotherIdentifier = new Buffer('Another');
+		const anotherIdentifier = Buffer.from('Another');
 
 
 		const encryptedData = cryptoApi.signThenEncrypt(
@@ -103,19 +103,19 @@ describe('signThenEncrypt -> decryptThenVerify with multiple keys', function () 
 	});
 
 	it('should decrypt and verify without signer id in metadata', function () {
-		const plainData = new Buffer('Secret message');
+		const plainData = Buffer.from('Secret message');
 
 		const senderKeyPair = cryptoApi.generateKeyPair();
-		const senderIdentifier = new Buffer('SENDER');
+		const senderIdentifier = Buffer.from('SENDER');
 
 		const recipientKeyPair = cryptoApi.generateKeyPair();
-		const recipientIdentifier = new Buffer('RECIPIENT');
+		const recipientIdentifier = Buffer.from('RECIPIENT');
 
 		const additionalKeyPair = cryptoApi.generateKeyPair();
-		const additionalIdentifier = new Buffer('Additional');
+		const additionalIdentifier = Buffer.from('Additional');
 
 		const anotherKeyPair = cryptoApi.generateKeyPair();
-		const anotherIdentifier = new Buffer('Another');
+		const anotherIdentifier = Buffer.from('Another');
 
 		const encryptedData = cryptoApi.signThenEncrypt(
 			plainData,

@@ -6,6 +6,8 @@ import { DecryptionKey, EncryptionKey, IVirgilCryptoApi, SigningKey, Verificatio
 import { HashAlgorithm } from './HashAlgorithm';
 import { IntegrityCheckFailedError } from './errors';
 
+const EMPTY_BUFFER = Buffer.alloc(0);
+
 /**
  * Key pair generation options.
  * @hidden
@@ -75,7 +77,7 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 
 	return {
 		generateKeyPair (options: KeyPairOptions = {}) {
-			let { type, password = new Buffer(0) } = options;
+			let { type, password = EMPTY_BUFFER } = options;
 			let keypair;
 			if (type) {
 				const libType = process.browser
@@ -92,7 +94,7 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 			};
 		},
 
-		privateKeyToDer(privateKey: Buffer, privateKeyPassword: Buffer = new Buffer(0)) {
+		privateKeyToDer(privateKey: Buffer, privateKeyPassword: Buffer = EMPTY_BUFFER) {
 			return lib.VirgilKeyPair.privateKeyToDERSafe(privateKey, privateKeyPassword);
 		},
 
@@ -100,7 +102,7 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 			return lib.VirgilKeyPair.publicKeyToDERSafe(publicKey);
 		},
 
-		extractPublicKey(privateKey: Buffer, privateKeyPassword: Buffer = new Buffer(0)) {
+		extractPublicKey(privateKey: Buffer, privateKeyPassword: Buffer = EMPTY_BUFFER) {
 			return lib.VirgilKeyPair.extractPublicKeySafe(privateKey, privateKeyPassword);
 		},
 
@@ -147,13 +149,13 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 		},
 
 		decrypt(encryptedData: Buffer, decryptionKey: DecryptionKey) {
-			const { identifier, key, password = new Buffer(0) } = decryptionKey;
+			const { identifier, key, password = EMPTY_BUFFER } = decryptionKey;
 			const cipher = lib.createVirgilCipher();
 			return cipher.decryptWithKeySafe(encryptedData, identifier, key, password);
 		},
 
 		sign (data: Buffer, signingKey: SigningKey) {
-			const { key, password = new Buffer(0) } = signingKey;
+			const { key, password = EMPTY_BUFFER } = signingKey;
 			const signer = lib.createVirgilSigner();
 			return signer.signSafe(data, key, password);
 		},
@@ -176,7 +178,7 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 			const signature = signer.signSafe(
 				data,
 				signingKey.key,
-				signingKey.password || new Buffer(0)
+				signingKey.password || EMPTY_BUFFER
 			);
 			customParams.setDataSafe(signatureKey, signature);
 
@@ -203,7 +205,7 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 				cipherData,
 				decryptionKey.identifier,
 				decryptionKey.key,
-				decryptionKey.password || new Buffer(0)
+				decryptionKey.password || EMPTY_BUFFER
 			);
 			const customParams = cipher.customParams();
 			const signature = customParams.getDataSafe(signatureKey);

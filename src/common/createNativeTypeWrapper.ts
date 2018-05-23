@@ -158,7 +158,9 @@ function createUtils(lib: any) {
 
 		virgilByteArrayToBuffer(byteArray: any) {
 			const size = byteArray.size();
-			const buffer = new Buffer(size);
+			// using `allocUnsafe` for additional performance
+			// as this method is used a lot
+			const buffer = Buffer.allocUnsafe(size);
 
 			for (let i = 0; i < size; ++i) {
 				buffer[i] = byteArray.get(i);

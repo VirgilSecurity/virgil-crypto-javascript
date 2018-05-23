@@ -1,8 +1,8 @@
 import { cryptoApi } from '../node/api';
 
 describe('keys PEM - DER conversion', function () {
-	const plaintext = new Buffer('data to be encrypted');
-	const identifier = new Buffer('keypair_identifier');
+	const plaintext = Buffer.from('data to be encrypted');
+	const identifier = Buffer.from('keypair_identifier');
 
 	it('should decrypt data with private key in DER format', function () {
 		const keyPair = cryptoApi.generateKeyPair();

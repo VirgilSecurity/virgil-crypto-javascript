@@ -11,7 +11,7 @@
   "typings": "dist/types/index.d.ts",
   "files": [
     "dist",
-    "scripts/download-native-library.js"
+    "scripts/download-node-addon.js"
   ],
   "repository": {
     "type": "git",

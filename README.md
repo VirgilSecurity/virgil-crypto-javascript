@@ -119,6 +119,7 @@ If you only intend to use virgil-crypto in a browser environment, you can ignore
 ```
 
 ## Docs
+- [API Reference](http://virgilsecurity.github.io/virgil-crypto-javascript/)
 - [Crypto Core Library](https://github.com/VirgilSecurity/virgil-crypto)
 - [More usage examples](https://developer.virgilsecurity.com/docs/how-to#cryptography)
 

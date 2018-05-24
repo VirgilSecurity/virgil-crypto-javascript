@@ -12,7 +12,7 @@ module.exports = function (config) {
 		mime: { 'text/x-typescript': ['ts'] },
 		logLevel: config.LOG_INFO,
 		singleRun: true,
-		browserNoActivityTimeout: 120 * 1000,
+		browserNoActivityTimeout: 180 * 1000,
 
 		preprocessors: {
 			'src/**/*.ts': [ 'rollup' ]

@@ -5,7 +5,7 @@ const PASSWORD = Buffer.from('veryStrongPa$$0rd');
 const PLAINTEXT = Buffer.from('Plaintext secret message');
 
 describe('encrypt/decrypt', function () {
-	this.timeout(120 * 1000);
+	this.timeout(180 * 1000);
 
 	function encryptDecryptUsingKeyPair(data: Buffer, keysType: KeyPairType, password?: Buffer) {
 		const keyPair = cryptoApi.generateKeyPair({ password: password, type: keysType });

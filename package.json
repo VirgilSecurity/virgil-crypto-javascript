@@ -43,7 +43,12 @@
     "docs": "typedoc src",
     "update-asmjs": "node scripts/download-asmjs.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "node-fetch": "^2.1.2",
+    "tar": "^4.4.2",
+    "tempy": "^0.2.1",
+    "yauzl": "^2.9.1"
+  },
   "devDependencies": {
     "@types/chai": "^4.1.2",
     "@types/mocha": "^5.0.0",
@@ -59,7 +64,6 @@
     "lint-staged": "^7.0.0",
     "mkdirp": "^0.5.1",
     "mocha": "^5.0.5",
-    "node-fetch": "^2.1.2",
     "prettier": "^1.4.4",
     "rimraf": "^2.6.1",
     "rollup": "^0.57.0",
@@ -70,16 +74,12 @@
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-typescript2": "^0.11.1",
     "rollup-plugin-uglify": "^3.0.0",
-    "tar": "^4.4.2",
-    "tempy": "^0.2.1",
     "ts-node": "^5.0.1",
     "tslint": "^5.8.0",
     "tslint-config-airbnb": "^5.7.0",
     "tslint-config-prettier": "^1.1.0",
     "typedoc": "^0.11.1",
-    "typescript": "^2.6.2",
-    "yauzl": "^2.9.1",
-    "zlib": "^1.0.5"
+    "typescript": "^2.6.2"
   },
   "virgil-crypto-lib-version": "2.4.4"
 }

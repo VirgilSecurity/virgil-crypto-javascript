@@ -1,6 +1,6 @@
 {
   "name": "virgil-crypto",
-  "version": "3.0.0-alpha.9",
+  "version": "3.0.0-alpha.10",
   "main": "dist/virgil-crypto.cjs.js",
   "browser": {
     "./dist/virgil-crypto.cjs.js": "./dist/virgil-crypto.browser.cjs.js",
@@ -11,7 +11,8 @@
   "typings": "dist/types/index.d.ts",
   "files": [
     "dist",
-    "scripts/download-node-addon.js"
+    "scripts/download-node-addon.js",
+    "scripts/helpers/"
   ],
   "repository": {
     "type": "git",

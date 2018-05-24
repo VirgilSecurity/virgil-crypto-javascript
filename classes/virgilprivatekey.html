@@ -927,7 +927,7 @@ img { max-width: 100%; }
 		<li class=" tsd-kind-class">
 			<a href="virgilcrypto.html" class="tsd-kind-icon">Virgil<wbr>Crypto</a>
 		</li>
-		<li class="current tsd-kind-class">
+		<li class="current tsd-kind-class tsd-is-protected">
 			<a href="virgilprivatekey.html" class="tsd-kind-icon">Virgil<wbr>Private<wbr>Key</a>
 			<ul>
 				<li class=" tsd-kind-constructor tsd-parent-kind-class">
@@ -941,7 +941,7 @@ img { max-width: 100%; }
 		<li class=" tsd-kind-class">
 			<a href="virgilprivatekeyexporter.html" class="tsd-kind-icon">Virgil<wbr>Private<wbr>Key<wbr>Exporter</a>
 		</li>
-		<li class=" tsd-kind-class">
+		<li class=" tsd-kind-class tsd-is-protected">
 			<a href="virgilpublickey.html" class="tsd-kind-icon">Virgil<wbr>Public<wbr>Key</a>
 		</li>
 		<li class=" tsd-kind-interface">
@@ -957,6 +957,16 @@ img { max-width: 100%; }
 </nav>
 <div class="container container-main">
 	<div class="content-wrap">
+		<section class="tsd-panel tsd-comment">
+			<div class="tsd-comment tsd-typography">
+				<div class="lead">
+					<p>Represents a private key for operations with <a href="virgilcrypto.html">VirgilCrypto</a>.</p>
+				</div>
+				<p><code>VirgilPrivateKey</code> objects are not meant to be created directly using the <code>new</code> keyword.
+					Use the <a href="virgilcrypto.html#generatekeys">VirgilCrypto.generateKeys</a> and <a href="virgilcrypto.html#importprivatekey">VirgilCrypto.importPrivateKey</a> methods
+				to create <code>VirgilPrivateKey</code> instances.</p>
+			</div>
+		</section>
 		<section class="tsd-panel tsd-hierarchy">
 			<h3>Hierarchy</h3>
 			<ul class="tsd-hierarchy">
@@ -1002,7 +1012,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/ae82470/src/VirgilCrypto.ts#L16">VirgilCrypto.ts:16</a></li>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/5b07f46/src/VirgilCrypto.ts#L29">VirgilCrypto.ts:29</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1027,9 +1037,15 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">identifier<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Buffer</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/ae82470/src/VirgilCrypto.ts#L16">VirgilCrypto.ts:16</a></li>
+						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/5b07f46/src/VirgilCrypto.ts#L29">VirgilCrypto.ts:29</a></li>
 					</ul>
 				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Private key identifier. Note that the private key and its
+						corresponding public key will have the same identifier.</p>
+					</div>
+				</div>
 			</section>
 		</section>
 		<footer>

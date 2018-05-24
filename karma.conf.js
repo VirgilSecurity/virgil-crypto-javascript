@@ -12,7 +12,8 @@ module.exports = function (config) {
 		mime: { 'text/x-typescript': ['ts'] },
 		logLevel: config.LOG_INFO,
 		singleRun: true,
-		browserNoActivityTimeout: 180 * 1000,
+		browserDisconnectTolerance: 2,
+		browserNoActivityTimeout: 200 * 1000,
 
 		preprocessors: {
 			'src/**/*.ts': [ 'rollup' ]

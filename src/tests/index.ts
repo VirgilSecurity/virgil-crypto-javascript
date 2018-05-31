@@ -1,4 +1,5 @@
 import './crypto.test';
+import './pythia-crypto.test';
 import './decryptThenVerify.test';
 import './encryption.test';
 import './extractPublicKey.test';

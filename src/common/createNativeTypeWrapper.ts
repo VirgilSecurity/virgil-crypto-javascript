@@ -3,6 +3,18 @@ const hasOwn = Object.prototype.hasOwnProperty;
 const toString = Object.prototype.toString;
 
 /**
+ * Native type wrapper utilities.
+ *
+ * @hidden
+ */
+export interface WrapperUtils {
+	isBuffer (obj: any): boolean;
+	bufferToVirgilByteArray (buf: Buffer): any;
+	isVirgilByteArray (obj: any): boolean;
+	virgilByteArrayToBuffer (arr: any): Buffer;
+}
+
+/**
  * Interface containing the set of functions allowing to wrap raw
  * VirgilCrypto functions so that they are safe to call with
  * `Buffer`s as binary data arguments and return binary data as
@@ -30,6 +42,11 @@ export interface NativeTypeWrapper {
 	 * @param {string[]} methods - Array of static method names to create "safe" versions of.
 	 */
 	createSafeStaticMethods: (ctor: (Function & {[p: string]: any}), methods: string[]) => void;
+
+	/**
+	 * Utility functions to convert to\from library types.
+	 */
+	utils: WrapperUtils
 }
 
 /**
@@ -45,7 +62,8 @@ export function createNativeTypeWrapper (lib: any): NativeTypeWrapper {
 
 	return {
 		createSafeInstanceMethods,
-		createSafeStaticMethods
+		createSafeStaticMethods,
+		utils
 	};
 
 	function createSafeInstanceMethods(ctor: Function, methods: string[]) {
@@ -123,7 +141,7 @@ export function createNativeTypeWrapper (lib: any): NativeTypeWrapper {
 	}
 }
 
-function createUtils(lib: any) {
+function createUtils(lib: any): WrapperUtils {
 	return {
 		isBuffer (obj: any) {
 			return Buffer.isBuffer(obj);

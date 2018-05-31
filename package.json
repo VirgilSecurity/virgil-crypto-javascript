@@ -5,7 +5,8 @@
   "browser": {
     "./dist/virgil-crypto.cjs.js": "./dist/virgil-crypto.browser.cjs.js",
     "./dist/virgil-crypto.es.js": "./dist/virgil-crypto.browser.es.js",
-    "./src/node/api.ts": "./src/browser/api.ts"
+    "./src/node/api.ts": "./src/browser/api.ts",
+    "./src/pythia/node/api.ts": "./src/pythia/browser/api.ts"
   },
   "module": "dist/virgil-crypto.es.js",
   "typings": "dist/types/index.d.ts",

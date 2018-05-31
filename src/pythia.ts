@@ -1,5 +1,5 @@
 import { makeVirgilCryptoFactory } from './makeVirgilCryptoFactory';
-import { cryptoApi } from './node/api';
+import { cryptoApi } from './pythia/node/api';
 import { VirgilCryptoFactory } from './interfaces';
 
 export { KeyPairType, HashAlgorithm } from './common';

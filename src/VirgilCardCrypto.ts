@@ -1,6 +1,5 @@
 import { HashAlgorithm } from './common';
-import { VirgilCrypto, VirgilPrivateKey, VirgilPublicKey } from './VirgilCrypto';
-import { IPrivateKey, IPublicKey } from './interfaces';
+import { IPrivateKey, IPublicKey, VirgilCrypto, VirgilPrivateKey, VirgilPublicKey } from './interfaces';
 
 /**
  * Class implementing  cryptographic operations required to create and
@@ -8,16 +7,14 @@ import { IPrivateKey, IPublicKey } from './interfaces';
  * from {@link https://bit.ly/2GCZLnU|virgil-sdk}), using {@link VirgilCrypto}.
  */
 export class VirgilCardCrypto {
-	private readonly crypto: VirgilCrypto;
 
 	/**
 	 * Initializes the new `VirgilCardCrypto`
-	 * @param {VirgilCrypto} [virgilCrypto] - VirgilCrypto instance, providing
-	 * implementation of crypto operations. Optional. A new instance will be
-	 * created automatically if this parameter is omitted.
+	 * @param {VirgilCrypto} virgilCrypto - VirgilCrypto instance, providing
+	 * implementation of crypto operations.
 	 */
-	constructor(virgilCrypto?: VirgilCrypto) {
-		this.crypto = virgilCrypto || new VirgilCrypto();
+	constructor(private readonly virgilCrypto: VirgilCrypto) {
+		if (virgilCrypto == null) throw new Error('`virgilCrypto` is required');
 	}
 
 	/**
@@ -28,7 +25,7 @@ export class VirgilCardCrypto {
 	 * @returns {Buffer} - The signature data.
 	 */
 	generateSignature (data: Buffer|string, privateKey: IPrivateKey) {
-		return this.crypto.calculateSignature(data, privateKey as VirgilPrivateKey);
+		return this.virgilCrypto.calculateSignature(data, privateKey as VirgilPrivateKey);
 	}
 
 	/**
@@ -40,7 +37,7 @@ export class VirgilCardCrypto {
 	 * @returns {boolean} - `true` if signature is valid, otherwise `false`
 	 */
 	verifySignature (data: Buffer|string, signature: Buffer|string, publicKey: IPublicKey) {
-		return this.crypto.verifySignature(data, signature, publicKey as VirgilPublicKey);
+		return this.virgilCrypto.verifySignature(data, signature, publicKey as VirgilPublicKey);
 	}
 
 	/**
@@ -50,7 +47,7 @@ export class VirgilCardCrypto {
 	 * @returns {Buffer} - The public key material in DER format.
 	 */
 	exportPublicKey (publicKey: IPublicKey) {
-		return this.crypto.exportPublicKey(publicKey as VirgilPublicKey);
+		return this.virgilCrypto.exportPublicKey(publicKey as VirgilPublicKey);
 	}
 
 	/**
@@ -61,7 +58,7 @@ export class VirgilCardCrypto {
 	 * @returns {VirgilPublicKey} The public key object.
 	 */
 	importPublicKey (publicKeyData: Buffer|string) {
-		return this.crypto.importPublicKey(publicKeyData);
+		return this.virgilCrypto.importPublicKey(publicKeyData);
 	}
 
 	/**
@@ -70,6 +67,6 @@ export class VirgilCardCrypto {
 	 * @returns {Buffer} - The resulting hash value.
 	 */
 	generateSha512 (data: Buffer|string) {
-		return this.crypto.calculateHash(data, HashAlgorithm.SHA512);
+		return this.virgilCrypto.calculateHash(data, HashAlgorithm.SHA512);
 	}
 }

@@ -1,5 +1,4 @@
-import { VirgilCrypto, VirgilPrivateKey, VirgilPublicKey } from './VirgilCrypto';
-import { IPrivateKey, IPublicKey } from './interfaces';
+import { IPrivateKey, IPublicKey, VirgilCrypto, VirgilPrivateKey, VirgilPublicKey } from './interfaces';
 
 /**
  * Class implementing  cryptographic operations required to sign and
@@ -8,16 +7,14 @@ import { IPrivateKey, IPublicKey } from './interfaces';
  * using {@link VirgilCrypto}.
  */
 export class VirgilAccessTokenSigner {
-	private readonly crypto: VirgilCrypto;
 
 	/**
 	 * Initializes the new `VirgilAccessTokenSigner`
 	 * @param {VirgilCrypto} virgilCrypto - VirgilCrypto instance, providing
-	 * implementation of crypto operations. Optional. A new instance will be
-	 * created automatically if this parameter is omitted.
+	 * implementation of crypto operations.
 	 */
-	constructor(virgilCrypto?: VirgilCrypto) {
-		this.crypto = virgilCrypto || new VirgilCrypto();
+	constructor(private readonly virgilCrypto: VirgilCrypto) {
+		if (virgilCrypto == null) throw new Error('`virgilCrypto` is required');
 	}
 
 	/**
@@ -38,7 +35,7 @@ export class VirgilAccessTokenSigner {
 	 * @returns {Buffer} - The signature.
 	 */
 	generateTokenSignature (token: Buffer|string, privateKey: IPrivateKey) {
-		return this.crypto.calculateSignature(token, privateKey as VirgilPrivateKey);
+		return this.virgilCrypto.calculateSignature(token, privateKey as VirgilPrivateKey);
 	}
 
 	/**
@@ -49,6 +46,6 @@ export class VirgilAccessTokenSigner {
 	 * @returns {boolean} - `true` if signature is valid, otherwise `false`
 	 */
 	verifyTokenSignature (token: Buffer|string, signature: Buffer|string, publicKey: IPublicKey) {
-		return this.crypto.verifySignature(token, signature, publicKey as VirgilPublicKey);
+		return this.virgilCrypto.verifySignature(token, signature, publicKey as VirgilPublicKey);
 	}
 }

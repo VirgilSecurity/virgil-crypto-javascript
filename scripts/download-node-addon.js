@@ -44,7 +44,7 @@ function getCdnLink(libVersion) {
 		nodeVersion,
 		platform,
 		arch,
-		platform.platform === 'win32' ? 'zip' : 'tgz'
+		process.platform === 'win32' ? 'zip' : 'tgz'
 	);
 }
 

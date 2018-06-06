@@ -1,4 +1,4 @@
-import { pythiaCryptoApi } from '../pythia/node/api';
+import { pythiaWrapper } from '../pythia/node/api';
 import { data } from './data/pythia-crypto-data';
 
 const DEBLINDED_PASSWORD = Buffer.from(data.kDeblindedPassword, 'hex');
@@ -19,7 +19,7 @@ const {
 	transform,
 	updateDeblindedWithToken,
 	verify
-} = pythiaCryptoApi;
+} = pythiaWrapper;
 
 function blindEvalDeblind() {
 	const { blindingSecret, blindedPassword } = blind(PASSWORD);

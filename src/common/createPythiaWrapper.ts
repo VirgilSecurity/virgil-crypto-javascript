@@ -1,7 +1,13 @@
-import { IVirgilPythiaCryptoApi } from './IVirgilPythiaCryptoApi';
 import { createNativeTypeWrapper } from './createNativeTypeWrapper';
 
-export function createPythiaCryptoApi (lib: any): IVirgilPythiaCryptoApi {
+/**
+ * Creates a wrapper for Pythia-related crypto operations.
+ *
+ * @hidden
+ *
+ * @param lib - Native VirgilCrypto library (browser or node.js).
+ */
+export function createPythiaWrapper (lib: any) {
 	const wrapper = createNativeTypeWrapper(lib);
 
 	wrapper.createSafeInstanceMethods(
@@ -91,7 +97,7 @@ export function createPythiaCryptoApi (lib: any): IVirgilPythiaCryptoApi {
 			};
 		},
 
-		deblind (transformedPassword: Buffer, blindingSecret: Buffer) {
+		deblind (transformedPassword: Buffer, blindingSecret: Buffer): Buffer {
 			if (transformedPassword == null) throw new Error('`transformedPassword` is required');
 			if (blindingSecret == null) throw new Error('`blindingSecret` is required');
 
@@ -99,7 +105,7 @@ export function createPythiaCryptoApi (lib: any): IVirgilPythiaCryptoApi {
 			return pythia.deblindSafe(transformedPassword, blindingSecret);
 		},
 
-		getPasswordUpdateToken (oldTransformationPrivateKey: Buffer, newTransformationPrivateKey: Buffer) {
+		getPasswordUpdateToken (oldTransformationPrivateKey: Buffer, newTransformationPrivateKey: Buffer): Buffer {
 			if (oldTransformationPrivateKey == null)
 				throw new Error('`oldTransformationPrivateKey` is required');
 			if (newTransformationPrivateKey == null)
@@ -178,7 +184,7 @@ export function createPythiaCryptoApi (lib: any): IVirgilPythiaCryptoApi {
 			};
 		},
 
-		updateDeblindedWithToken (deblindedPassword: Buffer, passwordUpdateToken: Buffer) {
+		updateDeblindedWithToken (deblindedPassword: Buffer, passwordUpdateToken: Buffer): Buffer {
 			if (deblindedPassword == null) throw new Error('`deblindedPassword` is required');
 			if (passwordUpdateToken == null) throw new Error('`passwordUpdateToken` is required');
 
@@ -193,7 +199,7 @@ export function createPythiaCryptoApi (lib: any): IVirgilPythiaCryptoApi {
 			transformationPublicKey: Buffer,
 			proofValueC: Buffer,
 			proofValueU: Buffer
-		) {
+		): boolean {
 			if (transformedPassword == null) throw new Error('`transformedPassword` is required');
 			if (blindedPassword == null) throw new Error('`blindedPassword` is required');
 			if (tweak == null) throw new Error('`tweak` is required');

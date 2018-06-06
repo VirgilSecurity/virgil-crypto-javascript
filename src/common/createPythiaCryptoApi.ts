@@ -18,59 +18,13 @@ export function createPythiaCryptoApi (lib: any): IVirgilPythiaCryptoApi {
 		]
 	);
 
-	wrapper.createSafeInstanceMethods(
-		lib.VirgilPythiaBlindResult,
-		[ 'blindedPassword', 'blindingSecret' ]
-	);
-
-	wrapper.createSafeInstanceMethods(
-		lib.VirgilPythiaProveResult,
-		[ 'proofValueC', 'proofValueU' ]
-	);
-
-	wrapper.createSafeInstanceMethods(
-		lib.VirgilPythiaTransformationKeyPair,
-		[ 'privateKey', 'publicKey' ]
-	);
-
-	wrapper.createSafeInstanceMethods(
-		lib.VirgilPythiaTransformResult,
-		[ 'transformedPassword', 'transformedTweak' ]
-	);
-
-	lib.createVirgilPythia = () => {
+	const createVirgilPythia = () => {
 		const pythia = new lib.VirgilPythia();
 		if (process.browser) pythia.deleteLater();
 		return pythia;
 	};
 
-	lib.createVirgilRandom = () => {
-		const random = new lib.VirgilRandom('');
-		if (process.browser) random.deleteLater();
-		return random;
-	};
-
-	lib.getRandomBytes = (numOfBytes: number) => {
-		if (process.browser) {
-			const personalInfo = lib.VirgilByteArrayUtils.stringToBytes('');
-			const random = new lib.VirgilRandom(personalInfo);
-
-			let byteArr: any;
-			try {
-				byteArr = random.randomizeBytes(numOfBytes);
-				return wrapper.utils.virgilByteArrayToBuffer(byteArr);
-			} finally {
-				personalInfo.delete();
-				random.delete();
-				byteArr && byteArr.delete();
-			}
-		} else {
-			const random = new lib.VirgilRandom('');
-			return wrapper.utils.virgilByteArrayToBuffer(random.randomize(numOfBytes));
-		}
-	};
-
-	lib.createVirgilPythiaTransformationKeyPair = (privateKey: Buffer, publicKey: Buffer) => {
+	const createVirgilPythiaTransformationKeyPair = (privateKey: Buffer, publicKey: Buffer) => {
 		const privateKeyArr = wrapper.utils.bufferToVirgilByteArray(privateKey);
 		const publicKeyArr = wrapper.utils.bufferToVirgilByteArray(publicKey);
 		const keyPair = new lib.VirgilPythiaTransformationKeyPair(
@@ -92,12 +46,21 @@ export function createPythiaCryptoApi (lib: any): IVirgilPythiaCryptoApi {
 			if (password == null) throw new Error('`password` is required');
 
 			password = Buffer.isBuffer(password) ? password : Buffer.from(password, 'utf8');
-			const pythia = lib.createVirgilPythia();
+			const pythia = createVirgilPythia();
 
 			const result = pythia.blindSafe(password);
+			const blindedPasswordArr = result.blindedPassword();
+			const blindingSecretArr = result.blindingSecret();
+
+			if (process.browser) {
+				blindedPasswordArr.deleteLater();
+				blindingSecretArr.deleteLater();
+				result.deleteLater();
+			}
+
 			return {
-				blindedPassword: result.blindedPasswordSafe(),
-				blindingSecret: result.blindingSecretSafe()
+				blindedPassword: wrapper.utils.virgilByteArrayToBuffer(blindedPasswordArr),
+				blindingSecret: wrapper.utils.virgilByteArrayToBuffer(blindingSecretArr)
 			};
 		},
 
@@ -106,16 +69,25 @@ export function createPythiaCryptoApi (lib: any): IVirgilPythiaCryptoApi {
 			if (pythiaSecret == null) throw new Error('`pythiaSecret` is required');
 			if (pythiaScopeSecret == null) throw new Error('`pythiaScopeSecret` is required');
 
-			const pythia = lib.createVirgilPythia();
+			const pythia = createVirgilPythia();
 			const keyPair = pythia.computeTransformationKeyPairSafe(
 				transformationKeyId,
 				pythiaSecret,
 				pythiaScopeSecret
 			);
 
+			const privateKeyArr = keyPair.privateKey();
+			const publicKeyArr = keyPair.publicKey();
+
+			if (process.browser) {
+				privateKeyArr.deleteLater();
+				publicKeyArr.deleteLater();
+				keyPair.deleteLater();
+			}
+
 			return {
-				privateKey: keyPair.privateKeySafe(),
-				publicKey: keyPair.publicKeySafe()
+				privateKey: wrapper.utils.virgilByteArrayToBuffer(privateKeyArr),
+				publicKey: wrapper.utils.virgilByteArrayToBuffer(publicKeyArr)
 			};
 		},
 
@@ -123,12 +95,8 @@ export function createPythiaCryptoApi (lib: any): IVirgilPythiaCryptoApi {
 			if (transformedPassword == null) throw new Error('`transformedPassword` is required');
 			if (blindingSecret == null) throw new Error('`blindingSecret` is required');
 
-			const pythia = lib.createVirgilPythia();
+			const pythia = createVirgilPythia();
 			return pythia.deblindSafe(transformedPassword, blindingSecret);
-		},
-
-		generateSalt (numOfBytes: number = 32) {
-			return lib.getRandomBytes(numOfBytes);
 		},
 
 		getPasswordUpdateToken (oldTransformationPrivateKey: Buffer, newTransformationPrivateKey: Buffer) {
@@ -137,7 +105,7 @@ export function createPythiaCryptoApi (lib: any): IVirgilPythiaCryptoApi {
 			if (newTransformationPrivateKey == null)
 				throw new Error('`newTransformationPrivateKey` is required');
 
-			const pythia = lib.createVirgilPythia();
+			const pythia = createVirgilPythia();
 			return pythia.getPasswordUpdateTokenSafe(
 				oldTransformationPrivateKey,
 				newTransformationPrivateKey
@@ -155,12 +123,12 @@ export function createPythiaCryptoApi (lib: any): IVirgilPythiaCryptoApi {
 			if (transformedTweak == null) throw new Error('`transformedTweak` is required');
 			if (transformationKeyPair == null) throw new Error('`transformationKeyPair` is required');
 
-			transformationKeyPair = lib.createVirgilPythiaTransformationKeyPair(
+			transformationKeyPair = createVirgilPythiaTransformationKeyPair(
 				transformationKeyPair.privateKey,
 				transformationKeyPair.publicKey
 			);
 
-			const pythia = lib.createVirgilPythia();
+			const pythia = createVirgilPythia();
 			const result = pythia.proveSafe(
 				transformedPassword,
 				blindedPassword,
@@ -168,9 +136,18 @@ export function createPythiaCryptoApi (lib: any): IVirgilPythiaCryptoApi {
 				transformationKeyPair
 			);
 
+			const proofValueCArr = result.proofValueC();
+			const proofValueUArr = result.proofValueU();
+
+			if (process.browser) {
+				proofValueCArr.deleteLater();
+				proofValueUArr.deleteLater();
+				result.deleteLater();
+			}
+
 			return {
-				proofValueC: result.proofValueCSafe(),
-				proofValueU: result.proofValueUSafe(),
+				proofValueC: wrapper.utils.virgilByteArrayToBuffer(proofValueCArr),
+				proofValueU: wrapper.utils.virgilByteArrayToBuffer(proofValueUArr),
 			}
 		},
 
@@ -179,16 +156,25 @@ export function createPythiaCryptoApi (lib: any): IVirgilPythiaCryptoApi {
 			if (tweak == null) throw new Error('`tweak` is required');
 			if (transformationPrivateKey == null) throw new Error('`transformationPrivateKey` is required');
 
-			const pythia = lib.createVirgilPythia();
+			const pythia = createVirgilPythia();
 			const result = pythia.transformSafe(
 				blindedPassword,
 				tweak,
 				transformationPrivateKey
 			);
 
+			const transformedPasswordArr = result.transformedPassword();
+			const transformedTweakArr = result.transformedTweak();
+
+			if (process.browser) {
+				transformedPasswordArr.deleteLater();
+				transformedTweakArr.deleteLater();
+				result.deleteLater();
+			}
+
 			return {
-				transformedPassword: result.transformedPasswordSafe(),
-				transformedTweak: result.transformedTweakSafe(),
+				transformedPassword: wrapper.utils.virgilByteArrayToBuffer(transformedPasswordArr),
+				transformedTweak: wrapper.utils.virgilByteArrayToBuffer(transformedTweakArr),
 			};
 		},
 
@@ -196,7 +182,7 @@ export function createPythiaCryptoApi (lib: any): IVirgilPythiaCryptoApi {
 			if (deblindedPassword == null) throw new Error('`deblindedPassword` is required');
 			if (passwordUpdateToken == null) throw new Error('`passwordUpdateToken` is required');
 
-			const pythia = lib.createVirgilPythia();
+			const pythia = createVirgilPythia();
 			return pythia.updateDeblindedWithTokenSafe(deblindedPassword, passwordUpdateToken);
 		},
 
@@ -215,7 +201,7 @@ export function createPythiaCryptoApi (lib: any): IVirgilPythiaCryptoApi {
 			if (proofValueC == null) throw new Error('`proofValueC` is required');
 			if (proofValueU == null) throw new Error('`proofValueU` is required');
 
-			const pythia = lib.createVirgilPythia();
+			const pythia = createVirgilPythia();
 			return pythia.verifySafe(
 				transformedPassword,
 				blindedPassword,

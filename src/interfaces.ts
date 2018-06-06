@@ -54,6 +54,11 @@ export interface VirgilPublicKey extends IPublicKey {
 	readonly key: Buffer;
 }
 
+/**
+ * Object representation of private and public keys pair.
+ *
+ * @protected
+ */
 export interface VirgilKeyPair {
 	privateKey: VirgilPrivateKey;
 	publicKey: VirgilPublicKey;
@@ -104,10 +109,20 @@ export interface VirgilCrypto {
 	 * Generates a new key pair.
 	 *
 	 * @param {KeyPairType} [type] - Optional type of the key pair.
-	 * See `KeyPairType` for available options. Default is Ed25519.
+	 * See {@link KeyPairType} for available options. Default is Ed25519.
 	 * @returns {KeyPair} - The newly generated key pair.
 	 * */
 	generateKeys(type?: KeyPairType): VirgilKeyPair;
+
+	/**
+	 * Generates a new key pair from the given key material.
+	 * @param {Buffer} keyMaterial - The data to be used for key generation,
+	 * must be strong enough (have high entropy).
+	 * @param {KeyPairType} [type] - Optional type of the key pair.
+	 * See {@link KeyPairType} for available options. Default is Ed25519.
+	 * @returns {VirgilKeyPair}
+	 */
+	generateKeysFromKeyMaterial(keyMaterial: Buffer, type?: KeyPairType): VirgilKeyPair;
 
 	/**
 	 * Creates a `VirgilPrivateKey` object from private key material in PEM or DER format.
@@ -281,4 +296,6 @@ export interface VirgilCrypto {
 		cipherData: Buffer|string,
 		decryptionKey: VirgilPrivateKey,
 		verificationKey: VirgilPublicKey|VirgilPublicKey[]): Buffer;
+
+	getRandomBytes (length: number): Buffer;
 }

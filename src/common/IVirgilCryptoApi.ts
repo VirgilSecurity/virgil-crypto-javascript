@@ -45,6 +45,34 @@ export type VerificationKey = {
 };
 
 /**
+ * Key pair generation options.
+ * @hidden
+ */
+export interface KeyPairOptions {
+	/**
+	 * Type of keys to generate. Optional. Default is {@link KeyPairType.Default}
+	 */
+	type?: KeyPairType;
+
+	/**
+	 * Password to encrypt the private key with. Optional. The private key
+	 * is not encrypted by default.
+	 */
+	password?: Buffer;
+}
+
+/**
+ * Parameter of {@link IVirgilCryptoApi.generateKeyPairFromKeyMaterial} method.
+ * @hidden
+ */
+export interface KeyPairFromKeyMaterialOptions extends KeyPairOptions {
+	/**
+	 * The data to be used for key generation, must be strong enough (have high entropy).
+	 */
+	keyMaterial: Buffer;
+}
+
+/**
  * The Virgil Crypto library api wrapper interface.
  * @hidden
  */
@@ -53,13 +81,21 @@ export interface IVirgilCryptoApi {
 	/**
 	 * Generate the key pair - public and private keys
 	 *
-	 * @param {Object} [options={}] - Keypair options.
+	 * @param {Object} [options={}] - KeyPair generation options.
 	 * @param {Buffer} [options.password] - Private key password (Optional).
-	 * @param {string} [options.type=] - Keys type identifier (Optional).
-	 * 		If provided must be one of KeyPairType values.
-	 * @returns {{publicKey: Buffer, privateKey: Buffer}}
+	 * @param {string} [options.type] - Keys type identifier (Optional).
+	 * If provided must be one of KeyPairType values.
+	 * @returns {KeyPair}
 	 */
 	generateKeyPair(options?: { type?: KeyPairType, password?: Buffer }): KeyPair;
+
+	/**
+	 * Generates private and public keys from the given key material.
+	 *
+	 * @param {KeyPairFromKeyMaterialOptions} options - KeyPair generation options.
+	 * @returns {KeyPair}
+	 */
+	generateKeyPairFromKeyMaterial (options: KeyPairFromKeyMaterialOptions): KeyPair;
 
 	/**
 	 * Converts PEM formatted private key to DER format.
@@ -210,4 +246,13 @@ export interface IVirgilCryptoApi {
 	 * @returns {Buffer} Decrypted data
 	 * */
 	decryptThenVerify(cipherData: Buffer, decryptionKey: DecryptionKey, verificationKey: VerificationKey|VerificationKey[]): Buffer;
+
+	/**
+	 * Generates a random byte sequence of the given size.
+	 *
+	 * @param {number} numOfBytes - Number of bytes to generate.
+	 *
+	 * @returns {Buffer}
+	 */
+	getRandomBytes (numOfBytes: number): Buffer;
 }

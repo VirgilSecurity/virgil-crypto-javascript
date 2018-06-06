@@ -1,4 +1,4 @@
-import { cryptoApi } from '../pythia/node/api';
+import { pythiaCryptoApi } from '../pythia/node/api';
 import { data } from './data/pythia-crypto-data';
 
 const DEBLINDED_PASSWORD = Buffer.from(data.kDeblindedPassword, 'hex');
@@ -14,13 +14,12 @@ const {
 	blind,
 	computeTransformationKeyPair,
 	deblind,
-	generateSalt,
 	getPasswordUpdateToken,
 	prove,
 	transform,
 	updateDeblindedWithToken,
 	verify
-} = cryptoApi.pythia;
+} = pythiaCryptoApi;
 
 function blindEvalDeblind() {
 	const { blindingSecret, blindedPassword } = blind(PASSWORD);
@@ -141,13 +140,6 @@ describe('Pythia Crypto', function () {
 			assert.throws(() => {
 				blind(hugePassword);
 			});
-		});
-	});
-
-	describe('Generate Salt', () => {
-		it ('generates 32 bytes by default', () => {
-			const salt = generateSalt();
-			assert.equal(salt.length, 32);
 		});
 	});
 });

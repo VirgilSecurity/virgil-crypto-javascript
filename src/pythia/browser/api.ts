@@ -1,11 +1,5 @@
 import { lib } from './asmjs';
-import { IVirgilCryptoApi, IVirgilPythiaCryptoApi, createCryptoApi, createPythiaCryptoApi } from '../../common';
+import { createCryptoApi, createPythiaCryptoApi, IVirgilCryptoApi, IVirgilPythiaCryptoApi } from '../../common';
 
-const virgilCryptoApi: IVirgilCryptoApi = createCryptoApi(lib);
-const pythiaApi = createPythiaCryptoApi(lib);
-
-export const cryptoApi: IVirgilCryptoApi & { pythia: IVirgilPythiaCryptoApi } = {
-	...virgilCryptoApi,
-	pythia: pythiaApi
-};
-
+export const cryptoApi: IVirgilCryptoApi = createCryptoApi(lib);
+export const pythiaCryptoApi: IVirgilPythiaCryptoApi = createPythiaCryptoApi(lib);

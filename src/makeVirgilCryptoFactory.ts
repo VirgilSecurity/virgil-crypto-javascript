@@ -1,11 +1,11 @@
-import { IVirgilCryptoApi } from './common';
+import { IVirgilCryptoApi, KeyPair } from './common';
 import { KeyPairType, HashAlgorithm, assert } from './common';
 import { toArray } from './utils/toArray';
 import {
 	VirgilPrivateKey as IVirgilPrivateKey,
 	VirgilPublicKey as IVirgilPublicKey,
 	VirgilCrypto,
-	VirgilCryptoOptions
+	VirgilCryptoOptions, VirgilKeyPair
 } from './interfaces';
 
 const _privateKeys = new WeakMap();
@@ -103,21 +103,21 @@ export function makeVirgilCryptoFactory (cryptoApi: IVirgilCryptoApi): (options?
 			 * Generates a new key pair.
 			 *
 			 * @param {KeyPairType} [type] - Optional type of the key pair.
-			 * 			See `KeyPairType` for available options. Default is Ed25519.
+			 * See {@link KeyPairType} for available options. Default is Ed25519.
 			 * @returns {KeyPair} - The newly generated key pair.
 			 * */
 			generateKeys(type?: KeyPairType) {
 				type = type != null ? type : defaultKeyPairType;
 
 				const keyPair = cryptoApi.generateKeyPair({ type });
-				const publicKeyDer = cryptoApi.publicKeyToDer(keyPair.publicKey);
-				const privateKeyDer = cryptoApi.privateKeyToDer(keyPair.privateKey);
-				const identifier = calculateKeypairIdentifier(publicKeyDer);
+				return wrapKeyPair(keyPair);
+			},
 
-				return {
-					privateKey: new VirgilPrivateKey(identifier, privateKeyDer),
-					publicKey: new VirgilPublicKey(identifier, publicKeyDer)
-				};
+			generateKeysFromKeyMaterial(keyMaterial: Buffer, type?: KeyPairType): VirgilKeyPair {
+				type = type != null ? type : defaultKeyPairType;
+
+				const keyPair = cryptoApi.generateKeyPairFromKeyMaterial({ keyMaterial, type });
+				return wrapKeyPair(keyPair);
 			},
 
 			/**
@@ -473,6 +473,10 @@ export function makeVirgilCryptoFactory (cryptoApi: IVirgilCryptoApi): (options?
 					},
 					verificationKeys!
 				);
+			},
+
+			getRandomBytes (length: number): Buffer {
+				return cryptoApi.getRandomBytes(length);
 			}
 		};
 
@@ -491,6 +495,22 @@ export function makeVirgilCryptoFactory (cryptoApi: IVirgilCryptoApi): (options?
 			} else {
 				return cryptoApi.hash(publicKeyData, HashAlgorithm.SHA512).slice(0, 8);
 			}
+		}
+
+		/**
+		 * Wraps binary private and public keys into {@link VirgilKeyPair} object.
+		 * @param {KeyPair} keyPair
+		 * @returns {VirgilKeyPair}
+		 */
+		function wrapKeyPair (keyPair: KeyPair) {
+			const privateKeyDer = cryptoApi.privateKeyToDer(keyPair.privateKey);
+			const publicKeyDer = cryptoApi.publicKeyToDer(keyPair.publicKey);
+			const identifier = calculateKeypairIdentifier(publicKeyDer);
+
+			return {
+				privateKey: new VirgilPrivateKey(identifier, privateKeyDer),
+				publicKey: new VirgilPublicKey(identifier, publicKeyDer)
+			};
 		}
 	};
 }

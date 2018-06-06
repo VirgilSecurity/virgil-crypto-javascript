@@ -29,8 +29,6 @@ export interface IVirgilPythiaCryptoApi {
 
 	deblind (transformedPassword: Buffer, blindingSecret: Buffer): Buffer;
 
-	generateSalt (numOfBytes?: number): Buffer;
-
 	getPasswordUpdateToken (oldTransformationPrivateKey: Buffer, newTransformationPrivateKey: Buffer): Buffer;
 
 	prove (

@@ -2,28 +2,19 @@ import { toArray } from '../utils/toArray';
 import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
 import { createNativeTypeWrapper } from './createNativeTypeWrapper';
 import { KeyPairType } from './KeyPairType';
-import { DecryptionKey, EncryptionKey, IVirgilCryptoApi, SigningKey, VerificationKey } from './IVirgilCryptoApi';
+import {
+	DecryptionKey,
+	EncryptionKey,
+	IVirgilCryptoApi,
+	KeyPairFromKeyMaterialOptions,
+	KeyPairOptions,
+	SigningKey,
+	VerificationKey
+} from './IVirgilCryptoApi';
 import { HashAlgorithm } from './HashAlgorithm';
 import { IntegrityCheckFailedError } from './errors';
 
 const EMPTY_BUFFER = Buffer.alloc(0);
-
-/**
- * Key pair generation options.
- * @hidden
- */
-export interface KeyPairOptions {
-	/**
-	 * Type of keys to generate. Optional. Default is {@link KeyPairType.Default}
-	 */
-	type?: KeyPairType;
-
-	/**
-	 * Password to encrypt the private key with. Optional. The private key
-	 * is not encrypted by default.
-	 */
-	password?: Buffer;
-}
 
 /**
  * Creates a low level API wrapper for "native" Virgil Crypto library
@@ -52,7 +43,9 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 		'extractPublicKey',
 		'privateKeyToDER',
 		'publicKeyToDER',
-		'resetPrivateKeyPassword'
+		'resetPrivateKeyPassword',
+		'generateFromKeyMaterial',
+		'generateRecommendedFromKeyMaterial'
 	]);
 
 	lib.createVirgilCipher = () => {
@@ -74,23 +67,62 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 		if (process.browser) hash.deleteLater();
 		return hash;
 	};
+	lib.getRandomBytes = (numOfBytes: number) => {
+		if (process.browser) {
+			const personalInfo = lib.VirgilByteArrayUtils.stringToBytes('');
+			const random = new lib.VirgilRandom(personalInfo);
+
+			let byteArr: any;
+			try {
+				byteArr = random.randomizeBytes(numOfBytes);
+				return wrapper.utils.virgilByteArrayToBuffer(byteArr);
+			} finally {
+				personalInfo.delete();
+				random.delete();
+				byteArr && byteArr.delete();
+			}
+		} else {
+			const random = new lib.VirgilRandom('');
+			return wrapper.utils.virgilByteArrayToBuffer(random.randomize(numOfBytes));
+		}
+	};
+
 
 	return {
 		generateKeyPair (options: KeyPairOptions = {}) {
 			let { type, password = EMPTY_BUFFER } = options;
-			let keypair;
+			let keyPair;
 			if (type) {
-				const libType = process.browser
-					? lib.VirgilKeyPairType[type]
-					: lib.VirgilKeyPair[`Type_${type}`];
-				keypair = lib.VirgilKeyPair.generateSafe(libType, password);
+				keyPair = lib.VirgilKeyPair.generateSafe(getLibKeyPairType(type), password);
 			} else {
-				keypair = lib.VirgilKeyPair.generateRecommendedSafe(password);
+				keyPair = lib.VirgilKeyPair.generateRecommendedSafe(password);
 			}
 
 			return {
-				privateKey: keypair.privateKeySafe(),
-				publicKey: keypair.publicKeySafe()
+				privateKey: keyPair.privateKeySafe(),
+				publicKey: keyPair.publicKeySafe()
+			};
+		},
+
+		generateKeyPairFromKeyMaterial (options: KeyPairFromKeyMaterialOptions) {
+			const { type = KeyPairType.Default, password = EMPTY_BUFFER, keyMaterial } = options;
+			let keyPair;
+			if (type) {
+				keyPair = lib.VirgilKeyPair.generateFromKeyMaterialSafe(
+					getLibKeyPairType(type),
+					keyMaterial,
+					password
+				);
+			} else {
+				keyPair = lib.VirgilKeyPair.generateRecommendedFromKeyMaterial(
+					keyMaterial,
+					password
+				);
+			}
+
+			return {
+				privateKey: keyPair.privateKeySafe(),
+				publicKey: keyPair.publicKeySafe()
 			};
 		},
 
@@ -239,6 +271,10 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 			}
 
 			return plainData;
+		},
+
+		getRandomBytes (numOfBytes: number): Buffer {
+			return lib.getRandomBytes(numOfBytes);
 		}
 	};
 
@@ -249,5 +285,11 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 		} catch (e) {
 			return null;
 		}
+	}
+
+	function getLibKeyPairType (type: KeyPairType) {
+		return process.browser
+			? lib.VirgilKeyPairType[type]
+			: lib.VirgilKeyPair[`Type_${type}`];
 	}
 }

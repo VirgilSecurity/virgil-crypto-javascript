@@ -8,3 +8,4 @@ export { VirgilPrivateKeyExporter } from './VirgilPrivateKeyExporter';
 export { VirgilCardCrypto } from './VirgilCardCrypto';
 
 export const createVirgilCrypto: VirgilCryptoFactory = makeVirgilCryptoFactory(cryptoApi);
+export { VirgilPythia } from './VirgilPythia';

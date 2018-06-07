@@ -31,7 +31,11 @@ describe('encrypt/decrypt', function () {
 		.filter(function (keyType) {
 			// these take too long to generate and encrypt causing the test
 			// to fail by timeout
-			return keyType.indexOf('RSA') !== 0;
+			if (process.browser) {
+				return keyType.indexOf('RSA') !== 0;
+			}
+
+			return keyType !== 'RSA_8192';
 		})
 		.forEach(function (keyType) {
 			it('using keys \''+keyType+'\' without password', function () {

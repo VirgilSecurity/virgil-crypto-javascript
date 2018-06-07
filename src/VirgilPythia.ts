@@ -3,7 +3,7 @@ import { pythiaWrapper } from './pythia/node/wrapper';
 /**
  * Input parameters of {@link VirgilPythia.computeTransformationKeyPair} method.
  */
-export interface ComputeTransformationKeyPairParams {
+export interface PythiaComputeTransformationKeyPairParams {
 	/**
 	 * Key ID used in key pair computation.
 	 */
@@ -23,7 +23,7 @@ export interface ComputeTransformationKeyPairParams {
 /**
  * Input parameters of {@link VirgilPythia.deblind} method.
  */
-export interface DeblindParams {
+export interface PythiaDeblindParams {
 	/**
 	 * GT transformed password returned by {@link VirgilPythia.transform}.
 	 */
@@ -38,7 +38,7 @@ export interface DeblindParams {
 /**
  * Input parameters of {@link VirgilPythia.getPasswordUpdateToken} method.
  */
-export interface GetPasswordUpdateTokenParams {
+export interface PythiaGetPasswordUpdateTokenParams {
 	/**
 	 * The transformation private key used to transform the existing `deblindedPassword`'s.
 	 */
@@ -53,7 +53,7 @@ export interface GetPasswordUpdateTokenParams {
 /**
  * Input parameters of {@link VirgilPythia.prove} method.
  */
-export interface ProveParams {
+export interface PythiaProveParams {
 	/**
 	 * GT transformed password from {@link VirgilPythia.transform}.
 	 */
@@ -72,13 +72,13 @@ export interface ProveParams {
 	/**
 	 * Transformation key pair from {@link VirgilPythia.computeTransformationKeyPair}
 	 */
-	transformationKeyPair: TransformationKeyPair;
+	transformationKeyPair: PythiaTransformationKeyPair;
 }
 
 /**
  * Input parameters of {@link VirgilPythia.transform} method.
  */
-export interface TransformParams {
+export interface PythiaTransformParams {
 	/**
 	 * G1 Blinded (obfuscated) password.
 	 */
@@ -98,7 +98,7 @@ export interface TransformParams {
 /**
  * Input parameters of {@link VirgilPythia.updateDeblindedWithToken} method.
  */
-export interface UpdateDeblindedWithTokenParams {
+export interface PythiaUpdateDeblindedWithTokenParams {
 	/**
 	 * GT Deblinded password to update.
 	 */
@@ -113,7 +113,7 @@ export interface UpdateDeblindedWithTokenParams {
 /**
  * Input parameters of {@link VirgilPythia.verify} method.
  */
-export interface VerifyParams {
+export interface PythiaVerifyParams {
 	/**
 	 * GT transformed password from {@link VirgilPythia.transform}.
 	 */
@@ -148,7 +148,7 @@ export interface VerifyParams {
 /**
  * Result of the {@link VirgilPythia.blind} method.
  */
-export interface BlindResult {
+export interface PythiaBlindResult {
 	/**
 	 * G1 password obfuscated into a pseudo-random string.
 	 */
@@ -163,7 +163,7 @@ export interface BlindResult {
 /**
  * Result of the {@link VirgilPythia.computeTransformationKeyPair} method.
  */
-export interface TransformationKeyPair {
+export interface PythiaTransformationKeyPair {
 	/**
 	 * BN transformation private key.
 	 */
@@ -178,7 +178,7 @@ export interface TransformationKeyPair {
 /**
  * Result of the {@link VirgilPythia.prove} method.
  */
-export interface ProveResult {
+export interface PythiaProveResult {
 	/**
 	 * BN first part of proof that `transformedPassword` was created using `transformationPrivateKey`.
 	 */
@@ -193,7 +193,7 @@ export interface ProveResult {
 /**
  * Result of the {@link VirgilPythia.transform} method.
  */
-export interface TransformResult {
+export interface PythiaTransformResult {
 	/**
 	 * GT blinded password, protected using server secret (pythia_secret + pythia_scope_secret + tweak).
 	 */
@@ -218,9 +218,9 @@ export class VirgilPythia {
 	 * password.
 	 *
 	 * @param {string | Buffer} password - The user's password.
-	 * @returns {BlindResult}
+	 * @returns {PythiaBlindResult}
 	 */
-	blind (password: string | Buffer): BlindResult {
+	blind (password: string | Buffer): PythiaBlindResult {
 		return pythiaWrapper.blind(password);
 	}
 
@@ -228,12 +228,12 @@ export class VirgilPythia {
 	 * Deblinds the `transformedPassword` with the previously computed `blindingSecret`
 	 * returned from {@link VirgilPythia.blind} method.
 	 *
-	 * @param {DeblindParams} params - Input parameters.
+	 * @param {PythiaDeblindParams} params - Input parameters.
 	 *
 	 * @returns {Buffer} - Deblinded password. This value is NOT equal to password
 	 * and is zero-knowledge protected.
 	 */
-	deblind (params: DeblindParams): Buffer {
+	deblind (params: PythiaDeblindParams): Buffer {
 		const { transformedPassword, blindingSecret } = params;
 		return pythiaWrapper.deblind(transformedPassword, blindingSecret);
 	}
@@ -241,11 +241,11 @@ export class VirgilPythia {
 	/**
 	 * Computes transformation private and public key.
 	 *
-	 * @param {ComputeTransformationKeyPairParams} params - Input parameters.
+	 * @param {PythiaComputeTransformationKeyPairParams} params - Input parameters.
 	 *
-	 * @returns {TransformationKeyPair}
+	 * @returns {PythiaTransformationKeyPair}
 	 */
-	computeTransformationKeyPair (params: ComputeTransformationKeyPairParams): TransformationKeyPair {
+	computeTransformationKeyPair (params: PythiaComputeTransformationKeyPairParams): PythiaTransformationKeyPair {
 		const { transformationKeyId, pythiaSecret, pythiaScopeSecret } = params;
 		return pythiaWrapper.computeTransformationKeyPair(
 			transformationKeyId, pythiaSecret, pythiaScopeSecret
@@ -255,10 +255,10 @@ export class VirgilPythia {
 	/**
 	 * Transforms blinded password using the private key, generated from `pythiaSecret` +
 	 * `pythiaScopeSecret`.
-	 * @param {TransformParams} params - Input parameters.
-	 * @returns {TransformResult}
+	 * @param {PythiaTransformParams} params - Input parameters.
+	 * @returns {PythiaTransformResult}
 	 */
-	transform (params: TransformParams): TransformResult {
+	transform (params: PythiaTransformParams): PythiaTransformResult {
 		const { blindedPassword, tweak, transformationPrivateKey } = params;
 		return pythiaWrapper.transform(blindedPassword, tweak, transformationPrivateKey);
 	}
@@ -267,10 +267,10 @@ export class VirgilPythia {
 	 * Generates a cryptographic proof that one is in possession of the secret values
 	 * that were used to transform the password.
 	 *
-	 * @param {ProveParams} params - Input parameters.
-	 * @returns {ProveResult}
+	 * @param {PythiaProveParams} params - Input parameters.
+	 * @returns {PythiaProveResult}
 	 */
-	prove (params: ProveParams): ProveResult {
+	prove (params: PythiaProveParams): PythiaProveResult {
 		const { transformedPassword, blindedPassword, transformedTweak, transformationKeyPair } = params;
 		return pythiaWrapper.prove(transformedPassword, blindedPassword, transformedTweak, transformationKeyPair);
 	}
@@ -278,10 +278,10 @@ export class VirgilPythia {
 	/**
 	 * Verifies the cryptographic proof that the output of {@link VirgilPythia.transform} is correct.
 	 *
-	 * @param {VerifyParams} params - Input parameters.
+	 * @param {PythiaVerifyParams} params - Input parameters.
 	 * @returns {boolean} - `true` if transformed password is correct, otherwise - `false`.
 	 */
-	verify (params: VerifyParams): boolean {
+	verify (params: PythiaVerifyParams): boolean {
 		const {
 			transformedPassword,
 			blindedPassword,
@@ -309,11 +309,11 @@ export class VirgilPythia {
 	 *
 	 * When doing this, one should also change the `pythiaScopeSecret`.
 	 *
-	 * @param {GetPasswordUpdateTokenParams} params - Input parameters.
+	 * @param {PythiaGetPasswordUpdateTokenParams} params - Input parameters.
 	 *
 	 * @returns {Buffer}
 	 */
-	getPasswordUpdateToken (params: GetPasswordUpdateTokenParams): Buffer {
+	getPasswordUpdateToken (params: PythiaGetPasswordUpdateTokenParams): Buffer {
 		const { oldTransformationPrivateKey, newTransformationPrivateKey } = params;
 		return pythiaWrapper.getPasswordUpdateToken(oldTransformationPrivateKey, newTransformationPrivateKey);
 	}
@@ -321,10 +321,10 @@ export class VirgilPythia {
 	/**
 	 * Generates new `deblindedPassword` by updating the existing one with the `updateToken`.
 	 *
-	 * @param {UpdateDeblindedWithTokenParams} params - Input parameters.
+	 * @param {PythiaUpdateDeblindedWithTokenParams} params - Input parameters.
 	 * @returns {Buffer} The new `deblindedPassword`
 	 */
-	updateDeblindedWithToken (params: UpdateDeblindedWithTokenParams) {
+	updateDeblindedWithToken (params: PythiaUpdateDeblindedWithTokenParams) {
 		const { deblindedPassword, updateToken } = params;
 		return pythiaWrapper.updateDeblindedWithToken(deblindedPassword, updateToken);
 	}

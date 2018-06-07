@@ -12,7 +12,7 @@ import {
 	VerificationKey,
 	IVirgilCryptoWrapper
 } from './IVirgilCryptoWrapper';
-import { IntegrityCheckFailedError } from './errors';
+import { IntegrityCheckFailedError, WeakKeyMaterialError } from './errors';
 
 const EMPTY_BUFFER = Buffer.alloc(0);
 
@@ -108,8 +108,13 @@ export function createCryptoWrapper (lib: any): IVirgilCryptoWrapper {
 		},
 
 		generateKeyPairFromKeyMaterial (options: KeyPairFromKeyMaterialOptions) {
-			const { type = KeyPairType.Default, password = EMPTY_BUFFER, keyMaterial } = options;
+			const { keyMaterial, type, password = EMPTY_BUFFER } = options;
+			if (keyMaterial.byteLength < 32) {
+				throw new WeakKeyMaterialError('Key material is not secure. Expected length >= 32.');
+			}
+
 			let keyPair;
+
 			if (type) {
 				keyPair = lib.VirgilKeyPair.generateFromKeyMaterialSafe(
 					getLibKeyPairType(type),
@@ -117,7 +122,7 @@ export function createCryptoWrapper (lib: any): IVirgilCryptoWrapper {
 					password
 				);
 			} else {
-				keyPair = lib.VirgilKeyPair.generateRecommendedFromKeyMaterial(
+				keyPair = lib.VirgilKeyPair.generateRecommendedFromKeyMaterialSafe(
 					keyMaterial,
 					password
 				);

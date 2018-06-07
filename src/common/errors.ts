@@ -28,6 +28,17 @@ export class IntegrityCheckFailedError extends VirgilCryptoError {
 }
 
 /**
+ * An error that is thrown when weak key material is passed to the
+ * {@link VirgilCrypto.generateKeysFromKeyMaterial} method.
+ * The key material is considered weak if it's less than 32 bytes.
+ */
+export class WeakKeyMaterialError extends VirgilCryptoError {
+	constructor(message: string) {
+		super(message, 'WeakKeyMaterialError');
+	}
+}
+
+/**
  * Throws an error with `message` if `condition` is `false`.
  * @hidden
  * @param {boolean} condition - Condition to check.

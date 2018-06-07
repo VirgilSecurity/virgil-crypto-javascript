@@ -1,4 +1,4 @@
-import { cryptoApi } from '../node/api';
+import { cryptoWrapper } from '../node/wrapper';
 import { KeyPairType } from '../common';
 
 const PASSWORD = Buffer.from('veryStrongPa$$0rd');
@@ -8,12 +8,12 @@ describe('encrypt/decrypt', function () {
 	this.timeout(180 * 1000);
 
 	function encryptDecryptUsingKeyPair(data: Buffer, keysType: KeyPairType, password?: Buffer) {
-		const keyPair = cryptoApi.generateKeyPair({ password: password, type: keysType });
-		const encryptedData = cryptoApi.encrypt(data, {
+		const keyPair = cryptoWrapper.generateKeyPair({ password: password, type: keysType });
+		const encryptedData = cryptoWrapper.encrypt(data, {
 			key: keyPair.publicKey,
 			identifier: keyPair.publicKey
 		});
-		return cryptoApi.decrypt(encryptedData, {
+		return cryptoWrapper.decrypt(encryptedData, {
 			identifier: keyPair.publicKey,
 			key: keyPair.privateKey,
 			password: password
@@ -21,8 +21,8 @@ describe('encrypt/decrypt', function () {
 	}
 
 	it('using password', function () {
-		const encryptedData = cryptoApi.encryptWithPassword(PLAINTEXT, PASSWORD);
-		const decryptedData = cryptoApi.decryptWithPassword(encryptedData, PASSWORD);
+		const encryptedData = cryptoWrapper.encryptWithPassword(PLAINTEXT, PASSWORD);
+		const decryptedData = cryptoWrapper.decryptWithPassword(encryptedData, PASSWORD);
 		assert.isFalse(encryptedData.equals(PLAINTEXT), 'data is encrypted');
 		assert.isTrue(decryptedData.equals(PLAINTEXT), 'data is decrypted ');
 	});
@@ -31,7 +31,7 @@ describe('encrypt/decrypt', function () {
 		.filter(function (keyType) {
 			// these take too long to generate and encrypt causing the test
 			// to fail by timeout
-			return keyType !== 'RSA_8192' && keyType !== 'RSA_4096';
+			return keyType.indexOf('RSA') !== 0;
 		})
 		.forEach(function (keyType) {
 			it('using keys \''+keyType+'\' without password', function () {
@@ -54,21 +54,21 @@ describe('encrypt/decrypt', function () {
 		const recipients = [];
 		let keyPair;
 		for (let i = 0; i < numRecipients; i++) {
-			keyPair = cryptoApi.generateKeyPair();
+			keyPair = cryptoWrapper.generateKeyPair();
 			recipients.push({
-				identifier: cryptoApi.hash(keyPair.publicKey),
+				identifier: cryptoWrapper.hash(keyPair.publicKey),
 				publicKey: keyPair.publicKey,
 				privateKey: keyPair.privateKey
 			});
 		}
 
-		const encryptedData = cryptoApi.encrypt(PLAINTEXT, recipients.map(r => ({
+		const encryptedData = cryptoWrapper.encrypt(PLAINTEXT, recipients.map(r => ({
 			key: r.publicKey,
 			identifier: r.identifier
 		})));
 
 		recipients.forEach(function (r) {
-			const decryptedData = cryptoApi.decrypt(
+			const decryptedData = cryptoWrapper.decrypt(
 				encryptedData,
 				{ identifier: r.identifier, key: r.privateKey }
 			);

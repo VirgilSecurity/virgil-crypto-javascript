@@ -1,23 +1,23 @@
-import { cryptoApi } from '../node/api';
+import { cryptoWrapper } from '../node/wrapper';
 
 describe('signThenEncrypt -> decryptThenVerify with multiple keys', function () {
 
 	it('should decrypt and verify data successfully given right keys', function () {
 		const plainData = Buffer.from('Secret message');
 
-		const senderKeyPair = cryptoApi.generateKeyPair();
+		const senderKeyPair = cryptoWrapper.generateKeyPair();
 		const senderIdentifier = Buffer.from('SENDER');
 
-		const recipientKeyPair = cryptoApi.generateKeyPair();
+		const recipientKeyPair = cryptoWrapper.generateKeyPair();
 		const recipientIdentifier = Buffer.from('RECIPIENT');
 
-		const additionalKeyPair = cryptoApi.generateKeyPair();
+		const additionalKeyPair = cryptoWrapper.generateKeyPair();
 		const additionalIdentifier = Buffer.from('Additional');
 
-		const anotherKeyPair = cryptoApi.generateKeyPair();
+		const anotherKeyPair = cryptoWrapper.generateKeyPair();
 		const anotherIdentifier = Buffer.from('Another');
 
-		const encryptedData = cryptoApi.signThenEncrypt(
+		const encryptedData = cryptoWrapper.signThenEncrypt(
 			plainData,
 			{
 				key: senderKeyPair.privateKey,
@@ -28,7 +28,7 @@ describe('signThenEncrypt -> decryptThenVerify with multiple keys', function () 
 			}
 		);
 
-		const decryptedData = cryptoApi.decryptThenVerify(
+		const decryptedData = cryptoWrapper.decryptThenVerify(
 			encryptedData,
 			{
 				identifier: recipientIdentifier,
@@ -56,20 +56,20 @@ describe('signThenEncrypt -> decryptThenVerify with multiple keys', function () 
 	it('should fail verification given the wrong public key', function () {
 		const plainData = Buffer.from('Secret message');
 
-		const senderKeyPair = cryptoApi.generateKeyPair();
+		const senderKeyPair = cryptoWrapper.generateKeyPair();
 		const senderIdentifier = Buffer.from('SENDER');
 
-		const recipientKeyPair = cryptoApi.generateKeyPair();
+		const recipientKeyPair = cryptoWrapper.generateKeyPair();
 		const recipientIdentifier = Buffer.from('RECIPIENT');
 
-		const additionalKeyPair = cryptoApi.generateKeyPair();
+		const additionalKeyPair = cryptoWrapper.generateKeyPair();
 		const additionalIdentifier = Buffer.from('Additional');
 
-		const anotherKeyPair = cryptoApi.generateKeyPair();
+		const anotherKeyPair = cryptoWrapper.generateKeyPair();
 		const anotherIdentifier = Buffer.from('Another');
 
 
-		const encryptedData = cryptoApi.signThenEncrypt(
+		const encryptedData = cryptoWrapper.signThenEncrypt(
 			plainData,
 			{
 				key: senderKeyPair.privateKey,
@@ -82,7 +82,7 @@ describe('signThenEncrypt -> decryptThenVerify with multiple keys', function () 
 		);
 
 		assert.throws(function() {
-			cryptoApi.decryptThenVerify(
+			cryptoWrapper.decryptThenVerify(
 				encryptedData,
 				{
 					identifier: recipientIdentifier,
@@ -105,19 +105,19 @@ describe('signThenEncrypt -> decryptThenVerify with multiple keys', function () 
 	it('should decrypt and verify without signer id in metadata', function () {
 		const plainData = Buffer.from('Secret message');
 
-		const senderKeyPair = cryptoApi.generateKeyPair();
+		const senderKeyPair = cryptoWrapper.generateKeyPair();
 		const senderIdentifier = Buffer.from('SENDER');
 
-		const recipientKeyPair = cryptoApi.generateKeyPair();
+		const recipientKeyPair = cryptoWrapper.generateKeyPair();
 		const recipientIdentifier = Buffer.from('RECIPIENT');
 
-		const additionalKeyPair = cryptoApi.generateKeyPair();
+		const additionalKeyPair = cryptoWrapper.generateKeyPair();
 		const additionalIdentifier = Buffer.from('Additional');
 
-		const anotherKeyPair = cryptoApi.generateKeyPair();
+		const anotherKeyPair = cryptoWrapper.generateKeyPair();
 		const anotherIdentifier = Buffer.from('Another');
 
-		const encryptedData = cryptoApi.signThenEncrypt(
+		const encryptedData = cryptoWrapper.signThenEncrypt(
 			plainData,
 			{
 				key: senderKeyPair.privateKey // no signer id is passed
@@ -128,7 +128,7 @@ describe('signThenEncrypt -> decryptThenVerify with multiple keys', function () 
 			}
 		);
 
-		const decryptedData = cryptoApi.decryptThenVerify(
+		const decryptedData = cryptoWrapper.decryptThenVerify(
 			encryptedData,
 			{
 				identifier: recipientIdentifier,

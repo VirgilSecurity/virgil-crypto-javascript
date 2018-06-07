@@ -79,8 +79,6 @@ export interface VirgilCryptoOptions {
 	defaultKeyPairType?: KeyPairType;
 }
 
-export type VirgilCryptoFactory = (options?: VirgilCryptoOptions) => VirgilCrypto;
-
 /**
  * Interface of object implementing high-level cryptographic operations using Virgil Crypto Library.
  */
@@ -297,5 +295,10 @@ export interface VirgilCrypto {
 		decryptionKey: VirgilPrivateKey,
 		verificationKey: VirgilPublicKey|VirgilPublicKey[]): Buffer;
 
+	/**
+	 * Generates a pseudo-random sequence of bytes of the given length.
+	 * @param {number} length - The number of bytes to generate.
+	 * @returns {Buffer}
+	 */
 	getRandomBytes (length: number): Buffer;
 }

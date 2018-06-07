@@ -62,7 +62,7 @@ export interface KeyPairOptions {
 }
 
 /**
- * Parameter of {@link IVirgilCryptoApi.generateKeyPairFromKeyMaterial} method.
+ * Parameter of {@link IVirgilCryptoWrapper.generateKeyPairFromKeyMaterial} method.
  * @hidden
  */
 export interface KeyPairFromKeyMaterialOptions extends KeyPairOptions {
@@ -76,7 +76,7 @@ export interface KeyPairFromKeyMaterialOptions extends KeyPairOptions {
  * The Virgil Crypto library api wrapper interface.
  * @hidden
  */
-export interface IVirgilCryptoApi {
+export interface IVirgilCryptoWrapper {
 
 	/**
 	 * Generate the key pair - public and private keys

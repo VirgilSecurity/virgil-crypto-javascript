@@ -1,4 +1,4 @@
-import { pythiaWrapper } from './pythia/node/api';
+import { pythiaWrapper } from './pythia/node/wrapper';
 
 /**
  * Input parameters of {@link VirgilPythia.computeTransformationKeyPair} method.

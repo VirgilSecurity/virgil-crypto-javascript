@@ -1,4 +1,4 @@
-import { cryptoApi } from '../node/api';
+import { cryptoWrapper } from '../node/wrapper';
 import { KeyPairType } from '../common';
 
 const PASSWORD = Buffer.from('veryStrongPa$$0rd');
@@ -6,7 +6,7 @@ const PASSWORD = Buffer.from('veryStrongPa$$0rd');
 describe('generateKeyPair', function () {
 
 	it('with default params', function () {
-		const keyPair = cryptoApi.generateKeyPair();
+		const keyPair = cryptoWrapper.generateKeyPair();
 		assert.exists(keyPair.publicKey, 'publicKey is defined');
 		assert.exists(keyPair.privateKey, 'privateKey is defined');
 		assert.notInclude(
@@ -17,7 +17,7 @@ describe('generateKeyPair', function () {
 	});
 
 	it('with password', function () {
-		const keyPair = cryptoApi.generateKeyPair({ password: PASSWORD });
+		const keyPair = cryptoWrapper.generateKeyPair({ password: PASSWORD });
 		assert.exists(keyPair.publicKey, 'publicKey is defined');
 		assert.exists(keyPair.privateKey, 'privateKey is defined');
 		assert.include(
@@ -27,7 +27,7 @@ describe('generateKeyPair', function () {
 	});
 
 	it('with specific type "Default"', function () {
-		const keyPair = cryptoApi.generateKeyPair({ type: KeyPairType.Default });
+		const keyPair = cryptoWrapper.generateKeyPair({ type: KeyPairType.Default });
 		assert.exists(keyPair.publicKey, 'publicKey is defined');
 		assert.exists(keyPair.privateKey, 'privateKey is defined');
 		assert.notInclude(
@@ -38,7 +38,7 @@ describe('generateKeyPair', function () {
 	});
 
 	it('with specific type "Default" and password', function () {
-		const keyPair = cryptoApi.generateKeyPair({ password: PASSWORD, type: KeyPairType.Default });
+		const keyPair = cryptoWrapper.generateKeyPair({ password: PASSWORD, type: KeyPairType.Default });
 		assert.exists(keyPair.publicKey, 'publicKey is defined');
 		assert.exists(keyPair.privateKey, 'privateKey is defined');
 		assert.include(
@@ -49,7 +49,7 @@ describe('generateKeyPair', function () {
 	});
 
 	it('with specific type EC_SECP384R1', function () {
-		const keyPair = cryptoApi.generateKeyPair({ type: KeyPairType.EC_SECP384R1 });
+		const keyPair = cryptoWrapper.generateKeyPair({ type: KeyPairType.EC_SECP384R1 });
 		assert.exists(keyPair.publicKey, 'publicKey is defined');
 		assert.exists(keyPair.privateKey, 'privateKey is defined');
 		assert.notInclude(
@@ -60,7 +60,7 @@ describe('generateKeyPair', function () {
 	});
 
 	it('with specific type EC_SECP384R1 and password', function () {
-		const keyPair = cryptoApi.generateKeyPair({ type: KeyPairType.EC_SECP384R1, password: PASSWORD });
+		const keyPair = cryptoWrapper.generateKeyPair({ type: KeyPairType.EC_SECP384R1, password: PASSWORD });
 		assert.exists(keyPair.publicKey, 'publicKey is defined');
 		assert.exists(keyPair.privateKey, 'privateKey is defined');
 		assert.include(
@@ -75,20 +75,20 @@ describe('generateKeyPair', function () {
 		const secondPassword = Buffer.from('qwerty2');
 		const data = Buffer.from('abc');
 		const identifier = Buffer.from('keypair_identifier');
-		const keyPair = cryptoApi.generateKeyPair({ password: firstPassword });
+		const keyPair = cryptoWrapper.generateKeyPair({ password: firstPassword });
 
-		const updatedPrivateKey = cryptoApi.changePrivateKeyPassword(
+		const updatedPrivateKey = cryptoWrapper.changePrivateKeyPassword(
 			keyPair.privateKey,
 			firstPassword,
 			secondPassword
 		);
 		assert.isFalse(updatedPrivateKey.equals(keyPair.privateKey), 'private key is re-encrypted');
 
-		const encryptedData = cryptoApi.encrypt(
+		const encryptedData = cryptoWrapper.encrypt(
 			data,
 			{ identifier, key: keyPair.publicKey }
 		);
-		const decryptedData = cryptoApi.decrypt(
+		const decryptedData = cryptoWrapper.decrypt(
 			encryptedData,
 			{ identifier, key: updatedPrivateKey, password: secondPassword }
 		);

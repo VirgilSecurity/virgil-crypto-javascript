@@ -2,16 +2,16 @@ import { toArray } from '../utils/toArray';
 import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
 import { createNativeTypeWrapper } from './createNativeTypeWrapper';
 import { KeyPairType } from './KeyPairType';
+import { HashAlgorithm } from './HashAlgorithm';
 import {
 	DecryptionKey,
 	EncryptionKey,
-	IVirgilCryptoApi,
 	KeyPairFromKeyMaterialOptions,
 	KeyPairOptions,
 	SigningKey,
-	VerificationKey
-} from './IVirgilCryptoApi';
-import { HashAlgorithm } from './HashAlgorithm';
+	VerificationKey,
+	IVirgilCryptoWrapper
+} from './IVirgilCryptoWrapper';
 import { IntegrityCheckFailedError } from './errors';
 
 const EMPTY_BUFFER = Buffer.alloc(0);
@@ -24,7 +24,7 @@ const EMPTY_BUFFER = Buffer.alloc(0);
  *
  * @param {any} lib - Native Virgil Crypto library (browser or Node.js)
  */
-export function createCryptoApi (lib: any): IVirgilCryptoApi {
+export function createCryptoWrapper (lib: any): IVirgilCryptoWrapper {
 
 	const wrapper = createNativeTypeWrapper(lib);
 
@@ -48,12 +48,13 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 		'generateRecommendedFromKeyMaterial'
 	]);
 
-	lib.createVirgilCipher = () => {
+	const createVirgilCipher = () => {
 		const cipher = new lib.VirgilCipher();
 		if (process.browser) cipher.deleteLater();
 		return cipher;
 	};
-	lib.createVirgilSigner = () => {
+
+	const createVirgilSigner = () => {
 		const sha512 = process.browser
 			? lib.VirgilHashAlgorithm.SHA512
 			: lib.VirgilHash.Algorithm_SHA512;
@@ -62,12 +63,14 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 		if (process.browser) signer.deleteLater();
 		return signer;
 	};
-	lib.createVirgilHash = (...args: any[]) => {
+
+	const createVirgilHash = (...args: any[]) => {
 		const hash = new lib.VirgilHash(...args);
 		if (process.browser) hash.deleteLater();
 		return hash;
 	};
-	lib.getRandomBytes = (numOfBytes: number) => {
+
+	const getRandomBytes = (numOfBytes: number) => {
 		if (process.browser) {
 			const personalInfo = lib.VirgilByteArrayUtils.stringToBytes('');
 			const random = new lib.VirgilRandom(personalInfo);
@@ -126,53 +129,53 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 			};
 		},
 
-		privateKeyToDer(privateKey: Buffer, privateKeyPassword: Buffer = EMPTY_BUFFER) {
+		privateKeyToDer(privateKey: Buffer, privateKeyPassword: Buffer = EMPTY_BUFFER): Buffer {
 			return lib.VirgilKeyPair.privateKeyToDERSafe(privateKey, privateKeyPassword);
 		},
 
-		publicKeyToDer(publicKey: Buffer) {
+		publicKeyToDer(publicKey: Buffer): Buffer {
 			return lib.VirgilKeyPair.publicKeyToDERSafe(publicKey);
 		},
 
-		extractPublicKey(privateKey: Buffer, privateKeyPassword: Buffer = EMPTY_BUFFER) {
+		extractPublicKey(privateKey: Buffer, privateKeyPassword: Buffer = EMPTY_BUFFER): Buffer {
 			return lib.VirgilKeyPair.extractPublicKeySafe(privateKey, privateKeyPassword);
 		},
 
-		encryptPrivateKey(privateKey: Buffer, privateKeyPassword: Buffer) {
+		encryptPrivateKey(privateKey: Buffer, privateKeyPassword: Buffer): Buffer {
 			return lib.VirgilKeyPair.encryptPrivateKeySafe(privateKey, privateKeyPassword);
 		},
 
-		decryptPrivateKey(privateKey: Buffer, privateKeyPassword: Buffer) {
+		decryptPrivateKey(privateKey: Buffer, privateKeyPassword: Buffer): Buffer {
 			return lib.VirgilKeyPair.decryptPrivateKeySafe(privateKey, privateKeyPassword);
 		},
 
-		changePrivateKeyPassword(privateKey: Buffer, oldPassword: Buffer, newPassword: Buffer) {
+		changePrivateKeyPassword(privateKey: Buffer, oldPassword: Buffer, newPassword: Buffer): Buffer {
 			return lib.VirgilKeyPair.resetPrivateKeyPasswordSafe(privateKey, oldPassword, newPassword);
 		},
 
-		hash(data: Buffer, algorithm: HashAlgorithm = HashAlgorithm.SHA256) {
+		hash(data: Buffer, algorithm: HashAlgorithm = HashAlgorithm.SHA256): Buffer {
 			const libAlgorithm = process.browser
 				? lib.VirgilHashAlgorithm[algorithm]
 				: lib.VirgilHash[`Algorithm_${algorithm}`];
 
-			const virgilHash = lib.createVirgilHash(libAlgorithm);
+			const virgilHash = createVirgilHash(libAlgorithm);
 			return virgilHash.hashSafe(data);
 		},
 
-		encryptWithPassword(data: Buffer, password: Buffer) {
-			const cipher = lib.createVirgilCipher();
+		encryptWithPassword(data: Buffer, password: Buffer): Buffer {
+			const cipher = createVirgilCipher();
 			cipher.addPasswordRecipientSafe(password);
 			return cipher.encryptSafe(data, true);
 		},
 
-		decryptWithPassword(encryptedData: Buffer, password: Buffer) {
-			const cipher = lib.createVirgilCipher();
+		decryptWithPassword(encryptedData: Buffer, password: Buffer): Buffer {
+			const cipher = createVirgilCipher();
 			return cipher.decryptWithPasswordSafe(encryptedData, password);
 		},
 
-		encrypt(data: Buffer, encryptionKey: EncryptionKey|EncryptionKey[] ) {
+		encrypt(data: Buffer, encryptionKey: EncryptionKey|EncryptionKey[] ): Buffer {
 			const encryptionKeys = toArray(encryptionKey)!;
-			const cipher = lib.createVirgilCipher();
+			const cipher = createVirgilCipher();
 
 			encryptionKeys.forEach(({ identifier, key }: EncryptionKey) => {
 				cipher.addKeyRecipientSafe(identifier, key);
@@ -180,29 +183,29 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 			return cipher.encryptSafe(data, true);
 		},
 
-		decrypt(encryptedData: Buffer, decryptionKey: DecryptionKey) {
+		decrypt(encryptedData: Buffer, decryptionKey: DecryptionKey): Buffer {
 			const { identifier, key, password = EMPTY_BUFFER } = decryptionKey;
-			const cipher = lib.createVirgilCipher();
+			const cipher = createVirgilCipher();
 			return cipher.decryptWithKeySafe(encryptedData, identifier, key, password);
 		},
 
-		sign (data: Buffer, signingKey: SigningKey) {
+		sign (data: Buffer, signingKey: SigningKey): Buffer {
 			const { key, password = EMPTY_BUFFER } = signingKey;
-			const signer = lib.createVirgilSigner();
+			const signer = createVirgilSigner();
 			return signer.signSafe(data, key, password);
 		},
 
-		verify (data: Buffer, signature: Buffer, verificationKey: VerificationKey) {
+		verify (data: Buffer, signature: Buffer, verificationKey: VerificationKey): boolean {
 			const { key } = verificationKey;
-			const signer = lib.createVirgilSigner();
+			const signer = createVirgilSigner();
 			return signer.verifySafe(data, signature, key);
 		},
 
-		signThenEncrypt(data: Buffer, signingKey: SigningKey, encryptionKey: EncryptionKey|EncryptionKey[]) {
+		signThenEncrypt(data: Buffer, signingKey: SigningKey, encryptionKey: EncryptionKey|EncryptionKey[]): Buffer {
 			const encryptionKeys = toArray(encryptionKey)!;
 
-			const signer = lib.createVirgilSigner();
-			const cipher = lib.createVirgilCipher();
+			const signer = createVirgilSigner();
+			const cipher = createVirgilCipher();
 			const signatureKey = Buffer.from(DATA_SIGNATURE_KEY);
 			const signerIdKey = Buffer.from(DATA_SIGNER_ID_KEY);
 			const customParams = cipher.customParams();
@@ -227,10 +230,10 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 
 		decryptThenVerify(
 			cipherData: Buffer, decryptionKey: DecryptionKey, verificationKey: VerificationKey|VerificationKey[]
-		) {
+		): Buffer {
 			const verificationKeys = toArray(verificationKey)!;
-			const signer = lib.createVirgilSigner();
-			const cipher = lib.createVirgilCipher();
+			const signer = createVirgilSigner();
+			const cipher = createVirgilCipher();
 			const signatureKey = Buffer.from(DATA_SIGNATURE_KEY);
 
 			const plainData = cipher.decryptWithKeySafe(
@@ -273,9 +276,7 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 			return plainData;
 		},
 
-		getRandomBytes (numOfBytes: number): Buffer {
-			return lib.getRandomBytes(numOfBytes);
-		}
+		getRandomBytes
 	};
 
 	function tryGetSignerId(customParams: any): Buffer|null {

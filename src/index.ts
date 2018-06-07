@@ -1,10 +1,13 @@
 import { makeVirgilCryptoFactory } from './makeVirgilCryptoFactory';
-import { cryptoApi } from './node/api';
-import { VirgilCryptoFactory } from './interfaces';
+import { cryptoWrapper } from './node/wrapper';
 
 export { KeyPairType, HashAlgorithm } from './common';
 export { VirgilAccessTokenSigner } from './VirgilAccessTokenSigner';
 export { VirgilPrivateKeyExporter } from './VirgilPrivateKeyExporter';
 export { VirgilCardCrypto } from './VirgilCardCrypto';
 
-export const createVirgilCrypto: VirgilCryptoFactory = makeVirgilCryptoFactory(cryptoApi);
+/**
+ * Factory function producing objects implementing the {@link VirgilCrypto} interface.
+ */
+export const createVirgilCrypto = makeVirgilCryptoFactory(cryptoWrapper);
+

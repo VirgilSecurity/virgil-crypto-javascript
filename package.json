@@ -84,5 +84,5 @@
     "typedoc": "^0.11.1",
     "typescript": "^2.6.2"
   },
-  "virgil-crypto-lib-version": "2.4.4"
+  "virgil-crypto-lib-version": "2.4.5"
 }

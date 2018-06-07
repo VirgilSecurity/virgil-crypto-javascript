@@ -37,14 +37,15 @@
   },
   "scripts": {
     "build": "node scripts/rollup/build.js",
-    "preversion": "npm run test",
+    "preversion": "npm run update:node && npm run update:asmjs && npm run test",
     "version": "npm run build",
     "test:node": "mocha --require ts-node/register --require chai/register-assert \"src/tests/**/*.test.ts\"",
     "test:browser": "karma start",
     "test": "npm run test:node && npm run test:browser",
-    "postinstall": "node scripts/download-node-addon.js",
+    "postinstall": "npm run update:node",
     "docs": "typedoc src",
-    "update-asmjs": "node scripts/download-asmjs.js"
+    "update:node": "node scripts/download-node-addon.js",
+    "update:asmjs": "node scripts/download-asmjs.js && node scripts/download-pythia-asmjs.js"
   },
   "dependencies": {
     "node-fetch": "^2.1.2",

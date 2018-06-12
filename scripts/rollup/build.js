@@ -24,7 +24,7 @@ const virgilPythiaCrypto = {
 	path: '.',
 	entry: 'src/pythia.ts',
 	filename: 'virgil-crypto-pythia',
-	global: 'VirgilCryptoPythia',
+	global: 'VirgilCrypto',
 	external: [ path.resolve('./virgil_crypto_node.node') ],
 	bundleTypes: [ NODE, BROWSER, BROWSER_PROD ]
 };

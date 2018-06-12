@@ -22,10 +22,10 @@ Virgil Security, Inc., guides software developers into the forthcoming security 
 Generate a Private Key with the default algorithm (EC_X25519):
 
 ```javascript
-import { VirgilCrypto } from 'virgil-crypto';
+import { createVirgilCrypto } from 'virgil-crypto';
 
-const crypto = new VirgilCrypto();
-const keyPair = crypto.generateKeys();
+const virgilCrypto = createVirgilCrypto();
+const keyPair = virgilCrypto.generateKeys();
 ```
 
 #### Generate and verify a signature
@@ -33,16 +33,16 @@ const keyPair = crypto.generateKeys();
 Generate signature and sign data with a private key:
 
 ```javascript
-import { VirgilCrypto } from 'virgil-crypto';
+import { createVirgilCrypto } from 'virgil-crypto';
 
-const crypto = new VirgilCrypto();
-const signingKeypair = crypto.generateKeys();
+const virgilCrypto = createVirgilCrypto();
+const signingKeypair = virgilCrypto.generateKeys();
 
 // prepare a message
 const messageToSign = 'Hello, Bob!';
 
 // generate a signature
-const signature = crypto.calculateSignature(messageToSign, signingKeypair.privateKey);
+const signature = virgilCrypto.calculateSignature(messageToSign, signingKeypair.privateKey);
 // signature is a NodeJS Buffer (or polyfill if in the browser)
 console.log(signature.toString('base64'));
 ```
@@ -51,7 +51,7 @@ Verify a signature with a public key:
 
 ```javascript
 // verify a signature
-const verified = crypto.verifySignature(messageToSign, signature, signingKeypair.publicKey);
+const verified = virgilCrypto.verifySignature(messageToSign, signature, signingKeypair.publicKey);
 ```
 
 #### Encrypt and decrypt data
@@ -59,16 +59,16 @@ const verified = crypto.verifySignature(messageToSign, signature, signingKeypair
 Encrypt Data on a Public Key:
 
 ```javascript
-import { VirgilCrypto } from 'virgil-crypto';
+import { createVirgilCrypto } from 'virgil-crypto';
 
-const crypto = new VirgilCrypto();
-const encryptionKeypair = crypto.generateKeys();
+const virgilCrypto = createVirgilCrypto();
+const encryptionKeypair = virgilCrypto.generateKeys();
 
 // prepare a message
 const messageToEncrypt = 'Hello, Bob!';
 
 // encrypt the message
-const encryptedData = crypto.encrypt(messageToEncrypt, encryptionKeypair.publicKey);
+const encryptedData = virgilCrypto.encrypt(messageToEncrypt, encryptionKeypair.publicKey);
 // encryptedData is a NodeJS Buffer (or polyfill if in the browser)
 console.log(encryptedData.toString('base64'));
 ```
@@ -77,7 +77,7 @@ Decrypt the encrypted data with a Private Key:
 
 ```javascript
 // decrypt the encrypted data using a private key
-const decryptedData = crypto.decrypt(encryptedData, encryptionKeypair.privateKey);
+const decryptedData = virgilCrypto.decrypt(encryptedData, encryptionKeypair.privateKey);
 
 // convert Buffer to string
 const decryptedMessage = decryptedData.toString('utf8');
@@ -96,7 +96,7 @@ npm install virgil-crypto@next
 ```
 
 > **Important!** You will need Node.js version >= 4.5.0 < 5 or >= 6 to use virgil-crypto.
-If you have a different version, you can use [nvm](https://github.com/creationix/nvm) 
+If you have a different version, consider upgrading, or use [nvm](https://github.com/creationix/nvm) 
 (or a similar tool) to install Node.js of supported version alongside your current installation.  
 If you only intend to use virgil-crypto in a browser environment, you can ignore this warning.
 
@@ -108,7 +108,7 @@ If you only intend to use virgil-crypto in a browser environment, you can ignore
 	// here you can use the global variable `VirgilCrypto` as a namespace object,
 	// containing all of module exports as properties
 	
-	var virgilCrypto = new VirgilCrypto.VirgilCrypto();
+	var virgilCrypto = VirgilCrypto.createVirgilCrypto();
 	var keyPair = virgilCrypto.generateKeys();
 	console.log(keyPair);
 	
@@ -117,6 +117,62 @@ If you only intend to use virgil-crypto in a browser environment, you can ignore
 	// implement Web Crypto API
 </script>
 ```
+
+## Pythia
+
+Support for [Pythia](https://virgilsecurity.com/wp-content/uploads/2018/05/Pythia-Service-by-Virgil-Security-Whitepaper-May-2018.pdf) algorithms is considered experimental.
+
+### Usage
+
+In Node.js:
+
+```js
+const { createVirgilPythia } = require('virgil-crypto/dist/virgil-crypto-pythia.cjs');
+
+const virgilPythia = createVirgilPythia();
+
+const tweak = Buffer.from('my_tweak');
+const { blindingSecret, blindedPassword } = virgilPythia.blind('pa$$w0rd');
+
+const transformationKeyPair = virgilPythia.computeTransformationKeyPair({
+	transformationKeyId: Buffer.from('my_transformation_key_id'),
+	pythiaSecret: Buffer.from('my_pythia_secret'),
+	pythiaScopeSecret: Buffer.from('my_pythia_scope_secret')
+});
+
+const { transformedPassword, transformedTweak } = virgilPythia.transform({
+	blindedPassword,
+	tweak,
+	transformationPrivateKey: transformationKeyPair.privateKey
+});
+
+const { proofValueC, proofValueU } = virgilPythia.prove({
+	transformedPassword,
+	blindedPassword,
+	transformedTweak,
+	transformationKeyPair
+});
+
+const verified = virgilPythia.verify({
+	transformedPassword,
+	blindedPassword,
+	tweak,
+	transformationPublicKey: transformationKeyPair.publicKey,
+	proofValueC,
+	proofValueU
+});
+
+console.log(verified);
+
+const deblinded = virgilPythia.deblind({
+	transformedPassword,
+	blindingSecret
+});
+
+console.log(deblinded);
+```
+
+For browser example, see [examples/virgil-pythia.html](./examples/virgil-pythia.html).
 
 ## Docs
 - [API Reference](http://virgilsecurity.github.io/virgil-crypto-javascript/)

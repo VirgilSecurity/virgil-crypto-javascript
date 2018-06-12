@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Pythia example</title>
+	<script src="../dist/virgil-crypto-pythia.browser.umd.js"></script>
+</head>
+<body>
+<script>
+	const virgilPythia = VirgilCrypto.createVirgilPythia();
+	const encoding = VirgilCrypto.encoding;
+
+	const tweak = encoding.stringToBytes('my_tweak');
+	const { blindingSecret, blindedPassword } = virgilPythia.blind('pa$$w0rd');
+
+	const transformationKeyPair = virgilPythia.computeTransformationKeyPair({
+		transformationKeyId: encoding.stringToBytes('my_transformation_key_id'),
+		pythiaSecret: encoding.stringToBytes('my_pythia_secret'),
+		pythiaScopeSecret: encoding.stringToBytes('my_pythia_scope_secret')
+	});
+
+	const { transformedPassword, transformedTweak } = virgilPythia.transform({
+		blindedPassword,
+		tweak,
+		transformationPrivateKey: transformationKeyPair.privateKey
+	});
+
+	const { proofValueC, proofValueU } = virgilPythia.prove({
+		transformedPassword,
+		blindedPassword,
+		transformedTweak,
+		transformationKeyPair
+	});
+
+	const verified = virgilPythia.verify({
+		transformedPassword,
+		blindedPassword,
+		tweak,
+		transformationPublicKey: transformationKeyPair.publicKey,
+		proofValueC,
+		proofValueU
+	});
+
+	console.log(verified);
+
+	const deblinded = virgilPythia.deblind({
+		transformedPassword,
+		blindingSecret
+	});
+
+	console.log(deblinded);
+</script>
+</body>
+</html>

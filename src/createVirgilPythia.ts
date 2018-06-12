@@ -1,6 +1,21 @@
 import { pythiaWrapper } from './pythia/node/wrapper';
 
 /**
+ * Result of the {@link VirgilPythia.blind} method.
+ */
+export interface PythiaBlindResult {
+	/**
+	 * G1 password obfuscated into a pseudo-random string.
+	 */
+	blindedPassword: Buffer;
+
+	/**
+	 * BN random value used to blind user's password.
+	 */
+	blindingSecret: Buffer;
+}
+
+/**
  * Input parameters of {@link VirgilPythia.computeTransformationKeyPair} method.
  */
 export interface PythiaComputeTransformationKeyPairParams {
@@ -21,33 +36,53 @@ export interface PythiaComputeTransformationKeyPairParams {
 }
 
 /**
- * Input parameters of {@link VirgilPythia.deblind} method.
+ * Result of the {@link VirgilPythia.computeTransformationKeyPair} method.
  */
-export interface PythiaDeblindParams {
+export interface PythiaTransformationKeyPair {
 	/**
-	 * GT transformed password returned by {@link VirgilPythia.transform}.
+	 * BN transformation private key.
+	 */
+	privateKey: Buffer;
+
+	/**
+	 * G1 Transformation public key.
+	 */
+	publicKey: Buffer;
+}
+
+/**
+ * Input parameters of {@link VirgilPythia.transform} method.
+ */
+export interface PythiaTransformParams {
+	/**
+	 * G1 Blinded (obfuscated) password.
+	 */
+	blindedPassword: Buffer;
+
+	/**
+	 * Some random value used to identify specific user.
+	 */
+	tweak: Buffer;
+
+	/**
+	 * BN transformation private key.
+	 */
+	transformationPrivateKey: Buffer;
+}
+
+/**
+ * Result of the {@link VirgilPythia.transform} method.
+ */
+export interface PythiaTransformResult {
+	/**
+	 * GT blinded password, protected using server secret (pythia_secret + pythia_scope_secret + tweak).
 	 */
 	transformedPassword: Buffer;
 
 	/**
-	 * BN value returned by {@link VirgilPythia.blind}
+	 * G2 tweak value turned into an elliptic curve point. This value is used by Prove() operation.
 	 */
-	blindingSecret: Buffer;
-}
-
-/**
- * Input parameters of {@link VirgilPythia.getPasswordUpdateToken} method.
- */
-export interface PythiaGetPasswordUpdateTokenParams {
-	/**
-	 * The transformation private key used to transform the existing `deblindedPassword`'s.
-	 */
-	oldTransformationPrivateKey: Buffer;
-
-	/**
-	 * The new transformation private key.
-	 */
-	newTransformationPrivateKey: Buffer;
+	transformedTweak: Buffer;
 }
 
 /**
@@ -76,38 +111,18 @@ export interface PythiaProveParams {
 }
 
 /**
- * Input parameters of {@link VirgilPythia.transform} method.
+ * Result of the {@link VirgilPythia.prove} method.
  */
-export interface PythiaTransformParams {
+export interface PythiaProveResult {
 	/**
-	 * G1 Blinded (obfuscated) password.
+	 * BN first part of proof that `transformedPassword` was created using `transformationPrivateKey`.
 	 */
-	blindedPassword: Buffer;
+	proofValueC: Buffer;
 
 	/**
-	 * Some random value used to identify specific user.
+	 * BN second part of proof that `transformedPassword` was created using `transformationPrivateKey`.
 	 */
-	tweak: Buffer;
-
-	/**
-	 * BN transformation private key.
-	 */
-	transformationPrivateKey: Buffer;
-}
-
-/**
- * Input parameters of {@link VirgilPythia.updateDeblindedWithToken} method.
- */
-export interface PythiaUpdateDeblindedWithTokenParams {
-	/**
-	 * GT Deblinded password to update.
-	 */
-	deblindedPassword: Buffer;
-
-	/**
-	 * BN Update token returned by {@link VirgilPythia.getPasswordUpdateToken}.
-	 */
-	updateToken: Buffer;
+	proofValueU: Buffer;
 }
 
 /**
@@ -146,63 +161,48 @@ export interface PythiaVerifyParams {
 }
 
 /**
- * Result of the {@link VirgilPythia.blind} method.
+ * Input parameters of {@link VirgilPythia.deblind} method.
  */
-export interface PythiaBlindResult {
+export interface PythiaDeblindParams {
 	/**
-	 * G1 password obfuscated into a pseudo-random string.
+	 * GT transformed password returned by {@link VirgilPythia.transform}.
 	 */
-	blindedPassword: Buffer;
+	transformedPassword: Buffer;
 
 	/**
-	 * BN random value used to blind user's password.
+	 * BN value returned by {@link VirgilPythia.blind}
 	 */
 	blindingSecret: Buffer;
 }
 
 /**
- * Result of the {@link VirgilPythia.computeTransformationKeyPair} method.
+ * Input parameters of {@link VirgilPythia.getPasswordUpdateToken} method.
  */
-export interface PythiaTransformationKeyPair {
+export interface PythiaGetPasswordUpdateTokenParams {
 	/**
-	 * BN transformation private key.
+	 * The transformation private key used to transform the existing `deblindedPassword`'s.
 	 */
-	privateKey: Buffer;
+	oldTransformationPrivateKey: Buffer;
 
 	/**
-	 * G1 Transformation public key.
+	 * The new transformation private key.
 	 */
-	publicKey: Buffer;
+	newTransformationPrivateKey: Buffer;
 }
 
 /**
- * Result of the {@link VirgilPythia.prove} method.
+ * Input parameters of {@link VirgilPythia.updateDeblindedWithToken} method.
  */
-export interface PythiaProveResult {
+export interface PythiaUpdateDeblindedWithTokenParams {
 	/**
-	 * BN first part of proof that `transformedPassword` was created using `transformationPrivateKey`.
+	 * GT Deblinded password to update.
 	 */
-	proofValueC: Buffer;
+	deblindedPassword: Buffer;
 
 	/**
-	 * BN second part of proof that `transformedPassword` was created using `transformationPrivateKey`.
+	 * BN Update token returned by {@link VirgilPythia.getPasswordUpdateToken}.
 	 */
-	proofValueU: Buffer;
-}
-
-/**
- * Result of the {@link VirgilPythia.transform} method.
- */
-export interface PythiaTransformResult {
-	/**
-	 * GT blinded password, protected using server secret (pythia_secret + pythia_scope_secret + tweak).
-	 */
-	transformedPassword: Buffer;
-
-	/**
-	 * G2 tweak value turned into an elliptic curve point. This value is used by Prove() operation.
-	 */
-	transformedTweak: Buffer;
+	updateToken: Buffer;
 }
 
 /**

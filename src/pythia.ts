@@ -6,5 +6,7 @@ export { VirgilAccessTokenSigner } from './VirgilAccessTokenSigner';
 export { VirgilPrivateKeyExporter } from './VirgilPrivateKeyExporter';
 export { VirgilCardCrypto } from './VirgilCardCrypto';
 
+export { encoding } from './utils/encoding';
+
 export const createVirgilCrypto = makeVirgilCryptoFactory(cryptoWrapper);
 export { createVirgilPythia }  from './createVirgilPythia';

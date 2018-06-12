@@ -6,8 +6,9 @@ export { VirgilAccessTokenSigner } from './VirgilAccessTokenSigner';
 export { VirgilPrivateKeyExporter } from './VirgilPrivateKeyExporter';
 export { VirgilCardCrypto } from './VirgilCardCrypto';
 
+export { encoding } from './utils/encoding';
+
 /**
  * Factory function producing objects implementing the {@link VirgilCrypto} interface.
  */
 export const createVirgilCrypto = makeVirgilCryptoFactory(cryptoWrapper);
-

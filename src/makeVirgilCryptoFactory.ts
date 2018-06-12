@@ -92,13 +92,12 @@ function setPrivateKeyBytes(privateKey: VirgilPrivateKey, bytes: Buffer) {
  * @hidden
  *
  * @param {IVirgilCryptoWrapper} cryptoWrapper
- * @returns {VirgilCryptoClass}
+ * @returns {(options?: VirgilCryptoOptions) => VirgilCrypto}
  */
 export function makeVirgilCryptoFactory (cryptoWrapper: IVirgilCryptoWrapper)
 	: (options?: VirgilCryptoOptions) => VirgilCrypto  {
 
-	return function virgilCryptoFactory (
-		{
+	return function virgilCryptoFactory ({
 			useSha256Identifiers = false,
 			defaultKeyPairType = KeyPairType.Default
 		}: VirgilCryptoOptions = {}

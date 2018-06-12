@@ -7,5 +7,4 @@ export { VirgilPrivateKeyExporter } from './VirgilPrivateKeyExporter';
 export { VirgilCardCrypto } from './VirgilCardCrypto';
 
 export const createVirgilCrypto = makeVirgilCryptoFactory(cryptoWrapper);
-
-export { VirgilPythia } from './VirgilPythia';
+export { createVirgilPythia }  from './createVirgilPythia';

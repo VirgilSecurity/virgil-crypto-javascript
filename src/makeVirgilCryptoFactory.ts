@@ -87,6 +87,11 @@ function setPrivateKeyBytes(privateKey: VirgilPrivateKey, bytes: Buffer) {
 }
 
 /**
+ * Factory function producing objects implementing the {@link VirgilCrypto} interface.
+ */
+export type VirgilCryptoFactory = (options?: VirgilCryptoOptions) => VirgilCrypto;
+
+/**
  * Creates a factory function for objects implementing the {@link VirgilCrypto} interface.
  *
  * @hidden
@@ -95,7 +100,7 @@ function setPrivateKeyBytes(privateKey: VirgilPrivateKey, bytes: Buffer) {
  * @returns {(options?: VirgilCryptoOptions) => VirgilCrypto}
  */
 export function makeVirgilCryptoFactory (cryptoWrapper: IVirgilCryptoWrapper)
-	: (options?: VirgilCryptoOptions) => VirgilCrypto  {
+	: VirgilCryptoFactory {
 
 	return function virgilCryptoFactory ({
 			useSha256Identifiers = false,

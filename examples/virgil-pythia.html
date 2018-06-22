@@ -7,7 +7,7 @@
 </head>
 <body>
 <script>
-	const virgilPythia = VirgilCrypto.createVirgilPythia();
+	const virgilPythia = new VirgilCrypto.VirgilPythia();
 	const encoding = VirgilCrypto.encoding;
 
 	const tweak = encoding.stringToBytes('my_tweak');

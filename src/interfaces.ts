@@ -15,10 +15,10 @@ export interface IPrivateKey {}
 export interface IPublicKey {}
 
 /**
- * Represents a private key for operations with {@link VirgilCrypto}.
+ * Represents a private key for operations with {@link IVirgilCrypto}.
  *
  * `VirgilPrivateKey` objects are not meant to be created directly using the `new` keyword.
- * Use the {@link VirgilCrypto.generateKeys} and {@link VirgilCrypto.importPrivateKey} methods
+ * Use the {@link IVirgilCrypto.generateKeys} and {@link IVirgilCrypto.importPrivateKey} methods
  * to create `VirgilPrivateKey` instances.
  *
  * @protected
@@ -32,10 +32,10 @@ export interface VirgilPrivateKey extends IPrivateKey {
 }
 
 /**
- * Represents a public key for operations with {@link VirgilCrypto}.
+ * Represents a public key for operations with {@link IVirgilCrypto}.
  *
  * `VirgilPublicKey` objects are not meant to be created directly using the `new` keyword.
- * Use the {@link VirgilCrypto.generateKeys} and {@link VirgilCrypto.importPublicKey} methods
+ * Use the {@link IVirgilCrypto.generateKeys} and {@link IVirgilCrypto.importPublicKey} methods
  * to create `VirgilPublicKey` instances.
  *
  * @protected
@@ -82,7 +82,7 @@ export interface VirgilCryptoOptions {
 /**
  * Interface of object implementing high-level cryptographic operations using Virgil Crypto Library.
  */
-export interface VirgilCrypto {
+export interface IVirgilCrypto {
 
 	/**
 	 * Indicates whether to use old algorithm to calculate keypair identifiers.

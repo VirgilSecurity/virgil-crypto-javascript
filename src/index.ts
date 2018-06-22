@@ -1,4 +1,4 @@
-import { makeVirgilCryptoFactory, VirgilCryptoFactory } from './makeVirgilCryptoFactory';
+import { makeVirgilCryptoClass, VirgilCryptoClass } from './makeVirgilCryptoClass';
 import { cryptoWrapper } from './node/wrapper';
 
 export { KeyPairType, HashAlgorithm } from './common';
@@ -9,6 +9,6 @@ export { VirgilCardCrypto } from './VirgilCardCrypto';
 export { encoding } from './utils/encoding';
 
 /**
- * Factory function producing objects implementing the {@link VirgilCrypto} interface.
+ * Dynamically generated class implementing the {@link IVirgilCrypto} interface.
  */
-export const createVirgilCrypto: VirgilCryptoFactory = makeVirgilCryptoFactory(cryptoWrapper);
+export const VirgilCrypto: VirgilCryptoClass = makeVirgilCryptoClass(cryptoWrapper);

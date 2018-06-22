@@ -1,19 +1,19 @@
-import { IPrivateKey, IPublicKey, VirgilCrypto, VirgilPrivateKey, VirgilPublicKey } from './interfaces';
+import { IPrivateKey, IPublicKey, IVirgilCrypto, VirgilPrivateKey, VirgilPublicKey } from './interfaces';
 
 /**
  * Class implementing  cryptographic operations required to sign and
  * verify the validity of access tokens (i.e. the `IAccessTokenSigner` interface
  * from {@link https://bit.ly/2GAAH0F|virgil-sdk}),
- * using {@link VirgilCrypto}.
+ * using {@link IVirgilCrypto}.
  */
 export class VirgilAccessTokenSigner {
 
 	/**
 	 * Initializes the new `VirgilAccessTokenSigner`
-	 * @param {VirgilCrypto} virgilCrypto - VirgilCrypto instance, providing
+	 * @param {IVirgilCrypto} virgilCrypto - VirgilCrypto instance, providing
 	 * implementation of crypto operations.
 	 */
-	constructor(private readonly virgilCrypto: VirgilCrypto) {
+	constructor(private readonly virgilCrypto: IVirgilCrypto) {
 		if (virgilCrypto == null) throw new Error('`virgilCrypto` is required');
 	}
 

@@ -19,7 +19,7 @@ export class VirgilCryptoError extends Error {
 
 /**
  * An error that is thrown when digital signature validation fails
- * during {@link VirgilCrypto.decryptThenVerify} method execution.
+ * during {@link IVirgilCrypto.decryptThenVerify} method execution.
  */
 export class IntegrityCheckFailedError extends VirgilCryptoError {
 	constructor(message: string) {
@@ -29,7 +29,7 @@ export class IntegrityCheckFailedError extends VirgilCryptoError {
 
 /**
  * An error that is thrown when weak key material is passed to the
- * {@link VirgilCrypto.generateKeysFromKeyMaterial} method.
+ * {@link IVirgilCrypto.generateKeysFromKeyMaterial} method.
  * The key material is considered weak if it's less than 32 bytes.
  */
 export class WeakKeyMaterialError extends VirgilCryptoError {

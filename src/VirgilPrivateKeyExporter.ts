@@ -1,23 +1,23 @@
-import { IPrivateKey, VirgilCrypto, VirgilPrivateKey } from './interfaces';
+import { IPrivateKey, IVirgilCrypto, VirgilPrivateKey } from './interfaces';
 
 /**
  * Class implementing operations required to convert between raw
  * private key material and private key objects and vice versa
  * (i.e. the `IPrivateKeyExporter` interface from
- * {@link https://bit.ly/2KFRmT8|virgil-sdk}), using {@link VirgilCrypto}.
+ * {@link https://bit.ly/2KFRmT8|virgil-sdk}), using {@link IVirgilCrypto}.
  */
 export class VirgilPrivateKeyExporter {
 
 	/**
 	 * Initializes the new `VirgilPrivateKeyExporter`
-	 * @param {VirgilCrypto} virgilCrypto - VirgilCrypto instance, providing
+	 * @param {IVirgilCrypto} virgilCrypto - VirgilCrypto instance, providing
 	 * implementation of crypto operations.
 	 * @param {string} [password] - Optional password used to encrypt the key
 	 * before export and decrypt before import.
 	 * NOTE: do NOT use the default (no password), unless your storage/transport
 	 * channel is secure.
 	 */
-	constructor(private readonly virgilCrypto: VirgilCrypto, public password?: string) {
+	constructor(private readonly virgilCrypto: IVirgilCrypto, public password?: string) {
 		if (virgilCrypto == null) throw new Error('`virgilCrypto` is required');
 	}
 

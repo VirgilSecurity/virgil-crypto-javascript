@@ -1,7 +1,7 @@
 import { pythiaWrapper } from './pythia/node/wrapper';
 
 /**
- * Result of the {@link VirgilPythia.blind} method.
+ * Result of the {@link VirgilPythiaCrypto.blind} method.
  */
 export interface PythiaBlindResult {
 	/**
@@ -16,7 +16,7 @@ export interface PythiaBlindResult {
 }
 
 /**
- * Input parameters of {@link VirgilPythia.computeTransformationKeyPair} method.
+ * Input parameters of {@link VirgilPythiaCrypto.computeTransformationKeyPair} method.
  */
 export interface PythiaComputeTransformationKeyPairParams {
 	/**
@@ -36,7 +36,7 @@ export interface PythiaComputeTransformationKeyPairParams {
 }
 
 /**
- * Result of the {@link VirgilPythia.computeTransformationKeyPair} method.
+ * Result of the {@link VirgilPythiaCrypto.computeTransformationKeyPair} method.
  */
 export interface PythiaTransformationKeyPair {
 	/**
@@ -51,7 +51,7 @@ export interface PythiaTransformationKeyPair {
 }
 
 /**
- * Input parameters of {@link VirgilPythia.transform} method.
+ * Input parameters of {@link VirgilPythiaCrypto.transform} method.
  */
 export interface PythiaTransformParams {
 	/**
@@ -71,7 +71,7 @@ export interface PythiaTransformParams {
 }
 
 /**
- * Result of the {@link VirgilPythia.transform} method.
+ * Result of the {@link VirgilPythiaCrypto.transform} method.
  */
 export interface PythiaTransformResult {
 	/**
@@ -86,32 +86,32 @@ export interface PythiaTransformResult {
 }
 
 /**
- * Input parameters of {@link VirgilPythia.prove} method.
+ * Input parameters of {@link VirgilPythiaCrypto.prove} method.
  */
 export interface PythiaProveParams {
 	/**
-	 * GT transformed password from {@link VirgilPythia.transform}.
+	 * GT transformed password from {@link VirgilPythiaCrypto.transform}.
 	 */
 	transformedPassword: Buffer;
 
 	/**
-	 * G1 blinded password from {@link VirgilPythia.blind}.
+	 * G1 blinded password from {@link VirgilPythiaCrypto.blind}.
 	 */
 	blindedPassword: Buffer;
 
 	/**
-	 * G2 transformed tweak from {@link VirgilPythia.transform}.
+	 * G2 transformed tweak from {@link VirgilPythiaCrypto.transform}.
 	 */
 	transformedTweak: Buffer;
 
 	/**
-	 * Transformation key pair from {@link VirgilPythia.computeTransformationKeyPair}
+	 * Transformation key pair from {@link VirgilPythiaCrypto.computeTransformationKeyPair}
 	 */
 	transformationKeyPair: PythiaTransformationKeyPair;
 }
 
 /**
- * Result of the {@link VirgilPythia.prove} method.
+ * Result of the {@link VirgilPythiaCrypto.prove} method.
  */
 export interface PythiaProveResult {
 	/**
@@ -126,16 +126,16 @@ export interface PythiaProveResult {
 }
 
 /**
- * Input parameters of {@link VirgilPythia.verify} method.
+ * Input parameters of {@link VirgilPythiaCrypto.verify} method.
  */
 export interface PythiaVerifyParams {
 	/**
-	 * GT transformed password from {@link VirgilPythia.transform}.
+	 * GT transformed password from {@link VirgilPythiaCrypto.transform}.
 	 */
 	transformedPassword: Buffer;
 
 	/**
-	 * G1 blinded password from {@link VirgilPythia.blind}.
+	 * G1 blinded password from {@link VirgilPythiaCrypto.blind}.
 	 */
 	blindedPassword: Buffer;
 
@@ -150,33 +150,33 @@ export interface PythiaVerifyParams {
 	transformationPublicKey: Buffer;
 
 	/**
-	 * BN proof value C from {@link VirgilPythia.prove}.
+	 * BN proof value C from {@link VirgilPythiaCrypto.prove}.
 	 */
 	proofValueC: Buffer;
 
 	/**
-	 * BN proof value U from {@link VirgilPythia.prove}.
+	 * BN proof value U from {@link VirgilPythiaCrypto.prove}.
 	 */
 	proofValueU: Buffer;
 }
 
 /**
- * Input parameters of {@link VirgilPythia.deblind} method.
+ * Input parameters of {@link VirgilPythiaCrypto.deblind} method.
  */
 export interface PythiaDeblindParams {
 	/**
-	 * GT transformed password returned by {@link VirgilPythia.transform}.
+	 * GT transformed password returned by {@link VirgilPythiaCrypto.transform}.
 	 */
 	transformedPassword: Buffer;
 
 	/**
-	 * BN value returned by {@link VirgilPythia.blind}
+	 * BN value returned by {@link VirgilPythiaCrypto.blind}
 	 */
 	blindingSecret: Buffer;
 }
 
 /**
- * Input parameters of {@link VirgilPythia.getPasswordUpdateToken} method.
+ * Input parameters of {@link VirgilPythiaCrypto.getPasswordUpdateToken} method.
  */
 export interface PythiaGetPasswordUpdateTokenParams {
 	/**
@@ -191,7 +191,7 @@ export interface PythiaGetPasswordUpdateTokenParams {
 }
 
 /**
- * Input parameters of {@link VirgilPythia.updateDeblindedWithToken} method.
+ * Input parameters of {@link VirgilPythiaCrypto.updateDeblindedWithToken} method.
  */
 export interface PythiaUpdateDeblindedWithTokenParams {
 	/**
@@ -200,15 +200,15 @@ export interface PythiaUpdateDeblindedWithTokenParams {
 	deblindedPassword: Buffer;
 
 	/**
-	 * BN Update token returned by {@link VirgilPythia.getPasswordUpdateToken}.
+	 * BN Update token returned by {@link VirgilPythiaCrypto.getPasswordUpdateToken}.
 	 */
 	updateToken: Buffer;
 }
 
 /**
- * Interface containing Pythia-related cryptographic operations.
+ * Class containing Pythia-related cryptographic operations.
  */
-export interface VirgilPythia {
+export class VirgilPythiaCrypto {
 
 	/**
 	 * Blinds (i.e. obfuscates) the password.
@@ -220,18 +220,23 @@ export interface VirgilPythia {
 	 * @param {string | Buffer} password - The user's password.
 	 * @returns {PythiaBlindResult}
 	 */
-	blind (password: string | Buffer): PythiaBlindResult;
+	blind (password: string | Buffer): PythiaBlindResult {
+		return pythiaWrapper.blind(password);
+	}
 
 	/**
 	 * Deblinds the `transformedPassword` with the previously computed `blindingSecret`
-	 * returned from {@link VirgilPythia.blind} method.
+	 * returned from {@link VirgilPythiaCrypto.blind} method.
 	 *
 	 * @param {PythiaDeblindParams} params - Input parameters.
 	 *
 	 * @returns {Buffer} - Deblinded password. This value is NOT equal to password
 	 * and is zero-knowledge protected.
 	 */
-	deblind (params: PythiaDeblindParams): Buffer;
+	deblind (params: PythiaDeblindParams): Buffer {
+		const { transformedPassword, blindingSecret } = params;
+		return pythiaWrapper.deblind(transformedPassword, blindingSecret);
+	}
 
 	/**
 	 * Computes transformation private and public key.
@@ -240,7 +245,12 @@ export interface VirgilPythia {
 	 *
 	 * @returns {PythiaTransformationKeyPair}
 	 */
-	computeTransformationKeyPair (params: PythiaComputeTransformationKeyPairParams): PythiaTransformationKeyPair;
+	computeTransformationKeyPair (params: PythiaComputeTransformationKeyPairParams): PythiaTransformationKeyPair {
+		const { transformationKeyId, pythiaSecret, pythiaScopeSecret } = params;
+		return pythiaWrapper.computeTransformationKeyPair(
+			transformationKeyId, pythiaSecret, pythiaScopeSecret
+		);
+	}
 
 	/**
 	 * Transforms blinded password using the private key, generated from `pythiaSecret` +
@@ -248,7 +258,10 @@ export interface VirgilPythia {
 	 * @param {PythiaTransformParams} params - Input parameters.
 	 * @returns {PythiaTransformResult}
 	 */
-	transform (params: PythiaTransformParams): PythiaTransformResult;
+	transform (params: PythiaTransformParams): PythiaTransformResult {
+		const { blindedPassword, tweak, transformationPrivateKey } = params;
+		return pythiaWrapper.transform(blindedPassword, tweak, transformationPrivateKey);
+	}
 
 	/**
 	 * Generates a cryptographic proof that one is in possession of the secret values
@@ -257,15 +270,36 @@ export interface VirgilPythia {
 	 * @param {PythiaProveParams} params - Input parameters.
 	 * @returns {PythiaProveResult}
 	 */
-	prove (params: PythiaProveParams): PythiaProveResult;
+	prove (params: PythiaProveParams): PythiaProveResult {
+		const { transformedPassword, blindedPassword, transformedTweak, transformationKeyPair } = params;
+		return pythiaWrapper.prove(transformedPassword, blindedPassword, transformedTweak, transformationKeyPair);
+	}
 
 	/**
-	 * Verifies the cryptographic proof that the output of {@link VirgilPythia.transform} is correct.
+	 * Verifies the cryptographic proof that the output of {@link VirgilPythiaCrypto.transform} is correct.
 	 *
 	 * @param {PythiaVerifyParams} params - Input parameters.
 	 * @returns {boolean} - `true` if transformed password is correct, otherwise - `false`.
 	 */
-	verify (params: PythiaVerifyParams): boolean;
+	verify (params: PythiaVerifyParams): boolean {
+		const {
+			transformedPassword,
+			blindedPassword,
+			tweak,
+			transformationPublicKey,
+			proofValueC,
+			proofValueU
+		} = params;
+
+		return pythiaWrapper.verify(
+			transformedPassword,
+			blindedPassword,
+			tweak,
+			transformationPublicKey,
+			proofValueC,
+			proofValueU
+		);
+	}
 
 	/**
 	 * Computes the `updateToken` based on the old and new transformation private keys.
@@ -279,7 +313,10 @@ export interface VirgilPythia {
 	 *
 	 * @returns {Buffer}
 	 */
-	getPasswordUpdateToken (params: PythiaGetPasswordUpdateTokenParams): Buffer;
+	getPasswordUpdateToken (params: PythiaGetPasswordUpdateTokenParams): Buffer {
+		const { oldTransformationPrivateKey, newTransformationPrivateKey } = params;
+		return pythiaWrapper.getPasswordUpdateToken(oldTransformationPrivateKey, newTransformationPrivateKey);
+	}
 
 	/**
 	 * Generates new `deblindedPassword` by updating the existing one with the `updateToken`.
@@ -287,69 +324,8 @@ export interface VirgilPythia {
 	 * @param {PythiaUpdateDeblindedWithTokenParams} params - Input parameters.
 	 * @returns {Buffer} The new `deblindedPassword`
 	 */
-	updateDeblindedWithToken (params: PythiaUpdateDeblindedWithTokenParams): Buffer;
+	updateDeblindedWithToken (params: PythiaUpdateDeblindedWithTokenParams): Buffer {
+		const { deblindedPassword, updateToken } = params;
+		return pythiaWrapper.updateDeblindedWithToken(deblindedPassword, updateToken);
+	}
 }
-
-/**
- * Factory function producing objects implementing the {@link VirgilPythia} interface.
- * @returns {VirgilPythia}
- */
-export const createVirgilPythia = (): VirgilPythia => {
-	return {
-		blind (password: string | Buffer): PythiaBlindResult {
-			return pythiaWrapper.blind(password);
-		},
-
-		deblind (params: PythiaDeblindParams): Buffer {
-			const { transformedPassword, blindingSecret } = params;
-			return pythiaWrapper.deblind(transformedPassword, blindingSecret);
-		},
-
-		computeTransformationKeyPair (params: PythiaComputeTransformationKeyPairParams): PythiaTransformationKeyPair {
-			const { transformationKeyId, pythiaSecret, pythiaScopeSecret } = params;
-			return pythiaWrapper.computeTransformationKeyPair(
-				transformationKeyId, pythiaSecret, pythiaScopeSecret
-			);
-		},
-
-		transform (params: PythiaTransformParams): PythiaTransformResult {
-			const { blindedPassword, tweak, transformationPrivateKey } = params;
-			return pythiaWrapper.transform(blindedPassword, tweak, transformationPrivateKey);
-		},
-
-		prove (params: PythiaProveParams): PythiaProveResult {
-			const { transformedPassword, blindedPassword, transformedTweak, transformationKeyPair } = params;
-			return pythiaWrapper.prove(transformedPassword, blindedPassword, transformedTweak, transformationKeyPair);
-		},
-
-		verify (params: PythiaVerifyParams): boolean {
-			const {
-				transformedPassword,
-				blindedPassword,
-				tweak,
-				transformationPublicKey,
-				proofValueC,
-				proofValueU
-			} = params;
-
-			return pythiaWrapper.verify(
-				transformedPassword,
-				blindedPassword,
-				tweak,
-				transformationPublicKey,
-				proofValueC,
-				proofValueU
-			);
-		},
-
-		getPasswordUpdateToken (params: PythiaGetPasswordUpdateTokenParams): Buffer {
-			const { oldTransformationPrivateKey, newTransformationPrivateKey } = params;
-			return pythiaWrapper.getPasswordUpdateToken(oldTransformationPrivateKey, newTransformationPrivateKey);
-		},
-
-		updateDeblindedWithToken (params: PythiaUpdateDeblindedWithTokenParams): Buffer {
-			const { deblindedPassword, updateToken } = params;
-			return pythiaWrapper.updateDeblindedWithToken(deblindedPassword, updateToken);
-		}
-	};
-};

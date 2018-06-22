@@ -1,4 +1,4 @@
-import { makeVirgilCryptoFactory, VirgilCryptoFactory } from './makeVirgilCryptoFactory';
+import { makeVirgilCryptoClass, VirgilCryptoClass } from './makeVirgilCryptoClass';
 import { cryptoWrapper } from './pythia/node/wrapper';
 
 export { KeyPairType, HashAlgorithm } from './common';
@@ -8,5 +8,5 @@ export { VirgilCardCrypto } from './VirgilCardCrypto';
 
 export { encoding } from './utils/encoding';
 
-export const createVirgilCrypto: VirgilCryptoFactory = makeVirgilCryptoFactory(cryptoWrapper);
-export { createVirgilPythia }  from './createVirgilPythia';
+export const VirgilCrypto: VirgilCryptoClass = makeVirgilCryptoClass(cryptoWrapper);
+export { VirgilPythiaCrypto } from './VirgilPythiaCrypto';

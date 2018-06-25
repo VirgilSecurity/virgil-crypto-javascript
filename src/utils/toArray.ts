@@ -7,15 +7,5 @@
 export function toArray<T>(val?: T|T[]): T[] {
 	return val == null
 		? []
-		: isArray(val) ? val : [ val ];
-}
-
-/**
- * Checks if `val` is an array.
- * @hidden
- * @param {T[] | T} val
- * @returns {boolean}
- */
-function isArray<T>(val: T|T[]): val is T[] {
-	return Array.isArray(val);
+		: Array.isArray(val) ? val : [ val ];
 }

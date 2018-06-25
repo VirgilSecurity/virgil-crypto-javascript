@@ -1,4 +1,4 @@
-import { pythiaWrapper } from '../pythia/node/wrapper';
+import { VirgilPythiaCrypto } from '../VirgilPythiaCrypto';
 import { data } from './data/pythia-crypto-data';
 
 const DEBLINDED_PASSWORD = Buffer.from(data.kDeblindedPassword, 'hex');
@@ -10,26 +10,21 @@ const PYTHIA_SECRET = Buffer.from(data.kPythiaSecret);
 const NEW_PYTHIA_SECRET = Buffer.from(data.kNewPythiaSecret);
 const PYTHIA_SCOPE_SECRET = Buffer.from(data.kPythiaScopeSecret);
 
-const {
-	blind,
-	computeTransformationKeyPair,
-	deblind,
-	getPasswordUpdateToken,
-	prove,
-	transform,
-	updateDeblindedWithToken,
-	verify
-} = pythiaWrapper;
+const pythiaCrypto = new VirgilPythiaCrypto();
 
 function blindEvalDeblind() {
-	const { blindingSecret, blindedPassword } = blind(PASSWORD);
-	const transformationKeyPair = computeTransformationKeyPair(
-		TRANSFORMATION_KEY_ID,
-		PYTHIA_SECRET,
-		PYTHIA_SCOPE_SECRET
-	);
-	const { transformedPassword } = transform(blindedPassword, TWEAK, transformationKeyPair.privateKey);
-	return deblind(transformedPassword, blindingSecret);
+	const { blindingSecret, blindedPassword } = pythiaCrypto.blind(PASSWORD);
+	const transformationKeyPair = pythiaCrypto.computeTransformationKeyPair({
+		transformationKeyId: TRANSFORMATION_KEY_ID,
+		pythiaSecret: PYTHIA_SECRET,
+		pythiaScopeSecret: PYTHIA_SCOPE_SECRET
+	});
+	const { transformedPassword } = pythiaCrypto.transform({
+		blindedPassword,
+		tweak: TWEAK,
+		transformationPrivateKey: transformationKeyPair.privateKey
+	});
+	return pythiaCrypto.deblind({ transformedPassword, blindingSecret });
 }
 
 describe('Pythia Crypto', function () {
@@ -37,11 +32,11 @@ describe('Pythia Crypto', function () {
 
 	describe('Deterministic Key Generation', () => {
 		it ('computes the transformation key pair deterministically', () => {
-			const keyPair = computeTransformationKeyPair(
-				TRANSFORMATION_KEY_ID,
-				PYTHIA_SECRET,
-				PYTHIA_SCOPE_SECRET
-			);
+			const keyPair = pythiaCrypto.computeTransformationKeyPair({
+				transformationKeyId: TRANSFORMATION_KEY_ID,
+				pythiaSecret: PYTHIA_SECRET,
+				pythiaScopeSecret: PYTHIA_SCOPE_SECRET
+			});
 
 			assert.isTrue(keyPair.privateKey.equals(Buffer.from(data.kTransformationPrivateKey, 'hex')));
 			assert.isTrue(keyPair.publicKey.equals(Buffer.from(data.kTransformationPublicKey, 'hex')));
@@ -54,7 +49,10 @@ describe('Pythia Crypto', function () {
 
 			for (let i = 0; i < iterationsCount; i++) {
 				let deblindedPassword = blindEvalDeblind();
-				assert.isTrue(deblindedPassword.equals(DEBLINDED_PASSWORD), 'deblined password is equal to pre-computed');
+				assert.isTrue(
+					deblindedPassword.equals(DEBLINDED_PASSWORD),
+					'deblined password is equal to pre-computed'
+				);
 			}
 		});
 	});
@@ -62,35 +60,35 @@ describe('Pythia Crypto', function () {
 	describe('BlindEvalProveVerify', () => {
 		it ('verifies transformed password', () => {
 
-			const { blindedPassword } = blind(PASSWORD);
+			const { blindedPassword } = pythiaCrypto.blind(PASSWORD);
 
-			const transformationKeyPair = computeTransformationKeyPair(
-				TRANSFORMATION_KEY_ID,
-				PYTHIA_SECRET,
-				PYTHIA_SCOPE_SECRET
-			);
+			const transformationKeyPair = pythiaCrypto.computeTransformationKeyPair({
+				transformationKeyId: TRANSFORMATION_KEY_ID,
+				pythiaSecret: PYTHIA_SECRET,
+				pythiaScopeSecret: PYTHIA_SCOPE_SECRET
+			});
 
-			const { transformedPassword, transformedTweak } = transform(
+			const { transformedPassword, transformedTweak } = pythiaCrypto.transform({
 				blindedPassword,
-				TWEAK,
-				transformationKeyPair.privateKey
-			);
+				tweak: TWEAK,
+				transformationPrivateKey: transformationKeyPair.privateKey
+			});
 
-			const { proofValueC, proofValueU } = prove(
+			const { proofValueC, proofValueU } = pythiaCrypto.prove({
 				transformedPassword,
 				blindedPassword,
 				transformedTweak,
 				transformationKeyPair
-			);
+			});
 
-			const verified = verify(
+			const verified = pythiaCrypto.verify({
 				transformedPassword,
 				blindedPassword,
-				TWEAK,
-				transformationKeyPair.publicKey,
+				tweak: TWEAK,
+				transformationPublicKey: transformationKeyPair.publicKey,
 				proofValueC,
 				proofValueU
-			);
+			});
 
 			assert.equal(verified, true, 'password is verified');
 		});
@@ -98,47 +96,59 @@ describe('Pythia Crypto', function () {
 
 	describe('Update Delta', () => {
 		it ('updates deblinded password with token', () => {
-			const { blindingSecret, blindedPassword } = blind(PASSWORD);
-			const oldTransformationKeyPair = computeTransformationKeyPair(
-				TRANSFORMATION_KEY_ID,
-				PYTHIA_SECRET,
-				PYTHIA_SCOPE_SECRET
-			);
-			const { transformedPassword } = transform(
+			const { blindingSecret, blindedPassword } = pythiaCrypto.blind(PASSWORD);
+			const oldTransformationKeyPair = pythiaCrypto.computeTransformationKeyPair({
+				transformationKeyId: TRANSFORMATION_KEY_ID,
+				pythiaSecret: PYTHIA_SECRET,
+				pythiaScopeSecret: PYTHIA_SCOPE_SECRET
+			});
+			const { transformedPassword } = pythiaCrypto.transform({
 				blindedPassword,
-				TWEAK,
-				oldTransformationKeyPair.privateKey
-			);
-			const deblindedPassword = deblind(transformedPassword, blindingSecret);
-			const newTransformationKeyPair = computeTransformationKeyPair(
-				TRANSFORMATION_KEY_ID,
-				NEW_PYTHIA_SECRET,
-				PYTHIA_SCOPE_SECRET
-			);
+				tweak: TWEAK,
+				transformationPrivateKey: oldTransformationKeyPair.privateKey
+			});
+			const deblindedPassword = pythiaCrypto.deblind({ transformedPassword, blindingSecret });
+			const newTransformationKeyPair = pythiaCrypto.computeTransformationKeyPair({
+				transformationKeyId: TRANSFORMATION_KEY_ID,
+				pythiaSecret: NEW_PYTHIA_SECRET,
+				pythiaScopeSecret: PYTHIA_SCOPE_SECRET
+			});
 
-			const updateToken = getPasswordUpdateToken(
-				oldTransformationKeyPair.privateKey,
-				newTransformationKeyPair.privateKey
-			);
+			const updateToken = pythiaCrypto.getPasswordUpdateToken({
+				oldTransformationPrivateKey: oldTransformationKeyPair.privateKey,
+				newTransformationPrivateKey: newTransformationKeyPair.privateKey
+			});
 
-			const updatedDeblindedPassword = updateDeblindedWithToken(deblindedPassword, updateToken);
-			const { blindingSecret: newBlindingSecret, blindedPassword: newBlindedPassword } = blind(PASSWORD);
-			const { transformedPassword: newTransformedPassword } = transform(
-				newBlindedPassword,
-				TWEAK,
-				newTransformationKeyPair.privateKey
-			);
+			const updatedDeblindedPassword = pythiaCrypto.updateDeblindedWithToken({
+				deblindedPassword,
+				updateToken
+			});
+			const {
+				blindingSecret: newBlindingSecret,
+				blindedPassword: newBlindedPassword
+			} = pythiaCrypto.blind(PASSWORD);
+			const { transformedPassword: newTransformedPassword } = pythiaCrypto.transform({
+				blindedPassword: newBlindedPassword,
+				tweak: TWEAK,
+				transformationPrivateKey: newTransformationKeyPair.privateKey
+			});
 
-			const newDeblindedPassword = deblind(newTransformedPassword, newBlindingSecret);
-			assert.isTrue(updatedDeblindedPassword.equals(newDeblindedPassword), 'updated password is equal to computed');
+			const newDeblindedPassword = pythiaCrypto.deblind({
+				transformedPassword: newTransformedPassword,
+				blindingSecret: newBlindingSecret
+			});
+			assert.isTrue(
+				updatedDeblindedPassword.equals(newDeblindedPassword),
+				'updated password is equal to computed'
+			);
 		});
 	});
 
 	describe('Blind Huge Password', () => {
 		it ('throws when given a huge password', () => {
-			const hugePassword = '1'.repeat(129);
+			const hugePassword = Buffer.from('1'.repeat(129));
 			assert.throws(() => {
-				blind(hugePassword);
+				pythiaCrypto.blind(hugePassword);
 			});
 		});
 	});

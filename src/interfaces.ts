@@ -80,6 +80,18 @@ export interface VirgilCryptoOptions {
 }
 
 /**
+ * Represents input bytes as either a string, Buffer or ArrayBuffer.
+ * If data is a string - assumed encoding depends on the method the input is being
+ * passed to.
+ *
+ * If data is Buffer, it is used as is, without copying.
+ *
+ * If data is ArrayBuffer, the view of the ArrayBuffer will be created without copying the
+ * underlying memory.
+ */
+export type Data = string|Buffer|ArrayBuffer;
+
+/**
  * Interface of object implementing high-level cryptographic operations using Virgil Crypto Library.
  */
 export interface IVirgilCrypto {
@@ -114,24 +126,25 @@ export interface IVirgilCrypto {
 
 	/**
 	 * Generates a new key pair from the given key material.
-	 * @param {Buffer} keyMaterial - The data to be used for key generation,
-	 * must be strong enough (have high entropy).
+	 * @param {Data} keyMaterial - The data to be used for key generation,
+	 * must be strong enough (have high entropy). If `keyMaterial` is a
+	 * string, base64 encoding is assumed.
 	 * @param {KeyPairType} [type] - Optional type of the key pair.
 	 * See {@link KeyPairType} for available options. Default is Ed25519.
 	 * @returns {VirgilKeyPair}
 	 */
-	generateKeysFromKeyMaterial(keyMaterial: Buffer, type?: KeyPairType): VirgilKeyPair;
+	generateKeysFromKeyMaterial(keyMaterial: Data, type?: KeyPairType): VirgilKeyPair;
 
 	/**
 	 * Creates a `VirgilPrivateKey` object from private key material in PEM or DER format.
 	 *
-	 * @param {Buffer|string} rawPrivateKey - The private key material as a `Buffer` or a
-	 * string in base64.
+	 * @param {Data} rawPrivateKey - The private key bytes. If `rawPrivateKey` is a
+	 * string, base64 encoding is assumed.
 	 * @param {string} [password] - Optional password the key material is encrypted with.
 	 *
 	 * @returns {VirgilPrivateKey} - The private key object.
 	 * */
-	importPrivateKey(rawPrivateKey: Buffer|string, password?: string): VirgilPrivateKey;
+	importPrivateKey(rawPrivateKey: Data, password?: string): VirgilPrivateKey;
 
 	/**
 	 * Exports private key material in DER format from the given private key object.
@@ -146,12 +159,12 @@ export interface IVirgilCrypto {
 	/**
 	 * Creates a `VirgilPublicKey` object from public key material in PEM or DER format.
 	 *
-	 * @param {Buffer|string} rawPublicKey - The public key material as a `Buffer` or
-	 * a {string} in base64.
+	 * @param {Data} rawPublicKey - The public key bytes. If `rawPublicKey` is a
+	 * string, base64 encoding is assumed.
 	 *
 	 * @returns {VirgilPublicKey} - The imported key handle.
 	 * */
-	importPublicKey(rawPublicKey: Buffer|string): VirgilPublicKey;
+	importPublicKey(rawPublicKey: Data): VirgilPublicKey;
 
 	/**
 	 * Exports public key material in DER format from the given public key object.
@@ -172,14 +185,14 @@ export interface IVirgilCrypto {
 	 * 5. Computes KDF to obtain AES-256 key - KEY2 - from shared secret for each recipient
 	 * 6. Encrypts KEY1 with KEY2 using AES-256-CBC for each recipient
 	 *
-	 * @param {Buffer|string} data - The data to be encrypted as a `Buffer`.
-	 * 			or a `string` in UTF8.
+	 * @param {Data} data - The data to be encrypted. If `data` is a
+	 * string, utf-8 encoding is assumed.
 	 * @param {VirgilPublicKey|VirgilPublicKey[]} publicKey - Public key or an array of public keys
 	 * of the intended recipients.
 	 *
 	 * @returns {Buffer} - Encrypted data.
 	 * */
-	encrypt(data: string|Buffer, publicKey: VirgilPublicKey|VirgilPublicKey[]): Buffer;
+	encrypt(data: Data, publicKey: VirgilPublicKey|VirgilPublicKey[]): Buffer;
 
 	/**
 	 * Decrypts the data with the given private key following the algorithm below:
@@ -189,23 +202,25 @@ export interface IVirgilCrypto {
 	 * 3. Decrypts KEY1 using AES-256-CBC and KEY2
 	 * 4. Decrypts data using KEY1 and AES-256-GCM
 	 *
-	 * @param {Buffer|string} encryptedData - The data to be decrypted as a `Buffer` or a `string` in base64.
+	 * @param {Data} encryptedData - The data to be decrypted. If `encryptedData` is a
+	 * string, base64 encoding is assumed.
 	 * @param {VirgilPrivateKey} privateKey - The private key to decrypt with.
 	 *
 	 * @returns {Buffer} - Decrypted data
 	 * */
-	decrypt(encryptedData: string|Buffer, privateKey: VirgilPrivateKey): Buffer;
+	decrypt(encryptedData: Data, privateKey: VirgilPrivateKey): Buffer;
 
 	/**
 	 * Calculates the hash of the given data.
 	 *
-	 * @param {Buffer|string} data - The data to calculate the hash of as a `Buffer` or a `string` in UTF-8.
+	 * @param {Data} data - The data to calculate the hash of. If `data` is a
+	 * string, utf-8 encoding is assumed.
 	 * @param {string} [algorithm] - Optional name of the hash algorithm to use.
 	 * See {@link HashAlgorithm} for available options. Default is SHA256.
 	 *
 	 * @returns {Buffer} - The hash.
 	 * */
-	calculateHash(data: Buffer|string, algorithm?: HashAlgorithm): Buffer;
+	calculateHash(data: Data, algorithm?: HashAlgorithm): Buffer;
 
 	/**
 	 * Extracts a public key from the private key handle.
@@ -225,25 +240,28 @@ export interface IVirgilCrypto {
 	 *
 	 * It's secure to pass raw data here.
 	 *
-	 * @param {Buffer|string} data - The data to be signed as a Buffer or a string in UTF-8.
+	 * @param {Data} data - The data to be signed. If `data` is a
+	 * string, utf-8 encoding is assumed.
 	 * @param {VirgilPrivateKey} privateKey - The private key object.
 	 *
 	 * @returns {Buffer} - The signature.
 	 * */
-	calculateSignature(data: Buffer|string, privateKey: VirgilPrivateKey): Buffer;
+	calculateSignature(data: Data, privateKey: VirgilPrivateKey): Buffer;
 
 	/**
 	 * Verifies the provided data using the given signature and public key.
 	 * Note: Verification algorithm depends on PublicKey type. Default: EdDSA
 	 *
-	 * @param {Buffer|string} data - The data to be verified as a `Buffer` or a `string` in UTF-8.
-	 * @param {Buffer|string} signature - The signature as a `Buffer` or a `string` in base64.
+	 * @param {Data} data - The data to be verified. If `data` is a
+	 * string, utf-8 encoding is assumed.
+	 * @param {Data} signature - The signature to verify. If `signature` is a
+	 * string, base64 encoding is assumed.
 	 * @param {VirgilPublicKey} publicKey - The public key object.
 	 *
 	 * @returns {boolean} - True or False depending on the validity of the signature for the data
 	 * and public key.
 	 * */
-	verifySignature(data: Buffer|string, signature: Buffer|string, publicKey: VirgilPublicKey): boolean;
+	verifySignature(data: Data, signature: Data, publicKey: VirgilPublicKey): boolean;
 
 	/**
 	 * Calculates the signature on the data using the private key,
@@ -257,17 +275,18 @@ export interface IVirgilCrypto {
 	 * 6. Computes KDF to obtain AES-256 key - KEY2 - from shared secret for each recipient
 	 * 7. Encrypts KEY1 with KEY2 using AES-256-CBC for each recipient
 	 *
-	 * @param {Buffer|string} data - The data to sign and encrypt as a Buffer or a string in UTF-8.
-	 * @param {VirgilPrivateKey} signingKey - The private key to use to calculate signature.
-	 * @param {VirgilPublicKey|VirgilPublicKey[]} encryptionKey - The public key of the intended recipient or an array
+	 * @param {Data} data - The data to sign and encrypt. If `data` is a
+	 * string, utf-8 encoding is assumed.
+	 * @param {VirgilPrivateKey} privateKey - The private key to use to calculate signature.
+	 * @param {VirgilPublicKey|VirgilPublicKey[]} publicKey - The public key of the intended recipient or an array
 	 * of public keys of multiple recipients.
 	 *
 	 * @returns {Buffer} - Encrypted data with attached signature.
 	 * */
 	signThenEncrypt(
-		data: Buffer|string,
-		signingKey: VirgilPrivateKey,
-		encryptionKey: VirgilPublicKey|VirgilPublicKey[]): Buffer;
+		data: Data,
+		privateKey: VirgilPrivateKey,
+		publicKey: VirgilPublicKey|VirgilPublicKey[]): Buffer;
 
 	/**
 	 * Decrypts the data using the private key, then verifies decrypted data
@@ -279,21 +298,21 @@ export interface IVirgilCrypto {
 	 * 4. Decrypts both data and signature using KEY1 and AES-256-GCM
 	 * 5. Verifies signature
 	 *
-	 * @param {Buffer|string} cipherData - The data to be decrypted and
-	 * verified as a Buffer or a string in base64.
-	 * @param {VirgilPrivateKey} decryptionKey - The private key object to use for decryption.
+	 * @param {Data} encryptedData - The data to be decrypted and verified. If `encryptedData` is a
+	 * string, base64 encoding is assumed.
+	 * @param {VirgilPrivateKey} privateKey - The private key object to use for decryption.
 	 *
-	 * @param {(VirgilPublicKey|VirgilPublicKey[])} verificationKey - The public key object
-	 * or an array of public key object to use to verify data integrity. If `verificationKey`
+	 * @param {(VirgilPublicKey|VirgilPublicKey[])} publicKey - The public key object
+	 * or an array of public key object to use to verify data integrity. If `publicKey`
 	 * is an array, the attached signature must be valid for any one of them.
 	 *
 	 * @returns {Buffer} - Decrypted data iff verification is successful,
 	 * otherwise throws {@link IntegrityCheckFailedError}.
 	 * */
 	decryptThenVerify(
-		cipherData: Buffer|string,
-		decryptionKey: VirgilPrivateKey,
-		verificationKey: VirgilPublicKey|VirgilPublicKey[]): Buffer;
+		encryptedData: Data,
+		privateKey: VirgilPrivateKey,
+		publicKey: VirgilPublicKey|VirgilPublicKey[]): Buffer;
 
 	/**
 	 * Generates a pseudo-random sequence of bytes of the given length.

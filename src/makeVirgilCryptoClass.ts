@@ -1,16 +1,19 @@
-import { KeyPair, KeyPairType, HashAlgorithm, assert, IVirgilCryptoWrapper } from './common';
+import { KeyPair, KeyPairType, HashAlgorithm, IVirgilCryptoWrapper } from './common';
 import { toArray } from './utils/toArray';
 import {
 	VirgilPrivateKey as IVirgilPrivateKey,
 	VirgilPublicKey as IVirgilPublicKey,
 	IVirgilCrypto,
 	VirgilCryptoOptions,
-	VirgilKeyPair
+	VirgilKeyPair,
+	Data
 } from './interfaces';
+import { anyToBuffer } from './utils/anyToBuffer';
 
 const _privateKeys = new WeakMap();
 const _setValue = WeakMap.prototype.set;
 const _getValue = WeakMap.prototype.get;
+const _hasValue = WeakMap.prototype.has;
 
 /**
  * Dynamically generated class that implements the {@link IVirgilCrypto} interface
@@ -70,9 +73,9 @@ class VirgilPublicKey implements IVirgilPublicKey {
 }
 
 /**
- * Gets the private key material of the given private key object from internal buffer.
+ * Gets the private key bytes of the given private key object from internal store.
  * @param {VirgilPrivateKey} privateKey - Private key object.
- * @returns {Buffer} - Private key material.
+ * @returns {Buffer} - Private key bytes.
  *
  * @hidden
  */
@@ -81,16 +84,45 @@ function getPrivateKeyBytes(privateKey: VirgilPrivateKey): Buffer {
 }
 
 /**
- * Saves the private key material corresponding to the given private key object into
+ * Saves the private key bytes corresponding to the given private key object into
  * internal buffer.
  *
  * @param {VirgilPrivateKey} privateKey - Private key object.
- * @param {Buffer} bytes - Private key material.
+ * @param {Buffer} bytes - Private key bytes.
  *
  * @hidden
  */
 function setPrivateKeyBytes(privateKey: VirgilPrivateKey, bytes: Buffer) {
 	_setValue.call(_privateKeys, privateKey, bytes);
+}
+
+/**
+ * @hidden
+ */
+function validatePrivateKey(privateKey: VirgilPrivateKey, label: string = 'privateKey') {
+	if (privateKey == null || !Buffer.isBuffer(privateKey.identifier) || !_hasValue.call(_privateKeys, privateKey)) {
+		throw new TypeError(`\`${label}\` is not a VirgilPrivateKey.`);
+	}
+}
+
+/**
+ * @hidden
+ */
+function validatePublicKey(publicKey: VirgilPublicKey, label: string = 'publicKey') {
+	if (publicKey == null || !Buffer.isBuffer(publicKey.identifier) || !Buffer.isBuffer(publicKey.key)) {
+		throw new TypeError(`\`${label}\` is not a VirgilPublicKey.`);
+	}
+}
+
+/**
+ * @hidden
+ */
+function validatePublicKeysArray(publicKeys: VirgilPublicKey[], label: string = 'publicKeys') {
+	if (publicKeys.length === 0) {
+		throw new TypeError(`\`${label}\` array must not be empty.`)
+	}
+
+	publicKeys.forEach(pubkey => validatePublicKey(pubkey));
 }
 
 /**
@@ -123,28 +155,28 @@ export function makeVirgilCryptoClass (cryptoWrapper: IVirgilCryptoWrapper)
 			return this.wrapKeyPair(keyPair);
 		}
 
-		generateKeysFromKeyMaterial(keyMaterial: Buffer, type?: KeyPairType): VirgilKeyPair {
+		generateKeysFromKeyMaterial(keyMaterial: Data, type?: KeyPairType): VirgilKeyPair {
 			type = type != null ? type : this.defaultKeyPairType;
+			const keyMaterialBuf = anyToBuffer(keyMaterial, 'base64', 'keyMaterial');
 
-			const keyPair = cryptoWrapper.generateKeyPairFromKeyMaterial({ keyMaterial, type });
+			const keyPair = cryptoWrapper.generateKeyPairFromKeyMaterial({
+				keyMaterial: keyMaterialBuf,
+				type
+			});
 			return this.wrapKeyPair(keyPair);
 		}
 
-		importPrivateKey(rawPrivateKey: Buffer|string, password?: string) {
-			assert(
-				Buffer.isBuffer(rawPrivateKey) || typeof rawPrivateKey === 'string',
-				'Cannot import private key. `rawPrivateKey` must be a Buffer or string in base64'
-			);
-
-			rawPrivateKey = Buffer.isBuffer(rawPrivateKey) ? rawPrivateKey : Buffer.from(rawPrivateKey, 'base64');
+		importPrivateKey(rawPrivateKey: Data, password?: string) {
+			let rawPrivateKeyBuf = anyToBuffer(rawPrivateKey, 'base64', 'rawPrivateKey');
 
 			if (password) {
-				rawPrivateKey = cryptoWrapper.decryptPrivateKey(
-					rawPrivateKey, Buffer.from(password, 'utf8')
+				rawPrivateKeyBuf = cryptoWrapper.decryptPrivateKey(
+					rawPrivateKeyBuf,
+					Buffer.from(password, 'utf8')
 				);
 			}
 
-			const privateKeyDer = cryptoWrapper.privateKeyToDer(rawPrivateKey);
+			const privateKeyDer = cryptoWrapper.privateKeyToDer(rawPrivateKeyBuf);
 			const publicKeyDer = cryptoWrapper.extractPublicKey(privateKeyDer);
 			const identifier = this.calculateKeypairIdentifier(publicKeyDer);
 
@@ -152,8 +184,8 @@ export function makeVirgilCryptoClass (cryptoWrapper: IVirgilCryptoWrapper)
 		}
 
 		exportPrivateKey(privateKey: VirgilPrivateKey, password?: string) {
+			validatePrivateKey(privateKey);
 			const privateKeyValue = getPrivateKeyBytes(privateKey);
-			assert(privateKeyValue !== undefined, 'Cannot export private key. `privateKey` is invalid');
 
 			if (password == null) {
 				return privateKeyValue;
@@ -162,183 +194,109 @@ export function makeVirgilCryptoClass (cryptoWrapper: IVirgilCryptoWrapper)
 			return cryptoWrapper.encryptPrivateKey(privateKeyValue, Buffer.from(password, 'utf8'));
 		}
 
-		importPublicKey(rawPublicKey: Buffer|string) {
-			assert(
-				Buffer.isBuffer(rawPublicKey) || typeof rawPublicKey === 'string',
-				'Cannot import public key. `rawPublicKey` must be a Buffer'
-			);
+		importPublicKey(rawPublicKey: Data) {
+			const rawPublicKeyBuf = anyToBuffer(rawPublicKey, 'base64', 'rawPublicKey');
 
-			rawPublicKey = Buffer.isBuffer(rawPublicKey) ? rawPublicKey : Buffer.from(rawPublicKey, 'base64');
-			const publicKeyDer = cryptoWrapper.publicKeyToDer(rawPublicKey);
+			const publicKeyDer = cryptoWrapper.publicKeyToDer(rawPublicKeyBuf);
 			const identifier = this.calculateKeypairIdentifier(publicKeyDer);
 			return new VirgilPublicKey(identifier, publicKeyDer);
 		}
 
 		exportPublicKey(publicKey: VirgilPublicKey) {
-			assert(
-				publicKey != null && publicKey.key != null,
-				'Cannot import public key. `publicKey` is invalid'
-			);
-
+			validatePublicKey(publicKey);
 			return publicKey.key;
 		}
 
-		encrypt(data: string|Buffer, publicKey: VirgilPublicKey|VirgilPublicKey[]) {
-			assert(
-				typeof data === 'string' || Buffer.isBuffer(data),
-				'Cannot encrypt. `data` must be a string or Buffer'
-			);
-
+		encrypt(data: Data, publicKey: VirgilPublicKey|VirgilPublicKey[]) {
+			const dataBuf = anyToBuffer(data, 'utf8', 'data');
 			const publicKeys = toArray(publicKey);
-			assert(
-				publicKeys.length > 0,
-				'Cannot encrypt. `publicKey` must not be empty'
-			);
 
-			data = Buffer.isBuffer(data) ? data : Buffer.from(data);
+			validatePublicKeysArray(publicKeys);
 
-			return cryptoWrapper.encrypt(data, publicKeys!);
+			return cryptoWrapper.encrypt(dataBuf, publicKeys);
 		}
 
-		decrypt(encryptedData: string|Buffer, privateKey: VirgilPrivateKey) {
-			assert(
-				typeof encryptedData === 'string' || Buffer.isBuffer(encryptedData),
-				'Cannot decrypt. `data` must be a Buffer or a string in base64'
-			);
-
-			encryptedData = Buffer.isBuffer(encryptedData) ? encryptedData : Buffer.from(encryptedData, 'base64');
+		decrypt(encryptedData: Data, privateKey: VirgilPrivateKey) {
+			const encryptedDataBuf = anyToBuffer(encryptedData, 'base64', 'encryptedData');
+			validatePrivateKey(privateKey);
 			const privateKeyValue = getPrivateKeyBytes(privateKey);
-			assert(privateKeyValue !== undefined, 'Cannot decrypt. `privateKey` is invalid');
-			return cryptoWrapper.decrypt(encryptedData, {
+
+			return cryptoWrapper.decrypt(encryptedDataBuf, {
 				identifier: privateKey.identifier,
 				key: privateKeyValue
 			});
 		}
 
-		calculateHash(data: Buffer|string, algorithm: HashAlgorithm = HashAlgorithm.SHA256) {
-			assert(Buffer.isBuffer(data) || typeof data === 'string',
-				'Cannot calculate hash. `data` must be a Buffer or a string in base64');
-
-			data = Buffer.isBuffer(data) ? data : Buffer.from(data, 'utf8');
-			return cryptoWrapper.hash(data, algorithm);
+		calculateHash(data: Data, algorithm: HashAlgorithm = HashAlgorithm.SHA256) {
+			const dataBuf = anyToBuffer(data, 'utf8', 'data');
+			return cryptoWrapper.hash(dataBuf, algorithm);
 		}
 
 		extractPublicKey(privateKey: VirgilPrivateKey) {
+			validatePrivateKey(privateKey);
 			const privateKeyValue = getPrivateKeyBytes(privateKey);
-
-			assert(
-				privateKeyValue !== undefined,
-				'Cannot extract public key. `privateKey` is invalid'
-			);
-
 			const publicKey = cryptoWrapper.extractPublicKey(privateKeyValue);
 			return new VirgilPublicKey(privateKey.identifier, publicKey);
 		}
 
-		calculateSignature(data: Buffer|string, privateKey: VirgilPrivateKey) {
-			assert(
-				Buffer.isBuffer(data) || typeof data === 'string',
-				'Cannot calculate signature. `data` must be a Buffer or a string'
-			);
-
+		calculateSignature(data: Data, privateKey: VirgilPrivateKey) {
+			const dataBuf = anyToBuffer(data, 'utf8', 'data');
+			validatePrivateKey(privateKey);
 			const privateKeyValue = getPrivateKeyBytes(privateKey);
 
-			assert(
-				privateKeyValue !== undefined,
-				'Cannot calculate signature. `privateKey` is invalid'
-			);
-
-			data = Buffer.isBuffer(data) ? data : Buffer.from(data, 'utf8');
-
-			return cryptoWrapper.sign(data, { key: privateKeyValue });
+			return cryptoWrapper.sign(dataBuf, { key: privateKeyValue });
 		}
 
-		verifySignature(data: Buffer|string, signature: Buffer|string, publicKey: VirgilPublicKey) {
-			assert(
-				Buffer.isBuffer(data) || typeof data === 'string',
-				'Cannot verify signature. `data` must be a Buffer or a string'
-			);
+		verifySignature(data: Data, signature: Data, publicKey: VirgilPublicKey) {
+			const dataBuf = anyToBuffer(data, 'utf8', 'data');
+			const signatureBuf = anyToBuffer(signature, 'base64', 'signature');
+			validatePublicKey(publicKey);
 
-			assert(
-				Buffer.isBuffer(signature) || typeof signature === 'string',
-				'Cannot verify signature. `signature` must be a Buffer or a string'
-			);
-
-			assert(
-				publicKey != null && Buffer.isBuffer(publicKey.key),
-				'Cannot verify signature. `publicKey` is invalid'
-			);
-
-			data = Buffer.isBuffer(data) ? data : Buffer.from(data, 'utf8');
-			signature = Buffer.isBuffer(signature) ? signature : Buffer.from(signature, 'base64');
-
-
-			return cryptoWrapper.verify(data, signature, publicKey);
+			return cryptoWrapper.verify(dataBuf, signatureBuf, publicKey);
 		}
 
 		signThenEncrypt(
-			data: Buffer|string,
-			signingKey: VirgilPrivateKey,
-			encryptionKey: VirgilPublicKey|VirgilPublicKey[])
+			data: Data,
+			privateKey: VirgilPrivateKey,
+			publicKey: VirgilPublicKey|VirgilPublicKey[])
 		{
-			assert(
-				Buffer.isBuffer(data) || typeof data === 'string',
-				'Cannot sign then encrypt. `data` must be a Buffer or a string'
-			);
+			const dataBuf = anyToBuffer(data, 'utf8', 'data');
+			validatePrivateKey(privateKey);
+			const signingKeyValue = getPrivateKeyBytes(privateKey);
 
-			const signingKeyValue = getPrivateKeyBytes(signingKey);
-
-			assert(signingKeyValue !== undefined, 'Cannot sign then encrypt. `signingKey` is invalid');
-
-			data = Buffer.isBuffer(data) ? data : Buffer.from(data, 'utf8');
-
-			const encryptionKeys = toArray(encryptionKey);
-			assert(
-				encryptionKeys.length > 0,
-				'Cannot sign then encrypt. `encryptionKey` must not be empty'
-			);
+			const publicKeys = toArray(publicKey);
+			validatePublicKeysArray(publicKeys);
 
 			return cryptoWrapper.signThenEncrypt(
-				data,
+				dataBuf,
 				{
-					identifier: signingKey.identifier,
+					identifier: privateKey.identifier,
 					key: signingKeyValue
 				},
-				encryptionKeys!
+				publicKeys
 			);
 		}
 
 		decryptThenVerify(
-			cipherData: Buffer|string,
-			decryptionKey: VirgilPrivateKey,
-			verificationKey: VirgilPublicKey|VirgilPublicKey[]
+			cipherData: Data,
+			privateKey: VirgilPrivateKey,
+			publicKey: VirgilPublicKey|VirgilPublicKey[]
 		) {
-			assert(
-				Buffer.isBuffer(cipherData) || typeof cipherData === 'string',
-				'Cannot decrypt then verify. `cipherData` must be a Buffer of a string in base64'
-			);
+			const cipherDataBuf = anyToBuffer(cipherData, 'base64', 'cipherData');
 
-			const verificationKeys = toArray(verificationKey);
-			assert(
-				verificationKeys.length > 0,
-				'Cannot decrypt then verify. `verificationKey` must not be empty'
-			);
+			const publicKeys = toArray(publicKey);
+			validatePublicKeysArray(publicKeys);
 
-			const decryptionKeyValue = getPrivateKeyBytes(decryptionKey);
-			assert(
-				decryptionKeyValue !== undefined,
-				'Cannot decrypt then verify. `decryptionKey` is invalid'
-			);
-
-			cipherData = Buffer.isBuffer(cipherData) ? cipherData : Buffer.from(cipherData, 'base64');
+			validatePrivateKey(privateKey);
+			const decryptionKeyValue = getPrivateKeyBytes(privateKey);
 
 			return cryptoWrapper.decryptThenVerify(
-				cipherData,
+				cipherDataBuf,
 				{
-					identifier: decryptionKey.identifier,
+					identifier: privateKey.identifier,
 					key: decryptionKeyValue
 				},
-				verificationKeys!
+				publicKeys
 			);
 		}
 
@@ -356,7 +314,7 @@ export function makeVirgilCryptoClass (cryptoWrapper: IVirgilCryptoWrapper)
 		 * @param {Buffer} publicKeyData - Public key material.
 		 * @returns {Buffer} Key pair identifier
 		 */
-		private calculateKeypairIdentifier(publicKeyData: Buffer) {
+		private calculateKeypairIdentifier(publicKeyData: Buffer): Buffer {
 			if (this.useSha256Identifiers) {
 				return cryptoWrapper.hash(publicKeyData, HashAlgorithm.SHA256);
 			} else {

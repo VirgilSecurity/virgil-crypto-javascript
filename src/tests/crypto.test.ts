@@ -178,7 +178,7 @@ describe('VirgilCrypto', function () {
 		assert.throws(function () {
 				crypto.verifySignature('some message', undefined!, publicKey)
 			},
-			/Cannot verify signature/,
+			/signature.+ undefined/,
 			'throws when invalid value for signature is passed'
 		);
 	});
@@ -188,7 +188,7 @@ describe('VirgilCrypto', function () {
 
 		assert.throws(function () {
 			crypto.encrypt('secret message', recipients);
-		},/`publicKey` must not be empty/);
+		},/array must not be empty/);
 	});
 
 	it('uses SHA512 identifiers by default', function () {

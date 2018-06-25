@@ -1,4 +1,6 @@
 import { pythiaWrapper } from './pythia/node/wrapper';
+import { Data } from './interfaces';
+import { anyToBuffer } from './utils/anyToBuffer';
 
 /**
  * Result of the {@link VirgilPythiaCrypto.blind} method.
@@ -22,17 +24,17 @@ export interface PythiaComputeTransformationKeyPairParams {
 	/**
 	 * Key ID used in key pair computation.
 	 */
-	transformationKeyId: Buffer;
+	transformationKeyId: Data;
 
 	/**
 	 * Global secret key used in key pair computation.
 	 */
-	pythiaSecret: Buffer;
+	pythiaSecret: Data;
 
 	/**
 	 * Scope secret used in key pair derivation.
 	 */
-	pythiaScopeSecret: Buffer;
+	pythiaScopeSecret: Data;
 }
 
 /**
@@ -57,17 +59,17 @@ export interface PythiaTransformParams {
 	/**
 	 * G1 Blinded (obfuscated) password.
 	 */
-	blindedPassword: Buffer;
+	blindedPassword: Data;
 
 	/**
 	 * Some random value used to identify specific user.
 	 */
-	tweak: Buffer;
+	tweak: Data;
 
 	/**
 	 * BN transformation private key.
 	 */
-	transformationPrivateKey: Buffer;
+	transformationPrivateKey: Data;
 }
 
 /**
@@ -92,17 +94,17 @@ export interface PythiaProveParams {
 	/**
 	 * GT transformed password from {@link VirgilPythiaCrypto.transform}.
 	 */
-	transformedPassword: Buffer;
+	transformedPassword: Data;
 
 	/**
 	 * G1 blinded password from {@link VirgilPythiaCrypto.blind}.
 	 */
-	blindedPassword: Buffer;
+	blindedPassword: Data;
 
 	/**
 	 * G2 transformed tweak from {@link VirgilPythiaCrypto.transform}.
 	 */
-	transformedTweak: Buffer;
+	transformedTweak: Data;
 
 	/**
 	 * Transformation key pair from {@link VirgilPythiaCrypto.computeTransformationKeyPair}
@@ -132,32 +134,32 @@ export interface PythiaVerifyParams {
 	/**
 	 * GT transformed password from {@link VirgilPythiaCrypto.transform}.
 	 */
-	transformedPassword: Buffer;
+	transformedPassword: Data;
 
 	/**
 	 * G1 blinded password from {@link VirgilPythiaCrypto.blind}.
 	 */
-	blindedPassword: Buffer;
+	blindedPassword: Data;
 
 	/**
 	 * The value used to identify the user.
 	 */
-	tweak: Buffer;
+	tweak: Data;
 
 	/**
 	 * G1 transformation public key.
 	 */
-	transformationPublicKey: Buffer;
+	transformationPublicKey: Data;
 
 	/**
 	 * BN proof value C from {@link VirgilPythiaCrypto.prove}.
 	 */
-	proofValueC: Buffer;
+	proofValueC: Data;
 
 	/**
 	 * BN proof value U from {@link VirgilPythiaCrypto.prove}.
 	 */
-	proofValueU: Buffer;
+	proofValueU: Data;
 }
 
 /**
@@ -167,12 +169,12 @@ export interface PythiaDeblindParams {
 	/**
 	 * GT transformed password returned by {@link VirgilPythiaCrypto.transform}.
 	 */
-	transformedPassword: Buffer;
+	transformedPassword: Data;
 
 	/**
 	 * BN value returned by {@link VirgilPythiaCrypto.blind}
 	 */
-	blindingSecret: Buffer;
+	blindingSecret: Data;
 }
 
 /**
@@ -182,12 +184,12 @@ export interface PythiaGetPasswordUpdateTokenParams {
 	/**
 	 * The transformation private key used to transform the existing `deblindedPassword`'s.
 	 */
-	oldTransformationPrivateKey: Buffer;
+	oldTransformationPrivateKey: Data;
 
 	/**
 	 * The new transformation private key.
 	 */
-	newTransformationPrivateKey: Buffer;
+	newTransformationPrivateKey: Data;
 }
 
 /**
@@ -197,12 +199,12 @@ export interface PythiaUpdateDeblindedWithTokenParams {
 	/**
 	 * GT Deblinded password to update.
 	 */
-	deblindedPassword: Buffer;
+	deblindedPassword: Data;
 
 	/**
 	 * BN Update token returned by {@link VirgilPythiaCrypto.getPasswordUpdateToken}.
 	 */
-	updateToken: Buffer;
+	updateToken: Data;
 }
 
 /**
@@ -217,11 +219,12 @@ export class VirgilPythiaCrypto {
 	 * Blinding is necessary to prevent third-parties form knowing the end user's
 	 * password.
 	 *
-	 * @param {string | Buffer} password - The user's password.
+	 * @param {Data} password - The user's password.
 	 * @returns {PythiaBlindResult}
 	 */
-	blind (password: string | Buffer): PythiaBlindResult {
-		return pythiaWrapper.blind(password);
+	blind (password: Data): PythiaBlindResult {
+		const passwordBuf = anyToBuffer(password, 'utf8', 'password');
+		return pythiaWrapper.blind(passwordBuf);
 	}
 
 	/**
@@ -234,7 +237,13 @@ export class VirgilPythiaCrypto {
 	 * and is zero-knowledge protected.
 	 */
 	deblind (params: PythiaDeblindParams): Buffer {
-		const { transformedPassword, blindingSecret } = params;
+		const transformedPassword = anyToBuffer(
+			params.transformedPassword, 'base64', 'params.transformedPassword'
+		);
+		const blindingSecret = anyToBuffer(
+			params.blindingSecret, 'base64', 'params.blindingSecret'
+		);
+
 		return pythiaWrapper.deblind(transformedPassword, blindingSecret);
 	}
 
@@ -246,7 +255,15 @@ export class VirgilPythiaCrypto {
 	 * @returns {PythiaTransformationKeyPair}
 	 */
 	computeTransformationKeyPair (params: PythiaComputeTransformationKeyPairParams): PythiaTransformationKeyPair {
-		const { transformationKeyId, pythiaSecret, pythiaScopeSecret } = params;
+		const transformationKeyId = anyToBuffer(
+			params.transformationKeyId, 'base64', 'params.transformationKeyId'
+		);
+		const pythiaSecret = anyToBuffer(
+			params.pythiaSecret, 'base64', 'params.pythiaSecret'
+		);
+		const pythiaScopeSecret = anyToBuffer(
+			params.pythiaScopeSecret, 'base64', 'params.pythiaScopeSecret'
+		);
 		return pythiaWrapper.computeTransformationKeyPair(
 			transformationKeyId, pythiaSecret, pythiaScopeSecret
 		);
@@ -259,7 +276,13 @@ export class VirgilPythiaCrypto {
 	 * @returns {PythiaTransformResult}
 	 */
 	transform (params: PythiaTransformParams): PythiaTransformResult {
-		const { blindedPassword, tweak, transformationPrivateKey } = params;
+		const blindedPassword = anyToBuffer(
+			params.blindedPassword, 'base64', 'params.blindedPassword'
+		);
+		const tweak = anyToBuffer(params.tweak, 'base64', 'params.tweak');
+		const transformationPrivateKey = anyToBuffer(
+			params.transformationPrivateKey, 'base64', 'params.transformationPrivateKey'
+		);
 		return pythiaWrapper.transform(blindedPassword, tweak, transformationPrivateKey);
 	}
 
@@ -271,7 +294,28 @@ export class VirgilPythiaCrypto {
 	 * @returns {PythiaProveResult}
 	 */
 	prove (params: PythiaProveParams): PythiaProveResult {
-		const { transformedPassword, blindedPassword, transformedTweak, transformationKeyPair } = params;
+		const transformationKeyPair = {
+			privateKey: anyToBuffer(
+				params.transformationKeyPair.privateKey,
+				'base64',
+				'params.transformationKeyPair.privateKey'
+			),
+			publicKey: anyToBuffer(
+				params.transformationKeyPair.publicKey,
+				'base64',
+				'params.transformationKeyPair.publicKey'
+			)
+		};
+		const transformedPassword = anyToBuffer(
+			params.transformedPassword, 'base64', 'params.transformedPassword'
+		);
+		const blindedPassword = anyToBuffer(
+			params.blindedPassword, 'base64', 'params.blindedPassword'
+		);
+		const transformedTweak = anyToBuffer(
+			params.transformedTweak, 'base64', 'params.transformedTweak'
+		);
+
 		return pythiaWrapper.prove(transformedPassword, blindedPassword, transformedTweak, transformationKeyPair);
 	}
 
@@ -282,14 +326,22 @@ export class VirgilPythiaCrypto {
 	 * @returns {boolean} - `true` if transformed password is correct, otherwise - `false`.
 	 */
 	verify (params: PythiaVerifyParams): boolean {
-		const {
-			transformedPassword,
-			blindedPassword,
-			tweak,
-			transformationPublicKey,
-			proofValueC,
-			proofValueU
-		} = params;
+		const transformedPassword = anyToBuffer(
+			params.transformedPassword, 'base64', 'params.transformedPassword'
+		);
+		const blindedPassword = anyToBuffer(
+			params.blindedPassword, 'base64', 'params.blindedPassword'
+		);
+		const tweak = anyToBuffer(params.tweak, 'base64', 'params.tweak');
+		const transformationPublicKey = anyToBuffer(
+			params.transformationPublicKey, 'base64', 'params.transformationPublicKey'
+		);
+		const proofValueC = anyToBuffer(
+			params.proofValueC, 'base64', 'params.proofValueC'
+		);
+		const proofValueU = anyToBuffer(
+			params.proofValueU, 'base64', 'params.proofValueU'
+		);
 
 		return pythiaWrapper.verify(
 			transformedPassword,
@@ -314,7 +366,12 @@ export class VirgilPythiaCrypto {
 	 * @returns {Buffer}
 	 */
 	getPasswordUpdateToken (params: PythiaGetPasswordUpdateTokenParams): Buffer {
-		const { oldTransformationPrivateKey, newTransformationPrivateKey } = params;
+		const oldTransformationPrivateKey = anyToBuffer(
+			params.oldTransformationPrivateKey, 'base64', 'params.oldTransformationPrivateKey'
+		);
+		const newTransformationPrivateKey = anyToBuffer(
+			params.newTransformationPrivateKey, 'base64', 'params.newTransformationPrivateKey'
+		);
 		return pythiaWrapper.getPasswordUpdateToken(oldTransformationPrivateKey, newTransformationPrivateKey);
 	}
 
@@ -325,7 +382,13 @@ export class VirgilPythiaCrypto {
 	 * @returns {Buffer} The new `deblindedPassword`
 	 */
 	updateDeblindedWithToken (params: PythiaUpdateDeblindedWithTokenParams): Buffer {
-		const { deblindedPassword, updateToken } = params;
+		const deblindedPassword = anyToBuffer(
+			params.deblindedPassword, 'base64', 'params.deblindedPassword'
+		);
+		const updateToken = anyToBuffer(
+			params.updateToken, 'base64', 'params.updateToken'
+		);
+
 		return pythiaWrapper.updateDeblindedWithToken(deblindedPassword, updateToken);
 	}
 }

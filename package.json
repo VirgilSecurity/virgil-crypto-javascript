@@ -1,11 +1,14 @@
 {
   "name": "virgil-crypto",
-  "version": "3.0.0-alpha.12",
+  "version": "3.0.0-alpha.13",
   "main": "dist/virgil-crypto.cjs.js",
   "browser": {
     "./dist/virgil-crypto.cjs.js": "./dist/virgil-crypto.browser.cjs.js",
     "./dist/virgil-crypto.es.js": "./dist/virgil-crypto.browser.es.js",
-    "./src/node/api.ts": "./src/browser/api.ts"
+    "./src/node/wrapper.ts": "./src/browser/wrapper.ts",
+    "./src/pythia/node/wrapper.ts": "./src/pythia/browser/wrapper.ts",
+    "./dist/virgil-crypto-pythia.cjs.js": "./dist/virgil-crypto-pythia.browser.cjs.js",
+    "./dist/virgil-crypto-pythia.es.js": "./dist/virgil-crypto-pythia.browser.es.js"
   },
   "module": "dist/virgil-crypto.es.js",
   "typings": "dist/types/index.d.ts",
@@ -34,14 +37,15 @@
   },
   "scripts": {
     "build": "node scripts/rollup/build.js",
-    "preversion": "npm run test",
+    "preversion": "npm run update:node && npm run update:asmjs && npm run test",
     "version": "npm run build",
     "test:node": "mocha --require ts-node/register --require chai/register-assert \"src/tests/**/*.test.ts\"",
     "test:browser": "karma start",
     "test": "npm run test:node && npm run test:browser",
-    "postinstall": "node scripts/download-node-addon.js",
+    "postinstall": "npm run update:node",
     "docs": "typedoc src",
-    "update-asmjs": "node scripts/download-asmjs.js"
+    "update:node": "node scripts/download-node-addon.js",
+    "update:asmjs": "node scripts/download-asmjs.js && node scripts/download-pythia-asmjs.js"
   },
   "dependencies": {
     "node-fetch": "^2.1.2",
@@ -81,5 +85,5 @@
     "typedoc": "^0.11.1",
     "typescript": "^2.6.2"
   },
-  "virgil-crypto-lib-version": "2.4.4"
+  "virgil-crypto-lib-version": "2.4.6"
 }

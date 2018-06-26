@@ -1,17 +1,17 @@
-import { cryptoApi } from '../node/api';
+import { cryptoWrapper } from '../node/wrapper';
 
 const PASSWORD = Buffer.from('veryStrongPa$$0rd', 'utf8');
 
 describe('extract public key from private', () => {
 	it ('should extract public key from encrypted private key', () => {
-		const keyPair = cryptoApi.generateKeyPair({ password: PASSWORD });
-		const extractedPubKey = cryptoApi.extractPublicKey(keyPair.privateKey, PASSWORD);
+		const keyPair = cryptoWrapper.generateKeyPair({ password: PASSWORD });
+		const extractedPubKey = cryptoWrapper.extractPublicKey(keyPair.privateKey, PASSWORD);
 		assert.isTrue(extractedPubKey.equals(keyPair.publicKey));
 	});
 
 	it ('should extract public key from non-encrypted private key', () => {
-		const keyPair = cryptoApi.generateKeyPair();
-		const extractedPubKey = cryptoApi.extractPublicKey(keyPair.privateKey);
+		const keyPair = cryptoWrapper.generateKeyPair();
+		const extractedPubKey = cryptoWrapper.extractPublicKey(keyPair.privateKey);
 		assert.isTrue(extractedPubKey.equals(keyPair.publicKey));
 	});
 });

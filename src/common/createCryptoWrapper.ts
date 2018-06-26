@@ -2,28 +2,19 @@ import { toArray } from '../utils/toArray';
 import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
 import { createNativeTypeWrapper } from './createNativeTypeWrapper';
 import { KeyPairType } from './KeyPairType';
-import { DecryptionKey, EncryptionKey, IVirgilCryptoApi, SigningKey, VerificationKey } from './IVirgilCryptoApi';
 import { HashAlgorithm } from './HashAlgorithm';
-import { IntegrityCheckFailedError } from './errors';
+import {
+	DecryptionKey,
+	EncryptionKey,
+	KeyPairFromKeyMaterialOptions,
+	KeyPairOptions,
+	SigningKey,
+	VerificationKey,
+	IVirgilCryptoWrapper
+} from './IVirgilCryptoWrapper';
+import { IntegrityCheckFailedError, WeakKeyMaterialError } from './errors';
 
 const EMPTY_BUFFER = Buffer.alloc(0);
-
-/**
- * Key pair generation options.
- * @hidden
- */
-export interface KeyPairOptions {
-	/**
-	 * Type of keys to generate. Optional. Default is {@link KeyPairType.Default}
-	 */
-	type?: KeyPairType;
-
-	/**
-	 * Password to encrypt the private key with. Optional. The private key
-	 * is not encrypted by default.
-	 */
-	password?: Buffer;
-}
 
 /**
  * Creates a low level API wrapper for "native" Virgil Crypto library
@@ -33,7 +24,7 @@ export interface KeyPairOptions {
  *
  * @param {any} lib - Native Virgil Crypto library (browser or Node.js)
  */
-export function createCryptoApi (lib: any): IVirgilCryptoApi {
+export function createCryptoWrapper (lib: any): IVirgilCryptoWrapper {
 
 	const wrapper = createNativeTypeWrapper(lib);
 
@@ -52,15 +43,18 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 		'extractPublicKey',
 		'privateKeyToDER',
 		'publicKeyToDER',
-		'resetPrivateKeyPassword'
+		'resetPrivateKeyPassword',
+		'generateFromKeyMaterial',
+		'generateRecommendedFromKeyMaterial'
 	]);
 
-	lib.createVirgilCipher = () => {
+	const createVirgilCipher = () => {
 		const cipher = new lib.VirgilCipher();
 		if (process.browser) cipher.deleteLater();
 		return cipher;
 	};
-	lib.createVirgilSigner = () => {
+
+	const createVirgilSigner = () => {
 		const sha512 = process.browser
 			? lib.VirgilHashAlgorithm.SHA512
 			: lib.VirgilHash.Algorithm_SHA512;
@@ -69,78 +63,124 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 		if (process.browser) signer.deleteLater();
 		return signer;
 	};
-	lib.createVirgilHash = (...args: any[]) => {
+
+	const createVirgilHash = (...args: any[]) => {
 		const hash = new lib.VirgilHash(...args);
 		if (process.browser) hash.deleteLater();
 		return hash;
 	};
 
+	const getRandomBytes = (numOfBytes: number) => {
+		if (process.browser) {
+			const personalInfo = lib.VirgilByteArrayUtils.stringToBytes('');
+			const random = new lib.VirgilRandom(personalInfo);
+
+			let byteArr: any;
+			try {
+				byteArr = random.randomizeBytes(numOfBytes);
+				return wrapper.utils.virgilByteArrayToBuffer(byteArr);
+			} finally {
+				personalInfo.delete();
+				random.delete();
+				byteArr && byteArr.delete();
+			}
+		} else {
+			const random = new lib.VirgilRandom('');
+			return wrapper.utils.virgilByteArrayToBuffer(random.randomize(numOfBytes));
+		}
+	};
+
+
 	return {
 		generateKeyPair (options: KeyPairOptions = {}) {
 			let { type, password = EMPTY_BUFFER } = options;
-			let keypair;
+			let keyPair;
 			if (type) {
-				const libType = process.browser
-					? lib.VirgilKeyPairType[type]
-					: lib.VirgilKeyPair[`Type_${type}`];
-				keypair = lib.VirgilKeyPair.generateSafe(libType, password);
+				keyPair = lib.VirgilKeyPair.generateSafe(getLibKeyPairType(type), password);
 			} else {
-				keypair = lib.VirgilKeyPair.generateRecommendedSafe(password);
+				keyPair = lib.VirgilKeyPair.generateRecommendedSafe(password);
 			}
 
 			return {
-				privateKey: keypair.privateKeySafe(),
-				publicKey: keypair.publicKeySafe()
+				privateKey: keyPair.privateKeySafe(),
+				publicKey: keyPair.publicKeySafe()
 			};
 		},
 
-		privateKeyToDer(privateKey: Buffer, privateKeyPassword: Buffer = EMPTY_BUFFER) {
+		generateKeyPairFromKeyMaterial (options: KeyPairFromKeyMaterialOptions) {
+			const { keyMaterial, type, password = EMPTY_BUFFER } = options;
+			if (keyMaterial.byteLength < 32) {
+				throw new WeakKeyMaterialError('Key material is not secure. Expected length >= 32.');
+			}
+
+			let keyPair;
+
+			if (type) {
+				keyPair = lib.VirgilKeyPair.generateFromKeyMaterialSafe(
+					getLibKeyPairType(type),
+					keyMaterial,
+					password
+				);
+			} else {
+				keyPair = lib.VirgilKeyPair.generateRecommendedFromKeyMaterialSafe(
+					keyMaterial,
+					password
+				);
+			}
+
+			return {
+				privateKey: keyPair.privateKeySafe(),
+				publicKey: keyPair.publicKeySafe()
+			};
+		},
+
+		privateKeyToDer(privateKey: Buffer, privateKeyPassword: Buffer = EMPTY_BUFFER): Buffer {
 			return lib.VirgilKeyPair.privateKeyToDERSafe(privateKey, privateKeyPassword);
 		},
 
-		publicKeyToDer(publicKey: Buffer) {
+		publicKeyToDer(publicKey: Buffer): Buffer {
 			return lib.VirgilKeyPair.publicKeyToDERSafe(publicKey);
 		},
 
-		extractPublicKey(privateKey: Buffer, privateKeyPassword: Buffer = EMPTY_BUFFER) {
+		extractPublicKey(privateKey: Buffer, privateKeyPassword: Buffer = EMPTY_BUFFER): Buffer {
 			return lib.VirgilKeyPair.extractPublicKeySafe(privateKey, privateKeyPassword);
 		},
 
-		encryptPrivateKey(privateKey: Buffer, privateKeyPassword: Buffer) {
+		encryptPrivateKey(privateKey: Buffer, privateKeyPassword: Buffer): Buffer {
 			return lib.VirgilKeyPair.encryptPrivateKeySafe(privateKey, privateKeyPassword);
 		},
 
-		decryptPrivateKey(privateKey: Buffer, privateKeyPassword: Buffer) {
+		decryptPrivateKey(privateKey: Buffer, privateKeyPassword: Buffer): Buffer {
 			return lib.VirgilKeyPair.decryptPrivateKeySafe(privateKey, privateKeyPassword);
 		},
 
-		changePrivateKeyPassword(privateKey: Buffer, oldPassword: Buffer, newPassword: Buffer) {
+		changePrivateKeyPassword(privateKey: Buffer, oldPassword: Buffer, newPassword: Buffer): Buffer {
 			return lib.VirgilKeyPair.resetPrivateKeyPasswordSafe(privateKey, oldPassword, newPassword);
 		},
 
-		hash(data: Buffer, algorithm: HashAlgorithm = HashAlgorithm.SHA256) {
+		hash(data: Buffer, algorithm: HashAlgorithm = HashAlgorithm.SHA256): Buffer {
 			const libAlgorithm = process.browser
 				? lib.VirgilHashAlgorithm[algorithm]
 				: lib.VirgilHash[`Algorithm_${algorithm}`];
 
-			const virgilHash = lib.createVirgilHash(libAlgorithm);
+			const virgilHash = createVirgilHash(libAlgorithm);
 			return virgilHash.hashSafe(data);
 		},
 
-		encryptWithPassword(data: Buffer, password: Buffer) {
-			const cipher = lib.createVirgilCipher();
+		encryptWithPassword(data: Buffer, password: Buffer): Buffer {
+			const cipher = createVirgilCipher();
 			cipher.addPasswordRecipientSafe(password);
 			return cipher.encryptSafe(data, true);
 		},
 
-		decryptWithPassword(encryptedData: Buffer, password: Buffer) {
-			const cipher = lib.createVirgilCipher();
+		decryptWithPassword(encryptedData: Buffer, password: Buffer): Buffer {
+			const cipher = createVirgilCipher();
 			return cipher.decryptWithPasswordSafe(encryptedData, password);
 		},
 
-		encrypt(data: Buffer, encryptionKey: EncryptionKey|EncryptionKey[] ) {
+		encrypt(data: Buffer, encryptionKey: EncryptionKey|EncryptionKey[] ): Buffer {
 			const encryptionKeys = toArray(encryptionKey)!;
-			const cipher = lib.createVirgilCipher();
+			const cipher = createVirgilCipher();
 
 			encryptionKeys.forEach(({ identifier, key }: EncryptionKey) => {
 				cipher.addKeyRecipientSafe(identifier, key);
@@ -148,29 +188,29 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 			return cipher.encryptSafe(data, true);
 		},
 
-		decrypt(encryptedData: Buffer, decryptionKey: DecryptionKey) {
+		decrypt(encryptedData: Buffer, decryptionKey: DecryptionKey): Buffer {
 			const { identifier, key, password = EMPTY_BUFFER } = decryptionKey;
-			const cipher = lib.createVirgilCipher();
+			const cipher = createVirgilCipher();
 			return cipher.decryptWithKeySafe(encryptedData, identifier, key, password);
 		},
 
-		sign (data: Buffer, signingKey: SigningKey) {
+		sign (data: Buffer, signingKey: SigningKey): Buffer {
 			const { key, password = EMPTY_BUFFER } = signingKey;
-			const signer = lib.createVirgilSigner();
+			const signer = createVirgilSigner();
 			return signer.signSafe(data, key, password);
 		},
 
-		verify (data: Buffer, signature: Buffer, verificationKey: VerificationKey) {
+		verify (data: Buffer, signature: Buffer, verificationKey: VerificationKey): boolean {
 			const { key } = verificationKey;
-			const signer = lib.createVirgilSigner();
+			const signer = createVirgilSigner();
 			return signer.verifySafe(data, signature, key);
 		},
 
-		signThenEncrypt(data: Buffer, signingKey: SigningKey, encryptionKey: EncryptionKey|EncryptionKey[]) {
+		signThenEncrypt(data: Buffer, signingKey: SigningKey, encryptionKey: EncryptionKey|EncryptionKey[]): Buffer {
 			const encryptionKeys = toArray(encryptionKey)!;
 
-			const signer = lib.createVirgilSigner();
-			const cipher = lib.createVirgilCipher();
+			const signer = createVirgilSigner();
+			const cipher = createVirgilCipher();
 			const signatureKey = Buffer.from(DATA_SIGNATURE_KEY);
 			const signerIdKey = Buffer.from(DATA_SIGNER_ID_KEY);
 			const customParams = cipher.customParams();
@@ -195,10 +235,10 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 
 		decryptThenVerify(
 			cipherData: Buffer, decryptionKey: DecryptionKey, verificationKey: VerificationKey|VerificationKey[]
-		) {
+		): Buffer {
 			const verificationKeys = toArray(verificationKey)!;
-			const signer = lib.createVirgilSigner();
-			const cipher = lib.createVirgilCipher();
+			const signer = createVirgilSigner();
+			const cipher = createVirgilCipher();
 			const signatureKey = Buffer.from(DATA_SIGNATURE_KEY);
 
 			const plainData = cipher.decryptWithKeySafe(
@@ -239,7 +279,9 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 			}
 
 			return plainData;
-		}
+		},
+
+		getRandomBytes
 	};
 
 	function tryGetSignerId(customParams: any): Buffer|null {
@@ -249,5 +291,11 @@ export function createCryptoApi (lib: any): IVirgilCryptoApi {
 		} catch (e) {
 			return null;
 		}
+	}
+
+	function getLibKeyPairType (type: KeyPairType) {
+		return process.browser
+			? lib.VirgilKeyPairType[type]
+			: lib.VirgilKeyPair[`Type_${type}`];
 	}
 }

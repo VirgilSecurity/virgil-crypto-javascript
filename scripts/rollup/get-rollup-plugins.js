@@ -27,6 +27,8 @@ function getRollupPlugins(bundleType) {
 
 		globalScript('src/browser/asmjs/virgil_crypto_asmjs.js'),
 
+		globalScript('src/pythia/browser/asmjs/virgil_crypto_asmjs.js'),
+
 		resolve({
 			browser: isBrowser,
 			jsnext: true,

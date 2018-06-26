@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>VirgilCryptoOptions | virgil-crypto</title>
+	<title>PythiaTransformParams | virgil-crypto</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style type="text/css">/*! normalize.css v1.1.3 | MIT License | git.io/normalize */
@@ -960,8 +960,19 @@ img { max-width: 100%; }
 		<li class=" tsd-kind-interface">
 			<a href="pythiaproveresult.html" class="tsd-kind-icon">Pythia<wbr>Prove<wbr>Result</a>
 		</li>
-		<li class=" tsd-kind-interface">
+		<li class="current tsd-kind-interface">
 			<a href="pythiatransformparams.html" class="tsd-kind-icon">Pythia<wbr>Transform<wbr>Params</a>
+			<ul>
+				<li class=" tsd-kind-property tsd-parent-kind-interface">
+					<a href="pythiatransformparams.html#blindedpassword" class="tsd-kind-icon">blinded<wbr>Password</a>
+				</li>
+				<li class=" tsd-kind-property tsd-parent-kind-interface">
+					<a href="pythiatransformparams.html#transformationprivatekey" class="tsd-kind-icon">transformation<wbr>Private<wbr>Key</a>
+				</li>
+				<li class=" tsd-kind-property tsd-parent-kind-interface">
+					<a href="pythiatransformparams.html#tweak" class="tsd-kind-icon">tweak</a>
+				</li>
+			</ul>
 		</li>
 		<li class=" tsd-kind-interface">
 			<a href="pythiatransformresult.html" class="tsd-kind-icon">Pythia<wbr>Transform<wbr>Result</a>
@@ -978,16 +989,8 @@ img { max-width: 100%; }
 		<li class=" tsd-kind-interface">
 			<a href="virgilcryptoclass.html" class="tsd-kind-icon">Virgil<wbr>Crypto<wbr>Class</a>
 		</li>
-		<li class="current tsd-kind-interface">
+		<li class=" tsd-kind-interface">
 			<a href="virgilcryptooptions.html" class="tsd-kind-icon">Virgil<wbr>Crypto<wbr>Options</a>
-			<ul>
-				<li class=" tsd-kind-property tsd-parent-kind-interface">
-					<a href="virgilcryptooptions.html#defaultkeypairtype" class="tsd-kind-icon">default<wbr>Key<wbr>Pair<wbr>Type</a>
-				</li>
-				<li class=" tsd-kind-property tsd-parent-kind-interface">
-					<a href="virgilcryptooptions.html#usesha256identifiers" class="tsd-kind-icon">use<wbr>Sha256<wbr>Identifiers</a>
-				</li>
-			</ul>
 		</li>
 		<li class=" tsd-kind-interface tsd-is-protected">
 			<a href="virgilkeypair.html" class="tsd-kind-icon">Virgil<wbr>Key<wbr>Pair</a>
@@ -1014,7 +1017,7 @@ img { max-width: 100%; }
 		<section class="tsd-panel tsd-comment">
 			<div class="tsd-comment tsd-typography">
 				<div class="lead">
-					<p><code>VirgilCrypto</code> initialization options.</p>
+					<p>Input parameters of <a href="../classes/virgilpythiacrypto.html#transform">VirgilPythiaCrypto.transform</a> method.</p>
 				</div>
 			</div>
 		</section>
@@ -1022,7 +1025,7 @@ img { max-width: 100%; }
 			<h3>Hierarchy</h3>
 			<ul class="tsd-hierarchy">
 				<li>
-					<span class="target">VirgilCryptoOptions</span>
+					<span class="target">PythiaTransformParams</span>
 				</li>
 			</ul>
 		</section>
@@ -1033,8 +1036,9 @@ img { max-width: 100%; }
 					<section class="tsd-index-section ">
 						<h3>Properties</h3>
 						<ul class="tsd-index-list">
-							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="virgilcryptooptions.html#defaultkeypairtype" class="tsd-kind-icon">default<wbr>Key<wbr>Pair<wbr>Type</a></li>
-							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="virgilcryptooptions.html#usesha256identifiers" class="tsd-kind-icon">use<wbr>Sha256<wbr>Identifiers</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="pythiatransformparams.html#blindedpassword" class="tsd-kind-icon">blinded<wbr>Password</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="pythiatransformparams.html#transformationprivatekey" class="tsd-kind-icon">transformation<wbr>Private<wbr>Key</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="pythiatransformparams.html#tweak" class="tsd-kind-icon">tweak</a></li>
 						</ul>
 					</section>
 				</div>
@@ -1043,32 +1047,47 @@ img { max-width: 100%; }
 		<section class="tsd-panel-group tsd-member-group ">
 			<h2>Properties</h2>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-				<a name="defaultkeypairtype" class="tsd-anchor"></a>
-				<h3><span class="tsd-flag ts-flagOptional">Optional</span> default<wbr>Key<wbr>Pair<wbr>Type</h3>
-				<div class="tsd-signature tsd-kind-icon">default<wbr>Key<wbr>Pair<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="../enums/keypairtype.html" class="tsd-signature-type">KeyPairType</a></div>
+				<a name="blindedpassword" class="tsd-anchor"></a>
+				<h3>blinded<wbr>Password</h3>
+				<div class="tsd-signature tsd-kind-icon">blinded<wbr>Password<span class="tsd-signature-symbol">:</span> <a href="../index.html#data" class="tsd-signature-type">Data</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L79">interfaces.ts:79</a></li>
+						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/VirgilPythiaCrypto.ts#L62">VirgilPythiaCrypto.ts:62</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Type of keys to generate by default. Optional. Default is <a href="../enums/keypairtype.html#default">KeyPairType.Default</a>.</p>
+						<p>G1 Blinded (obfuscated) password.</p>
 					</div>
 				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-				<a name="usesha256identifiers" class="tsd-anchor"></a>
-				<h3><span class="tsd-flag ts-flagOptional">Optional</span> use<wbr>Sha256<wbr>Identifiers</h3>
-				<div class="tsd-signature tsd-kind-icon">use<wbr>Sha256<wbr>Identifiers<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span></div>
+				<a name="transformationprivatekey" class="tsd-anchor"></a>
+				<h3>transformation<wbr>Private<wbr>Key</h3>
+				<div class="tsd-signature tsd-kind-icon">transformation<wbr>Private<wbr>Key<span class="tsd-signature-symbol">:</span> <a href="../index.html#data" class="tsd-signature-type">Data</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L74">interfaces.ts:74</a></li>
+						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/VirgilPythiaCrypto.ts#L72">VirgilPythiaCrypto.ts:72</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Indicates whether to use old algorithm to calculate keypair identifiers.</p>
+						<p>BN transformation private key.</p>
+					</div>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<a name="tweak" class="tsd-anchor"></a>
+				<h3>tweak</h3>
+				<div class="tsd-signature tsd-kind-icon">tweak<span class="tsd-signature-symbol">:</span> <a href="../index.html#data" class="tsd-signature-type">Data</a></div>
+				<aside class="tsd-sources">
+					<ul>
+						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/VirgilPythiaCrypto.ts#L67">VirgilPythiaCrypto.ts:67</a></li>
+					</ul>
+				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Some random value used to identify specific user.</p>
 					</div>
 				</div>
 			</section>

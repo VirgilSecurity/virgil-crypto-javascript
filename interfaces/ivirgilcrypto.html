@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>VirgilPublicKey | virgil-crypto</title>
+	<title>IVirgilCrypto | virgil-crypto</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style type="text/css">/*! normalize.css v1.1.3 | MIT License | git.io/normalize */
@@ -916,45 +916,141 @@ img { max-width: 100%; }
 			<a href="../enums/keypairtype.html" class="tsd-kind-icon">Key<wbr>Pair<wbr>Type</a>
 		</li>
 		<li class=" tsd-kind-class">
-			<a href="integritycheckfailederror.html" class="tsd-kind-icon">Integrity<wbr>Check<wbr>Failed<wbr>Error</a>
+			<a href="../classes/integritycheckfailederror.html" class="tsd-kind-icon">Integrity<wbr>Check<wbr>Failed<wbr>Error</a>
 		</li>
 		<li class=" tsd-kind-class">
-			<a href="virgilaccesstokensigner.html" class="tsd-kind-icon">Virgil<wbr>Access<wbr>Token<wbr>Signer</a>
+			<a href="../classes/virgilaccesstokensigner.html" class="tsd-kind-icon">Virgil<wbr>Access<wbr>Token<wbr>Signer</a>
 		</li>
 		<li class=" tsd-kind-class">
-			<a href="virgilcardcrypto.html" class="tsd-kind-icon">Virgil<wbr>Card<wbr>Crypto</a>
+			<a href="../classes/virgilcardcrypto.html" class="tsd-kind-icon">Virgil<wbr>Card<wbr>Crypto</a>
 		</li>
 		<li class=" tsd-kind-class">
-			<a href="virgilcrypto.html" class="tsd-kind-icon">Virgil<wbr>Crypto</a>
-		</li>
-		<li class=" tsd-kind-class tsd-is-protected">
-			<a href="virgilprivatekey.html" class="tsd-kind-icon">Virgil<wbr>Private<wbr>Key</a>
+			<a href="../classes/virgilprivatekeyexporter.html" class="tsd-kind-icon">Virgil<wbr>Private<wbr>Key<wbr>Exporter</a>
 		</li>
 		<li class=" tsd-kind-class">
-			<a href="virgilprivatekeyexporter.html" class="tsd-kind-icon">Virgil<wbr>Private<wbr>Key<wbr>Exporter</a>
+			<a href="../classes/virgilpythiacrypto.html" class="tsd-kind-icon">Virgil<wbr>Pythia<wbr>Crypto</a>
 		</li>
-		<li class="current tsd-kind-class tsd-is-protected">
-			<a href="virgilpublickey.html" class="tsd-kind-icon">Virgil<wbr>Public<wbr>Key</a>
+		<li class=" tsd-kind-class">
+			<a href="../classes/weakkeymaterialerror.html" class="tsd-kind-icon">Weak<wbr>Key<wbr>Material<wbr>Error</a>
+		</li>
+		<li class=" tsd-kind-interface">
+			<a href="iprivatekey.html" class="tsd-kind-icon">IPrivate<wbr>Key</a>
+		</li>
+		<li class=" tsd-kind-interface">
+			<a href="ipublickey.html" class="tsd-kind-icon">IPublic<wbr>Key</a>
+		</li>
+		<li class="current tsd-kind-interface">
+			<a href="ivirgilcrypto.html" class="tsd-kind-icon">IVirgil<wbr>Crypto</a>
 			<ul>
-				<li class=" tsd-kind-constructor tsd-parent-kind-class">
-					<a href="virgilpublickey.html#constructor" class="tsd-kind-icon">constructor</a>
+				<li class=" tsd-kind-property tsd-parent-kind-interface">
+					<a href="ivirgilcrypto.html#defaultkeypairtype" class="tsd-kind-icon">default<wbr>Key<wbr>Pair<wbr>Type</a>
 				</li>
-				<li class=" tsd-kind-property tsd-parent-kind-class">
-					<a href="virgilpublickey.html#identifier" class="tsd-kind-icon">identifier</a>
+				<li class=" tsd-kind-property tsd-parent-kind-interface">
+					<a href="ivirgilcrypto.html#usesha256identifiers" class="tsd-kind-icon">use<wbr>Sha256<wbr>Identifiers</a>
 				</li>
-				<li class=" tsd-kind-property tsd-parent-kind-class">
-					<a href="virgilpublickey.html#key" class="tsd-kind-icon">key</a>
+				<li class=" tsd-kind-method tsd-parent-kind-interface">
+					<a href="ivirgilcrypto.html#calculatehash" class="tsd-kind-icon">calculate<wbr>Hash</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-interface">
+					<a href="ivirgilcrypto.html#calculatesignature" class="tsd-kind-icon">calculate<wbr>Signature</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-interface">
+					<a href="ivirgilcrypto.html#decrypt" class="tsd-kind-icon">decrypt</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-interface">
+					<a href="ivirgilcrypto.html#decryptthenverify" class="tsd-kind-icon">decrypt<wbr>Then<wbr>Verify</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-interface">
+					<a href="ivirgilcrypto.html#encrypt" class="tsd-kind-icon">encrypt</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-interface">
+					<a href="ivirgilcrypto.html#exportprivatekey" class="tsd-kind-icon">export<wbr>Private<wbr>Key</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-interface">
+					<a href="ivirgilcrypto.html#exportpublickey" class="tsd-kind-icon">export<wbr>Public<wbr>Key</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-interface">
+					<a href="ivirgilcrypto.html#extractpublickey" class="tsd-kind-icon">extract<wbr>Public<wbr>Key</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-interface">
+					<a href="ivirgilcrypto.html#generatekeys" class="tsd-kind-icon">generate<wbr>Keys</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-interface">
+					<a href="ivirgilcrypto.html#generatekeysfromkeymaterial" class="tsd-kind-icon">generate<wbr>Keys<wbr>From<wbr>Key<wbr>Material</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-interface">
+					<a href="ivirgilcrypto.html#getrandombytes" class="tsd-kind-icon">get<wbr>Random<wbr>Bytes</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-interface">
+					<a href="ivirgilcrypto.html#importprivatekey" class="tsd-kind-icon">import<wbr>Private<wbr>Key</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-interface">
+					<a href="ivirgilcrypto.html#importpublickey" class="tsd-kind-icon">import<wbr>Public<wbr>Key</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-interface">
+					<a href="ivirgilcrypto.html#signthenencrypt" class="tsd-kind-icon">sign<wbr>Then<wbr>Encrypt</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-interface">
+					<a href="ivirgilcrypto.html#verifysignature" class="tsd-kind-icon">verify<wbr>Signature</a>
 				</li>
 			</ul>
 		</li>
 		<li class=" tsd-kind-interface">
-			<a href="../interfaces/iprivatekey.html" class="tsd-kind-icon">IPrivate<wbr>Key</a>
+			<a href="pythiablindresult.html" class="tsd-kind-icon">Pythia<wbr>Blind<wbr>Result</a>
 		</li>
 		<li class=" tsd-kind-interface">
-			<a href="../interfaces/ipublickey.html" class="tsd-kind-icon">IPublic<wbr>Key</a>
+			<a href="pythiacomputetransformationkeypairparams.html" class="tsd-kind-icon">Pythia<wbr>Compute<wbr>Transformation<wbr>Key<wbr>Pair<wbr>Params</a>
 		</li>
 		<li class=" tsd-kind-interface">
-			<a href="../interfaces/virgilcryptooptions.html" class="tsd-kind-icon">Virgil<wbr>Crypto<wbr>Options</a>
+			<a href="pythiadeblindparams.html" class="tsd-kind-icon">Pythia<wbr>Deblind<wbr>Params</a>
+		</li>
+		<li class=" tsd-kind-interface">
+			<a href="pythiagetpasswordupdatetokenparams.html" class="tsd-kind-icon">Pythia<wbr>Get<wbr>Password<wbr>Update<wbr>Token<wbr>Params</a>
+		</li>
+		<li class=" tsd-kind-interface">
+			<a href="pythiaproveparams.html" class="tsd-kind-icon">Pythia<wbr>Prove<wbr>Params</a>
+		</li>
+		<li class=" tsd-kind-interface">
+			<a href="pythiaproveresult.html" class="tsd-kind-icon">Pythia<wbr>Prove<wbr>Result</a>
+		</li>
+		<li class=" tsd-kind-interface">
+			<a href="pythiatransformparams.html" class="tsd-kind-icon">Pythia<wbr>Transform<wbr>Params</a>
+		</li>
+		<li class=" tsd-kind-interface">
+			<a href="pythiatransformresult.html" class="tsd-kind-icon">Pythia<wbr>Transform<wbr>Result</a>
+		</li>
+		<li class=" tsd-kind-interface">
+			<a href="pythiatransformationkeypair.html" class="tsd-kind-icon">Pythia<wbr>Transformation<wbr>Key<wbr>Pair</a>
+		</li>
+		<li class=" tsd-kind-interface">
+			<a href="pythiaupdatedeblindedwithtokenparams.html" class="tsd-kind-icon">Pythia<wbr>Update<wbr>Deblinded<wbr>With<wbr>Token<wbr>Params</a>
+		</li>
+		<li class=" tsd-kind-interface">
+			<a href="pythiaverifyparams.html" class="tsd-kind-icon">Pythia<wbr>Verify<wbr>Params</a>
+		</li>
+		<li class=" tsd-kind-interface">
+			<a href="virgilcryptoclass.html" class="tsd-kind-icon">Virgil<wbr>Crypto<wbr>Class</a>
+		</li>
+		<li class=" tsd-kind-interface">
+			<a href="virgilcryptooptions.html" class="tsd-kind-icon">Virgil<wbr>Crypto<wbr>Options</a>
+		</li>
+		<li class=" tsd-kind-interface tsd-is-protected">
+			<a href="virgilkeypair.html" class="tsd-kind-icon">Virgil<wbr>Key<wbr>Pair</a>
+		</li>
+		<li class=" tsd-kind-interface tsd-is-protected">
+			<a href="virgilprivatekey.html" class="tsd-kind-icon">Virgil<wbr>Private<wbr>Key</a>
+		</li>
+		<li class=" tsd-kind-interface tsd-is-protected">
+			<a href="virgilpublickey.html" class="tsd-kind-icon">Virgil<wbr>Public<wbr>Key</a>
+		</li>
+		<li class=" tsd-kind-type-alias">
+			<a href="../index.html#data" class="tsd-kind-icon">Data</a>
+		</li>
+		<li class=" tsd-kind-variable">
+			<a href="../index.html#virgilcrypto" class="tsd-kind-icon">Virgil<wbr>Crypto</a>
+		</li>
+		<li class=" tsd-kind-object-literal">
+			<a href="../index.html#encoding" class="tsd-kind-icon">encoding</a>
 		</li>
 	</ul>
 </nav>
@@ -963,25 +1059,16 @@ img { max-width: 100%; }
 		<section class="tsd-panel tsd-comment">
 			<div class="tsd-comment tsd-typography">
 				<div class="lead">
-					<p>Represents a public key for operations with <a href="virgilcrypto.html">VirgilCrypto</a>.</p>
+					<p>Interface of object implementing high-level cryptographic operations using Virgil Crypto Library.</p>
 				</div>
-				<p><code>VirgilPublicKey</code> objects are not meant to be created directly using the <code>new</code> keyword.
-					Use the <a href="virgilcrypto.html#generatekeys">VirgilCrypto.generateKeys</a> and <a href="virgilcrypto.html#importpublickey">VirgilCrypto.importPublicKey</a> methods
-				to create <code>VirgilPublicKey</code> instances.</p>
 			</div>
 		</section>
 		<section class="tsd-panel tsd-hierarchy">
 			<h3>Hierarchy</h3>
 			<ul class="tsd-hierarchy">
 				<li>
-					<span class="target">VirgilPublicKey</span>
+					<span class="target">IVirgilCrypto</span>
 				</li>
-			</ul>
-		</section>
-		<section class="tsd-panel">
-			<h3>Implements</h3>
-			<ul class="tsd-hierarchy">
-				<li><a href="../interfaces/ipublickey.html" class="tsd-signature-type">IPublicKey</a></li>
 			</ul>
 		</section>
 		<section class="tsd-panel-group tsd-index-group">
@@ -989,83 +1076,695 @@ img { max-width: 100%; }
 			<section class="tsd-panel tsd-index-panel">
 				<div class="tsd-index-content">
 					<section class="tsd-index-section ">
-						<h3>Constructors</h3>
+						<h3>Properties</h3>
 						<ul class="tsd-index-list">
-							<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="virgilpublickey.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ivirgilcrypto.html#defaultkeypairtype" class="tsd-kind-icon">default<wbr>Key<wbr>Pair<wbr>Type</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ivirgilcrypto.html#usesha256identifiers" class="tsd-kind-icon">use<wbr>Sha256<wbr>Identifiers</a></li>
 						</ul>
 					</section>
 					<section class="tsd-index-section ">
-						<h3>Properties</h3>
+						<h3>Methods</h3>
 						<ul class="tsd-index-list">
-							<li class="tsd-kind-property tsd-parent-kind-class"><a href="virgilpublickey.html#identifier" class="tsd-kind-icon">identifier</a></li>
-							<li class="tsd-kind-property tsd-parent-kind-class"><a href="virgilpublickey.html#key" class="tsd-kind-icon">key</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-interface"><a href="ivirgilcrypto.html#calculatehash" class="tsd-kind-icon">calculate<wbr>Hash</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-interface"><a href="ivirgilcrypto.html#calculatesignature" class="tsd-kind-icon">calculate<wbr>Signature</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-interface"><a href="ivirgilcrypto.html#decrypt" class="tsd-kind-icon">decrypt</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-interface"><a href="ivirgilcrypto.html#decryptthenverify" class="tsd-kind-icon">decrypt<wbr>Then<wbr>Verify</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-interface"><a href="ivirgilcrypto.html#encrypt" class="tsd-kind-icon">encrypt</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-interface"><a href="ivirgilcrypto.html#exportprivatekey" class="tsd-kind-icon">export<wbr>Private<wbr>Key</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-interface"><a href="ivirgilcrypto.html#exportpublickey" class="tsd-kind-icon">export<wbr>Public<wbr>Key</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-interface"><a href="ivirgilcrypto.html#extractpublickey" class="tsd-kind-icon">extract<wbr>Public<wbr>Key</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-interface"><a href="ivirgilcrypto.html#generatekeys" class="tsd-kind-icon">generate<wbr>Keys</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-interface"><a href="ivirgilcrypto.html#generatekeysfromkeymaterial" class="tsd-kind-icon">generate<wbr>Keys<wbr>From<wbr>Key<wbr>Material</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-interface"><a href="ivirgilcrypto.html#getrandombytes" class="tsd-kind-icon">get<wbr>Random<wbr>Bytes</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-interface"><a href="ivirgilcrypto.html#importprivatekey" class="tsd-kind-icon">import<wbr>Private<wbr>Key</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-interface"><a href="ivirgilcrypto.html#importpublickey" class="tsd-kind-icon">import<wbr>Public<wbr>Key</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-interface"><a href="ivirgilcrypto.html#signthenencrypt" class="tsd-kind-icon">sign<wbr>Then<wbr>Encrypt</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-interface"><a href="ivirgilcrypto.html#verifysignature" class="tsd-kind-icon">verify<wbr>Signature</a></li>
 						</ul>
 					</section>
 				</div>
 			</section>
 		</section>
 		<section class="tsd-panel-group tsd-member-group ">
-			<h2>Constructors</h2>
-			<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
-				<a name="constructor" class="tsd-anchor"></a>
-				<h3>constructor</h3>
-				<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-					<li class="tsd-signature tsd-kind-icon">new <wbr>Virgil<wbr>Public<wbr>Key<span class="tsd-signature-symbol">(</span>identifier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span>, key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a></li>
+			<h2>Properties</h2>
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<a name="defaultkeypairtype" class="tsd-anchor"></a>
+				<h3>default<wbr>Key<wbr>Pair<wbr>Type</h3>
+				<div class="tsd-signature tsd-kind-icon">default<wbr>Key<wbr>Pair<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="../enums/keypairtype.html" class="tsd-signature-type">KeyPairType</a></div>
+				<aside class="tsd-sources">
+					<ul>
+						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L116">interfaces.ts:116</a></li>
+					</ul>
+				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Type of keys to generate by default.</p>
+					</div>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<a name="usesha256identifiers" class="tsd-anchor"></a>
+				<h3>use<wbr>Sha256<wbr>Identifiers</h3>
+				<div class="tsd-signature tsd-kind-icon">use<wbr>Sha256<wbr>Identifiers<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+				<aside class="tsd-sources">
+					<ul>
+						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L111">interfaces.ts:111</a></li>
+					</ul>
+				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Indicates whether to use old algorithm to calculate keypair identifiers.</p>
+					</div>
+					<p>Current algorithm: first 8 bytes of SHA512 hash of public key in DER format.</p>
+					<p>Old algorithm: SHA256 hash of public key in DER format.</p>
+					<p>Use SHA256 identifiers only if you need to be compatible with version 2 of
+					this library (i.e. decrypt data that were encrypted using the version 2).</p>
+					<p>Default is <code>false</code> (new algorithm)</p>
+				</div>
+			</section>
+		</section>
+		<section class="tsd-panel-group tsd-member-group ">
+			<h2>Methods</h2>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<a name="calculatehash" class="tsd-anchor"></a>
+				<h3>calculate<wbr>Hash</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<li class="tsd-signature tsd-kind-icon">calculate<wbr>Hash<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><a href="../index.html#data" class="tsd-signature-type">Data</a>, algorithm<span class="tsd-signature-symbol">?: </span><a href="../enums/hashalgorithm.html" class="tsd-signature-type">HashAlgorithm</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/873d321/src/VirgilCrypto.ts#L57">VirgilCrypto.ts:57</a></li>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L223">interfaces.ts:223</a></li>
 							</ul>
 						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Calculates the hash of the given data.</p>
+							</div>
+						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
-								<h5>identifier: <span class="tsd-signature-type">Buffer</span></h5>
+								<h5>data: <a href="../index.html#data" class="tsd-signature-type">Data</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The data to calculate the hash of. If <code>data</code> is a
+									string, utf-8 encoding is assumed.</p>
+								</div>
 							</li>
 							<li>
-								<h5>key: <span class="tsd-signature-type">Buffer</span></h5>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> algorithm: <a href="../enums/hashalgorithm.html" class="tsd-signature-type">HashAlgorithm</a></h5>
 							</li>
 						</ul>
-						<h4 class="tsd-returns-title">Returns <a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a></h4>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Buffer</span></h4>
+						<ul>
+							<li>The hash.</li>
+						</ul>
 					</li>
 				</ul>
 			</section>
-		</section>
-		<section class="tsd-panel-group tsd-member-group ">
-			<h2>Properties</h2>
-			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-				<a name="identifier" class="tsd-anchor"></a>
-				<h3>identifier</h3>
-				<div class="tsd-signature tsd-kind-icon">identifier<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Buffer</span></div>
-				<aside class="tsd-sources">
-					<ul>
-						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/873d321/src/VirgilCrypto.ts#L51">VirgilCrypto.ts:51</a></li>
-					</ul>
-				</aside>
-				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p>Public key identifier. Note that the public key and its
-						corresponding private key will have the same identifier.</p>
-					</div>
-				</div>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<a name="calculatesignature" class="tsd-anchor"></a>
+				<h3>calculate<wbr>Signature</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<li class="tsd-signature tsd-kind-icon">calculate<wbr>Signature<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><a href="../index.html#data" class="tsd-signature-type">Data</a>, privateKey<span class="tsd-signature-symbol">: </span><a href="virgilprivatekey.html" class="tsd-signature-type">VirgilPrivateKey</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L249">interfaces.ts:249</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Calculates the signature of the data using the private key.</p>
+							</div>
+							<p>NOTE: Returned value contains only digital signature, not data itself.</p>
+							<p>NOTE: Data inside this function is guaranteed to be hashed with SHA512 at least one time.</p>
+							<p>It&#39;s secure to pass raw data here.</p>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>data: <a href="../index.html#data" class="tsd-signature-type">Data</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The data to be signed. If <code>data</code> is a
+									string, utf-8 encoding is assumed.</p>
+								</div>
+							</li>
+							<li>
+								<h5>privateKey: <a href="virgilprivatekey.html" class="tsd-signature-type">VirgilPrivateKey</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The private key object.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Buffer</span></h4>
+						<ul>
+							<li>The signature.</li>
+						</ul>
+					</li>
+				</ul>
 			</section>
-			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-				<a name="key" class="tsd-anchor"></a>
-				<h3>key</h3>
-				<div class="tsd-signature tsd-kind-icon">key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Buffer</span></div>
-				<aside class="tsd-sources">
-					<ul>
-						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/873d321/src/VirgilCrypto.ts#L57">VirgilCrypto.ts:57</a></li>
-					</ul>
-				</aside>
-				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p>The public key material. Unlike the private keys, the public
-						key material is available as a property of the <code>PublicKey</code> object.</p>
-					</div>
-				</div>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<a name="decrypt" class="tsd-anchor"></a>
+				<h3>decrypt</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<li class="tsd-signature tsd-kind-icon">decrypt<span class="tsd-signature-symbol">(</span>encryptedData<span class="tsd-signature-symbol">: </span><a href="../index.html#data" class="tsd-signature-type">Data</a>, privateKey<span class="tsd-signature-symbol">: </span><a href="virgilprivatekey.html" class="tsd-signature-type">VirgilPrivateKey</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L211">interfaces.ts:211</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Decrypts the data with the given private key following the algorithm below:</p>
+							</div>
+							<ol>
+								<li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key &amp; the <code>privateKey</code></li>
+								<li>Computes KDF to obtain AES-256 KEY2 from shared secret</li>
+								<li>Decrypts KEY1 using AES-256-CBC and KEY2</li>
+								<li>Decrypts data using KEY1 and AES-256-GCM</li>
+							</ol>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>encryptedData: <a href="../index.html#data" class="tsd-signature-type">Data</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The data to be decrypted. If <code>encryptedData</code> is a
+									string, base64 encoding is assumed.</p>
+								</div>
+							</li>
+							<li>
+								<h5>privateKey: <a href="virgilprivatekey.html" class="tsd-signature-type">VirgilPrivateKey</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The private key to decrypt with.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Buffer</span></h4>
+						<ul>
+							<li>Decrypted data</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<a name="decryptthenverify" class="tsd-anchor"></a>
+				<h3>decrypt<wbr>Then<wbr>Verify</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<li class="tsd-signature tsd-kind-icon">decrypt<wbr>Then<wbr>Verify<span class="tsd-signature-symbol">(</span>encryptedData<span class="tsd-signature-symbol">: </span><a href="../index.html#data" class="tsd-signature-type">Data</a>, privateKey<span class="tsd-signature-symbol">: </span><a href="virgilprivatekey.html" class="tsd-signature-type">VirgilPrivateKey</a>, publicKey<span class="tsd-signature-symbol">: </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol"> | </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L312">interfaces.ts:312</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Decrypts the data using the private key, then verifies decrypted data
+								using the attached signature and the given public key.</p>
+							</div>
+							<ol>
+								<li>Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key &amp; recipient&#39;s private key</li>
+								<li>Computes KDF to obtain AES-256 key - KEY2 - from shared secret</li>
+								<li>Decrypts KEY1 using AES-256-CBC and KEY2</li>
+								<li>Decrypts both data and signature using KEY1 and AES-256-GCM</li>
+								<li>Verifies signature</li>
+							</ol>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>encryptedData: <a href="../index.html#data" class="tsd-signature-type">Data</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The data to be decrypted and verified. If <code>encryptedData</code> is a
+									string, base64 encoding is assumed.</p>
+								</div>
+							</li>
+							<li>
+								<h5>privateKey: <a href="virgilprivatekey.html" class="tsd-signature-type">VirgilPrivateKey</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The private key object to use for decryption.</p>
+								</div>
+							</li>
+							<li>
+								<h5>publicKey: <a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol"> | </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol">[]</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The public key object
+										or an array of public key object to use to verify data integrity. If <code>publicKey</code>
+									is an array, the attached signature must be valid for any one of them.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Buffer</span></h4>
+						<ul>
+							<li>Decrypted data iff verification is successful,
+							otherwise throws <a href="../classes/integritycheckfailederror.html">IntegrityCheckFailedError</a>.</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<a name="encrypt" class="tsd-anchor"></a>
+				<h3>encrypt</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<li class="tsd-signature tsd-kind-icon">encrypt<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><a href="../index.html#data" class="tsd-signature-type">Data</a>, publicKey<span class="tsd-signature-symbol">: </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol"> | </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L195">interfaces.ts:195</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Encrypts the data for the given public key(s) following the algorithm below:</p>
+							</div>
+							<ol>
+								<li>Generates random AES-256 key - KEY1</li>
+								<li>Encrypts the data with KEY1 using AES-256-GCM</li>
+								<li>Generates ephemeral keypair for each recipient public key</li>
+								<li>Uses Diffie-Hellman to obtain shared secret with each recipient public key &amp; ephemeral private key</li>
+								<li>Computes KDF to obtain AES-256 key - KEY2 - from shared secret for each recipient</li>
+								<li>Encrypts KEY1 with KEY2 using AES-256-CBC for each recipient</li>
+							</ol>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>data: <a href="../index.html#data" class="tsd-signature-type">Data</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The data to be encrypted. If <code>data</code> is a
+									string, utf-8 encoding is assumed.</p>
+								</div>
+							</li>
+							<li>
+								<h5>publicKey: <a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol"> | </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol">[]</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>Public key or an array of public keys
+									of the intended recipients.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Buffer</span></h4>
+						<ul>
+							<li>Encrypted data.</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<a name="exportprivatekey" class="tsd-anchor"></a>
+				<h3>export<wbr>Private<wbr>Key</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<li class="tsd-signature tsd-kind-icon">export<wbr>Private<wbr>Key<span class="tsd-signature-symbol">(</span>privateKey<span class="tsd-signature-symbol">: </span><a href="virgilprivatekey.html" class="tsd-signature-type">VirgilPrivateKey</a>, password<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L157">interfaces.ts:157</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Exports private key material in DER format from the given private key object.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>privateKey: <a href="virgilprivatekey.html" class="tsd-signature-type">VirgilPrivateKey</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The private key object.</p>
+								</div>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> password: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Buffer</span></h4>
+						<ul>
+							<li>The private key material in DER format.</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<a name="exportpublickey" class="tsd-anchor"></a>
+				<h3>export<wbr>Public<wbr>Key</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<li class="tsd-signature tsd-kind-icon">export<wbr>Public<wbr>Key<span class="tsd-signature-symbol">(</span>publicKey<span class="tsd-signature-symbol">: </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L176">interfaces.ts:176</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Exports public key material in DER format from the given public key object.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>publicKey: <a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The public key object.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Buffer</span></h4>
+						<ul>
+							<li>The public key bytes.</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<a name="extractpublickey" class="tsd-anchor"></a>
+				<h3>extract<wbr>Public<wbr>Key</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<li class="tsd-signature tsd-kind-icon">extract<wbr>Public<wbr>Key<span class="tsd-signature-symbol">(</span>privateKey<span class="tsd-signature-symbol">: </span><a href="virgilprivatekey.html" class="tsd-signature-type">VirgilPrivateKey</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L232">interfaces.ts:232</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Extracts a public key from the private key handle.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>privateKey: <a href="virgilprivatekey.html" class="tsd-signature-type">VirgilPrivateKey</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The private key object to extract from.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a></h4>
+						<ul>
+							<li>The handle to the extracted public key.</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<a name="generatekeys" class="tsd-anchor"></a>
+				<h3>generate<wbr>Keys</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<li class="tsd-signature tsd-kind-icon">generate<wbr>Keys<span class="tsd-signature-symbol">(</span>type<span class="tsd-signature-symbol">?: </span><a href="../enums/keypairtype.html" class="tsd-signature-type">KeyPairType</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="virgilkeypair.html" class="tsd-signature-type">VirgilKeyPair</a></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L125">interfaces.ts:125</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Generates a new key pair.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> type: <a href="../enums/keypairtype.html" class="tsd-signature-type">KeyPairType</a></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <a href="virgilkeypair.html" class="tsd-signature-type">VirgilKeyPair</a></h4>
+						<ul>
+							<li>The newly generated key pair.</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<a name="generatekeysfromkeymaterial" class="tsd-anchor"></a>
+				<h3>generate<wbr>Keys<wbr>From<wbr>Key<wbr>Material</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<li class="tsd-signature tsd-kind-icon">generate<wbr>Keys<wbr>From<wbr>Key<wbr>Material<span class="tsd-signature-symbol">(</span>keyMaterial<span class="tsd-signature-symbol">: </span><a href="../index.html#data" class="tsd-signature-type">Data</a>, type<span class="tsd-signature-symbol">?: </span><a href="../enums/keypairtype.html" class="tsd-signature-type">KeyPairType</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="virgilkeypair.html" class="tsd-signature-type">VirgilKeyPair</a></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L136">interfaces.ts:136</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Generates a new key pair from the given key material.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>keyMaterial: <a href="../index.html#data" class="tsd-signature-type">Data</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The data to be used for key generation,
+										must be strong enough (have high entropy). If <code>keyMaterial</code> is a
+									string, base64 encoding is assumed.</p>
+								</div>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> type: <a href="../enums/keypairtype.html" class="tsd-signature-type">KeyPairType</a></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <a href="virgilkeypair.html" class="tsd-signature-type">VirgilKeyPair</a></h4>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<a name="getrandombytes" class="tsd-anchor"></a>
+				<h3>get<wbr>Random<wbr>Bytes</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<li class="tsd-signature tsd-kind-icon">get<wbr>Random<wbr>Bytes<span class="tsd-signature-symbol">(</span>length<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L322">interfaces.ts:322</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Generates a pseudo-random sequence of bytes of the given length.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>length: <span class="tsd-signature-type">number</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The number of bytes to generate.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Buffer</span></h4>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<a name="importprivatekey" class="tsd-anchor"></a>
+				<h3>import<wbr>Private<wbr>Key</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<li class="tsd-signature tsd-kind-icon">import<wbr>Private<wbr>Key<span class="tsd-signature-symbol">(</span>rawPrivateKey<span class="tsd-signature-symbol">: </span><a href="../index.html#data" class="tsd-signature-type">Data</a>, password<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="virgilprivatekey.html" class="tsd-signature-type">VirgilPrivateKey</a></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L147">interfaces.ts:147</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Creates a <code>VirgilPrivateKey</code> object from private key material in PEM or DER format.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>rawPrivateKey: <a href="../index.html#data" class="tsd-signature-type">Data</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The private key bytes. If <code>rawPrivateKey</code> is a
+									string, base64 encoding is assumed.</p>
+								</div>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> password: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <a href="virgilprivatekey.html" class="tsd-signature-type">VirgilPrivateKey</a></h4>
+						<ul>
+							<li>The private key object.</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<a name="importpublickey" class="tsd-anchor"></a>
+				<h3>import<wbr>Public<wbr>Key</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<li class="tsd-signature tsd-kind-icon">import<wbr>Public<wbr>Key<span class="tsd-signature-symbol">(</span>rawPublicKey<span class="tsd-signature-symbol">: </span><a href="../index.html#data" class="tsd-signature-type">Data</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L167">interfaces.ts:167</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Creates a <code>VirgilPublicKey</code> object from public key material in PEM or DER format.</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>rawPublicKey: <a href="../index.html#data" class="tsd-signature-type">Data</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The public key bytes. If <code>rawPublicKey</code> is a
+									string, base64 encoding is assumed.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a></h4>
+						<ul>
+							<li>The imported key handle.</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<a name="signthenencrypt" class="tsd-anchor"></a>
+				<h3>sign<wbr>Then<wbr>Encrypt</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<li class="tsd-signature tsd-kind-icon">sign<wbr>Then<wbr>Encrypt<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><a href="../index.html#data" class="tsd-signature-type">Data</a>, privateKey<span class="tsd-signature-symbol">: </span><a href="virgilprivatekey.html" class="tsd-signature-type">VirgilPrivateKey</a>, publicKey<span class="tsd-signature-symbol">: </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol"> | </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L286">interfaces.ts:286</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Calculates the signature on the data using the private key,
+								then encrypts the data along with the signature using the public key(s).</p>
+							</div>
+							<ol>
+								<li>Generates signature depending on the type of private key</li>
+								<li>Generates random AES-256 key - KEY1</li>
+								<li>Encrypts both data and signature with KEY1 using AES-256-GCM</li>
+								<li>Generates ephemeral key pair for each recipient</li>
+								<li>Uses Diffie-Hellman to obtain shared secret with each recipient&#39;s public key &amp; each ephemeral private key</li>
+								<li>Computes KDF to obtain AES-256 key - KEY2 - from shared secret for each recipient</li>
+								<li>Encrypts KEY1 with KEY2 using AES-256-CBC for each recipient</li>
+							</ol>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>data: <a href="../index.html#data" class="tsd-signature-type">Data</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The data to sign and encrypt. If <code>data</code> is a
+									string, utf-8 encoding is assumed.</p>
+								</div>
+							</li>
+							<li>
+								<h5>privateKey: <a href="virgilprivatekey.html" class="tsd-signature-type">VirgilPrivateKey</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The private key to use to calculate signature.</p>
+								</div>
+							</li>
+							<li>
+								<h5>publicKey: <a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol"> | </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol">[]</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The public key of the intended recipient or an array
+									of public keys of multiple recipients.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Buffer</span></h4>
+						<ul>
+							<li>Encrypted data with attached signature.</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<a name="verifysignature" class="tsd-anchor"></a>
+				<h3>verify<wbr>Signature</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<li class="tsd-signature tsd-kind-icon">verify<wbr>Signature<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><a href="../index.html#data" class="tsd-signature-type">Data</a>, signature<span class="tsd-signature-symbol">: </span><a href="../index.html#data" class="tsd-signature-type">Data</a>, publicKey<span class="tsd-signature-symbol">: </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/65fb60e/src/interfaces.ts#L264">interfaces.ts:264</a></li>
+							</ul>
+						</aside>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>Verifies the provided data using the given signature and public key.
+								Note: Verification algorithm depends on PublicKey type. Default: EdDSA</p>
+							</div>
+						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>data: <a href="../index.html#data" class="tsd-signature-type">Data</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The data to be verified. If <code>data</code> is a
+									string, utf-8 encoding is assumed.</p>
+								</div>
+							</li>
+							<li>
+								<h5>signature: <a href="../index.html#data" class="tsd-signature-type">Data</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The signature to verify. If <code>signature</code> is a
+									string, base64 encoding is assumed.</p>
+								</div>
+							</li>
+							<li>
+								<h5>publicKey: <a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>The public key object.</p>
+								</div>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<ul>
+							<li>True or False depending on the validity of the signature for the data
+							and public key.</li>
+						</ul>
+					</li>
+				</ul>
 			</section>
 		</section>
 		<footer>

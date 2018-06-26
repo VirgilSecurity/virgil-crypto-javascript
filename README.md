@@ -1,4 +1,5 @@
 # Virgil Security JavaScript Crypto Library 
+
 [![Build Status](https://travis-ci.org/VirgilSecurity/virgil-crypto-javascript.svg)](https://travis-ci.org/VirgilSecurity/virgil-crypto-javascript) 
 [![npm](https://img.shields.io/npm/v/virgil-crypto.svg)](https://www.npmjs.com/package/virgil-crypto)
 [![GitHub license](https://img.shields.io/badge/license-BSD%203--Clause-blue.svg)](https://github.com/VirgilSecurity/virgil/blob/master/LICENSE)
@@ -22,9 +23,9 @@ Virgil Security, Inc., guides software developers into the forthcoming security 
 Generate a Private Key with the default algorithm (EC_X25519):
 
 ```javascript
-import { createVirgilCrypto } from 'virgil-crypto';
+import { VirgilCrypto } from 'virgil-crypto';
 
-const virgilCrypto = createVirgilCrypto();
+const virgilCrypto = new VirgilCrypto();
 const keyPair = virgilCrypto.generateKeys();
 ```
 
@@ -33,9 +34,9 @@ const keyPair = virgilCrypto.generateKeys();
 Generate signature and sign data with a private key:
 
 ```javascript
-import { createVirgilCrypto } from 'virgil-crypto';
+import { VirgilCrypto } from 'virgil-crypto';
 
-const virgilCrypto = createVirgilCrypto();
+const virgilCrypto = new VirgilCrypto();
 const signingKeypair = virgilCrypto.generateKeys();
 
 // prepare a message
@@ -59,9 +60,9 @@ const verified = virgilCrypto.verifySignature(messageToSign, signature, signingK
 Encrypt Data on a Public Key:
 
 ```javascript
-import { createVirgilCrypto } from 'virgil-crypto';
+import { VirgilCrypto } from 'virgil-crypto';
 
-const virgilCrypto = createVirgilCrypto();
+const virgilCrypto = new VirgilCrypto();
 const encryptionKeypair = virgilCrypto.generateKeys();
 
 // prepare a message
@@ -108,7 +109,7 @@ If you only intend to use virgil-crypto in a browser environment, you can ignore
 	// here you can use the global variable `VirgilCrypto` as a namespace object,
 	// containing all of module exports as properties
 	
-	var virgilCrypto = VirgilCrypto.createVirgilCrypto();
+	var virgilCrypto = new VirgilCrypto.VirgilCrypto();
 	var keyPair = virgilCrypto.generateKeys();
 	console.log(keyPair);
 	
@@ -127,9 +128,9 @@ Support for [Pythia](https://virgilsecurity.com/wp-content/uploads/2018/05/Pythi
 In Node.js:
 
 ```js
-const { createVirgilPythia } = require('virgil-crypto/dist/virgil-crypto-pythia.cjs');
+const { VirgilPythiaCrypto } = require('virgil-crypto/dist/virgil-crypto-pythia.cjs');
 
-const virgilPythia = createVirgilPythia();
+const virgilPythiaCrypto = new VirgilPythiaCrypto();
 
 const tweak = Buffer.from('my_tweak');
 const { blindingSecret, blindedPassword } = virgilPythia.blind('pa$$w0rd');

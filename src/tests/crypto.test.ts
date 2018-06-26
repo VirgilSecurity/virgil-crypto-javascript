@@ -1,5 +1,5 @@
 import { VirgilCrypto, HashAlgorithm } from '../index';
-import { VirgilPublicKey } from '../VirgilCrypto';
+import { IVirgilCrypto, VirgilPublicKey } from '../interfaces';
 
 // private key with password = "1234"
 const PRIVATE_KEY_1234 = 'LS0tLS1CRUdJTiBFTkNSWVBURUQgUFJJVkFURSBLRVktLS' +
@@ -29,7 +29,7 @@ const PUBLIC_KEY_4321 = 'LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUNvd0JR' +
 	'FlGbDQ9Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=';
 
 describe('VirgilCrypto', function () {
-	let crypto: VirgilCrypto;
+	let crypto: IVirgilCrypto;
 	beforeEach(function () {
 		crypto = new VirgilCrypto();
 	});
@@ -178,7 +178,7 @@ describe('VirgilCrypto', function () {
 		assert.throws(function () {
 				crypto.verifySignature('some message', undefined!, publicKey)
 			},
-			/Cannot verify signature/,
+			/signature.+ undefined/,
 			'throws when invalid value for signature is passed'
 		);
 	});
@@ -188,7 +188,7 @@ describe('VirgilCrypto', function () {
 
 		assert.throws(function () {
 			crypto.encrypt('secret message', recipients);
-		},/`publicKey` must not be empty/);
+		},/array must not be empty/);
 	});
 
 	it('uses SHA512 identifiers by default', function () {

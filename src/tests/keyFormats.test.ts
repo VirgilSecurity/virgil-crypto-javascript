@@ -1,44 +1,44 @@
-import { cryptoApi } from '../node/api';
+import { cryptoWrapper } from '../node/wrapper';
 
 describe('keys PEM - DER conversion', function () {
 	const plaintext = Buffer.from('data to be encrypted');
 	const identifier = Buffer.from('keypair_identifier');
 
 	it('should decrypt data with private key in DER format', function () {
-		const keyPair = cryptoApi.generateKeyPair();
-		const privateKeyDer = cryptoApi.privateKeyToDer(keyPair.privateKey);
-		const encryptedData = cryptoApi.encrypt(plaintext, { identifier, key: keyPair.publicKey });
-		const decryptedData = cryptoApi.decrypt(encryptedData, { identifier, key: privateKeyDer });
+		const keyPair = cryptoWrapper.generateKeyPair();
+		const privateKeyDer = cryptoWrapper.privateKeyToDer(keyPair.privateKey);
+		const encryptedData = cryptoWrapper.encrypt(plaintext, { identifier, key: keyPair.publicKey });
+		const decryptedData = cryptoWrapper.decrypt(encryptedData, { identifier, key: privateKeyDer });
 		assert.isTrue(decryptedData.equals(plaintext));
 	});
 
 	it('should encrypt data with public key in DER format', function () {
-		const keyPair = cryptoApi.generateKeyPair();
-		const publicKeyDer = cryptoApi.publicKeyToDer(keyPair.publicKey);
-		const encryptedData = cryptoApi.encrypt(plaintext, { identifier, key: publicKeyDer });
-		const decryptedData = cryptoApi.decrypt(encryptedData, { identifier, key: keyPair.privateKey });
+		const keyPair = cryptoWrapper.generateKeyPair();
+		const publicKeyDer = cryptoWrapper.publicKeyToDer(keyPair.publicKey);
+		const encryptedData = cryptoWrapper.encrypt(plaintext, { identifier, key: publicKeyDer });
+		const decryptedData = cryptoWrapper.decrypt(encryptedData, { identifier, key: keyPair.privateKey });
 		assert.isTrue(decryptedData.equals(plaintext));
 	});
 
 	it('public key DER to DER conversion is noop', function () {
-		const keyPair = cryptoApi.generateKeyPair();
-		const firstPublicKeyDer = cryptoApi.publicKeyToDer(keyPair.publicKey);
-		const secondPublicKeyDer = cryptoApi.publicKeyToDer(firstPublicKeyDer);
+		const keyPair = cryptoWrapper.generateKeyPair();
+		const firstPublicKeyDer = cryptoWrapper.publicKeyToDer(keyPair.publicKey);
+		const secondPublicKeyDer = cryptoWrapper.publicKeyToDer(firstPublicKeyDer);
 		assert.isTrue(secondPublicKeyDer.equals(firstPublicKeyDer));
 	});
 
 	it('private key DER to DER conversion is noop', function () {
-		const keyPair = cryptoApi.generateKeyPair();
-		const firstPrivateKeyDer = cryptoApi.privateKeyToDer(keyPair.privateKey);
-		const secondPrivateKeyDer = cryptoApi.privateKeyToDer(firstPrivateKeyDer);
+		const keyPair = cryptoWrapper.generateKeyPair();
+		const firstPrivateKeyDer = cryptoWrapper.privateKeyToDer(keyPair.privateKey);
+		const secondPrivateKeyDer = cryptoWrapper.privateKeyToDer(firstPrivateKeyDer);
 		assert.isTrue(secondPrivateKeyDer.equals(firstPrivateKeyDer));
 	});
 
 	it('extract returns public key in same format', function () {
-		const keyPairPem = cryptoApi.generateKeyPair();
-		const privateKeyDer = cryptoApi.privateKeyToDer(keyPairPem.privateKey);
-		const publicKeyPem = cryptoApi.extractPublicKey(keyPairPem.privateKey);
-		const publicKeyDer = cryptoApi.extractPublicKey(privateKeyDer);
+		const keyPairPem = cryptoWrapper.generateKeyPair();
+		const privateKeyDer = cryptoWrapper.privateKeyToDer(keyPairPem.privateKey);
+		const publicKeyPem = cryptoWrapper.extractPublicKey(keyPairPem.privateKey);
+		const publicKeyDer = cryptoWrapper.extractPublicKey(privateKeyDer);
 
 		assert.isFalse(keyPairPem.privateKey.equals(privateKeyDer));
 		assert.include(publicKeyPem.toString('utf8'), 'BEGIN');

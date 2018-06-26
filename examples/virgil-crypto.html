@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en-US">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Virgil Crypto Browser examples</title>
+		<script type="text/javascript" src="../dist/virgil-crypto.browser.umd.min.js"></script>
+	</head>
+
+	<body>
+	<script>
+		const virgilCrypto = new VirgilCrypto.VirgilCrypto();
+		const k1 = virgilCrypto.generateKeys();
+		console.log(k1);
+
+		const k2 = virgilCrypto.generateKeys();
+		console.log(k2);
+
+		const ciphertext = virgilCrypto.encrypt('hello', k2.publicKey);
+		console.log(ciphertext.toString('base64'));
+		console.log(virgilCrypto.decrypt(ciphertext, k2.privateKey).toString());
+
+		const signature = virgilCrypto.calculateSignature('hello', k1.privateKey);
+		console.log(signature.toString('base64'));
+		console.log(virgilCrypto.verifySignature('hello', signature, k1.publicKey));
+	</script>
+	</body>
+
+</html>

@@ -13,40 +13,44 @@ const BROWSER_PROD = bundleTypes.BROWSER_PROD;
 
 const virgilCrypto = {
 	path: '.',
+	entry: 'src/index.ts',
 	filename: 'virgil-crypto',
 	global: 'VirgilCrypto',
 	external: [ path.resolve('./virgil_crypto_node.node') ],
 	bundleTypes: [ NODE, BROWSER, BROWSER_PROD ]
 };
 
-function createBundle(bundle) {
+const virgilPythiaCrypto = {
+	path: '.',
+	entry: 'src/pythia.ts',
+	filename: 'virgil-crypto-pythia',
+	global: 'VirgilCrypto',
+	external: [ path.resolve('./virgil_crypto_node.node') ],
+	bundleTypes: [ NODE, BROWSER, BROWSER_PROD ]
+};
 
-	return Promise.resolve()
-		.then(() => rimraf(path.resolve(bundle.path, 'dist')))
-		.then(() => mkdirp(path.resolve(bundle.path, 'dist')))
-		.then(() => {
-			return Promise.all(bundle.bundleTypes.map(bundleType => {
-				const entry = 'src/index.ts';
-				return rollup({
-					input: path.resolve(bundle.path, entry),
-					external: [ ...builtinModules, ...(bundle.external || []) ],
-					plugins: getRollupPlugins(bundleType)
-				}).then(output => {
-					const formats = getOutputFormatsFromBundleType(bundleType);
-					return Promise.all(formats.map(format => {
-						const file = getOutpupFilenameFormBundleType(bundle.filename, format, bundleType);
-						return output.write({
-							format: format,
-							name: bundle.global,
-							file: path.resolve(bundle.path, file)
-						}).then(() => {
-							console.log('  \u2713' + ' wrote ' +
-								path.basename(path.resolve(bundle.path)) + '/' + file);
-						})
-					}))
-				});
-			}));
+function createBundle(bundle) {
+	return Promise.all(bundle.bundleTypes.map(bundleType => {
+		const entry = bundle.entry;
+		return rollup({
+			input: path.resolve(bundle.path, entry),
+			external: [ ...builtinModules, ...(bundle.external || []) ],
+			plugins: getRollupPlugins(bundleType)
+		}).then(output => {
+			const formats = getOutputFormatsFromBundleType(bundleType);
+			return Promise.all(formats.map(format => {
+				const file = getOutpupFilenameFormBundleType(bundle.filename, format, bundleType);
+				return output.write({
+					format: format,
+					name: bundle.global,
+					file: path.resolve(bundle.path, file)
+				}).then(() => {
+					console.log('  \u2713' + ' wrote ' +
+						path.basename(path.resolve(bundle.path)) + '/' + file);
+				})
+			}))
 		});
+	}));
 }
 
 function getOutpupFilenameFormBundleType(filename, format, bundleType) {
@@ -75,8 +79,16 @@ function bundleVirgilCrypto() {
 	return createBundle(virgilCrypto);
 }
 
+function bundleVirgilPythiaCrypto() {
+	return createBundle(virgilPythiaCrypto);
+}
+
 function build() {
-	return bundleVirgilCrypto()
+	return Promise.resolve()
+		.then(() => rimraf(path.resolve('dist')))
+		.then(() => mkdirp(path.resolve('dist')))
+		.then(bundleVirgilCrypto)
+		.then(bundleVirgilPythiaCrypto)
 		.catch(e => console.error(e));
 }
 

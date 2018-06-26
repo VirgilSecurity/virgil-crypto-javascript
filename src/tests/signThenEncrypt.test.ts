@@ -1,12 +1,12 @@
-import { cryptoApi } from '../node/api';
+import { cryptoWrapper } from '../node/wrapper';
 
 describe('signThenEncrypt -> decryptThenVerify', function () {
 
 	it('should decrypt and verify data successfully given right keys', function () {
-		const keyPair = cryptoApi.generateKeyPair();
+		const keyPair = cryptoWrapper.generateKeyPair();
 		const identifier = Buffer.from('keypair_identifier');
 		const plainData = Buffer.from('Secret message');
-		const encryptedData = cryptoApi.signThenEncrypt(
+		const encryptedData = cryptoWrapper.signThenEncrypt(
 			plainData,
 			{
 				key: keyPair.privateKey
@@ -17,7 +17,7 @@ describe('signThenEncrypt -> decryptThenVerify', function () {
 			}
 		);
 
-		const decryptedData = cryptoApi.decryptThenVerify(
+		const decryptedData = cryptoWrapper.decryptThenVerify(
 			encryptedData,
 			{
 				identifier,
@@ -31,10 +31,10 @@ describe('signThenEncrypt -> decryptThenVerify', function () {
 	});
 
 	it('should fail verification given the wrong public key', function () {
-		const keyPair = cryptoApi.generateKeyPair();
+		const keyPair = cryptoWrapper.generateKeyPair();
 		const identifier = Buffer.from('keypair_identifier');
 		const plainData = Buffer.from('Secret message');
-		const encryptedData = cryptoApi.signThenEncrypt(
+		const encryptedData = cryptoWrapper.signThenEncrypt(
 			plainData,
 			{
 				key: keyPair.privateKey
@@ -44,10 +44,10 @@ describe('signThenEncrypt -> decryptThenVerify', function () {
 			}
 		);
 
-		const wrongPubkey = cryptoApi.generateKeyPair().publicKey;
+		const wrongPubkey = cryptoWrapper.generateKeyPair().publicKey;
 
 		assert.throws(function() {
-			cryptoApi.decryptThenVerify(
+			cryptoWrapper.decryptThenVerify(
 				encryptedData,
 				{
 					identifier,
@@ -61,10 +61,10 @@ describe('signThenEncrypt -> decryptThenVerify', function () {
 
 	it('should sign with password-protected key', function () {
 		const password = Buffer.from('pa$$w0rd');
-		const keyPair = cryptoApi.generateKeyPair({ password: password });
+		const keyPair = cryptoWrapper.generateKeyPair({ password: password });
 		const identifier = Buffer.from('keypair_identifier');
 		const plainData = Buffer.from('Secret message');
-		const encryptedData = cryptoApi.signThenEncrypt(
+		const encryptedData = cryptoWrapper.signThenEncrypt(
 			plainData,
 			{
 				key: keyPair.privateKey,
@@ -76,7 +76,7 @@ describe('signThenEncrypt -> decryptThenVerify', function () {
 			}
 		);
 
-		const decryptedData = cryptoApi.decryptThenVerify(
+		const decryptedData = cryptoWrapper.decryptThenVerify(
 			encryptedData,
 			{
 				identifier: identifier,

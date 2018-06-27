@@ -255,4 +255,12 @@ export interface IVirgilCryptoWrapper {
 	 * @returns {Buffer}
 	 */
 	getRandomBytes (numOfBytes: number): Buffer;
+
+	signThenEncryptDetached (
+		data: Buffer, signingKey: SigningKey, encryptionKeys: EncryptionKey[]
+	): { encryptedData: Buffer, contentInfo: Buffer };
+
+	decryptThenVerifyDetached (
+		encryptedData: Buffer, contentInfo: Buffer, decryptionKey: DecryptionKey, verificationKeys: VerificationKey[]
+	): Buffer;
 }

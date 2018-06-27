@@ -10,3 +10,4 @@ import './keyFormats.test';
 import './privateKeyEncryption.test';
 import './signThenEncrypt.test';
 import './signVerify.test';
+import './detachedEncryption.test';

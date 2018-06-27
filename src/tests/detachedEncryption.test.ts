@@ -1,7 +1,7 @@
 import { cryptoWrapper } from '../node/wrapper';
 import { KeyPair } from '../common';
 
-describe.only ('encryption with detached content info', () => {
+describe ('encryption with detached content info', () => {
 	describe('signTheEncryptDetached', () => {
 		it ('returns encrypted data and content info separately', () => {
 			const data = Buffer.from('message');
@@ -10,7 +10,7 @@ describe.only ('encryption with detached content info', () => {
 			const recipientKeyPair = cryptoWrapper.generateKeyPair();
 			const recipientId = Buffer.from('recipient_id');
 
-			const { encryptedData, contentInfo } = cryptoWrapper.signThenEncryptDetached(
+			const { encryptedData, metadata } = cryptoWrapper.signThenEncryptDetached(
 				data,
 				{ key: senderKeyPair.privateKey, identifier: senderId },
 				[ { key: recipientKeyPair.publicKey, identifier: recipientId } ]
@@ -18,7 +18,7 @@ describe.only ('encryption with detached content info', () => {
 
 			assert.isTrue(Buffer.isBuffer(encryptedData));
 			assert.isFalse(encryptedData.equals(data));
-			assert.isTrue(Buffer.isBuffer(contentInfo));
+			assert.isTrue(Buffer.isBuffer(metadata));
 		});
 	});
 
@@ -29,7 +29,7 @@ describe.only ('encryption with detached content info', () => {
 			recipientKeyPair: KeyPair,
 			recipientId: Buffer,
 			encryptedData: Buffer,
-			contentInfo: Buffer;
+			metadata: Buffer;
 
 		before (() => {
 			data = Buffer.from('message');
@@ -45,13 +45,13 @@ describe.only ('encryption with detached content info', () => {
 			);
 
 			encryptedData = result.encryptedData;
-			contentInfo = result.contentInfo;
+			metadata = result.metadata;
 		});
 
 		it ('can decrypt', () => {
 			const decryptedData = cryptoWrapper.decryptThenVerifyDetached(
 				encryptedData,
-				contentInfo,
+				metadata,
 				{ key: recipientKeyPair.privateKey, identifier: recipientId },
 				[ { key: senderKeyPair.publicKey, identifier: senderId } ]
 			);
@@ -65,7 +65,7 @@ describe.only ('encryption with detached content info', () => {
 			assert.throws(() => {
 				cryptoWrapper.decryptThenVerifyDetached(
 					encryptedData,
-					contentInfo,
+					metadata,
 					{ key: wrongKeyPair.privateKey, identifier: wrongId },
 					[ { key: senderKeyPair.publicKey, identifier: senderId } ]
 				);
@@ -78,7 +78,7 @@ describe.only ('encryption with detached content info', () => {
 			assert.throws(() => {
 				cryptoWrapper.decryptThenVerifyDetached(
 					encryptedData,
-					contentInfo,
+					metadata,
 					{ key: recipientKeyPair.privateKey, identifier: recipientId },
 					[ { key: wrongKeyPair.publicKey, identifier: wrongId } ]
 				);
@@ -90,11 +90,11 @@ describe.only ('encryption with detached content info', () => {
 			assert.throws(() => {
 				cryptoWrapper.decryptThenVerifyDetached(
 					encryptedData,
-					contentInfo,
+					metadata,
 					{ key: recipientKeyPair.privateKey, identifier: recipientId },
 					[ { key: wrongKeyPair.publicKey, identifier: senderId } ] // wrong key, correct id
 				);
-			}, /signature verification failed/i);
+			}, /signature verification has failed/i);
 		});
 	});
 
@@ -104,7 +104,7 @@ describe.only ('encryption with detached content info', () => {
 			senderId: Buffer,
 			recipients: Array<{ keyPair: KeyPair, id: Buffer }> = [],
 			encryptedData: Buffer,
-			contentInfo: Buffer;
+			metadata: Buffer;
 
 		const recipientCount = 3;
 
@@ -125,14 +125,14 @@ describe.only ('encryption with detached content info', () => {
 				recipients.map(r => ({ key: r.keyPair.publicKey, identifier: r.id }))
 			);
 			encryptedData = result.encryptedData;
-			contentInfo = result.contentInfo;
+			metadata = result.metadata;
 		});
 
 		it ('can decrypt with any of the recipient keys', () => {
 			for (let i = 0; i < recipientCount; i++) {
 				const decryptedData = cryptoWrapper.decryptThenVerifyDetached(
 					encryptedData,
-					contentInfo,
+					metadata,
 					{ key: recipients[i].keyPair.privateKey, identifier: recipients[i].id },
 					[ { key: senderKeyPair.publicKey, identifier: senderId } ]
 				);

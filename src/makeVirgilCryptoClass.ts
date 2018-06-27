@@ -262,7 +262,7 @@ export function makeVirgilCryptoClass (cryptoWrapper: IVirgilCryptoWrapper)
 		{
 			const dataBuf = anyToBuffer(data, 'utf8', 'data');
 			validatePrivateKey(privateKey);
-			const signingKeyValue = getPrivateKeyBytes(privateKey);
+			const privateKeyBytes = getPrivateKeyBytes(privateKey);
 
 			const publicKeys = toArray(publicKey);
 			validatePublicKeysArray(publicKeys);
@@ -271,30 +271,30 @@ export function makeVirgilCryptoClass (cryptoWrapper: IVirgilCryptoWrapper)
 				dataBuf,
 				{
 					identifier: privateKey.identifier,
-					key: signingKeyValue
+					key: privateKeyBytes
 				},
 				publicKeys
 			);
 		}
 
 		decryptThenVerify(
-			cipherData: Data,
+			encryptedData: Data,
 			privateKey: VirgilPrivateKey,
 			publicKey: VirgilPublicKey|VirgilPublicKey[]
 		) {
-			const cipherDataBuf = anyToBuffer(cipherData, 'base64', 'cipherData');
+			const cipherDataBuf = anyToBuffer(encryptedData, 'base64', 'encryptedData');
 
 			const publicKeys = toArray(publicKey);
 			validatePublicKeysArray(publicKeys);
 
 			validatePrivateKey(privateKey);
-			const decryptionKeyValue = getPrivateKeyBytes(privateKey);
+			const privateKeyBytes = getPrivateKeyBytes(privateKey);
 
 			return cryptoWrapper.decryptThenVerify(
 				cipherDataBuf,
 				{
 					identifier: privateKey.identifier,
-					key: decryptionKeyValue
+					key: privateKeyBytes
 				},
 				publicKeys
 			);
@@ -302,6 +302,54 @@ export function makeVirgilCryptoClass (cryptoWrapper: IVirgilCryptoWrapper)
 
 		getRandomBytes (length: number): Buffer {
 			return cryptoWrapper.getRandomBytes(length);
+		}
+
+		signThenEncryptDetached (
+			data: Data,
+			privateKey: VirgilPrivateKey,
+			publicKey: VirgilPublicKey|VirgilPublicKey[]) {
+
+			const dataBuf = anyToBuffer(data, 'utf8', 'data');
+			validatePrivateKey(privateKey);
+			const privateKeyBytes = getPrivateKeyBytes(privateKey);
+
+			const publicKeys = toArray(publicKey);
+			validatePublicKeysArray(publicKeys);
+
+			return cryptoWrapper.signThenEncryptDetached(
+				dataBuf,
+				{
+					identifier: privateKey.identifier,
+					key: privateKeyBytes
+				},
+				publicKeys
+			);
+		}
+
+		decryptThenVerifyDetached (
+			encryptedData: Data,
+			metadata: Data,
+			privateKey: VirgilPrivateKey,
+			publicKey: VirgilPublicKey|VirgilPublicKey[]) {
+
+			const encryptedDataBuf = anyToBuffer(encryptedData, 'base64', 'encryptedData');
+			const metadataBuf = anyToBuffer(metadata, 'base64', 'contentInfo');
+
+			const publicKeys = toArray(publicKey);
+			validatePublicKeysArray(publicKeys);
+
+			validatePrivateKey(privateKey);
+			const privateKeyBytes = getPrivateKeyBytes(privateKey);
+
+			return cryptoWrapper.decryptThenVerifyDetached(
+				encryptedDataBuf,
+				metadataBuf,
+				{
+					identifier: privateKey.identifier,
+					key: privateKeyBytes
+				},
+				publicKeys
+			);
 		}
 
 		/**

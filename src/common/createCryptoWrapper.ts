@@ -292,7 +292,7 @@ export function createCryptoWrapper (lib: any): IVirgilCryptoWrapper {
 
 		signThenEncryptDetached (
 			data: Buffer, privateKey: SigningKey, publicKeys: EncryptionKey[]
-		): { encryptedData: Buffer, contentInfo: Buffer } {
+		): { encryptedData: Buffer, metadata: Buffer } {
 			const signer = createVirgilSigner();
 			const cipher = createVirgilCipher();
 			const customParams = cipher.customParams();
@@ -308,16 +308,16 @@ export function createCryptoWrapper (lib: any): IVirgilCryptoWrapper {
 
 			const encryptedData = cipher.encryptSafe(data, false);
 			const contentInfo = cipher.getContentInfoSafe();
-			return { encryptedData, contentInfo };
+			return { encryptedData, metadata: contentInfo };
 		},
 
 		decryptThenVerifyDetached (
-			encryptedData: Buffer, contentInfo: Buffer, privateKey: DecryptionKey, publicKeys: VerificationKey[]
+			encryptedData: Buffer, metadata: Buffer, privateKey: DecryptionKey, publicKeys: VerificationKey[]
 		): Buffer {
 			const signer = createVirgilSigner();
 			const cipher = createVirgilCipher();
 
-			cipher.setContentInfoSafe(contentInfo);
+			cipher.setContentInfoSafe(metadata);
 
 			if (!cipher.keyRecipientExistsSafe(privateKey.identifier)) {
 				throw new VirgilCryptoError(
@@ -347,7 +347,7 @@ export function createCryptoWrapper (lib: any): IVirgilCryptoWrapper {
 			}
 
 			if (!signer.verifySafe(decryptedData, signature, matchingPublicKey.key)) {
-				throw new VirgilCryptoError('Signature verification failed.');
+				throw new IntegrityCheckFailedError('Signature verification has failed.');
 			}
 
 			return decryptedData;

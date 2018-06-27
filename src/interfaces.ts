@@ -303,7 +303,7 @@ export interface IVirgilCrypto {
 	 * @param {VirgilPrivateKey} privateKey - The private key object to use for decryption.
 	 *
 	 * @param {(VirgilPublicKey|VirgilPublicKey[])} publicKey - The public key object
-	 * or an array of public key object to use to verify data integrity. If `publicKey`
+	 * or an array of public key objects to use to verify data integrity. If `publicKey`
 	 * is an array, the attached signature must be valid for any one of them.
 	 *
 	 * @returns {Buffer} - Decrypted data iff verification is successful,
@@ -320,4 +320,43 @@ export interface IVirgilCrypto {
 	 * @returns {Buffer}
 	 */
 	getRandomBytes (length: number): Buffer;
+
+	/**
+	 * Same as {@link IVirgilCrypto.signThenEncrypt} but returns the metadata (i.e. public
+	 * algorithm parameters used for encryption) as a separate property on the response
+	 * object rather than embedded in the encrypted data as regular `signThenEncrypt` does.
+	 *
+	 * @param {Data} data - The data to sign and encrypt. If `data` is a
+	 * string, utf-8 encoding is assumed.
+	 * @param {VirgilPrivateKey} privateKey - The private key to use to calculate signature.
+	 * @param {VirgilPublicKey | VirgilPublicKey[]} publicKey - The public key of the intended
+	 * recipient or an array of public keys of multiple recipients.
+	 * @returns {{encryptedData: Buffer; metadata: Buffer}} - Encrypted data and metadata.
+	 */
+	signThenEncryptDetached (
+		data: Data,
+		privateKey: VirgilPrivateKey,
+		publicKey: VirgilPublicKey|VirgilPublicKey[]): { encryptedData: Buffer, metadata: Buffer };
+
+	/**
+	 * Same as {@link IVirgilCrypto.decryptThenVerify} but expects the Virgil Cryptogram
+	 * (the content info) to be passed as `contentInfo` parameter instead of be embedded
+	 * in the `encryptedData`.
+	 * @param {Data} encryptedData - The data to be decrypted and verified. If `encryptedData`
+	 * is a string, base64 encoding is assumed.
+	 * @param {Data} metadata - The metadata (i.e. public  algorithm parameters used for
+	 * encryption) required for decryption.
+	 * @param {VirgilPrivateKey} privateKey - The private key object to use for decryption.
+	 * @param {VirgilPublicKey | VirgilPublicKey[]} publicKey - The public key object
+	 * or an array of public key objects to use to verify data integrity. If the public key
+	 * identifier specified in `metadata` does not correspond to the `publicKey` argument
+	 * (or any of the keys in the `publicKey` array), an error is thrown.
+	 * @returns {Buffer} - Decrypted data iff verification is successful,
+	 * otherwise throws {@link IntegrityCheckFailedError}.
+	 */
+	decryptThenVerifyDetached (
+		encryptedData: Data,
+		metadata: Data,
+		privateKey: VirgilPrivateKey,
+		publicKey: VirgilPublicKey|VirgilPublicKey[]): Buffer;
 }

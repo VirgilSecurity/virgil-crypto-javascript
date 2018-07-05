@@ -255,4 +255,37 @@ export interface IVirgilCryptoWrapper {
 	 * @returns {Buffer}
 	 */
 	getRandomBytes (numOfBytes: number): Buffer;
+
+	/**
+	 * Signs and encrypts the data, returning the encrypted data and metadata
+	 * used for encryption as properties of the response object.
+	 * @param {Buffer} data - The data to encrypt.
+	 * @param {SigningKey} privateKey - The private key to use to calculate the signature.
+	 * @param {EncryptionKey[]} publicKeys - The public keys to use to encrypt the data.
+	 * @returns {{encryptedData: Buffer; metadata: Buffer}} - Object containing the encrypted
+	 * data and the metadata.
+	 */
+	signThenEncryptDetached (
+		data: Buffer, privateKey: SigningKey, publicKeys: EncryptionKey[]
+	): { encryptedData: Buffer, metadata: Buffer };
+
+	/**
+	 * Decrypts the given data with the `privateKey` and verifies the signature with
+	 * one of `publicKeys`. Receives the metadata required for decryption as an argument
+	 * rather than embedded in encrypted data.
+	 *
+	 * @param {Buffer} encryptedData - Data to decrypt.
+	 * @param {Buffer} metadata - The metadata (i.e. public  algorithm parameters used for
+	 * encryption) required for decryption.
+	 * @param {DecryptionKey} privateKey - The private key to use for decryption.
+	 * @param {VerificationKey[]} publicKeys - Array of public key objects with identifiers
+	 * to use to verify data integrity. If a public key with identifier specified in `metadata`
+	 * is not found in the list, an error is thrown.
+	 *
+	 * @returns {Buffer} - Decrypted data iff signature verification is successful,
+	 * otherwise throws {@link IntegrityCheckFailedError}.
+	 */
+	decryptThenVerifyDetached (
+		encryptedData: Buffer, metadata: Buffer, privateKey: DecryptionKey, publicKeys: VerificationKey[]
+	): Buffer;
 }

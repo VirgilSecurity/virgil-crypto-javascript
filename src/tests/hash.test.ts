@@ -1,4 +1,4 @@
-import { cryptoWrapper } from '../node/wrapper';
+import { cryptoWrapper } from '../virgilCryptoWrapper';
 import { HashAlgorithm } from '../common';
 
 describe('calculateHash', function () {

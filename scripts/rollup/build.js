@@ -1,7 +1,4 @@
 const builtinModules = require('builtin-modules');
-const { promisify } = require('util');
-const rimraf = promisify(require('rimraf'));
-const mkdirp = promisify(require('mkdirp'));
 const path = require('path');
 const { rollup } = require('rollup');
 const bundleTypes = require('./bundle-types');
@@ -13,17 +10,8 @@ const BROWSER_PROD = bundleTypes.BROWSER_PROD;
 
 const virgilCrypto = {
 	path: '.',
-	entry: 'src/index.ts',
-	filename: 'virgil-crypto',
-	global: 'VirgilCrypto',
-	external: [ path.resolve('./virgil_crypto_node.node') ],
-	bundleTypes: [ NODE, BROWSER, BROWSER_PROD ]
-};
-
-const virgilPythiaCrypto = {
-	path: '.',
-	entry: 'src/pythia.ts',
-	filename: 'virgil-crypto-pythia',
+	entry: Boolean(process.env.PYTHIA) ? 'src/pythia.ts' : 'src/index.ts',
+	filename: Boolean(process.env.PYTHIA) ? 'virgil-crypto-pythia' : 'virgil-crypto',
 	global: 'VirgilCrypto',
 	external: [ path.resolve('./virgil_crypto_node.node') ],
 	bundleTypes: [ NODE, BROWSER, BROWSER_PROD ]
@@ -35,7 +23,7 @@ function createBundle(bundle) {
 		return rollup({
 			input: path.resolve(bundle.path, entry),
 			external: [ ...builtinModules, ...(bundle.external || []) ],
-			plugins: getRollupPlugins(bundleType)
+			plugins: getRollupPlugins(bundleType),
 		}).then(output => {
 			const formats = getOutputFormatsFromBundleType(bundleType);
 			return Promise.all(formats.map(format => {
@@ -75,20 +63,9 @@ function getOutputFormatsFromBundleType(bundleType) {
 	}
 }
 
-function bundleVirgilCrypto() {
-	return createBundle(virgilCrypto);
-}
-
-function bundleVirgilPythiaCrypto() {
-	return createBundle(virgilPythiaCrypto);
-}
-
 function build() {
 	return Promise.resolve()
-		.then(() => rimraf(path.resolve('dist')))
-		.then(() => mkdirp(path.resolve('dist')))
-		.then(bundleVirgilCrypto)
-		.then(bundleVirgilPythiaCrypto)
+		.then(() => createBundle(virgilCrypto))
 		.catch(e => console.error(e));
 }
 

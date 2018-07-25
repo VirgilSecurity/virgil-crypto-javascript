@@ -4,14 +4,10 @@ declare module NodeJS {
 	}
 }
 
-declare module '*/virgil_crypto_asmjs.js' {
-	const __virgilCrypto: Function;
-	export default __virgilCrypto;
-}
+declare module '*/virgil_crypto_asmjs.js';
 
-declare module '*.node' {
-	const VirgilCrypto: any;
-	export default VirgilCrypto;
-}
+declare module '*/virgil_crypto_pythia_asmjs.js';
+
+declare module '*.node';
 
 declare var __virgilCrypto: Function;

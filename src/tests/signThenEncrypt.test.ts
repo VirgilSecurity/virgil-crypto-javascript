@@ -1,4 +1,4 @@
-import { cryptoWrapper } from '../node/wrapper';
+import { cryptoWrapper } from '../virgilCryptoWrapper';
 
 describe('signThenEncrypt -> decryptThenVerify', function () {
 

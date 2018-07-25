@@ -1,4 +1,4 @@
-import { cryptoWrapper } from '../node/wrapper';
+import { cryptoWrapper } from '../virgilCryptoWrapper';
 import { KeyPairType } from '../common';
 
 function getRandomBytes (length: number) {

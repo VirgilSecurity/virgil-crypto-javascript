@@ -1,4 +1,4 @@
-import { cryptoWrapper } from '../node/wrapper';
+import { cryptoWrapper } from '../virgilCryptoWrapper';
 import { KeyPair } from '../common';
 
 describe ('encryption with detached content info', () => {

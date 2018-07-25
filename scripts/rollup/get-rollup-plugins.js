@@ -3,8 +3,9 @@ const typescript = require('rollup-plugin-typescript2');
 const inject = require('rollup-plugin-inject');
 const replace = require('rollup-plugin-replace');
 const globals = require('rollup-plugin-node-globals');
-const uglify = require('rollup-plugin-uglify');
+const { uglify } = require('rollup-plugin-uglify');
 const globalScript = require('./rollup-plugin-global-script');
+const resolveCryptoLib = require('./rollup-plugin-resolve-crypto-lib');
 const bundleTypes = require('./bundle-types');
 
 const BROWSER_ONLY_PLUGINS = [
@@ -24,10 +25,11 @@ function getRollupPlugins(bundleType) {
 	const isProd = bundleType === bundleTypes.BROWSER_PROD;
 
 	return [
+		resolveCryptoLib(isBrowser),
 
-		globalScript('src/browser/asmjs/virgil_crypto_asmjs.js'),
+		globalScript('src/lib/virgil_crypto_asmjs.js'),
 
-		globalScript('src/pythia/browser/asmjs/virgil_crypto_asmjs.js'),
+		globalScript('src/lib/virgil_crypto_pythia_asmjs.js'),
 
 		resolve({
 			browser: isBrowser,

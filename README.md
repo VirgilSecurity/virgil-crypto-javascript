@@ -7,9 +7,16 @@
 ### [Introduction](#introduction) | [Library purposes](#library-purposes) | [Usage examples](#usage-examples) | [Installation](#installation) | [Docs](#docs) | [License](#license) | [Contacts](#support)
 
 ## Introduction
-VirgilCrypto is a stack of security libraries (ECIES with Crypto Agility wrapped in Virgil Cryptogram) and an open-source high-level [cryptographic library](https://github.com/VirgilSecurity/virgil-crypto) that allows you to perform all necessary operations for securely storing and transferring data in your digital solutions. Crypto Library is written in C++ and is suitable for mobile and server platforms.
+VirgilCrypto is a stack of security libraries (ECIES with Crypto Agility wrapped in Virgil Cryptogram) and an 
+open-source high-level [cryptographic library](https://github.com/VirgilSecurity/virgil-crypto) that allows you to 
+perform all necessary operations for securely storing and transferring data in your digital solutions. Crypto Library 
+is written in C++ and is suitable for mobile and server platforms.
 
-Virgil Security, Inc., guides software developers into the forthcoming security world in which everything will be encrypted (and passwords will be eliminated). In this world, the days of developers having to raise millions of dollars to build a secure chat, secure email, secure file-sharing, or a secure anything have come to an end. Now developers can instead focus on building features that give them a competitive market advantage while end-users can enjoy the privacy and security they increasingly demand.
+Virgil Security, Inc., guides software developers into the forthcoming security world in which everything will be 
+encrypted (and passwords will be eliminated). In this world, the days of developers having to raise millions of 
+dollars to build a secure chat, secure email, secure file-sharing, or a secure anything have come to an end. Now 
+developers can instead focus on building features that give them a competitive market advantage while end-users can 
+enjoy the privacy and security they increasingly demand.
 
 ## Library purposes
 * Asymmetric Key Generation
@@ -89,8 +96,7 @@ Need more examples? Visit our [developer documentation](https://developer.virgil
 ## Installation
 
 ### NPM
-
-This is a pre-release version, so for now you will need to specify the `@next` tag when installing
+The recommended way is to install from npm:
 
 ```sh
 npm install virgil-crypto@next
@@ -104,7 +110,7 @@ If you only intend to use virgil-crypto in a browser environment, you can ignore
 ### CDN
 
 ```html
-<script src="https://unpkg.com/virgil-crypto@next/dist/virgil-crypto.browser.umd.min.js"></script>
+<script src="https://unpkg.com/virgil-crypto/dist/virgil-crypto.browser.umd.min.js"></script>
 <script>
 	// here you can use the global variable `VirgilCrypto` as a namespace object,
 	// containing all of module exports as properties

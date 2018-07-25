@@ -1,4 +1,4 @@
-import { cryptoWrapper } from '../node/wrapper';
+import { cryptoWrapper } from '../virgilCryptoWrapper';
 
 const PASSWORD = Buffer.from('veryStrongPa$$0rd', 'utf8');
 const PLAINTEXT = Buffer.from('initial data', 'utf8');

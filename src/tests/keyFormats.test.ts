@@ -1,4 +1,4 @@
-import { cryptoWrapper } from '../node/wrapper';
+import { cryptoWrapper } from '../virgilCryptoWrapper';
 
 describe('keys PEM - DER conversion', function () {
 	const plaintext = Buffer.from('data to be encrypted');

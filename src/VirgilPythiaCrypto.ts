@@ -1,6 +1,9 @@
-import { pythiaWrapper } from './pythia/node/wrapper';
+import { lib } from './lib/pythia-node';
 import { Data } from './interfaces';
 import { anyToBuffer } from './utils/anyToBuffer';
+import { createPythiaWrapper } from './common';
+
+const pythiaWrapper = createPythiaWrapper(lib);
 
 /**
  * Result of the {@link VirgilPythiaCrypto.blind} method.

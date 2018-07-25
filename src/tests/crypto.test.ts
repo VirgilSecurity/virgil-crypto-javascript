@@ -1,5 +1,5 @@
 import { VirgilCrypto, HashAlgorithm } from '../index';
-import { IVirgilCrypto, VirgilPublicKey } from '../interfaces';
+import { VirgilPublicKey } from '../VirgilCrypto';
 
 // private key with password = "1234"
 const PRIVATE_KEY_1234 = 'LS0tLS1CRUdJTiBFTkNSWVBURUQgUFJJVkFURSBLRVktLS' +
@@ -29,7 +29,7 @@ const PUBLIC_KEY_4321 = 'LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUNvd0JR' +
 	'FlGbDQ9Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=';
 
 describe('VirgilCrypto', function () {
-	let crypto: IVirgilCrypto;
+	let crypto: VirgilCrypto;
 	beforeEach(function () {
 		crypto = new VirgilCrypto();
 	});

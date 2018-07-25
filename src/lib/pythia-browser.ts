@@ -1,4 +1,4 @@
-import './virgil_crypto_asmjs.js';
+import './virgil_crypto_pythia_asmjs.js';
 
 const minMemory = 1024 * 1024 * 16; // 16 MB - emscripten default
 

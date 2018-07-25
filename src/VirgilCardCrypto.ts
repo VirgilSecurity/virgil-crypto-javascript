@@ -1,19 +1,20 @@
 import { HashAlgorithm } from './common';
-import { IPrivateKey, IPublicKey, IVirgilCrypto, VirgilPrivateKey, VirgilPublicKey } from './interfaces';
+import { IPrivateKey, IPublicKey } from './interfaces';
+import { VirgilCrypto, VirgilPrivateKey, VirgilPublicKey } from './VirgilCrypto';
 
 /**
  * Class implementing  cryptographic operations required to create and
  * verify the validity of Virgil Cards (i.e. the `ICardCrypto` interface
- * from {@link https://bit.ly/2GCZLnU|virgil-sdk}), using {@link IVirgilCrypto}.
+ * from {@link https://bit.ly/2GCZLnU|virgil-sdk}), using {@link VirgilCrypto}.
  */
 export class VirgilCardCrypto {
 
 	/**
 	 * Initializes the new `VirgilCardCrypto`
-	 * @param {IVirgilCrypto} virgilCrypto - VirgilCrypto instance, providing
+	 * @param {VirgilCrypto} virgilCrypto - VirgilCrypto instance, providing
 	 * implementation of crypto operations.
 	 */
-	constructor(private readonly virgilCrypto: IVirgilCrypto) {
+	constructor(private readonly virgilCrypto: VirgilCrypto) {
 		if (virgilCrypto == null) throw new Error('`virgilCrypto` is required');
 	}
 

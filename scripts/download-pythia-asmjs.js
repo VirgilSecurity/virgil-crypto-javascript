@@ -5,7 +5,7 @@ const format = require('util').format;
 const log = require('./helpers/log');
 const downloadVerifyExtract = require('./helpers/downloadVerifyExtract');
 
-const destFileName = path.resolve(__dirname + '/../src/pythia/browser/asmjs/virgil_crypto_asmjs.js');
+const destFileName = path.resolve(__dirname + '/../src/lib/virgil_crypto_pythia_asmjs.js');
 
 downloadVerifyExtract({
 	getCdnLink: getCdnLink,

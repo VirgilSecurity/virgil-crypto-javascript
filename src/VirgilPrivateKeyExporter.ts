@@ -1,5 +1,6 @@
 import { IPrivateKey } from './interfaces';
-import { VirgilCrypto, VirgilPrivateKey } from './VirgilCrypto';
+import { VirgilCrypto } from './VirgilCrypto';
+import { VirgilPrivateKey } from './VirgilPrivateKey';
 
 /**
  * Class implementing operations required to convert between raw

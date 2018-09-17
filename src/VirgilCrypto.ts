@@ -1,12 +1,12 @@
 import { KeyPair, KeyPairType, HashAlgorithm } from './common';
 import { toArray } from './utils/toArray';
-import {
-	IPrivateKey,
-	IPublicKey,
-	Data
-} from './interfaces';
+import { Data } from './interfaces';
 import { anyToBuffer } from './utils/anyToBuffer';
 import { cryptoWrapper } from './virgilCryptoWrapper';
+import { VirgilPublicKey } from './VirgilPublicKey';
+import { VirgilPrivateKey } from './VirgilPrivateKey';
+import { getPrivateKeyBytes } from './privateKeyUtils';
+import { validatePrivateKey, validatePublicKey, validatePublicKeysArray } from './validators';
 
 /**
  * `VirgilCrypto` initialization options.
@@ -25,67 +25,10 @@ export interface VirgilCryptoOptions {
 
 /**
  * Object representation of private and public keys pair.
- *
- * @protected
  */
 export interface VirgilKeyPair {
 	privateKey: VirgilPrivateKey;
 	publicKey: VirgilPublicKey;
-}
-
-const _privateKeys = new WeakMap();
-const _setValue = WeakMap.prototype.set;
-const _getValue = WeakMap.prototype.get;
-const _hasValue = WeakMap.prototype.has;
-
-/**
- * Represents a private key for operations with {@link VirgilCrypto}.
- *
- * `VirgilPrivateKey` objects are not meant to be created directly using the `new` keyword.
- * Use the {@link VirgilCrypto.generateKeys} and {@link VirgilCrypto.importPrivateKey} methods
- * to create `VirgilPrivateKey` instances.
- *
- * @protected
- */
-export class VirgilPrivateKey implements IPrivateKey {
-	/**
-	 * Private key identifier. Note that the private key and its
-	 * corresponding public key will have the same identifier.
-	 * */
-	identifier: Buffer;
-
-	constructor(identifier: Buffer, key: Buffer) {
-		this.identifier = identifier;
-		setPrivateKeyBytes(this, key);
-	}
-}
-
-/**
- * Represents a public key for operations with {@link VirgilCrypto}.
- *
- * `VirgilPublicKey` objects are not meant to be created directly using the `new` keyword.
- * Use the {@link VirgilCrypto.generateKeys} and {@link VirgilCrypto.importPublicKey} methods
- * to create `VirgilPublicKey` instances.
- *
- * @protected
- */
-export class VirgilPublicKey implements IPublicKey {
-	/**
-	 * Public key identifier. Note that the public key and its
-	 * corresponding private key will have the same identifier.
-	 * */
-	identifier: Buffer;
-
-	/**
-	 * The public key material. Unlike the private keys, the public
-	 * key material is available as a property of the `PublicKey` object.
-	 */
-	key: Buffer;
-
-	constructor(identifier: Buffer, key: Buffer) {
-		this.identifier = identifier;
-		this.key = key;
-	}
 }
 
 /**
@@ -129,14 +72,13 @@ export class VirgilCrypto {
 	/**
 	 * Generates a new key pair.
 	 *
-	 * @param {KeyPairType} [type] - Optional type of the key pair.
+	 * @param {KeyPairType} [keyPairType] - Optional type of the key pair.
 	 * See {@link KeyPairType} for available options. Default is Ed25519.
 	 * @returns {KeyPair} - The newly generated key pair.
 	 * */
 	generateKeys(type?: KeyPairType) {
-		type = type != null ? type : this.defaultKeyPairType;
-
-		const keyPair = cryptoWrapper.generateKeyPair({ type });
+		const keyPairType = type != null ? type : this.defaultKeyPairType;
+		const keyPair = cryptoWrapper.generateKeyPair({ type: keyPairType });
 		return this.wrapKeyPair(keyPair);
 	}
 
@@ -150,12 +92,12 @@ export class VirgilCrypto {
 	 * @returns {VirgilKeyPair}
 	 */
 	generateKeysFromKeyMaterial(keyMaterial: Data, type?: KeyPairType): VirgilKeyPair {
-		type = type != null ? type : this.defaultKeyPairType;
+		const keyPairType = type != null ? type : this.defaultKeyPairType;
 		const keyMaterialBuf = anyToBuffer(keyMaterial, 'base64', 'keyMaterial');
 
 		const keyPair = cryptoWrapper.generateKeyPairFromKeyMaterial({
 			keyMaterial: keyMaterialBuf,
-			type
+			type: keyPairType
 		});
 		return this.wrapKeyPair(keyPair);
 	}
@@ -541,9 +483,9 @@ export class VirgilCrypto {
 	private calculateKeypairIdentifier(publicKeyData: Buffer): Buffer {
 		if (this.useSha256Identifiers) {
 			return cryptoWrapper.hash(publicKeyData, HashAlgorithm.SHA256);
-		} else {
-			return cryptoWrapper.hash(publicKeyData, HashAlgorithm.SHA512).slice(0, 8);
 		}
+
+		return cryptoWrapper.hash(publicKeyData, HashAlgorithm.SHA512).slice(0, 8);
 	}
 
 	/**
@@ -564,57 +506,4 @@ export class VirgilCrypto {
 			publicKey: new VirgilPublicKey(identifier, publicKeyDer)
 		};
 	}
-}
-
-/**
- * Gets the private key bytes of the given private key object from internal store.
- * @param {VirgilPrivateKey} privateKey - Private key object.
- * @returns {Buffer} - Private key bytes.
- *
- * @hidden
- */
-function getPrivateKeyBytes(privateKey: VirgilPrivateKey): Buffer {
-	return _getValue.call(_privateKeys, privateKey);
-}
-
-/**
- * Saves the private key bytes corresponding to the given private key object into
- * internal buffer.
- *
- * @param {VirgilPrivateKey} privateKey - Private key object.
- * @param {Buffer} bytes - Private key bytes.
- *
- * @hidden
- */
-function setPrivateKeyBytes(privateKey: VirgilPrivateKey, bytes: Buffer) {
-	_setValue.call(_privateKeys, privateKey, bytes);
-}
-
-/**
- * @hidden
- */
-function validatePrivateKey(privateKey: VirgilPrivateKey, label: string = 'privateKey') {
-	if (privateKey == null || !Buffer.isBuffer(privateKey.identifier) || !_hasValue.call(_privateKeys, privateKey)) {
-		throw new TypeError(`\`${label}\` is not a VirgilPrivateKey.`);
-	}
-}
-
-/**
- * @hidden
- */
-function validatePublicKey(publicKey: VirgilPublicKey, label: string = 'publicKey') {
-	if (publicKey == null || !Buffer.isBuffer(publicKey.identifier) || !Buffer.isBuffer(publicKey.key)) {
-		throw new TypeError(`\`${label}\` is not a VirgilPublicKey.`);
-	}
-}
-
-/**
- * @hidden
- */
-function validatePublicKeysArray(publicKeys: VirgilPublicKey[], label: string = 'publicKeys') {
-	if (publicKeys.length === 0) {
-		throw new TypeError(`\`${label}\` array must not be empty.`)
-	}
-
-	publicKeys.forEach(pubkey => validatePublicKey(pubkey));
 }

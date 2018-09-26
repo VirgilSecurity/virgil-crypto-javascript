@@ -7,6 +7,8 @@ import { VirgilPublicKey } from './VirgilPublicKey';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 import { getPrivateKeyBytes } from './privateKeyUtils';
 import { validatePrivateKey, validatePublicKey, validatePublicKeysArray } from './validators';
+import { VirgilStreamCipher, VirgilStreamDecipher } from './stream-encryption';
+import { VirgilStreamSigner, VirgilStreamVerifier } from './stream-signing';
 
 /**
  * `VirgilCrypto` initialization options.
@@ -468,6 +470,22 @@ export class VirgilCrypto {
 			},
 			publicKeys
 		);
+	}
+
+	createStreamCipher (publicKey: VirgilPublicKey|VirgilPublicKey[]): NodeJS.ReadWriteStream {
+		return new VirgilStreamCipher(cryptoWrapper.createVirgilSeqCipher(), publicKey);
+	}
+
+	createStreamDecipher (privateKey: VirgilPrivateKey): NodeJS.ReadWriteStream {
+		return new VirgilStreamDecipher(cryptoWrapper.createVirgilSeqCipher(), privateKey);
+	}
+
+	createStreamSigner () {
+		return new VirgilStreamSigner();
+	}
+
+	createStreamVerifier (signature: Buffer) {
+		return new VirgilStreamVerifier(signature);
 	}
 
 	/**

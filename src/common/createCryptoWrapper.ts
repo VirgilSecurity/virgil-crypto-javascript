@@ -38,7 +38,23 @@ export function createCryptoWrapper (lib: any): IVirgilCryptoWrapper {
 		'setContentInfo',
 		'keyRecipientExists'
 	]);
+	wrapper.createSafeInstanceMethods(lib.VirgilSeqCipher, [
+		'addKeyRecipient',
+		'addPasswordRecipient',
+		'startEncryption',
+		'startDecryptionWithKey',
+		'startDecryptionWithPassword',
+		'process',
+		'finish'
+	]);
 	wrapper.createSafeInstanceMethods(lib.VirgilSigner, [ 'sign', 'verify' ]);
+	wrapper.createSafeInstanceMethods(lib.VirgilSeqSigner, [
+		'startSigning',
+		'startVerifying',
+		'update',
+		'sign',
+		'verify'
+	]);
 	wrapper.createSafeInstanceMethods(lib.VirgilHash, [ 'hash' ]);
 	wrapper.createSafeInstanceMethods(lib.VirgilCustomParams, [ 'setData', 'getData' ]);
 	wrapper.createSafeInstanceMethods(lib.VirgilKeyPair, [ 'privateKey', 'publicKey' ]);
@@ -91,16 +107,15 @@ export function createCryptoWrapper (lib: any): IVirgilCryptoWrapper {
 				random.delete();
 				byteArr && byteArr.delete();
 			}
-		} else {
-			const random = new lib.VirgilRandom('');
-			return wrapper.utils.virgilByteArrayToBuffer(random.randomize(numOfBytes));
 		}
-	};
 
+		const random = new lib.VirgilRandom('');
+		return wrapper.utils.virgilByteArrayToBuffer(random.randomize(numOfBytes));
+	};
 
 	return {
 		generateKeyPair (options: KeyPairOptions = {}) {
-			let { type, password = EMPTY_BUFFER } = options;
+			const { type, password = EMPTY_BUFFER } = options;
 			let keyPair;
 			if (type) {
 				keyPair = lib.VirgilKeyPair.generateSafe(getLibKeyPairType(type), password);
@@ -351,6 +366,14 @@ export function createCryptoWrapper (lib: any): IVirgilCryptoWrapper {
 			}
 
 			return decryptedData;
+		},
+
+		createVirgilSeqCipher () {
+			return new lib.VirgilSeqCipher();
+		},
+
+		createVirgilSeqSigner () {
+			return new lib.VirgilSeqSigner();
 		}
 	};
 

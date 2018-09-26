@@ -3,6 +3,7 @@ const path = require('path');
 const { rollup } = require('rollup');
 const bundleTypes = require('./bundle-types');
 const getRollupPlugins = require('./get-rollup-plugins');
+const pkg = require('../../package.json');
 
 const NODE = bundleTypes.NODE;
 const BROWSER = bundleTypes.BROWSER;
@@ -22,7 +23,7 @@ function createBundle(bundle) {
 		const entry = bundle.entry;
 		return rollup({
 			input: path.resolve(bundle.path, entry),
-			external: [ ...builtinModules, ...(bundle.external || []) ],
+			external: [ ...(bundleType === NODE ? Object.keys(pkg.dependencies).concat(builtinModules) : []), ...(bundle.external || []) ],
 			plugins: getRollupPlugins(bundleType),
 		}).then(output => {
 			const formats = getOutputFormatsFromBundleType(bundleType);

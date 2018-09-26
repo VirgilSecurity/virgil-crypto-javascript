@@ -288,4 +288,42 @@ export interface IVirgilCryptoWrapper {
 	decryptThenVerifyDetached (
 		encryptedData: Buffer, metadata: Buffer, privateKey: DecryptionKey, publicKeys: VerificationKey[]
 	): Buffer;
+
+	/**
+	 * Create an instance of `VirgilSeqCipher` class from VirgilCrypto library,
+	 * which can be used to encrypt and decrypt data one chunk at a time.
+	 */
+	createVirgilSeqCipher(): WrappedVirgilSeqCipher;
+
+	/**
+	 * Create an instance of `VirgilSeqSigner` class from VirgilCrypto library,
+	 * which can be used to calculate and verify digital signatures of data
+	 * one chunk at a time.
+	 */
+	createVirgilSeqSigner(): WrappedVirgilSeqSigner;
+}
+
+export interface IDeletable {
+	delete(): void;
+}
+
+export interface WrappedVirgilCipherBase extends IDeletable {
+	addKeyRecipientSafe(recipientId: Buffer, publicKey: Buffer): void;
+	addPasswordRecipientSafe(password: Buffer): void;
+}
+
+export interface WrappedVirgilSeqCipher extends WrappedVirgilCipherBase {
+	startEncryptionSafe(): Buffer;
+	startDecryptionWithKeySafe(recipientId: Buffer, privateKey: Buffer, privateKeyPassword: Buffer): void;
+	startDecryptionWithPasswordSafe(password: Buffer): void;
+	processSafe(data: Buffer): Buffer;
+	finishSafe(): Buffer;
+}
+
+export interface WrappedVirgilSeqSigner extends IDeletable {
+	startSigningSafe(): void;
+	startVerifyingSafe(): void;
+	updateSafe(data: Buffer): void;
+	signSafe(privateKey: Buffer, privateKeyPassword: Buffer): Buffer;
+	verifySafe(publicKey: Buffer): boolean;
 }

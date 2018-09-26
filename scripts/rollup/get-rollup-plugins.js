@@ -1,7 +1,9 @@
 const resolve = require('rollup-plugin-node-resolve');
+const commonjs = require('rollup-plugin-commonjs');
 const typescript = require('rollup-plugin-typescript2');
 const inject = require('rollup-plugin-inject');
 const replace = require('rollup-plugin-replace');
+const builtins = require('rollup-plugin-node-builtins');
 const globals = require('rollup-plugin-node-globals');
 const { uglify } = require('rollup-plugin-uglify');
 const globalScript = require('./rollup-plugin-global-script');
@@ -15,9 +17,7 @@ const BROWSER_ONLY_PLUGINS = [
 		modules: {
 			Buffer: [ 'buffer-es6', 'Buffer' ]
 		}
-	}),
-
-	globals()
+	})
 ];
 
 function getRollupPlugins(bundleType) {
@@ -35,8 +35,14 @@ function getRollupPlugins(bundleType) {
 			browser: isBrowser,
 			jsnext: true,
 			extensions: [ '.ts', '.js' ],
-			include: [ 'src/**' ],
 			preferBuiltins: !isBrowser
+		}),
+
+		globals(),
+		builtins(),
+
+		commonjs({
+			ignoreGlobal: true
 		}),
 
 		typescript({

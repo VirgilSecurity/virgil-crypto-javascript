@@ -322,7 +322,7 @@ export interface WrappedVirgilSeqCipher extends WrappedVirgilCipherBase {
 
 export interface WrappedVirgilSeqSigner extends IDeletable {
 	startSigningSafe(): void;
-	startVerifyingSafe(): void;
+	startVerifyingSafe(signature: Buffer): void;
 	updateSafe(data: Buffer): void;
 	signSafe(privateKey: Buffer, privateKeyPassword: Buffer): Buffer;
 	verifySafe(publicKey: Buffer): boolean;

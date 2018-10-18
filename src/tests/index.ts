@@ -11,4 +11,5 @@ import './privateKeyEncryption.test';
 import './signThenEncrypt.test';
 import './signVerify.test';
 import './detachedEncryption.test';
-import './streamEncryption.test';
+import './streams/streamEncryption.test';
+import './streams/streamSigning.test';

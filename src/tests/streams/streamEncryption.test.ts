@@ -1,16 +1,16 @@
-import { cryptoWrapper } from '../virgilCryptoWrapper';
-import { VirgilStreamCipher, VirgilStreamDecipher } from '../stream-encryption';
-import { VirgilPublicKey } from '../VirgilPublicKey';
-import { WrappedVirgilSeqCipher } from '../common';
-import { VirgilPrivateKey } from '../VirgilPrivateKey';
+import { cryptoWrapper } from '../../virgilCryptoWrapper';
+import { VirgilStreamCipher } from '../../streams/VirgilStreamCipher';
+import { VirgilStreamDecipher } from '../../streams/VirgilStreamDecipher';
+import { VirgilPublicKey } from '../../VirgilPublicKey';
+import { VirgilPrivateKey } from '../../VirgilPrivateKey';
+import { writeToStreamInChunks, readableStreamToPromise } from './utils';
 
 describe ('VirgilStreamCipher', () => {
 	describe ('constructor', () => {
 		it ('validates public keys', () => {
 			const invalidPublicKey = {} as VirgilPublicKey;
-			const seqCipherStub = {} as WrappedVirgilSeqCipher;
 			assert.throws(
-				() => new VirgilStreamCipher(seqCipherStub, invalidPublicKey),
+				() => new VirgilStreamCipher(invalidPublicKey),
 				TypeError
 			);
 		});
@@ -21,24 +21,22 @@ describe ('VirgilStreamDecipher', () => {
 	describe('constructor', () => {
 		it ('validates private key', () => {
 			const invalidPrivateKey = {} as VirgilPrivateKey;
-			const seqCipherStub = {} as WrappedVirgilSeqCipher;
 			assert.throws(
-				() => new VirgilStreamDecipher(seqCipherStub, invalidPrivateKey),
+				() => new VirgilStreamDecipher(invalidPrivateKey),
 				TypeError
 			);
 		});
 	});
 });
 
-describe ('stream encryption', function () {
-	this.timeout(10 * 1000);
+describe.only ('stream encryption', function () {
+	this.timeout(15 * 1000);
 
 	it ('encrypts data', (done) => {
 		const keyPair = cryptoWrapper.generateKeyPair();
 		const keyPairId = Buffer.from('key_pair_id');
 
 		const streamCipher = new VirgilStreamCipher(
-			cryptoWrapper.createVirgilSeqCipher(),
 			new VirgilPublicKey(keyPairId, keyPair.publicKey)
 		);
 
@@ -59,12 +57,10 @@ describe ('stream encryption', function () {
 		const keyPairId = Buffer.from('key_pair_id');
 
 		const streamCipher = new VirgilStreamCipher(
-			cryptoWrapper.createVirgilSeqCipher(),
 			new VirgilPublicKey(keyPairId, keyPair.publicKey)
 		);
 
 		const streamDecipher = new VirgilStreamDecipher(
-			cryptoWrapper.createVirgilSeqCipher(),
 			new VirgilPrivateKey(keyPairId, keyPair.privateKey)
 		);
 
@@ -90,7 +86,6 @@ describe ('stream encryption', function () {
 		const keyPairId2 = Buffer.from('key_pair_id_2');
 
 		const cipher = new VirgilStreamCipher(
-			cryptoWrapper.createVirgilSeqCipher(),
 			[
 				new VirgilPublicKey(keyPairId1, keyPair1.publicKey),
 				new VirgilPublicKey(keyPairId2, keyPair2.publicKey)
@@ -98,11 +93,9 @@ describe ('stream encryption', function () {
 		);
 
 		const decipher1 = new VirgilStreamDecipher(
-			cryptoWrapper.createVirgilSeqCipher(),
 			new VirgilPrivateKey(keyPairId1, keyPair1.privateKey)
 		);
 		const decipher2 = new VirgilStreamDecipher(
-			cryptoWrapper.createVirgilSeqCipher(),
 			new VirgilPrivateKey(keyPairId2, keyPair2.privateKey)
 		);
 
@@ -123,7 +116,7 @@ describe ('stream encryption', function () {
 		}).catch(err => done(err));
 	});
 
-	it.only ('emits error when trying to decrypt with a wrong key', (done) => {
+	it ('emits error when trying to decrypt with a wrong key', (done) => {
 		const keyPair = cryptoWrapper.generateKeyPair();
 		const keyPairId = Buffer.from('key_pair_id');
 
@@ -131,12 +124,10 @@ describe ('stream encryption', function () {
 		const wrongKeyPairId = Buffer.from('wrong_key_pair_id');
 
 		const cipher = new VirgilStreamCipher(
-			cryptoWrapper.createVirgilSeqCipher(),
 			new VirgilPublicKey(keyPairId, keyPair.publicKey)
 		);
 
 		const decipher = new VirgilStreamDecipher(
-			cryptoWrapper.createVirgilSeqCipher(),
 			new VirgilPrivateKey(wrongKeyPairId, wrongKeyPair.privateKey)
 		);
 
@@ -156,53 +147,64 @@ describe ('stream encryption', function () {
 			done(err);
 		})
 	});
-});
 
-function readableStreamToPromise(readable: NodeJS.ReadableStream): Promise<Buffer> {
-	return new Promise((resolve, reject) => {
-		const chunks: Buffer[] = [];
-		readable.on('readable', () => {
-			const data = readable.read();
+	it ('encrypt as stream -> decrypt synchronously', done => {
+		const keyPair = cryptoWrapper.generateKeyPair();
+		const keyPairId = Buffer.from('key_pair_id');
+
+		const cipher = new VirgilStreamCipher(new VirgilPublicKey(keyPairId, keyPair.publicKey));
+		const input = Buffer.alloc(1000 * 1000).fill('foo');
+
+		let ciphertext = Buffer.alloc(0);
+		cipher.on('readable', () => {
+			const data = cipher.read();
 			if (data) {
-				chunks.push(data as Buffer);
+				ciphertext = Buffer.concat([ciphertext, data]);
 			}
 		});
 
-		readable.on('close', () => {
-			console.log('READABLE CLOSED');
+		cipher.on('end', () => {
+			const decryptedData = cryptoWrapper.decrypt(ciphertext, { identifier: keyPairId, key: keyPair.privateKey });
+			assert.deepEqual(decryptedData, input);
+			done();
 		});
 
-		readable.on('error', err => {
-			reject(err);
+		cipher.on('error', err => {
+			done(err);
 		});
 
-		readable.on('end', () => {
-			resolve(Buffer.concat(chunks));
-		});
+		cipher.write(input);
+		cipher.end();
 	});
-}
 
-function writeToStreamInChunks(writable: NodeJS.WritableStream, input: Buffer) {
-	const CHUNK_SIZE = 1024 * 1024; // 1Mb
-	const inputChunks = splitIntoChunks(input, CHUNK_SIZE);
+	it ('encrypt synchronously -> decrypt as stream', done => {
+		const keyPair = cryptoWrapper.generateKeyPair();
+		const keyPairId = Buffer.from('key_pair_id');
 
-	function next() {
-		if (inputChunks.length > 0) {
-			writable.write(inputChunks.shift() as Buffer);
-			setTimeout(next, 0);
-		} else {
-			writable.end();
-		}
-	}
+		const input = Buffer.alloc(1000 * 1000).fill('foo');
+		const ciphertext = cryptoWrapper.encrypt(input, { identifier: keyPairId, key: keyPair.publicKey });
 
-	next();
-}
+		const decipher = new VirgilStreamDecipher(new VirgilPrivateKey(keyPairId, keyPair.privateKey ));
 
-function splitIntoChunks (input: Buffer, chunkSize: number) {
-	const chunks = [];
-	let offset = 0;
-	while(offset < input.byteLength) {
-		chunks.push(input.slice(offset, offset += chunkSize));
-	}
-	return chunks;
-}
+		let plaintext = Buffer.alloc(0);
+
+		decipher.on('readable', () => {
+			const data = decipher.read();
+			if (data) {
+				plaintext = Buffer.concat([ plaintext, data ]);
+			}
+		});
+
+		decipher.on('error', err => {
+			done(err);
+		});
+
+		decipher.on('end', () => {
+			assert.deepEqual(plaintext, input);
+			done();
+		});
+
+		decipher.write(ciphertext);
+		decipher.end();
+	});
+});

@@ -3,36 +3,14 @@ import { VirgilStreamCipher } from '../../streams/VirgilStreamCipher';
 import { VirgilStreamDecipher } from '../../streams/VirgilStreamDecipher';
 import { VirgilPublicKey } from '../../VirgilPublicKey';
 import { VirgilPrivateKey } from '../../VirgilPrivateKey';
-import { writeToStreamInChunks, readableStreamToPromise } from './utils';
+import { splitIntoChunks, createAsyncIterable } from './utils';
 
-describe ('VirgilStreamCipher', () => {
-	describe ('constructor', () => {
-		it ('validates public keys', () => {
-			const invalidPublicKey = {} as VirgilPublicKey;
-			assert.throws(
-				() => new VirgilStreamCipher(invalidPublicKey),
-				TypeError
-			);
-		});
-	});
-});
-
-describe ('VirgilStreamDecipher', () => {
-	describe('constructor', () => {
-		it ('validates private key', () => {
-			const invalidPrivateKey = {} as VirgilPrivateKey;
-			assert.throws(
-				() => new VirgilStreamDecipher(invalidPrivateKey),
-				TypeError
-			);
-		});
-	});
-});
+const CHUNK_SIZE = 65536;
 
 describe.only ('stream encryption', function () {
-	this.timeout(15 * 1000);
+	this.timeout(20 * 1000);
 
-	it ('encrypts data', (done) => {
+	it ('encrypts data', async () => {
 		const keyPair = cryptoWrapper.generateKeyPair();
 		const keyPairId = Buffer.from('key_pair_id');
 
@@ -41,18 +19,21 @@ describe.only ('stream encryption', function () {
 		);
 
 		const input = Buffer.alloc(5 * 1000 * 1000).fill('foo');
+		const inputChunks = splitIntoChunks(input, CHUNK_SIZE);
 
-		writeToStreamInChunks(streamCipher, input);
+		const encryptedChunks: Buffer[] = [];
+		encryptedChunks.push(streamCipher.start());
 
-		readableStreamToPromise(streamCipher)
-		.then(encrypted => {
-			assert.isFalse(encrypted.equals(input));
-			done();
-		})
-		.catch(err => done(err));
+		for await (const inputChunk of inputChunks) {
+			encryptedChunks.push(streamCipher.update(inputChunk));
+		}
+
+		encryptedChunks.push(streamCipher.final());
+
+		assert.isFalse(Buffer.concat(encryptedChunks).equals(input));
 	});
 
-	it ('decrypts data', (done) => {
+	it ('decrypts data', async () => {
 		const keyPair = cryptoWrapper.generateKeyPair();
 		const keyPairId = Buffer.from('key_pair_id');
 
@@ -65,20 +46,21 @@ describe.only ('stream encryption', function () {
 		);
 
 		const input = Buffer.alloc(5 * 1000 * 1000).fill('foo');
+		const inputChunks = splitIntoChunks(input, CHUNK_SIZE);
 
-		streamCipher.pipe(streamDecipher);
+		const decryptedChunks: Buffer[] = [];
+		decryptedChunks.push(streamDecipher.update(streamCipher.start()));
 
-		writeToStreamInChunks(streamCipher, input);
+		for await (const inputChunk of inputChunks) {
+			const encryptedChunk = streamCipher.update(inputChunk);
+			decryptedChunks.push(streamDecipher.update(encryptedChunk));
+		}
 
-		readableStreamToPromise(streamDecipher)
-		.then(decrypted => {
-			assert.isTrue(decrypted.equals(input));
-			done();
-		})
-		.catch(err => done(err));
+		decryptedChunks.push(streamDecipher.final(streamCipher.final())!);
+		assert.isTrue(Buffer.concat(decryptedChunks).equals(input));
 	});
 
-	it ('encrypts and decrypts with multiple keys', (done) => {
+	it ('encrypts and decrypts with multiple keys', async () => {
 		const keyPair1 = cryptoWrapper.generateKeyPair();
 		const keyPairId1 = Buffer.from('key_pair_id_1');
 
@@ -100,23 +82,30 @@ describe.only ('stream encryption', function () {
 		);
 
 		const input = Buffer.alloc(5 * 1000 * 1000).fill('foo');
+		const inputChunks = splitIntoChunks(input, CHUNK_SIZE);
 
-		cipher.pipe(decipher1);
-		cipher.pipe(decipher2);
+		const decryptedChunks1: Buffer[] = [];
+		const decryptedChunks2: Buffer[] = [];
 
-		writeToStreamInChunks(cipher, input);
+		const initialEncryptedChunk = cipher.start();
+		decryptedChunks1.push(decipher1.update(initialEncryptedChunk));
+		decryptedChunks2.push(decipher2.update(initialEncryptedChunk));
 
-		Promise.all([
-			readableStreamToPromise(decipher1),
-			readableStreamToPromise(decipher2)
-		]).then(([ decrypted1, decrypted2 ]) => {
-			assert.isTrue(decrypted1.equals(input));
-			assert.isTrue(decrypted2.equals(input));
-			done();
-		}).catch(err => done(err));
+		for await (const inputChunk of createAsyncIterable(inputChunks)) {
+			const encryptedChunk = cipher.update(inputChunk);
+			decryptedChunks1.push(decipher1.update(encryptedChunk));
+			decryptedChunks2.push(decipher2.update(encryptedChunk));
+		}
+
+		const finalEncryptedChunk = cipher.final();
+		decryptedChunks1.push(decipher1.final(finalEncryptedChunk));
+		decryptedChunks2.push(decipher2.final(finalEncryptedChunk));
+
+		assert.isTrue(Buffer.concat(decryptedChunks1).equals(input));
+		assert.isTrue(Buffer.concat(decryptedChunks2).equals(input));
 	});
 
-	it ('emits error when trying to decrypt with a wrong key', (done) => {
+	it ('throws error when trying to decrypt with a wrong key', () => {
 		const keyPair = cryptoWrapper.generateKeyPair();
 		const keyPairId = Buffer.from('key_pair_id');
 
@@ -131,80 +120,53 @@ describe.only ('stream encryption', function () {
 			new VirgilPrivateKey(wrongKeyPairId, wrongKeyPair.privateKey)
 		);
 
-		const input = Buffer.alloc(3 * 1000 * 1000).fill('bar');
+		const initialEncryptedChunk = cipher.start();
 
-		cipher.pipe(decipher);
-
-		writeToStreamInChunks(cipher, input);
-
-		readableStreamToPromise(decipher)
-		.then(() => done(new Error('The steam should have emitted an error')))
-		.catch(err => {
-			if (/recipient with given identifier is not found/i.test(err.message)) {
-				return done();
-			}
-
-			done(err);
-		})
+		assert.throws(() => {
+			decipher.update(initialEncryptedChunk)
+		}, /recipient with given identifier is not found/i);
 	});
 
-	it ('encrypt as stream -> decrypt synchronously', done => {
+	it ('encrypt as stream -> decrypt synchronously', async () => {
 		const keyPair = cryptoWrapper.generateKeyPair();
 		const keyPairId = Buffer.from('key_pair_id');
 
 		const cipher = new VirgilStreamCipher(new VirgilPublicKey(keyPairId, keyPair.publicKey));
 		const input = Buffer.alloc(1000 * 1000).fill('foo');
+		const inputChunks = splitIntoChunks(input, CHUNK_SIZE);
 
-		let ciphertext = Buffer.alloc(0);
-		cipher.on('readable', () => {
-			const data = cipher.read();
-			if (data) {
-				ciphertext = Buffer.concat([ciphertext, data]);
-			}
-		});
+		const encryptedChunks: Buffer[] = [];
+		encryptedChunks.push(cipher.start());
 
-		cipher.on('end', () => {
-			const decryptedData = cryptoWrapper.decrypt(ciphertext, { identifier: keyPairId, key: keyPair.privateKey });
-			assert.deepEqual(decryptedData, input);
-			done();
-		});
+		for await (const inputChunk of createAsyncIterable(inputChunks)) {
+			encryptedChunks.push(cipher.update(inputChunk));
+		}
 
-		cipher.on('error', err => {
-			done(err);
-		});
-
-		cipher.write(input);
-		cipher.end();
+		encryptedChunks.push(cipher.final());
+		const decryptedData = cryptoWrapper.decrypt(
+			Buffer.concat(encryptedChunks),
+			{ identifier: keyPairId, key: keyPair.privateKey }
+		);
+		assert.isTrue(decryptedData.equals(input));
 	});
 
-	it ('encrypt synchronously -> decrypt as stream', done => {
+	it ('encrypt synchronously -> decrypt as stream', async () => {
 		const keyPair = cryptoWrapper.generateKeyPair();
 		const keyPairId = Buffer.from('key_pair_id');
 
-		const input = Buffer.alloc(1000 * 1000).fill('foo');
-		const ciphertext = cryptoWrapper.encrypt(input, { identifier: keyPairId, key: keyPair.publicKey });
-
 		const decipher = new VirgilStreamDecipher(new VirgilPrivateKey(keyPairId, keyPair.privateKey ));
 
-		let plaintext = Buffer.alloc(0);
+		const input = Buffer.alloc(1000 * 1000).fill('foo');
+		const encryptedData = cryptoWrapper.encrypt(input, { identifier: keyPairId, key: keyPair.publicKey });
+		const encryptedChunks = splitIntoChunks(encryptedData, CHUNK_SIZE);
 
-		decipher.on('readable', () => {
-			const data = decipher.read();
-			if (data) {
-				plaintext = Buffer.concat([ plaintext, data ]);
-			}
-		});
+		const decryptedChunks: Buffer[] = [];
 
-		decipher.on('error', err => {
-			done(err);
-		});
+		for await (const encryptedChunk of createAsyncIterable(encryptedChunks)) {
+			decryptedChunks.push(decipher.update(encryptedChunk));
+		}
 
-		decipher.on('end', () => {
-			assert.deepEqual(plaintext, input);
-			done();
-		});
-
-		decipher.write(ciphertext);
-		decipher.end();
+		decryptedChunks.push(decipher.final());
+		assert.isTrue(Buffer.concat(decryptedChunks).equals(input));
 	});
 });

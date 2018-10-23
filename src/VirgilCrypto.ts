@@ -474,11 +474,11 @@ export class VirgilCrypto {
 		);
 	}
 
-	createStreamCipher (publicKey: VirgilPublicKey|VirgilPublicKey[]): NodeJS.ReadWriteStream {
+	createStreamCipher (publicKey: VirgilPublicKey|VirgilPublicKey[]) {
 		return new VirgilStreamCipher(publicKey);
 	}
 
-	createStreamDecipher (privateKey: VirgilPrivateKey): NodeJS.ReadWriteStream {
+	createStreamDecipher (privateKey: VirgilPrivateKey){
 		return new VirgilStreamDecipher(privateKey);
 	}
 

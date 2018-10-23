@@ -1,47 +1,53 @@
-import { Transform, TransformCallback } from 'stream';
 import { WrappedVirgilSeqCipher } from '../common';
 import { cryptoWrapper } from '../virgilCryptoWrapper';
+import { Data } from '../interfaces';
+import { anyToBuffer, StringEncoding } from '../utils/anyToBuffer';
 
-export class VirgilStreamCipherBase extends Transform {
-	protected seqCipher: WrappedVirgilSeqCipher
+export class VirgilStreamCipherBase {
+	private isFinished: boolean = false;
+	private isDisposed: boolean = false;
+
+	protected seqCipher: WrappedVirgilSeqCipher;
 
 	constructor () {
-		super();
 		this.seqCipher = cryptoWrapper.createVirgilSeqCipher();
 	}
 
-	// tslint:disable-next-line:function-name
-	_flush (callback: TransformCallback) {
+	update (data: Data, encoding: StringEncoding = 'utf8') {
+		this.ensureLegalState();
+		return this.seqCipher.processSafe(anyToBuffer(data, encoding));
+	}
+
+	final (data?: Data, encoding: StringEncoding = 'utf8') {
+		this.ensureLegalState();
+
 		try {
-			this.push(this.seqCipher.finishSafe());
-		} catch (err) {
-			callback(err);
-			return;
+			if (data) {
+				const lastProcessed = this.seqCipher.processSafe(anyToBuffer(data, encoding));
+				const final = this.seqCipher.finishSafe();
+				return Buffer.concat([ lastProcessed, final ]);
+			}
+			return this.seqCipher.finishSafe();
 		} finally {
+			this.isFinished = true;
 			this.dispose();
 		}
-		callback();
-	}
-
-	// tslint:disable-next-line:function-name
-	_destroy () {
-		this.dispose();
-	}
-
-	// tslint:disable-next-line:function-name
-	_transform(chunk: any, encoding: string, callback: TransformCallback) {
-		try {
-			this.push(this.seqCipher.processSafe(chunk));
-		} catch (err) {
-			callback(err);
-		}
-
-		callback();
 	}
 
 	dispose () {
 		if (process.browser) {
 			this.seqCipher.delete();
+			this.isDisposed = true;
+		}
+	}
+
+	protected ensureLegalState () {
+		if (this.isFinished) {
+			throw new Error('Illegal state. Cannot use cipher after the `final` method has been called.');
+		}
+
+		if (this.isDisposed) {
+			throw new Error('Illegal state. Cannot use cipher after the `dispose` method has been called.');
 		}
 	}
 }

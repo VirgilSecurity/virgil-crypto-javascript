@@ -1,3 +1,13 @@
+if (!Symbol.asyncIterator) {
+	(Symbol as any).asyncIterator = Symbol.for('Symbol.asyncIterator');
+}
+
+export async function* createAsyncIterable<T>(arr: T[]) {
+	for (const item of arr) {
+		yield item;
+	}
+}
+
 export function readableStreamToPromise(readable: NodeJS.ReadableStream): Promise<Buffer> {
 	return new Promise((resolve, reject) => {
 		const chunks: Buffer[] = [];
@@ -34,7 +44,7 @@ export function writeToStreamInChunks(writable: NodeJS.WritableStream, input: Bu
 	next();
 }
 
-function splitIntoChunks (input: Buffer, chunkSize: number) {
+export function splitIntoChunks (input: Buffer, chunkSize: number): Buffer[] {
 	const chunks = [];
 	let offset = 0;
 	while(offset < input.byteLength) {

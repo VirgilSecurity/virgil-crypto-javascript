@@ -13,8 +13,10 @@ export class VirgilStreamCipher extends VirgilStreamCipherBase {
 		for (const { identifier, key} of publicKeyArr) {
 			this.seqCipher.addKeyRecipientSafe(identifier, key);
 		}
+	}
 
-		const contentInfo = this.seqCipher.startEncryptionSafe();
-		this.unshift(contentInfo);
+	start () {
+		this.ensureLegalState();
+		return this.seqCipher.startEncryptionSafe();
 	}
 }

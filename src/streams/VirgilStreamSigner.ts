@@ -13,7 +13,7 @@ export class VirgilStreamSigner extends VirgilStreamSignerBase {
 	sign(privateKey: VirgilPrivateKey, final: boolean = true) {
 		if (this.isDisposed()) {
 			throw new Error(
-				'The VirgilStreamSigner has been disposed. ' +
+				'Illegal state. The VirgilStreamSigner has been disposed. ' +
 				'Pass `false` as the second argument to the `sign` method ' +
 				'if you need to generate more than one signature.'
 			);

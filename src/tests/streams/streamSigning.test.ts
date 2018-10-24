@@ -1,95 +1,74 @@
 import { cryptoWrapper } from '../../virgilCryptoWrapper';
 import { VirgilStreamSigner } from '../../streams/VirgilStreamSigner';
 import { VirgilStreamVerifier } from '../../streams/VirgilStreamVerifier';
-import { writeToStreamInChunks, readableStreamToPromise } from './utils';
 import { VirgilPrivateKey } from '../../VirgilPrivateKey';
 import { VirgilPublicKey } from '../../VirgilPublicKey';
+import { createAsyncIterable, splitIntoChunks, createVirgilKeyPair } from './utils';
+
+const CHUNK_SIZE = 65536;
 
 describe ('stream signing', function () {
-	this.timeout(15 * 1000);
+	this.timeout(10 * 1000);
 
 	describe ('signature calculation', () => {
-		it ('using StreamSigner as stream', done => {
+
+		it ('calulates the signature', async () => {
 			const { privateKey } = createVirgilKeyPair();
 			const streamSigner = new VirgilStreamSigner();
-			const input = Buffer.alloc(5 * 1000 * 1000).fill('foo');
+			const input = Buffer.alloc(3 * 1000 * 1000).fill('foo');
+			const inputChunks = splitIntoChunks(input, CHUNK_SIZE);
 
-			writeToStreamInChunks(streamSigner, input);
-
-			readableStreamToPromise(streamSigner)
-			.then(transformedInput => {
-				assert.isTrue(transformedInput.equals(input), 'does not modify input');
-				const signature = streamSigner.sign(privateKey);
-
-				assert.isTrue(Buffer.isBuffer(signature), 'calculates the signature');
-				done();
-			})
-			.catch(err => done(err));
-		});
-
-		it ('using update and sign methods', () => {
-			const { privateKey } = createVirgilKeyPair();
-			const streamSigner = new VirgilStreamSigner();
-			const inputs = [
-				Buffer.alloc(1000 * 1000).fill('foo'),
-				Buffer.alloc(1000 * 1000).fill('bar'),
-				Buffer.alloc(1000 * 1000).fill('baz')
-			];
-
-			while (inputs.length > 0) {
-				streamSigner.update(inputs.pop() as Buffer);
+			for await (const chunk of createAsyncIterable(inputChunks)) {
+				streamSigner.update(chunk);
 			}
 
 			const signature = streamSigner.sign(privateKey);
-			assert.isTrue(Buffer.isBuffer(signature), 'calculates the signature');
+			assert.isTrue(Buffer.isBuffer(signature));
 		});
 	});
 
 	describe ('signature verification', () => {
-		it ('using StreamVerifier as stream', done => {
+
+		it ('verifies the signature', async () => {
 			const keyPair = createVirgilKeyPair();
 			const streamSigner = new VirgilStreamSigner();
-			const input = Buffer.alloc(5 * 1000 * 1000).fill('foo');
+			const input = Buffer.alloc(3 * 1000 * 1000).fill('foo');
+			const inputChunks = splitIntoChunks(input, CHUNK_SIZE);
 
-			writeToStreamInChunks(streamSigner, input);
-
-			readableStreamToPromise(streamSigner)
-			.then(_ => {
-				const signature = streamSigner.sign(keyPair.privateKey);
-				const streamVerifier = new VirgilStreamVerifier(signature);
-
-				writeToStreamInChunks(streamVerifier, input);
-
-				return readableStreamToPromise(streamVerifier).then(transformedInput => {
-					assert.isTrue(transformedInput.equals(input), 'does not modify input');
-					assert.isTrue(streamVerifier.verify(keyPair.publicKey), 'signature is valid');
-					done();
-				});
-			})
-			.catch(err => done(err));
-		});
-
-		it ('using update and verify methods', () => {
-			const keyPair = createVirgilKeyPair();
-			const streamSigner = new VirgilStreamSigner();
-			const inputs = [
-				Buffer.alloc(1000 * 1000).fill('foo'),
-				Buffer.alloc(1000 * 1000).fill('bar'),
-				Buffer.alloc(1000 * 1000).fill('baz')
-			];
-
-			streamSigner.update(inputs[0]);
-			streamSigner.update(inputs[1]);
-			streamSigner.update(inputs[2]);
+			for await (const chunk of createAsyncIterable(inputChunks)) {
+				streamSigner.update(chunk);
+			}
 
 			const signature = streamSigner.sign(keyPair.privateKey);
+
 			const streamVerifier = new VirgilStreamVerifier(signature);
 
-			streamVerifier.update(inputs[0]);
-			streamVerifier.update(inputs[1]);
-			streamVerifier.update(inputs[2]);
+			for await (const chunk of createAsyncIterable(inputChunks)) {
+				streamVerifier.update(chunk);
+			}
 
 			assert.isTrue(streamVerifier.verify(keyPair.publicKey));
+		});
+
+		it ('does not verify signature given the wrong key', async () => {
+			const keyPair = createVirgilKeyPair();
+			const input = Buffer.alloc(3 * 1000 * 1000).fill('foo');
+			const inputChunks = splitIntoChunks(input, CHUNK_SIZE);
+
+			const streamSigner = new VirgilStreamSigner();
+			for await (const chunk of createAsyncIterable(inputChunks)) {
+				streamSigner.update(chunk);
+			}
+			const signature = streamSigner.sign(keyPair.privateKey);
+
+			const wrongKeyPair = createVirgilKeyPair();
+			const streamVerifier = new VirgilStreamVerifier(signature);
+
+			for await (const chunk of createAsyncIterable(inputChunks)) {
+				streamVerifier.update(chunk);
+			}
+
+			assert.isFalse(streamVerifier.verify(wrongKeyPair.publicKey));
 		});
 
 		it ('sign synchronously -> verify as stream', () => {
@@ -120,12 +99,3 @@ describe ('stream signing', function () {
 		});
 	});
 });
-
-function createVirgilKeyPair() {
-	const keyPair = cryptoWrapper.generateKeyPair();
-	const keyPairId = Buffer.from('key_pair_id');
-	return {
-		privateKey: new VirgilPrivateKey(keyPairId, keyPair.privateKey),
-		publicKey: new VirgilPublicKey(keyPairId, keyPair.publicKey)
-	};
-}

@@ -1,22 +1,18 @@
 import { cryptoWrapper } from '../../virgilCryptoWrapper';
 import { VirgilStreamCipher } from '../../streams/VirgilStreamCipher';
 import { VirgilStreamDecipher } from '../../streams/VirgilStreamDecipher';
-import { VirgilPublicKey } from '../../VirgilPublicKey';
-import { VirgilPrivateKey } from '../../VirgilPrivateKey';
-import { splitIntoChunks, createAsyncIterable } from './utils';
+import { splitIntoChunks, createAsyncIterable, createVirgilKeyPair } from './utils';
+import { getPrivateKeyBytes } from '../../privateKeyUtils';
 
 const CHUNK_SIZE = 65536;
 
-describe.only ('stream encryption', function () {
+describe ('stream encryption', function () {
 	this.timeout(20 * 1000);
 
 	it ('encrypts data', async () => {
-		const keyPair = cryptoWrapper.generateKeyPair();
-		const keyPairId = Buffer.from('key_pair_id');
+		const keyPair = createVirgilKeyPair();
 
-		const streamCipher = new VirgilStreamCipher(
-			new VirgilPublicKey(keyPairId, keyPair.publicKey)
-		);
+		const streamCipher = new VirgilStreamCipher(keyPair.publicKey);
 
 		const input = Buffer.alloc(5 * 1000 * 1000).fill('foo');
 		const inputChunks = splitIntoChunks(input, CHUNK_SIZE);
@@ -34,16 +30,9 @@ describe.only ('stream encryption', function () {
 	});
 
 	it ('decrypts data', async () => {
-		const keyPair = cryptoWrapper.generateKeyPair();
-		const keyPairId = Buffer.from('key_pair_id');
-
-		const streamCipher = new VirgilStreamCipher(
-			new VirgilPublicKey(keyPairId, keyPair.publicKey)
-		);
-
-		const streamDecipher = new VirgilStreamDecipher(
-			new VirgilPrivateKey(keyPairId, keyPair.privateKey)
-		);
+		const keyPair = createVirgilKeyPair();
+		const streamCipher = new VirgilStreamCipher(keyPair.publicKey);
+		const streamDecipher = new VirgilStreamDecipher(keyPair.privateKey);
 
 		const input = Buffer.alloc(5 * 1000 * 1000).fill('foo');
 		const inputChunks = splitIntoChunks(input, CHUNK_SIZE);
@@ -61,25 +50,18 @@ describe.only ('stream encryption', function () {
 	});
 
 	it ('encrypts and decrypts with multiple keys', async () => {
-		const keyPair1 = cryptoWrapper.generateKeyPair();
-		const keyPairId1 = Buffer.from('key_pair_id_1');
-
-		const keyPair2 = cryptoWrapper.generateKeyPair();
-		const keyPairId2 = Buffer.from('key_pair_id_2');
+		const keyPair1 = createVirgilKeyPair();
+		const keyPair2 = createVirgilKeyPair();
 
 		const cipher = new VirgilStreamCipher(
 			[
-				new VirgilPublicKey(keyPairId1, keyPair1.publicKey),
-				new VirgilPublicKey(keyPairId2, keyPair2.publicKey)
+				keyPair1.publicKey,
+				keyPair2.publicKey
 			]
 		);
 
-		const decipher1 = new VirgilStreamDecipher(
-			new VirgilPrivateKey(keyPairId1, keyPair1.privateKey)
-		);
-		const decipher2 = new VirgilStreamDecipher(
-			new VirgilPrivateKey(keyPairId2, keyPair2.privateKey)
-		);
+		const decipher1 = new VirgilStreamDecipher(keyPair1.privateKey);
+		const decipher2 = new VirgilStreamDecipher(keyPair2.privateKey);
 
 		const input = Buffer.alloc(5 * 1000 * 1000).fill('foo');
 		const inputChunks = splitIntoChunks(input, CHUNK_SIZE);
@@ -106,19 +88,11 @@ describe.only ('stream encryption', function () {
 	});
 
 	it ('throws error when trying to decrypt with a wrong key', () => {
-		const keyPair = cryptoWrapper.generateKeyPair();
-		const keyPairId = Buffer.from('key_pair_id');
+		const keyPair = createVirgilKeyPair();
+		const wrongKeyPair = createVirgilKeyPair();
 
-		const wrongKeyPair = cryptoWrapper.generateKeyPair();
-		const wrongKeyPairId = Buffer.from('wrong_key_pair_id');
-
-		const cipher = new VirgilStreamCipher(
-			new VirgilPublicKey(keyPairId, keyPair.publicKey)
-		);
-
-		const decipher = new VirgilStreamDecipher(
-			new VirgilPrivateKey(wrongKeyPairId, wrongKeyPair.privateKey)
-		);
+		const cipher = new VirgilStreamCipher(keyPair.publicKey);
+		const decipher = new VirgilStreamDecipher(wrongKeyPair.privateKey);
 
 		const initialEncryptedChunk = cipher.start();
 
@@ -128,10 +102,9 @@ describe.only ('stream encryption', function () {
 	});
 
 	it ('encrypt as stream -> decrypt synchronously', async () => {
-		const keyPair = cryptoWrapper.generateKeyPair();
-		const keyPairId = Buffer.from('key_pair_id');
+		const keyPair = createVirgilKeyPair();
 
-		const cipher = new VirgilStreamCipher(new VirgilPublicKey(keyPairId, keyPair.publicKey));
+		const cipher = new VirgilStreamCipher(keyPair.publicKey);
 		const input = Buffer.alloc(1000 * 1000).fill('foo');
 		const inputChunks = splitIntoChunks(input, CHUNK_SIZE);
 
@@ -145,19 +118,18 @@ describe.only ('stream encryption', function () {
 		encryptedChunks.push(cipher.final());
 		const decryptedData = cryptoWrapper.decrypt(
 			Buffer.concat(encryptedChunks),
-			{ identifier: keyPairId, key: keyPair.privateKey }
+			{ identifier: keyPair.privateKey.identifier, key: getPrivateKeyBytes(keyPair.privateKey) }
 		);
 		assert.isTrue(decryptedData.equals(input));
 	});
 
 	it ('encrypt synchronously -> decrypt as stream', async () => {
-		const keyPair = cryptoWrapper.generateKeyPair();
-		const keyPairId = Buffer.from('key_pair_id');
+		const keyPair = createVirgilKeyPair();
 
-		const decipher = new VirgilStreamDecipher(new VirgilPrivateKey(keyPairId, keyPair.privateKey ));
+		const decipher = new VirgilStreamDecipher(keyPair.privateKey);
 
 		const input = Buffer.alloc(1000 * 1000).fill('foo');
-		const encryptedData = cryptoWrapper.encrypt(input, { identifier: keyPairId, key: keyPair.publicKey });
+		const encryptedData = cryptoWrapper.encrypt(input, keyPair.publicKey);
 		const encryptedChunks = splitIntoChunks(encryptedData, CHUNK_SIZE);
 
 		const decryptedChunks: Buffer[] = [];

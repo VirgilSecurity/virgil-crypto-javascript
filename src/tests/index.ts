@@ -13,5 +13,7 @@ import './signVerify.test';
 import './detachedEncryption.test';
 import './streams/VirgilStreamCipher.test';
 import './streams/VirgilStreamDecipher.test';
+import './streams/VirgilStreamSigner.test';
+import './streams/VirgilStreamVerifier.test';
 import './streams/streamEncryption.test';
 import './streams/streamSigning.test';

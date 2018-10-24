@@ -1,6 +1,7 @@
 import { cryptoWrapper } from '../../virgilCryptoWrapper';
 import { VirgilStreamDecipher } from '../../streams/VirgilStreamDecipher';
 import { VirgilPrivateKey } from '../../VirgilPrivateKey';
+import { createVirgilKeyPair } from './utils';
 
 describe ('VirgilStreamDecipher', () => {
 	describe('constructor', () => {
@@ -18,14 +19,9 @@ describe ('VirgilStreamDecipher', () => {
 		let ciphertext: Buffer;
 
 		beforeEach(() => {
-			const keyPair = cryptoWrapper.generateKeyPair();
-			const keyPairId = Buffer.from('key_pair_id');
-
-			streamDecipher = new VirgilStreamDecipher(
-				new VirgilPrivateKey(keyPairId, keyPair.privateKey)
-			);
-
-			ciphertext = cryptoWrapper.encrypt(Buffer.from('test'), { identifier: keyPairId, key: keyPair.publicKey });
+			const keyPair = createVirgilKeyPair();
+			streamDecipher = new VirgilStreamDecipher(keyPair.privateKey);
+			ciphertext = cryptoWrapper.encrypt(Buffer.from('test'), keyPair.publicKey);
 		});
 
 		it ('update cannot be called after final', () => {
@@ -51,15 +47,11 @@ describe ('VirgilStreamDecipher', () => {
 		describe('behavior in browser', () => {
 			let streamDecipher: VirgilStreamDecipher;
 			let ciphertext: Buffer;
+
 			beforeEach(() => {
-				const keyPair = cryptoWrapper.generateKeyPair();
-				const keyPairId = Buffer.from('key_pair_id');
-
-				streamDecipher = new VirgilStreamDecipher(
-					new VirgilPrivateKey(keyPairId, keyPair.privateKey)
-				);
-
-				ciphertext = cryptoWrapper.encrypt(Buffer.from('test'), { identifier: keyPairId, key: keyPair.publicKey });
+				const keyPair = createVirgilKeyPair();
+				streamDecipher = new VirgilStreamDecipher(keyPair.privateKey);
+				ciphertext = cryptoWrapper.encrypt(Buffer.from('test'), keyPair.publicKey);
 			});
 
 			it ('update throws if already disposed', () => {

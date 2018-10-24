@@ -1,30 +1,20 @@
-import { Transform } from 'stream';
 import { WrappedVirgilSeqSigner } from '../common';
 import { cryptoWrapper } from '../virgilCryptoWrapper';
 
-export class VirgilStreamSignerBase extends Transform {
-
+export class VirgilStreamSignerBase {
 	// tslint:disable-next-line:variable-name
 	private _isDisposed: boolean = false;
 	protected seqSigner: WrappedVirgilSeqSigner
 
 	constructor() {
-		super();
 		this.seqSigner = cryptoWrapper.createVirgilSeqSigner();
 	}
 
-	// tslint:disable-next-line:function-name
-	_transform(chunk: Buffer, encoding: string, callback: Function) {
-		this.seqSigner.updateSafe(chunk);
-		callback(null, chunk);
-	}
-
-	// tslint:disable-next-line:function-name
-	_destroy () {
-		this.dispose();
-	}
-
 	update(data: Buffer) {
+		if (this.isDisposed()) {
+			throw new Error('Illegal state. Cannot use signer after the `dispose` method has been called.');
+		}
+
 		this.seqSigner.updateSafe(data);
 		return this;
 	}

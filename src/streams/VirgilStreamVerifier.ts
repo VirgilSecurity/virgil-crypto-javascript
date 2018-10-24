@@ -7,14 +7,15 @@ import { VirgilStreamSignerBase } from './VirgilStreamSignerBase';
 export class VirgilStreamVerifier extends VirgilStreamSignerBase {
 
 	constructor(signature: Data, encoding: StringEncoding = 'base64') {
+		const signatureBuf = anyToBuffer(signature, encoding, 'signature');
 		super();
-		this.seqSigner.startVerifyingSafe(anyToBuffer(signature, encoding));
+		this.seqSigner.startVerifyingSafe(signatureBuf);
 	}
 
 	verify(publicKey: VirgilPublicKey, final: boolean = true) {
 		if (this.isDisposed()) {
 			throw new Error(
-				'The VirgilStreamVerifier has been disposed. ' +
+				'Illegal state. The VirgilStreamVerifier has been disposed. ' +
 				'Pass `false` as the second argument to the `verify` method ' +
 				'if you need to verify with more than one public key.'
 			);

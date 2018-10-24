@@ -1,6 +1,6 @@
-import { cryptoWrapper } from '../../virgilCryptoWrapper';
 import { VirgilStreamCipher } from '../../streams/VirgilStreamCipher';
 import { VirgilPublicKey } from '../../VirgilPublicKey';
+import { createVirgilKeyPair } from './utils';
 
 describe ('VirgilStreamCipher', () => {
 	describe ('constructor', () => {
@@ -17,12 +17,8 @@ describe ('VirgilStreamCipher', () => {
 		let streamCipher: VirgilStreamCipher;
 
 		beforeEach(() => {
-			const keyPair = cryptoWrapper.generateKeyPair();
-			const keyPairId = Buffer.from('key_pair_id');
-
-			streamCipher = new VirgilStreamCipher(
-				new VirgilPublicKey(keyPairId, keyPair.publicKey)
-			);
+			const keyPair = createVirgilKeyPair();
+			streamCipher = new VirgilStreamCipher(keyPair.publicKey);
 		});
 
 		it ('update cannot be called before start', () => {
@@ -72,12 +68,8 @@ describe ('VirgilStreamCipher', () => {
 		describe('behavior in browser', () => {
 			let streamCipher: VirgilStreamCipher;
 			beforeEach(() => {
-				const keyPair = cryptoWrapper.generateKeyPair();
-				const keyPairId = Buffer.from('key_pair_id');
-
-				streamCipher = new VirgilStreamCipher(
-					new VirgilPublicKey(keyPairId, keyPair.publicKey)
-				);
+				const keyPair = createVirgilKeyPair();
+				streamCipher = new VirgilStreamCipher(keyPair.publicKey);
 			});
 
 			it ('start throws if already disposed', () => {

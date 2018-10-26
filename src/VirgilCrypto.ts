@@ -1,7 +1,7 @@
 import { KeyPair, KeyPairType, HashAlgorithm } from './common';
 import { toArray } from './utils/toArray';
 import { Data } from './interfaces';
-import { anyToBuffer } from './utils/anyToBuffer';
+import { anyToBuffer, StringEncoding } from './utils/anyToBuffer';
 import { cryptoWrapper } from './virgilCryptoWrapper';
 import { VirgilPublicKey } from './VirgilPublicKey';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
@@ -486,7 +486,7 @@ export class VirgilCrypto {
 		return new VirgilStreamSigner();
 	}
 
-	createStreamVerifier (signature: Buffer) {
+	createStreamVerifier (signature: Data, encoding: StringEncoding) {
 		return new VirgilStreamVerifier(signature);
 	}
 

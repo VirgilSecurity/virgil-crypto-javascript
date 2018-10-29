@@ -474,20 +474,44 @@ export class VirgilCrypto {
 		);
 	}
 
+	/**
+	 * Creates an instance of {@link VirgilStreamCipher} to be used
+	 * to encrypt data in chunks using the given `publicKey`.
+	 * @param {VirgilPublicKey|VirgilPublicKey[]} publicKey - A signle
+	 * public key or an array of public keys to encrypt the data with.
+	 */
 	createStreamCipher (publicKey: VirgilPublicKey|VirgilPublicKey[]) {
 		return new VirgilStreamCipher(publicKey);
 	}
 
+	/**
+	 * Creates an instance of {@link VirgilStreamDecipher} to be used
+	 * to decrypt data in chunks using the given `privateKey`.
+	 * @param {VirgilPrivateKey} privateKey - The private key to decrypt
+	 * the data with.
+	 */
 	createStreamDecipher (privateKey: VirgilPrivateKey){
 		return new VirgilStreamDecipher(privateKey);
 	}
 
+	/**
+	 * Creates an instance of {@link VirgilStreamSigner} to be used
+	 * to calculate signature of data in chunks.
+	 */
 	createStreamSigner () {
 		return new VirgilStreamSigner();
 	}
 
+	/**
+	 * Creates an instance of {@link VirgilStreamVerifier} to be used
+	 * to verify the `signature` for the data in comming in chunks.
+	 *
+	 * @param {Data} signature - The signature to be verified.
+	 * @param {StringEncoding} encoding - If `signature` is a string,
+	 * specifies its encoding, otherwise is ignored. Default is 'utf8'.
+	 */
 	createStreamVerifier (signature: Data, encoding: StringEncoding) {
-		return new VirgilStreamVerifier(signature);
+		return new VirgilStreamVerifier(signature, encoding);
 	}
 
 	/**

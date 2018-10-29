@@ -15,10 +15,17 @@
 				display: block;
 				margin: 40px auto;
 			}
+			li {
+				margin-bottom: .5em;
+			}
+			button {
+				margin-left: 1em;
+			}
 		</style>
 	</head>
 
 	<body>
+		<ul id="output"></ul>
 		<input type="file" id="image-input" name="image" accept="image/*" />
 		<img id="img" />
 	<script>
@@ -26,9 +33,93 @@
 		const virgilCrypto = new VirgilCrypto();
 		const keypair = getOrCreateKeyPair();
 
+		document.getElementById('image-input').addEventListener('change', encryptAndUpload);
+
+		function encryptAndUpload() {
+			const file = this.files[0];
+			if (!file) {
+				return;
+			}
+
+			const reader = new FileReader();
+			// Using 64kB chunk size here, but can be arbitrary size up to 1MB
+			const chunkSize = 64 * 1024;
+			const fileSize = file.size;
+			let offset = 0;
+			let endOffset = Math.min(offset + chunkSize, fileSize);
+
+			const streamCipher = virgilCrypto.createStreamCipher(keypair.publicKey);
+			const encryptedChunks = [];
+			encryptedChunks.push(streamCipher.start());
+
+			reader.onload = () => {
+				if (reader.result === null || offset === fileSize) {
+					console.log('Finished encryption');
+					encryptedChunks.push(streamCipher.final(reader.result));
+					uploadEncryptedFile(new File(encryptedChunks, file.name, { type: file.type }));
+				} else {
+					console.log(`Encrypting ${endOffset - offset} byte chunk`);
+					encryptedChunks.push(streamCipher.update(reader.result));
+
+					offset = endOffset;
+					endOffset = Math.min(offset + chunkSize, fileSize);
+					reader.readAsArrayBuffer(file.slice(offset, endOffset));
+				}
+			};
+
+			reader.onerror = () => {
+				console.log('FileReader error:', reader.error);
+			};
+
+			reader.readAsArrayBuffer(file.slice(offset, endOffset));
+		}
+
+		function downloadAndDecrypt(fileDescriptor) {
+			fetch('/uploads/' + fileDescriptor.filename)
+			.then(response => {
+				if (!response.ok) {
+					console.error(`Server returned: ${response.status}:${response.statusText}`);
+					return;
+				}
+
+				response.blob().then(blob => {
+					const streamDecipher = virgilCrypto.createStreamDecipher(keypair.privateKey);
+					const decryptedChunks = [];
+
+					const reader = new FileReader();
+					// Using 64kB chunk size here, but can be arbitrary size up to 1MB
+					const chunkSize = 64 * 1024;
+					const fileSize = blob.size;
+					let offset = 0;
+					let endOffset = Math.min(offset + chunkSize, fileSize);
+
+					reader.onload = () => {
+						if (reader.result === null || offset === fileSize) {
+							console.log('Finished decryption');
+							decryptedChunks.push(streamDecipher.final(reader.result));
+							renderDecryptedFile(new File(decryptedChunks, fileDescriptor.name, { type: fileDescriptor.type }));
+						} else {
+							console.log(`Decrypting ${endOffset - offset} byte chunk`);
+							decryptedChunks.push(streamDecipher.update(reader.result));
+
+							offset = endOffset;
+							endOffset = Math.min(offset + chunkSize, fileSize);
+							reader.readAsArrayBuffer(blob.slice(offset, endOffset));
+						}
+					};
+
+					reader.onerror = () => {
+						console.log('FileReader error:', reader.error);
+					};
+
+					reader.readAsArrayBuffer(blob.slice(offset, endOffset));
+				});
+			});
+		}
+
 		function getOrCreateKeyPair() {
 			if (localStorage.getItem('my_private_key')) {
-				console.log('Loading keypair from stroage');
+				console.log('Loading keypair from local stroage');
 				const privateKey = virgilCrypto.importPrivateKey(localStorage.getItem('my_private_key'));
 				const publicKey = virgilCrypto.extractPublicKey(privateKey);
 				return { privateKey, publicKey };
@@ -43,87 +134,36 @@
 			return keypair;
 		}
 
-		function encryptAndUpload() {
-			const file = this.files[0];
-			const res = new Response(file);
-			const reader = res.body.getReader();
+		function uploadEncryptedFile(encryptedFile) {
+			const formData = new FormData();
+			formData.append('image', encryptedFile);
 
-			const streamCipher = virgilCrypto.createStreamCipher(keypair.publicKey);
-
-			const encryptedChunks = [];
-			encryptedChunks.push(streamCipher.start());
-
-			next().then(() => {
-				const encryptedFile = new File(encryptedChunks, file.name, { type: file.type });
-				const formData = new FormData();
-
-				formData.append('image', encryptedFile);
-
-				fetch('/uploads', {
-					method: 'POST',
-					body: formData
-				})
-				.then(res => {
-					if (res.ok) {
-						return res.json();
-					}
-
-					throw new Error(`${res.status} - ${res.statusText}`);
-				})
-				.then(file => downloadAndDecrypt(file))
-				.catch(err => console.log(err));
-			});
-
-			function next() {
-				return reader.read().then(({ done, value }) => {
-					if (done) {
-						console.log('Finished encryption');
-						encryptedChunks.push(streamCipher.final());
-						return;
-					}
-
-					console.log(`Encrypting ${value.length} byte chunk`);
-					encryptedChunks.push(streamCipher.update(value.buffer));
-					return next();
-				});
-			}
-		}
-
-		function downloadAndDecrypt(fileDescriptor) {
-			fetch('/uploads/' + fileDescriptor.filename)
+			fetch('/uploads', { method: 'POST', body: formData })
 			.then(response => {
-				if (!response.ok) {
-					console.error(`Server returned: ${response.status}:${response.statusText}`);
-					return;
-				}
+				if (response.ok) return response.json();
 
-				const reader = response.body.getReader();
-				const streamDecipher = virgilCrypto.createStreamDecipher(keypair.privateKey);
-				const decryptedChunks = [];
-
-				next().then(() => {
-					const decryptedFile = new File(decryptedChunks, fileDescriptor.originalname, { type: fileDescriptor.mimetype });
-					document.getElementById('img').src = URL.createObjectURL(decryptedFile);
-				});
-
-				function next() {
-					return reader.read().then(({ done, value }) => {
-						if (done) {
-							console.log('Finished decryption');
-							decryptedChunks.push(streamDecipher.final());
-							return;
-						}
-
-						console.log(`Decrypting ${value.length} byte chunk`);
-						decryptedChunks.push(streamDecipher.update(value.buffer));
-						return next();
-					});
-				}
-			});
+				throw new Error(`${response.status} - ${response.statusText}`);
+			})
+			.then(renderUploadResult)
+			.catch(err => console.log(err));
 		}
 
-		document.getElementById('image-input').addEventListener('change', encryptAndUpload);
+		function renderUploadResult(fileDescriptor) {
+			const textEl = document.createTextNode(fileDescriptor.originalname);
+			const downloadBtn = document.createElement('button');
+			downloadBtn.textContent = 'Download & Display';
+			downloadBtn.addEventListener('click', () => downloadAndDecrypt(fileDescriptor));
+
+			const itemEl = document.createElement('li');
+			itemEl.appendChild(textEl);
+			itemEl.appendChild(downloadBtn);
+
+			document.getElementById('output').appendChild(itemEl);
+		}
+
+		function renderDecryptedFile(decryptedFile) {
+			document.getElementById('img').src = URL.createObjectURL(decryptedFile);
+		}
 	</script>
 	</body>
-
 </html>

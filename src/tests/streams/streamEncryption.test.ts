@@ -7,7 +7,7 @@ import { getPrivateKeyBytes } from '../../privateKeyUtils';
 const CHUNK_SIZE = 65536;
 
 describe ('stream encryption', function () {
-	this.timeout(20 * 1000);
+	this.timeout(30 * 1000);
 
 	it ('encrypts data', async () => {
 		const keyPair = createVirgilKeyPair();

@@ -8,7 +8,7 @@ import { createAsyncIterable, splitIntoChunks, createVirgilKeyPair } from './uti
 const CHUNK_SIZE = 65536;
 
 describe ('stream signing', function () {
-	this.timeout(10 * 1000);
+	this.timeout(30 * 1000);
 
 	describe ('signature calculation', () => {
 

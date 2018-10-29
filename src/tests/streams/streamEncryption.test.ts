@@ -45,7 +45,8 @@ describe ('stream encryption', function () {
 			decryptedChunks.push(streamDecipher.update(encryptedChunk));
 		}
 
-		decryptedChunks.push(streamDecipher.final(streamCipher.final())!);
+		decryptedChunks.push(streamDecipher.update(streamCipher.final()));
+		decryptedChunks.push(streamDecipher.final());
 		assert.isTrue(Buffer.concat(decryptedChunks).equals(input));
 	});
 
@@ -80,8 +81,12 @@ describe ('stream encryption', function () {
 		}
 
 		const finalEncryptedChunk = cipher.final();
-		decryptedChunks1.push(decipher1.final(finalEncryptedChunk));
-		decryptedChunks2.push(decipher2.final(finalEncryptedChunk));
+
+		decryptedChunks1.push(decipher1.update(finalEncryptedChunk));
+		decryptedChunks1.push(decipher1.final());
+
+		decryptedChunks2.push(decipher2.update(finalEncryptedChunk));
+		decryptedChunks2.push(decipher2.final());
 
 		assert.isTrue(Buffer.concat(decryptedChunks1).equals(input));
 		assert.isTrue(Buffer.concat(decryptedChunks2).equals(input));

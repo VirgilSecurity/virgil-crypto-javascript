@@ -53,16 +53,18 @@
 			encryptedChunks.push(streamCipher.start());
 
 			reader.onload = () => {
-				if (reader.result === null || offset === fileSize) {
-					console.log('Finished encryption');
-					encryptedChunks.push(streamCipher.final(reader.result));
+				console.log(`Encrypting ${endOffset - offset} byte chunk`);
+				encryptedChunks.push(streamCipher.update(reader.result));
+
+				offset = endOffset;
+				endOffset = Math.min(offset + chunkSize, fileSize);
+
+				if (offset === fileSize) {
+					// done
+					encryptedChunks.push(streamCipher.final());
 					uploadEncryptedFile(new File(encryptedChunks, file.name, { type: file.type }));
 				} else {
-					console.log(`Encrypting ${endOffset - offset} byte chunk`);
-					encryptedChunks.push(streamCipher.update(reader.result));
-
-					offset = endOffset;
-					endOffset = Math.min(offset + chunkSize, fileSize);
+					// read next chunk
 					reader.readAsArrayBuffer(file.slice(offset, endOffset));
 				}
 			};
@@ -94,16 +96,18 @@
 					let endOffset = Math.min(offset + chunkSize, fileSize);
 
 					reader.onload = () => {
-						if (reader.result === null || offset === fileSize) {
-							console.log('Finished decryption');
-							decryptedChunks.push(streamDecipher.final(reader.result));
+						console.log(`Decrypting ${endOffset - offset} byte chunk`);
+						decryptedChunks.push(streamDecipher.update(reader.result));
+
+						offset = endOffset;
+						endOffset = Math.min(offset + chunkSize, fileSize);
+
+						if (offset === fileSize) {
+							// done
+							decryptedChunks.push(streamDecipher.final());
 							renderDecryptedFile(new File(decryptedChunks, fileDescriptor.name, { type: fileDescriptor.type }));
 						} else {
-							console.log(`Decrypting ${endOffset - offset} byte chunk`);
-							decryptedChunks.push(streamDecipher.update(reader.result));
-
-							offset = endOffset;
-							endOffset = Math.min(offset + chunkSize, fileSize);
+							// read next chunk
 							reader.readAsArrayBuffer(blob.slice(offset, endOffset));
 						}
 					};

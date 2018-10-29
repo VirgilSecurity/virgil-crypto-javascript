@@ -6,9 +6,11 @@ Uses the `VirgilCrypto#createStreamCipher` and `VirgilCrypto#createStreamDeciphe
 
 Move to the `examples/file-upload` folder, install dependencies and start the server
 
+> The `--no-package-lock` flag is needed because the virgil-crypto module is installed from file system and it may fail to install from package-lock.json
+
 ```sh
 cd examples/file-upload
-npm install
+npm install --no-package-lock
 npm start
 ```
 

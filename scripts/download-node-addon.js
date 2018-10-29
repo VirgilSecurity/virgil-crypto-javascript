@@ -7,12 +7,14 @@ const downloadVerifyExtract = require('./helpers/downloadVerifyExtract');
 
 const destFileName = path.resolve(__dirname + '/../virgil_crypto_node.node');
 
+const isWindows = process.platform === 'win32';
+
 const ModuleVersionToNodeVersion = {
-	'64': '10.1.0',
-	'59': '9.11.1',
-	'57': '8.11.2',
+	'64': isWindows ? '10.4.1' : '10.1.0',
+	'59': isWindows ? '9.11.2' : '9.11.1',
+	'57': isWindows ? '8.11.3' : '8.11.2',
 	'51': '7.10.1',
-	'48': '6.14.2',
+	'48': isWindows ? '6.14.3' : '6.14.2',
 	'46': '4.9.1'
 };
 
@@ -44,7 +46,7 @@ function getCdnLink(libVersion) {
 		nodeVersion,
 		platform,
 		arch,
-		process.platform === 'win32' ? 'zip' : 'tgz'
+		isWindows ? 'zip' : 'tgz'
 	);
 }
 
@@ -53,7 +55,7 @@ function getPlatform () {
 		return 'darwin-17.5';
 	}
 
-	if (process.platform === 'win32') {
+	if (isWindows) {
 		return 'windows-6.3';
 	}
 
@@ -61,11 +63,11 @@ function getPlatform () {
 }
 
 function getArch () {
-	if (process.arch === 'x64' && process.platform !== 'win32') {
+	if (process.arch === 'x64' && !isWindows) {
 		return 'x86_64';
 	}
 
-	if (process.arch === 'ia32' && process.platform === 'win32') {
+	if (process.arch === 'ia32' && isWindows) {
 		return 'x86';
 	}
 

@@ -8,18 +8,6 @@ const globalScript = require('./rollup-plugin-global-script');
 const resolveCryptoLib = require('./rollup-plugin-resolve-crypto-lib');
 const bundleTypes = require('./bundle-types');
 
-const BROWSER_ONLY_PLUGINS = [
-	inject({
-		include: '**/*.ts',
-		exclude: 'node_modules/**',
-		modules: {
-			Buffer: [ 'buffer-es6', 'Buffer' ]
-		}
-	}),
-
-	globals()
-];
-
 function getRollupPlugins(bundleType) {
 	const isBrowser = bundleType !== bundleTypes.NODE;
 	const isProd = bundleType === bundleTypes.BROWSER_PROD;
@@ -33,26 +21,26 @@ function getRollupPlugins(bundleType) {
 
 		resolve({
 			browser: isBrowser,
-			jsnext: true,
 			extensions: [ '.ts', '.js' ],
-			include: [ 'src/**' ],
-			preferBuiltins: !isBrowser
 		}),
 
 		typescript({
 			useTsconfigDeclarationDir: true,
-			tsconfigOverride: {
-				compilerOptions: {
-					module: 'es2015'
-				}
-			}
+			typescript: require('typescript')
 		}),
 
 		replace({ 'process.browser': JSON.stringify(isBrowser) }),
 
-		...(isBrowser ? BROWSER_ONLY_PLUGINS : []),
+		isBrowser && globals(),
+		isBrowser && inject({
+			include: '**/*.ts',
+			exclude: 'node_modules/**',
+			modules: {
+				Buffer: [ 'buffer-es6', 'Buffer' ]
+			}
+		}),
 
-		...(isProd ? [ uglify() ] : [])
+		isProd && uglify()
 	];
 }
 

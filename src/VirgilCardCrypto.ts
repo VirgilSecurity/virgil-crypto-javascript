@@ -1,6 +1,8 @@
 import { HashAlgorithm } from './common';
 import { IPrivateKey, IPublicKey } from './interfaces';
-import { VirgilCrypto, VirgilPrivateKey, VirgilPublicKey } from './VirgilCrypto';
+import { VirgilCrypto } from './VirgilCrypto';
+import { VirgilPrivateKey } from './VirgilPrivateKey';
+import { VirgilPublicKey } from './VirgilPublicKey';
 
 /**
  * Class implementing  cryptographic operations required to create and

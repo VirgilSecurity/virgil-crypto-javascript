@@ -1,5 +1,5 @@
 import { VirgilCrypto, HashAlgorithm } from '../index';
-import { VirgilPublicKey } from '../VirgilCrypto';
+import { VirgilPublicKey } from '../VirgilPublicKey';
 
 // private key with password = "1234"
 const PRIVATE_KEY_1234 = 'LS0tLS1CRUdJTiBFTkNSWVBURUQgUFJJVkFURSBLRVktLS' +

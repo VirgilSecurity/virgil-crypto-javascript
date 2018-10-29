@@ -52,7 +52,7 @@ function getCdnLink(libVersion) {
 
 function getPlatform () {
 	if (process.platform === 'darwin') {
-		return 'darwin-17.5';
+		return 'darwin-18.0';
 	}
 
 	if (isWindows) {

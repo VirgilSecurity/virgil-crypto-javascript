@@ -91,6 +91,9 @@ const decryptedData = virgilCrypto.decrypt(encryptedData, encryptionKeypair.priv
 const decryptedMessage = decryptedData.toString('utf8');
 ```
 
+#### File encryption
+See examples for [browser](./examples/file-upload) and [node.js](./examples/streams).
+
 Need more examples? Visit our [developer documentation](https://developer.virgilsecurity.com/docs/how-to#cryptography).
   
 ## Installation

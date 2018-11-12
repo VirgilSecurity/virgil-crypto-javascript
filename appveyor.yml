@@ -1,12 +1,15 @@
 environment:
   matrix:
-    - nodejs_version: "8.0"
-    - nodejs_version: "10.0"
+    - nodejs_version: "8"
+    - nodejs_version: "10"
+
+cache:
+ - "%LOCALAPPDATA%\\Yarn"
 
 # Install scripts. (runs after repo cloning)
 install:
   # Get the latest stable version of Node.js
-  - ps: Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version)
+  - ps: Install-Product node $env:nodejs_version
   # install modules
   - yarn install
 
@@ -14,7 +17,6 @@ install:
 test_script:
   # Output useful info for debugging.
   - node --version
-  - npm --version
   # run tests
   - yarn run test:node
 

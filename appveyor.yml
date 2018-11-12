@@ -1,0 +1,22 @@
+environment:
+  matrix:
+    - nodejs_version: "8.0"
+    - nodejs_version: "10.0"
+
+# Install scripts. (runs after repo cloning)
+install:
+  # Get the latest stable version of Node.js
+  - ps: Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version)
+  # install modules
+  - yarn install
+
+# Post-install test scripts.
+test_script:
+  # Output useful info for debugging.
+  - node --version
+  - npm --version
+  # run tests
+  - yarn run test:node
+
+# Don't actually build.
+build: off

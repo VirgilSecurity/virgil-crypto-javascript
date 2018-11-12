@@ -1,16 +1,18 @@
 language: node_js
 matrix:
   include:
-    - os: windows
-      node_js: "10"
-      env:
-        - TEST_BROWSER=false
-        - BUILD_DOCS=false
+    - os: osx
+      node_js: "8"
     - os: osx
       node_js: "10"
-      env:
-        - TEST_BROWSER=false
-        - BUILD_DOCS=false
+    - os: osx
+      node_js: "11"
+    - os: linux
+      dist: trusty
+      node_js: "8"
+    - os: linux
+      dist: trusty
+      node_js: "11"
     - os: linux
       dist: trusty
       sudo: required
@@ -20,15 +22,6 @@ matrix:
       env:
         - TEST_BROWSER=true
         - BUILD_DOCS=true
-    - os: linux
-      dist: trusty
-      sudo: required
-      node_js:
-        - "8"
-        - "11"
-      env:
-        - TEST_BROWSER=false
-        - BUILD_DOCS=false
 cache:
   yarn: true
   directories:
@@ -38,3 +31,13 @@ install:
 script:
   - if [[ "$TEST_BROWSER" = true ]]; then yarn test; else yarn run test:node; fi
   - if [[ "$BUILD_DOCS" = true ]]; then yarn run docs; fi
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  keep-history: true
+  local-dir: docs
+  on: # deploy only tagged build on Linux and Node.js 10
+    tags: true
+    node: '10'
+    condition: $TRAVIS_OS_NAME = linux

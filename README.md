@@ -1,6 +1,7 @@
 # Virgil Security JavaScript Crypto Library 
 
 [![Build Status](https://travis-ci.org/VirgilSecurity/virgil-crypto-javascript.svg)](https://travis-ci.org/VirgilSecurity/virgil-crypto-javascript) 
+[![Build status](https://ci.appveyor.com/api/projects/status/7f65gm604d8sf6sm/branch/master?svg=true)](https://ci.appveyor.com/project/vadimavdeev/virgil-crypto-javascript/branch/master)
 [![npm](https://img.shields.io/npm/v/virgil-crypto.svg)](https://www.npmjs.com/package/virgil-crypto)
 [![GitHub license](https://img.shields.io/badge/license-BSD%203--Clause-blue.svg)](https://github.com/VirgilSecurity/virgil/blob/master/LICENSE)
 
@@ -131,6 +132,8 @@ If you only intend to use virgil-crypto in a browser environment, you can ignore
 ## Pythia
 
 Support for [Pythia](https://virgilsecurity.com/wp-content/uploads/2018/05/Pythia-Service-by-Virgil-Security-Whitepaper-May-2018.pdf) algorithms is considered experimental.
+
+> **Important!** Pythia algorithms implementation is not available in Node.js on Windows. An error will be thrown if you try to invoke the `VirgilCryptoPythia` constructor in Node.js on Windows.
 
 ### Usage
 

@@ -10,25 +10,18 @@ const PYTHIA_SECRET = Buffer.from(data.kPythiaSecret);
 const NEW_PYTHIA_SECRET = Buffer.from(data.kNewPythiaSecret);
 const PYTHIA_SCOPE_SECRET = Buffer.from(data.kPythiaScopeSecret);
 
-const pythiaCrypto = new VirgilPythiaCrypto();
-
-function blindEvalDeblind() {
-	const { blindingSecret, blindedPassword } = pythiaCrypto.blind(PASSWORD);
-	const transformationKeyPair = pythiaCrypto.computeTransformationKeyPair({
-		transformationKeyId: TRANSFORMATION_KEY_ID,
-		pythiaSecret: PYTHIA_SECRET,
-		pythiaScopeSecret: PYTHIA_SCOPE_SECRET
-	});
-	const { transformedPassword } = pythiaCrypto.transform({
-		blindedPassword,
-		tweak: TWEAK,
-		transformationPrivateKey: transformationKeyPair.privateKey
-	});
-	return pythiaCrypto.deblind({ transformedPassword, blindingSecret });
-}
-
 describe('Pythia Crypto', function () {
 	this.timeout(10000);
+	let pythiaCrypto: VirgilPythiaCrypto;
+
+	beforeEach(function() {
+		try {
+			pythiaCrypto = new VirgilPythiaCrypto();
+		} catch(_) {
+			// VirgilPythia is not available on the current platform
+			this.skip();
+		}
+	});
 
 	describe('Deterministic Key Generation', () => {
 		it ('computes the transformation key pair deterministically', () => {
@@ -47,8 +40,8 @@ describe('Pythia Crypto', function () {
 		it ('produces the same result for multiple iterations', () => {
 			const iterationsCount = 10;
 
-			for (let i = 0; i < iterationsCount; i++) {
-				let deblindedPassword = blindEvalDeblind();
+			for (let i = 0; i < iterationsCount; i += 1) {
+				const deblindedPassword = blindEvalDeblind(pythiaCrypto);
 				assert.isTrue(
 					deblindedPassword.equals(DEBLINDED_PASSWORD),
 					'deblined password is equal to pre-computed'
@@ -84,10 +77,10 @@ describe('Pythia Crypto', function () {
 			const verified = pythiaCrypto.verify({
 				transformedPassword,
 				blindedPassword,
-				tweak: TWEAK,
-				transformationPublicKey: transformationKeyPair.publicKey,
 				proofValueC,
-				proofValueU
+				proofValueU,
+				tweak: TWEAK,
+				transformationPublicKey: transformationKeyPair.publicKey
 			});
 
 			assert.equal(verified, true, 'password is verified');
@@ -153,3 +146,18 @@ describe('Pythia Crypto', function () {
 		});
 	});
 });
+
+function blindEvalDeblind(pythiaCrypto: VirgilPythiaCrypto) {
+	const { blindingSecret, blindedPassword } = pythiaCrypto.blind(PASSWORD);
+	const transformationKeyPair = pythiaCrypto.computeTransformationKeyPair({
+		transformationKeyId: TRANSFORMATION_KEY_ID,
+		pythiaSecret: PYTHIA_SECRET,
+		pythiaScopeSecret: PYTHIA_SCOPE_SECRET
+	});
+	const { transformedPassword } = pythiaCrypto.transform({
+		blindedPassword,
+		tweak: TWEAK,
+		transformationPrivateKey: transformationKeyPair.privateKey
+	});
+	return pythiaCrypto.deblind({ transformedPassword, blindingSecret });
+}

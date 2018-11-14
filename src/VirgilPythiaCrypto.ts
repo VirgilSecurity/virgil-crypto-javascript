@@ -214,6 +214,14 @@ export interface PythiaUpdateDeblindedWithTokenParams {
  * Class containing Pythia-related cryptographic operations.
  */
 export class VirgilPythiaCrypto {
+	constructor() {
+		if (pythiaWrapper === null) {
+			throw new Error(
+				'Cannot create an insance of `VirgilPythiaCrypto`. ' +
+				'Pythia algorithms implementation is not available on the current platform'
+			);
+		}
+	}
 
 	/**
 	 * Blinds (i.e. obfuscates) the password.
@@ -227,7 +235,7 @@ export class VirgilPythiaCrypto {
 	 */
 	blind (password: Data): PythiaBlindResult {
 		const passwordBuf = anyToBuffer(password, 'utf8', 'password');
-		return pythiaWrapper.blind(passwordBuf);
+		return pythiaWrapper!.blind(passwordBuf);
 	}
 
 	/**
@@ -247,7 +255,7 @@ export class VirgilPythiaCrypto {
 			params.blindingSecret, 'base64', 'params.blindingSecret'
 		);
 
-		return pythiaWrapper.deblind(transformedPassword, blindingSecret);
+		return pythiaWrapper!.deblind(transformedPassword, blindingSecret);
 	}
 
 	/**
@@ -267,7 +275,7 @@ export class VirgilPythiaCrypto {
 		const pythiaScopeSecret = anyToBuffer(
 			params.pythiaScopeSecret, 'base64', 'params.pythiaScopeSecret'
 		);
-		return pythiaWrapper.computeTransformationKeyPair(
+		return pythiaWrapper!.computeTransformationKeyPair(
 			transformationKeyId, pythiaSecret, pythiaScopeSecret
 		);
 	}
@@ -286,7 +294,7 @@ export class VirgilPythiaCrypto {
 		const transformationPrivateKey = anyToBuffer(
 			params.transformationPrivateKey, 'base64', 'params.transformationPrivateKey'
 		);
-		return pythiaWrapper.transform(blindedPassword, tweak, transformationPrivateKey);
+		return pythiaWrapper!.transform(blindedPassword, tweak, transformationPrivateKey);
 	}
 
 	/**
@@ -319,7 +327,7 @@ export class VirgilPythiaCrypto {
 			params.transformedTweak, 'base64', 'params.transformedTweak'
 		);
 
-		return pythiaWrapper.prove(transformedPassword, blindedPassword, transformedTweak, transformationKeyPair);
+		return pythiaWrapper!.prove(transformedPassword, blindedPassword, transformedTweak, transformationKeyPair);
 	}
 
 	/**
@@ -346,7 +354,7 @@ export class VirgilPythiaCrypto {
 			params.proofValueU, 'base64', 'params.proofValueU'
 		);
 
-		return pythiaWrapper.verify(
+		return pythiaWrapper!.verify(
 			transformedPassword,
 			blindedPassword,
 			tweak,
@@ -375,7 +383,7 @@ export class VirgilPythiaCrypto {
 		const newTransformationPrivateKey = anyToBuffer(
 			params.newTransformationPrivateKey, 'base64', 'params.newTransformationPrivateKey'
 		);
-		return pythiaWrapper.getPasswordUpdateToken(oldTransformationPrivateKey, newTransformationPrivateKey);
+		return pythiaWrapper!.getPasswordUpdateToken(oldTransformationPrivateKey, newTransformationPrivateKey);
 	}
 
 	/**
@@ -392,6 +400,6 @@ export class VirgilPythiaCrypto {
 			params.updateToken, 'base64', 'params.updateToken'
 		);
 
-		return pythiaWrapper.updateDeblindedWithToken(deblindedPassword, updateToken);
+		return pythiaWrapper!.updateDeblindedWithToken(deblindedPassword, updateToken);
 	}
 }

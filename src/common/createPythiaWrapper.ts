@@ -8,6 +8,10 @@ import { createNativeTypeWrapper } from './createNativeTypeWrapper';
  * @param lib - Native VirgilCrypto library (browser or node.js).
  */
 export function createPythiaWrapper (lib: any) {
+	if (typeof lib.VirgilPythia !== 'function') {
+		return null;
+	}
+
 	const wrapper = createNativeTypeWrapper(lib);
 
 	wrapper.createSafeInstanceMethods(

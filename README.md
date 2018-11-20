@@ -103,7 +103,7 @@ Need more examples? Visit our [developer documentation](https://developer.virgil
 The recommended way is to install from npm:
 
 ```sh
-npm install virgil-crypto@next
+npm install virgil-crypto
 ```
 
 > **Important!** You will need Node.js version >= 4.5.0 < 5 or >= 6 to use virgil-crypto.

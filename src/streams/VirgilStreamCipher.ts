@@ -2,6 +2,8 @@ import { VirgilPublicKey } from '../VirgilPublicKey';
 import { toArray } from '../utils/toArray';
 import { validatePublicKeysArray } from '../validators';
 import { VirgilStreamCipherBase } from './VirgilStreamCipherBase';
+import { Data } from './../interfaces';
+import { DATA_SIGNATURE_KEY } from '../common/constants';
 
 /**
  * Class responsible for encryption of streams of data.
@@ -19,8 +21,9 @@ export class VirgilStreamCipher extends VirgilStreamCipherBase {
 	 * @param {VirgilPublicKey|VirgilPublicKey[]} publicKeys - A single
 	 * {@link VirgilPublicKey} or an array of {@link VirgilPublicKey}'s to
 	 * to encrypt the data with.
+	 * @param {Data} [signature] - Optionally add a signature of plain data to the of encrypted file.
 	 */
-	constructor (publicKeys: VirgilPublicKey|VirgilPublicKey[]) {
+	constructor (publicKeys: VirgilPublicKey|VirgilPublicKey[], signature?: Data) {
 		const publicKeyArr = toArray(publicKeys);
 		validatePublicKeysArray(publicKeyArr);
 
@@ -28,6 +31,12 @@ export class VirgilStreamCipher extends VirgilStreamCipherBase {
 
 		for (const { identifier, key} of publicKeyArr) {
 			this.seqCipher.addKeyRecipientSafe(identifier, key);
+		}
+
+		if (signature) {
+			const signatureKey = Buffer.from(DATA_SIGNATURE_KEY);
+			const customParams = this.seqCipher.customParams();
+			customParams.setDataSafe(signatureKey, signature);
 		}
 	}
 

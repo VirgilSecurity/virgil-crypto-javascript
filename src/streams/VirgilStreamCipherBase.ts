@@ -13,7 +13,7 @@ export class VirgilStreamCipherBase {
 	/**
 	 * Indicates whether the `final` method has been called.
 	 */
-	private isFinished: boolean = false;
+	isFinished: boolean = false;
 
 	/**
 	 * Indicates whether the `dispose` method has been called.
@@ -52,13 +52,13 @@ export class VirgilStreamCipherBase {
 	 * result in an error being thrown.
 	 * This method also automatically calls `dispose`.
 	 */
-	final () {
+	final (dispose: boolean = false) {
 		this.ensureLegalState();
 		try {
 			return this.seqCipher.finishSafe();
 		} finally {
 			this.isFinished = true;
-			this.dispose();
+			if (dispose) this.dispose();
 		}
 	}
 

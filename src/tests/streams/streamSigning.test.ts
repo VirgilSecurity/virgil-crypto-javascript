@@ -73,10 +73,8 @@ describe('stream signing', function() {
 			}
 
 			decryptedBuffer.push(streamDecipher.final(false));
-			const transferredSignature = encoding
-				? streamDecipher.getSignature(encoding)
-				: streamDecipher.getSignature();
-
+			let transferredSignature: Buffer | string = streamDecipher.getSignature()!;
+			if (encoding) transferredSignature = transferredSignature.toString(encoding);
 			streamDecipher.dispose();
 			assert.exists(transferredSignature);
 			const streamVerifier = new VirgilStreamVerifier(transferredSignature!, encoding);

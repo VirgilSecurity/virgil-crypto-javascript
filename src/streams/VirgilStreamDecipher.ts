@@ -38,9 +38,7 @@ export class VirgilStreamDecipher extends VirgilStreamCipherBase {
 	/**
 	 * Get signature from content_info if it was added on encryption phase.
 	 */
-	getSignature(): Buffer | null
-	getSignature(encoding: StringEncoding): string | null
-	getSignature(encoding?: StringEncoding | undefined): Buffer | string | null {
+	getSignature(): Buffer | null {
 		if (!this.isFinished) {
 			throw new Error('Illegal state. Cannot get signature before the `final` method has been called.');
 		}
@@ -51,7 +49,6 @@ export class VirgilStreamDecipher extends VirgilStreamCipherBase {
 		} catch (err) {
 			return null;
 		}
-		if (encoding) return signature.toString(encoding);
 		return signature;
 	}
 }

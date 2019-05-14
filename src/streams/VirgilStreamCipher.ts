@@ -21,7 +21,7 @@ export class VirgilStreamCipher extends VirgilStreamCipherBase {
 	 * @param {VirgilPublicKey|VirgilPublicKey[]} publicKeys - A single
 	 * {@link VirgilPublicKey} or an array of {@link VirgilPublicKey}'s to
 	 * to encrypt the data with.
-	 * @param {Data} [signature] - Optionally add a signature of plain data to the of encrypted file.
+	 * @param {Data} [signature] - Optionally add a signature of plain data to the encrypted stream.
 	 */
 	constructor (publicKeys: VirgilPublicKey|VirgilPublicKey[], signature?: Data) {
 		const publicKeyArr = toArray(publicKeys);

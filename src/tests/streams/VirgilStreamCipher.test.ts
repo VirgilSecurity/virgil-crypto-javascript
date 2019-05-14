@@ -11,6 +11,15 @@ describe ('VirgilStreamCipher', () => {
 				TypeError
 			);
 		});
+
+		it ('pass signature to constructor', () => {
+			const keyPair = createVirgilKeyPair();
+			const streamCipher = new VirgilStreamCipher(keyPair.publicKey, 'any');
+
+			streamCipher.start();
+			streamCipher.update('test', 'utf8');
+			streamCipher.final();
+		})
 	});
 
 	describe('prerequisites', () => {
@@ -52,6 +61,7 @@ describe ('VirgilStreamCipher', () => {
 				streamCipher.start();
 			}, 'Illegal state');
 		});
+
 
 		it ('final cannot be called after final', () => {
 			streamCipher.start();

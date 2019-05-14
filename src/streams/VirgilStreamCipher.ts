@@ -4,12 +4,12 @@ import { validatePublicKeysArray } from '../validators';
 import { VirgilStreamCipherBase } from './VirgilStreamCipherBase';
 import { Data } from './../interfaces';
 import { DATA_SIGNATURE_KEY } from '../common/constants';
+import { anyToBuffer, StringEncoding } from '../utils/anyToBuffer';
 
 /**
  * Class responsible for encryption of streams of data.
  */
 export class VirgilStreamCipher extends VirgilStreamCipherBase {
-
 	/**
 	 * Initializes a new instance of `VirgilStreamCipher`.
 	 * `VirgilStreamCipher` objects are not meant to be created with the `new`
@@ -22,21 +22,27 @@ export class VirgilStreamCipher extends VirgilStreamCipherBase {
 	 * {@link VirgilPublicKey} or an array of {@link VirgilPublicKey}'s to
 	 * to encrypt the data with.
 	 * @param {Data} [signature] - Optionally add a signature of plain data to the encrypted stream.
+	 * @param {StringEncoding} [encoding] - If `signature` is a string,
+	 * specifies its encoding, otherwise is ignored. Default is 'base64'.
 	 */
-	constructor (publicKeys: VirgilPublicKey|VirgilPublicKey[], signature?: Data) {
+	constructor(
+		publicKeys: VirgilPublicKey | VirgilPublicKey[],
+		signature?: Data,
+		encoding: StringEncoding = 'base64'
+	) {
 		const publicKeyArr = toArray(publicKeys);
 		validatePublicKeysArray(publicKeyArr);
 
 		super();
 
-		for (const { identifier, key} of publicKeyArr) {
+		for (const { identifier, key } of publicKeyArr) {
 			this.seqCipher.addKeyRecipientSafe(identifier, key);
 		}
 
 		if (signature) {
 			const signatureKey = Buffer.from(DATA_SIGNATURE_KEY);
 			const customParams = this.seqCipher.customParams();
-			customParams.setDataSafe(signatureKey, signature);
+			customParams.setDataSafe(signatureKey, anyToBuffer(signature, encoding));
 		}
 	}
 

@@ -3,6 +3,7 @@ import { VirgilPrivateKey } from '../VirgilPrivateKey';
 import { getPrivateKeyBytes } from '../privateKeyUtils';
 import { VirgilStreamCipherBase } from './VirgilStreamCipherBase';
 import { DATA_SIGNATURE_KEY } from '../common/constants';
+import { StringEncoding } from '../utils/anyToBuffer';
 
 /**
  * Class responsible for decryption of streams of data.
@@ -37,11 +38,20 @@ export class VirgilStreamDecipher extends VirgilStreamCipherBase {
 	/**
 	 * Get signature from content_info if it was added on encryption phase.
 	 */
-	getSignature(): Buffer | null {
+	getSignature(): Buffer | null
+	getSignature(encoding: StringEncoding): string | null
+	getSignature(encoding?: StringEncoding | undefined): Buffer | string | null {
 		if (!this.isFinished) {
 			throw new Error('Illegal state. Cannot get signature before the `final` method has been called.');
 		}
 		const customParams = this.seqCipher.customParams();
-		return customParams.getDataSafe(Buffer.from(DATA_SIGNATURE_KEY));
+		let signature: Buffer;
+		try {
+			signature = customParams.getDataSafe(Buffer.from(DATA_SIGNATURE_KEY));
+		} catch (err) {
+			return null;
+		}
+		if (encoding) return signature.toString(encoding);
+		return signature;
 	}
 }

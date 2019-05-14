@@ -51,8 +51,15 @@ export class VirgilStreamCipherBase {
 	 * or decrypt data, attempts to call any method including `final` will
 	 * result in an error being thrown.
 	 * This method also automatically calls `dispose`.
+	 * @param {boolean} dispose - Optional. Indicating whether to automatically
+	 * free the memory occupied by internal {@link seqSigner} object in the
+	 * browser.
+	 * Default is `true`. `false` is used to perform operations in inherited classes.
+	 *
+	 * In node.js this argument is ignored because the memory will be freed by the
+	 * garbage collector.
 	 */
-	final (dispose: boolean = false) {
+	final (dispose: boolean = true) {
 		this.ensureLegalState();
 		try {
 			return this.seqCipher.finishSafe();

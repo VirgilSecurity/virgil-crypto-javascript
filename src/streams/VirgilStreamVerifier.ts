@@ -18,7 +18,7 @@ export class VirgilStreamVerifier extends VirgilStreamSignerBase {
 	 *
 	 * @param {Data} signature = The signature to be verified.
 	 * @param {StringEncoding} [encoding] - If `signature` is a string,
-	 * specifies its encoding, otherwise is ignored. Default is 'utf8'.
+	 * specifies its encoding, otherwise is ignored. Default is 'base64'.
 	 */
 	constructor(signature: Data, encoding: StringEncoding = 'base64') {
 		const signatureBuf = anyToBuffer(signature, encoding, 'signature');

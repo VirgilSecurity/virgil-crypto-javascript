@@ -4,15 +4,17 @@ import { VirgilStreamVerifier } from '../../streams/VirgilStreamVerifier';
 import { VirgilPrivateKey } from '../../VirgilPrivateKey';
 import { VirgilPublicKey } from '../../VirgilPublicKey';
 import { createAsyncIterable, splitIntoChunks, createVirgilKeyPair } from './utils';
+import { VirgilStreamCipher } from '../../streams/VirgilStreamCipher';
+import { VirgilStreamDecipher } from '../../streams/VirgilStreamDecipher';
+import { StringEncoding } from '../../utils/anyToBuffer';
 
 const CHUNK_SIZE = 65536;
 
-describe ('stream signing', function () {
+describe('stream signing', function() {
 	this.timeout(30 * 1000);
 
-	describe ('signature calculation', () => {
-
-		it ('calulates the signature', async () => {
+	describe('signature calculation', () => {
+		it('calculates the signature', async () => {
 			const { privateKey } = createVirgilKeyPair();
 			const streamSigner = new VirgilStreamSigner();
 			const input = Buffer.alloc(3 * 1000 * 1000).fill('foo');
@@ -27,8 +29,81 @@ describe ('stream signing', function () {
 		});
 	});
 
-	describe ('signature verification', () => {
+	describe('transfer the signature', () => {
+		let publicKey: VirgilPublicKey;
+		let privateKey: VirgilPrivateKey;
+		let signature: Buffer;
+		let inputChunks: Buffer[];
 
+		beforeEach(async () => {
+			({ privateKey, publicKey } = createVirgilKeyPair());
+			const streamSigner = new VirgilStreamSigner();
+			const input = Buffer.alloc(3 * 1000).fill('foo');
+			inputChunks = splitIntoChunks(input, CHUNK_SIZE);
+
+			for await (const chunk of createAsyncIterable(inputChunks)) {
+				streamSigner.update(chunk);
+			}
+
+			signature = streamSigner.sign(privateKey);
+		});
+
+		const transferSignature = async (encoding?: StringEncoding) => {
+			assert.isTrue(Buffer.isBuffer(signature));
+
+			const streamCipher = new VirgilStreamCipher(
+				publicKey,
+				encoding ? signature.toString(encoding) : signature,
+				encoding
+			);
+			const encryptedBuffer: Buffer[] = [];
+
+			encryptedBuffer.push(streamCipher.start());
+
+			for await (const chunk of createAsyncIterable(inputChunks)) {
+				encryptedBuffer.push(streamCipher.update(chunk));
+			}
+			encryptedBuffer.push(streamCipher.final());
+
+			const streamDecipher = new VirgilStreamDecipher(privateKey);
+			const decryptedBuffer: Buffer[] = [];
+
+			for await (const chunk of createAsyncIterable(encryptedBuffer)) {
+				decryptedBuffer.push(streamDecipher.update(chunk));
+			}
+
+			decryptedBuffer.push(streamDecipher.final(false));
+			const transferredSignature = encoding
+				? streamDecipher.getSignature(encoding)
+				: streamDecipher.getSignature();
+
+			streamDecipher.dispose();
+			assert.exists(transferredSignature);
+			const streamVerifier = new VirgilStreamVerifier(transferredSignature!, encoding);
+
+			for await (const chunk of createAsyncIterable(inputChunks)) {
+				streamVerifier.update(chunk);
+			}
+
+			encoding
+				? assert.isString(transferredSignature)
+				: assert.isTrue(Buffer.isBuffer(transferredSignature));
+
+			return streamVerifier.verify(publicKey);
+		};
+
+		it('transfer base64 signature', async () => {
+			const isVerified = await transferSignature('base64');
+			assert.isTrue(isVerified);
+		});
+
+		it('transfer buffer signature', async () => {
+			const isVerified = await transferSignature();
+			assert.isTrue(isVerified);
+		});
+	});
+
+	describe('signature verification', () => {
 		it ('verifies the signature', async () => {
 			const keyPair = createVirgilKeyPair();
 			const streamSigner = new VirgilStreamSigner();

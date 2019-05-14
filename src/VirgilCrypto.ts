@@ -479,7 +479,7 @@ export class VirgilCrypto {
 	 * to encrypt data in chunks using the given `publicKey`.
 	 * @param {VirgilPublicKey|VirgilPublicKey[]} publicKey - A single
 	 * public key or an array of public keys to encrypt the data with.
-	 * @param {Data} [signature] - Optionally add a signature of plain data to the of encrypted file.
+	 * @param {Data} [signature] - Optionally add a signature of plain data to the encrypted stream.
 	 */
 	createStreamCipher (publicKey: VirgilPublicKey|VirgilPublicKey[], signature?: Data) {
 		return new VirgilStreamCipher(publicKey, signature);

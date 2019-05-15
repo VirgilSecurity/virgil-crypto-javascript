@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>PythiaDeblindParams | virgil-crypto</title>
+	<title>VirgilStreamCipherOptions | virgil-crypto</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style type="text/css">/*! normalize.css v1.1.3 | MIT License | git.io/normalize */
@@ -972,16 +972,8 @@ img { max-width: 100%; }
 		<li class=" tsd-kind-interface">
 			<a href="pythiacomputetransformationkeypairparams.html" class="tsd-kind-icon">Pythia<wbr>Compute<wbr>Transformation<wbr>Key<wbr>Pair<wbr>Params</a>
 		</li>
-		<li class="current tsd-kind-interface">
+		<li class=" tsd-kind-interface">
 			<a href="pythiadeblindparams.html" class="tsd-kind-icon">Pythia<wbr>Deblind<wbr>Params</a>
-			<ul>
-				<li class=" tsd-kind-property tsd-parent-kind-interface">
-					<a href="pythiadeblindparams.html#blindingsecret" class="tsd-kind-icon">blinding<wbr>Secret</a>
-				</li>
-				<li class=" tsd-kind-property tsd-parent-kind-interface">
-					<a href="pythiadeblindparams.html#transformedpassword" class="tsd-kind-icon">transformed<wbr>Password</a>
-				</li>
-			</ul>
 		</li>
 		<li class=" tsd-kind-interface">
 			<a href="pythiagetpasswordupdatetokenparams.html" class="tsd-kind-icon">Pythia<wbr>Get<wbr>Password<wbr>Update<wbr>Token<wbr>Params</a>
@@ -1013,8 +1005,16 @@ img { max-width: 100%; }
 		<li class=" tsd-kind-interface">
 			<a href="virgilkeypair.html" class="tsd-kind-icon">Virgil<wbr>Key<wbr>Pair</a>
 		</li>
-		<li class=" tsd-kind-interface">
+		<li class="current tsd-kind-interface">
 			<a href="virgilstreamcipheroptions.html" class="tsd-kind-icon">Virgil<wbr>Stream<wbr>Cipher<wbr>Options</a>
+			<ul>
+				<li class=" tsd-kind-property tsd-parent-kind-interface">
+					<a href="virgilstreamcipheroptions.html#encoding" class="tsd-kind-icon">encoding</a>
+				</li>
+				<li class=" tsd-kind-property tsd-parent-kind-interface">
+					<a href="virgilstreamcipheroptions.html#signature" class="tsd-kind-icon">signature</a>
+				</li>
+			</ul>
 		</li>
 		<li class=" tsd-kind-type-alias">
 			<a href="../index.html#data" class="tsd-kind-icon">Data</a>
@@ -1029,7 +1029,7 @@ img { max-width: 100%; }
 		<section class="tsd-panel tsd-comment">
 			<div class="tsd-comment tsd-typography">
 				<div class="lead">
-					<p>Input parameters of <a href="../classes/virgilpythiacrypto.html#deblind">VirgilPythiaCrypto.deblind</a> method.</p>
+					<p><code>VirgilStreamCipher</code> constructor <code>options</code> parameter.</p>
 				</div>
 			</div>
 		</section>
@@ -1037,7 +1037,7 @@ img { max-width: 100%; }
 			<h3>Hierarchy</h3>
 			<ul class="tsd-hierarchy">
 				<li>
-					<span class="target">PythiaDeblindParams</span>
+					<span class="target">VirgilStreamCipherOptions</span>
 				</li>
 			</ul>
 		</section>
@@ -1048,8 +1048,8 @@ img { max-width: 100%; }
 					<section class="tsd-index-section ">
 						<h3>Properties</h3>
 						<ul class="tsd-index-list">
-							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="pythiadeblindparams.html#blindingsecret" class="tsd-kind-icon">blinding<wbr>Secret</a></li>
-							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="pythiadeblindparams.html#transformedpassword" class="tsd-kind-icon">transformed<wbr>Password</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="virgilstreamcipheroptions.html#encoding" class="tsd-kind-icon">encoding</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-interface"><a href="virgilstreamcipheroptions.html#signature" class="tsd-kind-icon">signature</a></li>
 						</ul>
 					</section>
 				</div>
@@ -1058,32 +1058,33 @@ img { max-width: 100%; }
 		<section class="tsd-panel-group tsd-member-group ">
 			<h2>Properties</h2>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-				<a name="blindingsecret" class="tsd-anchor"></a>
-				<h3>blinding<wbr>Secret</h3>
-				<div class="tsd-signature tsd-kind-icon">blinding<wbr>Secret<span class="tsd-signature-symbol">:</span> <a href="../index.html#data" class="tsd-signature-type">Data</a></div>
+				<a name="encoding" class="tsd-anchor"></a>
+				<h3><span class="tsd-flag ts-flagOptional">Optional</span> encoding</h3>
+				<div class="tsd-signature tsd-kind-icon">encoding<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">StringEncoding</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/1a7c8c3/src/VirgilPythiaCrypto.ts#L180">VirgilPythiaCrypto.ts:180</a></li>
+						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/1a7c8c3/src/streams/VirgilStreamCipher.ts#L21">streams/VirgilStreamCipher.ts:21</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>BN value returned by <a href="../classes/virgilpythiacrypto.html#blind">VirgilPythiaCrypto.blind</a></p>
+						<p>If <code>signature</code> is a string,
+						specifies its encoding, otherwise is ignored. Default is &#39;base64&#39;.</p>
 					</div>
 				</div>
 			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-				<a name="transformedpassword" class="tsd-anchor"></a>
-				<h3>transformed<wbr>Password</h3>
-				<div class="tsd-signature tsd-kind-icon">transformed<wbr>Password<span class="tsd-signature-symbol">:</span> <a href="../index.html#data" class="tsd-signature-type">Data</a></div>
+				<a name="signature" class="tsd-anchor"></a>
+				<h3><span class="tsd-flag ts-flagOptional">Optional</span> signature</h3>
+				<div class="tsd-signature tsd-kind-icon">signature<span class="tsd-signature-symbol">:</span> <a href="../index.html#data" class="tsd-signature-type">Data</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/1a7c8c3/src/VirgilPythiaCrypto.ts#L175">VirgilPythiaCrypto.ts:175</a></li>
+						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/1a7c8c3/src/streams/VirgilStreamCipher.ts#L16">streams/VirgilStreamCipher.ts:16</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>GT transformed password returned by <a href="../classes/virgilpythiacrypto.html#transform">VirgilPythiaCrypto.transform</a>.</p>
+						<p> Optionally add a signature of plain data to the encrypted stream.</p>
 					</div>
 				</div>
 			</section>

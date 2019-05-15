@@ -945,6 +945,9 @@ img { max-width: 100%; }
 				<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
 					<a href="virgilstreamcipher.html#constructor" class="tsd-kind-icon">constructor</a>
 				</li>
+				<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a href="virgilstreamcipher.html#isfinished" class="tsd-kind-icon">is<wbr>Finished</a>
+				</li>
 				<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
 					<a href="virgilstreamcipher.html#seqcipher" class="tsd-kind-icon">seq<wbr>Cipher</a>
 				</li>
@@ -1025,6 +1028,9 @@ img { max-width: 100%; }
 		<li class=" tsd-kind-interface">
 			<a href="../interfaces/virgilkeypair.html" class="tsd-kind-icon">Virgil<wbr>Key<wbr>Pair</a>
 		</li>
+		<li class=" tsd-kind-interface">
+			<a href="../interfaces/virgilstreamcipheroptions.html" class="tsd-kind-icon">Virgil<wbr>Stream<wbr>Cipher<wbr>Options</a>
+		</li>
 		<li class=" tsd-kind-type-alias">
 			<a href="../index.html#data" class="tsd-kind-icon">Data</a>
 		</li>
@@ -1065,9 +1071,10 @@ img { max-width: 100%; }
 							<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="virgilstreamcipher.html#constructor" class="tsd-kind-icon">constructor</a></li>
 						</ul>
 					</section>
-					<section class="tsd-index-section tsd-is-inherited tsd-is-private-protected">
+					<section class="tsd-index-section tsd-is-inherited">
 						<h3>Properties</h3>
 						<ul class="tsd-index-list">
+							<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="virgilstreamcipher.html#isfinished" class="tsd-kind-icon">is<wbr>Finished</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="virgilstreamcipher.html#seqcipher" class="tsd-kind-icon">seq<wbr>Cipher</a></li>
 						</ul>
 					</section>
@@ -1089,14 +1096,14 @@ img { max-width: 100%; }
 				<a name="constructor" class="tsd-anchor"></a>
 				<h3>constructor</h3>
 				<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-					<li class="tsd-signature tsd-kind-icon">new <wbr>Virgil<wbr>Stream<wbr>Cipher<span class="tsd-signature-symbol">(</span>publicKeys<span class="tsd-signature-symbol">: </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol"> | </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="virgilstreamcipher.html" class="tsd-signature-type">VirgilStreamCipher</a></li>
+					<li class="tsd-signature tsd-kind-icon">new <wbr>Virgil<wbr>Stream<wbr>Cipher<span class="tsd-signature-symbol">(</span>publicKeys<span class="tsd-signature-symbol">: </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol"> | </span><a href="virgilpublickey.html" class="tsd-signature-type">VirgilPublicKey</a><span class="tsd-signature-symbol">[]</span>, options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/virgilstreamcipheroptions.html" class="tsd-signature-type">VirgilStreamCipherOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="virgilstreamcipher.html" class="tsd-signature-type">VirgilStreamCipher</a></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<p>Overrides <a href="virgilstreamcipherbase.html">VirgilStreamCipherBase</a>.<a href="virgilstreamcipherbase.html#constructor">constructor</a></p>
 							<ul>
-								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/4a91df0/src/streams/VirgilStreamCipher.ts#L9">streams/VirgilStreamCipher.ts:9</a></li>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/1a7c8c3/src/streams/VirgilStreamCipher.ts#L27">streams/VirgilStreamCipher.ts:27</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1123,14 +1130,33 @@ img { max-width: 100%; }
 									</div>
 								</div>
 							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="../interfaces/virgilstreamcipheroptions.html" class="tsd-signature-type">VirgilStreamCipherOptions</a></h5>
+							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="virgilstreamcipher.html" class="tsd-signature-type">VirgilStreamCipher</a></h4>
 					</li>
 				</ul>
 			</section>
 		</section>
-		<section class="tsd-panel-group tsd-member-group tsd-is-inherited tsd-is-private-protected">
+		<section class="tsd-panel-group tsd-member-group tsd-is-inherited">
 			<h2>Properties</h2>
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+				<a name="isfinished" class="tsd-anchor"></a>
+				<h3>is<wbr>Finished</h3>
+				<div class="tsd-signature tsd-kind-icon">is<wbr>Finished<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
+				<aside class="tsd-sources">
+					<p>Inherited from <a href="virgilstreamcipherbase.html">VirgilStreamCipherBase</a>.<a href="virgilstreamcipherbase.html#isfinished">isFinished</a></p>
+					<ul>
+						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/1a7c8c3/src/streams/VirgilStreamCipherBase.ts#L16">streams/VirgilStreamCipherBase.ts:16</a></li>
+					</ul>
+				</aside>
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Indicates whether the <code>final</code> method has been called.</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
 				<a name="seqcipher" class="tsd-anchor"></a>
 				<h3><span class="tsd-flag ts-flagProtected">Protected</span> seq<wbr>Cipher</h3>
@@ -1138,7 +1164,7 @@ img { max-width: 100%; }
 				<aside class="tsd-sources">
 					<p>Inherited from <a href="virgilstreamcipherbase.html">VirgilStreamCipherBase</a>.<a href="virgilstreamcipherbase.html#seqcipher">seqCipher</a></p>
 					<ul>
-						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/4a91df0/src/streams/VirgilStreamCipherBase.ts#L28">streams/VirgilStreamCipherBase.ts:28</a></li>
+						<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/1a7c8c3/src/streams/VirgilStreamCipherBase.ts#L28">streams/VirgilStreamCipherBase.ts:28</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -1161,7 +1187,7 @@ img { max-width: 100%; }
 						<aside class="tsd-sources">
 							<p>Inherited from <a href="virgilstreamcipherbase.html">VirgilStreamCipherBase</a>.<a href="virgilstreamcipherbase.html#dispose">dispose</a></p>
 							<ul>
-								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/4a91df0/src/streams/VirgilStreamCipherBase.ts#L69">streams/VirgilStreamCipherBase.ts:69</a></li>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/1a7c8c3/src/streams/VirgilStreamCipherBase.ts#L77">streams/VirgilStreamCipherBase.ts:77</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1178,14 +1204,14 @@ img { max-width: 100%; }
 				<a name="final" class="tsd-anchor"></a>
 				<h3>final</h3>
 				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-					<li class="tsd-signature tsd-kind-icon">final<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span></li>
+					<li class="tsd-signature tsd-kind-icon">final<span class="tsd-signature-symbol">(</span>dispose<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<p>Inherited from <a href="virgilstreamcipherbase.html">VirgilStreamCipherBase</a>.<a href="virgilstreamcipherbase.html#final">final</a></p>
 							<ul>
-								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/4a91df0/src/streams/VirgilStreamCipherBase.ts#L55">streams/VirgilStreamCipherBase.ts:55</a></li>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/1a7c8c3/src/streams/VirgilStreamCipherBase.ts#L63">streams/VirgilStreamCipherBase.ts:63</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1198,6 +1224,21 @@ img { max-width: 100%; }
 								This method also automatically calls <code>dispose</code>.</p>
 							</div>
 						</div>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> dispose: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>Optional. Indicating whether to automatically
+										free the memory occupied by internal <a href="virgilstreamsignerbase.html#seqsigner">seqSigner</a> object in the
+										browser.
+										Default is <code>true</code>. <code>false</code> is used to perform operations in inherited classes.
+									If you pass <code>false</code> as an argument you should call <code>dispose</code> method manually.</p>
+									<p>In node.js this argument is ignored because the memory will be freed by the
+									garbage collector.</p>
+								</div>
+							</li>
+						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Buffer</span></h4>
 					</li>
 				</ul>
@@ -1212,7 +1253,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/4a91df0/src/streams/VirgilStreamCipher.ts#L50">streams/VirgilStreamCipher.ts:50</a></li>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/1a7c8c3/src/streams/VirgilStreamCipher.ts#L78">streams/VirgilStreamCipher.ts:78</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1248,7 +1289,7 @@ img { max-width: 100%; }
 						<aside class="tsd-sources">
 							<p>Inherited from <a href="virgilstreamcipherbase.html">VirgilStreamCipherBase</a>.<a href="virgilstreamcipherbase.html#update">update</a></p>
 							<ul>
-								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/4a91df0/src/streams/VirgilStreamCipherBase.ts#L42">streams/VirgilStreamCipherBase.ts:42</a></li>
+								<li>Defined in <a href="https://github.com/VirgilSecurity/virgil-crypto-javascript/blob/1a7c8c3/src/streams/VirgilStreamCipherBase.ts#L42">streams/VirgilStreamCipherBase.ts:42</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">

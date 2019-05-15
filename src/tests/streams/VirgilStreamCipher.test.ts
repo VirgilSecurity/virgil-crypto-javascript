@@ -53,6 +53,7 @@ describe ('VirgilStreamCipher', () => {
 			}, 'Illegal state');
 		});
 
+
 		it ('final cannot be called after final', () => {
 			streamCipher.start();
 			streamCipher.update('test', 'utf8');

@@ -2,12 +2,29 @@ import { VirgilPublicKey } from '../VirgilPublicKey';
 import { toArray } from '../utils/toArray';
 import { validatePublicKeysArray } from '../validators';
 import { VirgilStreamCipherBase } from './VirgilStreamCipherBase';
+import { Data } from './../interfaces';
+import { DATA_SIGNATURE_KEY } from '../common/constants';
+import { anyToBuffer, StringEncoding } from '../utils/anyToBuffer';
+
+/**
+ * `VirgilStreamCipher` constructor `options` parameter.
+ */
+export interface VirgilStreamCipherOptions {
+	/**
+	 *  Optionally add a signature of plain data to the encrypted stream.
+	 */
+	signature?: Data;
+	/**
+	 * If `signature` is a string,
+	 * specifies its encoding, otherwise is ignored. Default is 'base64'.
+	 */
+	encoding?: StringEncoding;
+}
 
 /**
  * Class responsible for encryption of streams of data.
  */
 export class VirgilStreamCipher extends VirgilStreamCipherBase {
-
 	/**
 	 * Initializes a new instance of `VirgilStreamCipher`.
 	 * `VirgilStreamCipher` objects are not meant to be created with the `new`
@@ -19,15 +36,26 @@ export class VirgilStreamCipher extends VirgilStreamCipherBase {
 	 * @param {VirgilPublicKey|VirgilPublicKey[]} publicKeys - A single
 	 * {@link VirgilPublicKey} or an array of {@link VirgilPublicKey}'s to
 	 * to encrypt the data with.
+	 * @param {VirgilStreamCipherOptions} [options] - `VirgilStreamCipherOptions` object.
 	 */
-	constructor (publicKeys: VirgilPublicKey|VirgilPublicKey[]) {
+	constructor(
+		publicKeys: VirgilPublicKey | VirgilPublicKey[],
+		options?: VirgilStreamCipherOptions
+	) {
 		const publicKeyArr = toArray(publicKeys);
 		validatePublicKeysArray(publicKeyArr);
 
 		super();
 
-		for (const { identifier, key} of publicKeyArr) {
+		for (const { identifier, key } of publicKeyArr) {
 			this.seqCipher.addKeyRecipientSafe(identifier, key);
+		}
+
+		if (options && options.signature) {
+			const signatureKey = Buffer.from(DATA_SIGNATURE_KEY);
+			const customParams = this.seqCipher.customParams();
+			const encoding = options.encoding ? options.encoding : 'base64'
+			customParams.setDataSafe(signatureKey, anyToBuffer(options.signature, encoding));
 		}
 	}
 

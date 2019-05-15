@@ -2,6 +2,8 @@ import { validatePrivateKey } from '../validators';
 import { VirgilPrivateKey } from '../VirgilPrivateKey';
 import { getPrivateKeyBytes } from '../privateKeyUtils';
 import { VirgilStreamCipherBase } from './VirgilStreamCipherBase';
+import { DATA_SIGNATURE_KEY } from '../common/constants';
+import { StringEncoding } from '../utils/anyToBuffer';
 
 /**
  * Class responsible for decryption of streams of data.
@@ -31,5 +33,22 @@ export class VirgilStreamDecipher extends VirgilStreamCipherBase {
 			privateKeyValue,
 			Buffer.alloc(0)
 		);
+	}
+
+	/**
+	 * Get signature from content_info if it was added on encryption phase.
+	 */
+	getSignature(): Buffer | null {
+		if (!this.isFinished) {
+			throw new Error('Illegal state. Cannot get signature before the `final` method has been called.');
+		}
+		const customParams = this.seqCipher.customParams();
+		let signature: Buffer;
+		try {
+			signature = customParams.getDataSafe(Buffer.from(DATA_SIGNATURE_KEY));
+		} catch (err) {
+			return null;
+		}
+		return signature;
 	}
 }

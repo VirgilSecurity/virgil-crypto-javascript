@@ -13,7 +13,7 @@ export class VirgilStreamCipherBase {
 	/**
 	 * Indicates whether the `final` method has been called.
 	 */
-	private isFinished: boolean = false;
+	isFinished: boolean = false;
 
 	/**
 	 * Indicates whether the `dispose` method has been called.
@@ -51,14 +51,22 @@ export class VirgilStreamCipherBase {
 	 * or decrypt data, attempts to call any method including `final` will
 	 * result in an error being thrown.
 	 * This method also automatically calls `dispose`.
+	 * @param {boolean} dispose - Optional. Indicating whether to automatically
+	 * free the memory occupied by internal {@link seqSigner} object in the
+	 * browser.
+	 * Default is `true`. `false` is used to perform operations in inherited classes.
+	 * If you pass `false` as an argument you should call `dispose` method manually.
+	 *
+	 * In node.js this argument is ignored because the memory will be freed by the
+	 * garbage collector.
 	 */
-	final () {
+	final (dispose: boolean = true) {
 		this.ensureLegalState();
 		try {
 			return this.seqCipher.finishSafe();
 		} finally {
 			this.isFinished = true;
-			this.dispose();
+			if (dispose) this.dispose();
 		}
 	}
 

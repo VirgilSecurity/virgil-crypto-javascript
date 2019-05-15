@@ -323,6 +323,7 @@ export interface IDeletable {
  * `VirgilByteArray` to\from `Buffer`s.
  */
 export interface WrappedVirgilCipherBase extends IDeletable {
+	customParams(): any;
 	addKeyRecipientSafe(recipientId: Buffer, publicKey: Buffer): void;
 	addPasswordRecipientSafe(password: Buffer): void;
 }

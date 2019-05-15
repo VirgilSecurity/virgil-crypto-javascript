@@ -29,7 +29,7 @@ describe('stream signing', function() {
 		});
 	});
 
-	describe('transfer the signature', () => {
+	describe('sign and encrypt, then decrypt and verify', () => {
 		let publicKey: VirgilPublicKey;
 		let privateKey: VirgilPrivateKey;
 		let signature: Buffer;
@@ -53,8 +53,10 @@ describe('stream signing', function() {
 
 			const streamCipher = new VirgilStreamCipher(
 				publicKey,
-				encoding ? signature.toString(encoding) : signature,
-				encoding
+				{
+					encoding,
+					signature: encoding ? signature.toString(encoding) : signature,
+				}
 			);
 			const encryptedBuffer: Buffer[] = [];
 
@@ -74,6 +76,7 @@ describe('stream signing', function() {
 
 			decryptedBuffer.push(streamDecipher.final(false));
 			let transferredSignature: Buffer | string = streamDecipher.getSignature()!;
+			assert.isNotEmpty(transferredSignature);
 			if (encoding) transferredSignature = transferredSignature.toString(encoding);
 			streamDecipher.dispose();
 			assert.exists(transferredSignature);
@@ -82,10 +85,6 @@ describe('stream signing', function() {
 			for await (const chunk of createAsyncIterable(inputChunks)) {
 				streamVerifier.update(chunk);
 			}
-
-			encoding
-				? assert.isString(transferredSignature)
-				: assert.isTrue(Buffer.isBuffer(transferredSignature));
 
 			return streamVerifier.verify(publicKey);
 		};

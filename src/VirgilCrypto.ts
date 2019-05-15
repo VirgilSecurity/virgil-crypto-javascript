@@ -7,7 +7,7 @@ import { VirgilPublicKey } from './VirgilPublicKey';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 import { getPrivateKeyBytes } from './privateKeyUtils';
 import { validatePrivateKey, validatePublicKey, validatePublicKeysArray } from './validators';
-import { VirgilStreamCipher } from './streams/VirgilStreamCipher';
+import { VirgilStreamCipher, VirgilStreamCipherOptions } from './streams/VirgilStreamCipher';
 import { VirgilStreamDecipher } from './streams/VirgilStreamDecipher';
 import { VirgilStreamSigner } from './streams/VirgilStreamSigner';
 import { VirgilStreamVerifier } from './streams/VirgilStreamVerifier';
@@ -481,8 +481,8 @@ export class VirgilCrypto {
 	 * public key or an array of public keys to encrypt the data with.
 	 * @param {Data} [signature] - Optionally add a signature of plain data to the encrypted stream.
 	 */
-	createStreamCipher (publicKey: VirgilPublicKey|VirgilPublicKey[], signature?: Data) {
-		return new VirgilStreamCipher(publicKey, signature);
+	createStreamCipher (publicKey: VirgilPublicKey|VirgilPublicKey[], options?: VirgilStreamCipherOptions) {
+		return new VirgilStreamCipher(publicKey, options);
 	}
 
 	/**
@@ -505,7 +505,7 @@ export class VirgilCrypto {
 
 	/**
 	 * Creates an instance of {@link VirgilStreamVerifier} to be used
-	 * to verify the `signature` for the data in comming in chunks.
+	 * to verify the `signature` for the data in coming in chunks.
 	 *
 	 * @param {Data} signature - The signature to be verified.
 	 * @param {StringEncoding} encoding - If `signature` is a string,

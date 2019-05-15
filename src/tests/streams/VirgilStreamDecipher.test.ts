@@ -46,6 +46,7 @@ describe ('VirgilStreamDecipher', () => {
 			streamDecipher.update(ciphertext);
 			streamDecipher.final(false);
 			const signature = streamDecipher.getSignature();
+			streamDecipher.dispose();
 			assert.isNull(signature)
 		});
 	});

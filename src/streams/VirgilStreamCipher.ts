@@ -7,6 +7,21 @@ import { DATA_SIGNATURE_KEY } from '../common/constants';
 import { anyToBuffer, StringEncoding } from '../utils/anyToBuffer';
 
 /**
+ * `VirgilStreamCipher` constructor `options` parameter.
+ */
+export interface VirgilStreamCipherOptions {
+	/**
+	 *  Optionally add a signature of plain data to the encrypted stream.
+	 */
+	signature?: Data;
+	/**
+	 * If `signature` is a string,
+	 * specifies its encoding, otherwise is ignored. Default is 'base64'.
+	 */
+	encoding?: StringEncoding;
+}
+
+/**
  * Class responsible for encryption of streams of data.
  */
 export class VirgilStreamCipher extends VirgilStreamCipherBase {
@@ -21,14 +36,11 @@ export class VirgilStreamCipher extends VirgilStreamCipherBase {
 	 * @param {VirgilPublicKey|VirgilPublicKey[]} publicKeys - A single
 	 * {@link VirgilPublicKey} or an array of {@link VirgilPublicKey}'s to
 	 * to encrypt the data with.
-	 * @param {Data} [signature] - Optionally add a signature of plain data to the encrypted stream.
-	 * @param {StringEncoding} [encoding] - If `signature` is a string,
-	 * specifies its encoding, otherwise is ignored. Default is 'base64'.
+	 * @param {VirgilStreamCipherOptions} [options] - `VirgilStreamCipherOptions` object.
 	 */
 	constructor(
 		publicKeys: VirgilPublicKey | VirgilPublicKey[],
-		signature?: Data,
-		encoding: StringEncoding = 'base64'
+		options?: VirgilStreamCipherOptions
 	) {
 		const publicKeyArr = toArray(publicKeys);
 		validatePublicKeysArray(publicKeyArr);
@@ -39,10 +51,11 @@ export class VirgilStreamCipher extends VirgilStreamCipherBase {
 			this.seqCipher.addKeyRecipientSafe(identifier, key);
 		}
 
-		if (signature) {
+		if (options && options.signature) {
 			const signatureKey = Buffer.from(DATA_SIGNATURE_KEY);
 			const customParams = this.seqCipher.customParams();
-			customParams.setDataSafe(signatureKey, anyToBuffer(signature, encoding));
+			const encoding = options.encoding ? options.encoding : 'base64'
+			customParams.setDataSafe(signatureKey, anyToBuffer(options.signature, encoding));
 		}
 	}
 

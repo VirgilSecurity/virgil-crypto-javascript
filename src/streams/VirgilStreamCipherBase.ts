@@ -55,6 +55,7 @@ export class VirgilStreamCipherBase {
 	 * free the memory occupied by internal {@link seqSigner} object in the
 	 * browser.
 	 * Default is `true`. `false` is used to perform operations in inherited classes.
+	 * If you pass `false` as an argument you should call `dispose` method manually.
 	 *
 	 * In node.js this argument is ignored because the memory will be freed by the
 	 * garbage collector.

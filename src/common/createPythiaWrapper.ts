@@ -52,67 +52,78 @@ export function createPythiaWrapper (lib: any) {
 	return {
 		blind (password: Buffer) {
 			const pythia = createVirgilPythia();
+			let result: any;
+			let blindedPasswordArr: any;
+			let blindingSecretArr: any;
 
-			const result = pythia.blindSafe(password);
-			const blindedPasswordArr = result.blindedPassword();
-			const blindingSecretArr = result.blindingSecret();
+			try {
+				result = pythia.blindSafe(password);
+				blindedPasswordArr = result.blindedPassword();
+				blindingSecretArr = result.blindingSecret();
 
-			const retVal = {
-				blindedPassword: wrapper.utils.virgilByteArrayToBuffer(blindedPasswordArr),
-				blindingSecret: wrapper.utils.virgilByteArrayToBuffer(blindingSecretArr)
-			};
-
-			if (process.browser) {
-				pythia.delete();
-				blindedPasswordArr.delete();
-				blindingSecretArr.delete();
-				result.delete();
+				return {
+					blindedPassword: wrapper.utils.virgilByteArrayToBuffer(blindedPasswordArr),
+					blindingSecret: wrapper.utils.virgilByteArrayToBuffer(blindingSecretArr)
+				};
+			} finally {
+				if (process.browser) {
+					pythia.delete();
+					blindedPasswordArr &&  blindedPasswordArr.delete();
+					blindingSecretArr && blindingSecretArr.delete();
+					result && result.delete();
+				}
 			}
-
-			return retVal;
 		},
 
 		computeTransformationKeyPair (transformationKeyId: Buffer, pythiaSecret: Buffer, pythiaScopeSecret: Buffer) {
 			const pythia = createVirgilPythia();
-			const keyPair = pythia.computeTransformationKeyPairSafe(
-				transformationKeyId,
-				pythiaSecret,
-				pythiaScopeSecret
-			);
+			let keyPair: any;
+			let privateKeyArr: any;
+			let publicKeyArr: any;
 
-			const privateKeyArr = keyPair.privateKey();
-			const publicKeyArr = keyPair.publicKey();
+			try {
+				keyPair = pythia.computeTransformationKeyPairSafe(
+					transformationKeyId,
+					pythiaSecret,
+					pythiaScopeSecret
+				);
 
-			const retVal = {
-				privateKey: wrapper.utils.virgilByteArrayToBuffer(privateKeyArr),
-				publicKey: wrapper.utils.virgilByteArrayToBuffer(publicKeyArr)
-			};
+				privateKeyArr = keyPair.privateKey();
+				publicKeyArr = keyPair.publicKey();
 
-			if (process.browser) {
-				pythia.delete();
-				privateKeyArr.delete();
-				publicKeyArr.delete();
-				keyPair.delete();
+				return {
+					privateKey: wrapper.utils.virgilByteArrayToBuffer(privateKeyArr),
+					publicKey: wrapper.utils.virgilByteArrayToBuffer(publicKeyArr)
+				};
+			} finally {
+				if (process.browser) {
+					pythia.delete();
+					privateKeyArr && privateKeyArr.delete();
+					publicKeyArr && publicKeyArr.delete();
+					keyPair && keyPair.delete();
+				}
 			}
-
-			return retVal;
 		},
 
 		deblind (transformedPassword: Buffer, blindingSecret: Buffer): Buffer {
 			const pythia = createVirgilPythia();
-			const retVal = pythia.deblindSafe(transformedPassword, blindingSecret);
-			if (process.browser) pythia.delete();
-			return retVal;
+			try {
+				return pythia.deblindSafe(transformedPassword, blindingSecret);
+			} finally {
+				if (process.browser) pythia.delete();
+			}
 		},
 
 		getPasswordUpdateToken (oldTransformationPrivateKey: Buffer, newTransformationPrivateKey: Buffer): Buffer {
 			const pythia = createVirgilPythia();
-			const retVal = pythia.getPasswordUpdateTokenSafe(
-				oldTransformationPrivateKey,
-				newTransformationPrivateKey
-			);
-			if (process.browser) pythia.delete();
-			return retVal;
+			try {
+				return pythia.getPasswordUpdateTokenSafe(
+					oldTransformationPrivateKey,
+					newTransformationPrivateKey
+				);
+			} finally {
+				if (process.browser) pythia.delete();
+			}
 		},
 
 		prove (
@@ -121,62 +132,72 @@ export function createPythiaWrapper (lib: any) {
 			transformedTweak: Buffer,
 			transformationKeyPair: { privateKey: Buffer, publicKey: Buffer }
 		) {
-			const pythiaTransformationKeyPair = createVirgilPythiaTransformationKeyPair(
-				transformationKeyPair.privateKey,
-				transformationKeyPair.publicKey
-			);
-
 			const pythia = createVirgilPythia();
-			const result = pythia.proveSafe(
-				transformedPassword,
-				blindedPassword,
-				transformedTweak,
-				pythiaTransformationKeyPair.keyPair
-			);
 
-			const proofValueCArr = result.proofValueC();
-			const proofValueUArr = result.proofValueU();
+			let pythiaTransformationKeyPair: { keyPair: any, freeMem: () => void }|undefined;
+			let result: any;
+			let proofValueCArr: any;
+			let proofValueUArr: any;
 
-			const retVal = {
-				proofValueC: wrapper.utils.virgilByteArrayToBuffer(proofValueCArr),
-				proofValueU: wrapper.utils.virgilByteArrayToBuffer(proofValueUArr),
+			try {
+				pythiaTransformationKeyPair = createVirgilPythiaTransformationKeyPair(
+					transformationKeyPair.privateKey,
+					transformationKeyPair.publicKey
+				);
+
+				result = pythia.proveSafe(
+					transformedPassword,
+					blindedPassword,
+					transformedTweak,
+					pythiaTransformationKeyPair.keyPair
+				);
+
+				proofValueCArr = result.proofValueC();
+				proofValueUArr = result.proofValueU();
+
+				return {
+					proofValueC: wrapper.utils.virgilByteArrayToBuffer(proofValueCArr),
+					proofValueU: wrapper.utils.virgilByteArrayToBuffer(proofValueUArr),
+				}
+			} finally {
+				if (process.browser) {
+					pythia.delete();
+					pythiaTransformationKeyPair && pythiaTransformationKeyPair.freeMem();
+					proofValueCArr && proofValueCArr.delete();
+					proofValueUArr && proofValueUArr.delete();
+					result && result.delete();
+				}
 			}
-
-			if (process.browser) {
-				pythia.delete();
-				pythiaTransformationKeyPair.freeMem();
-				proofValueCArr.delete();
-				proofValueUArr.delete();
-				result.delete();
-			}
-
-			return retVal;
 		},
 
 		transform (blindedPassword: Buffer, tweak: Buffer, transformationPrivateKey: Buffer) {
 			const pythia = createVirgilPythia();
-			const result = pythia.transformSafe(
-				blindedPassword,
-				tweak,
-				transformationPrivateKey
-			);
+			let result: any;
+			let transformedPasswordArr: any;
+			let transformedTweakArr: any;
 
-			const transformedPasswordArr = result.transformedPassword();
-			const transformedTweakArr = result.transformedTweak();
+			try {
+				result = pythia.transformSafe(
+					blindedPassword,
+					tweak,
+					transformationPrivateKey
+				);
 
-			const retVal = {
-				transformedPassword: wrapper.utils.virgilByteArrayToBuffer(transformedPasswordArr),
-				transformedTweak: wrapper.utils.virgilByteArrayToBuffer(transformedTweakArr),
-			};
+				transformedPasswordArr = result.transformedPassword();
+				transformedTweakArr = result.transformedTweak();
 
-			if (process.browser) {
-				pythia.delete();
-				transformedPasswordArr.delete();
-				transformedTweakArr.delete();
-				result.delete();
+				return {
+					transformedPassword: wrapper.utils.virgilByteArrayToBuffer(transformedPasswordArr),
+					transformedTweak: wrapper.utils.virgilByteArrayToBuffer(transformedTweakArr),
+				};
+			} finally {
+				if (process.browser) {
+					pythia.delete();
+					transformedPasswordArr && transformedPasswordArr.delete();
+					transformedTweakArr && transformedTweakArr.delete();
+					result && result.delete();
+				}
 			}
-
-			return retVal;
 		},
 
 		updateDeblindedWithToken (deblindedPassword: Buffer, passwordUpdateToken: Buffer): Buffer {
@@ -184,9 +205,11 @@ export function createPythiaWrapper (lib: any) {
 			if (passwordUpdateToken == null) throw new Error('`passwordUpdateToken` is required');
 
 			const pythia = createVirgilPythia();
-			const retVal = pythia.updateDeblindedWithTokenSafe(deblindedPassword, passwordUpdateToken);
-			if (process.browser) pythia.delete();
-			return retVal;
+			try {
+				return pythia.updateDeblindedWithTokenSafe(deblindedPassword, passwordUpdateToken);
+			} finally {
+				if (process.browser) pythia.delete();
+			}
 		},
 
 		verify (
@@ -198,17 +221,18 @@ export function createPythiaWrapper (lib: any) {
 			proofValueU: Buffer
 		): boolean {
 			const pythia = createVirgilPythia();
-			const retVal = pythia.verifySafe(
-				transformedPassword,
-				blindedPassword,
-				tweak,
-				transformationPublicKey,
-				proofValueC,
-				proofValueU
-			);
-
-			if (process.browser) pythia.delete();
-			return retVal;
+			try {
+				return pythia.verifySafe(
+					transformedPassword,
+					blindedPassword,
+					tweak,
+					transformationPublicKey,
+					proofValueC,
+					proofValueU
+				);
+			} finally {
+				if (process.browser) pythia.delete();
+			}
 		}
 	}
 }

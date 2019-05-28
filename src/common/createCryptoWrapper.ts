@@ -72,9 +72,7 @@ export function createCryptoWrapper (lib: any): IVirgilCryptoWrapper {
 	]);
 
 	const createVirgilCipher = () => {
-		const cipher = new lib.VirgilCipher();
-		if (process.browser) cipher.deleteLater();
-		return cipher;
+		return new lib.VirgilCipher();
 	};
 
 	const createVirgilSigner = () => {
@@ -82,15 +80,11 @@ export function createCryptoWrapper (lib: any): IVirgilCryptoWrapper {
 			? lib.VirgilHashAlgorithm.SHA512
 			: lib.VirgilHash.Algorithm_SHA512;
 
-		const signer = new lib.VirgilSigner(sha512);
-		if (process.browser) signer.deleteLater();
-		return signer;
+		return new lib.VirgilSigner(sha512);
 	};
 
 	const createVirgilHash = (...args: any[]) => {
-		const hash = new lib.VirgilHash(...args);
-		if (process.browser) hash.deleteLater();
-		return hash;
+		return new lib.VirgilHash(...args);
 	};
 
 	const getRandomBytes = (numOfBytes: number) => {
@@ -186,46 +180,72 @@ export function createCryptoWrapper (lib: any): IVirgilCryptoWrapper {
 				: lib.VirgilHash[`Algorithm_${algorithm}`];
 
 			const virgilHash = createVirgilHash(libAlgorithm);
-			return virgilHash.hashSafe(data);
+			const retVal = virgilHash.hashSafe(data);
+			if (process.browser) virgilHash.delete();
+			return retVal;
 		},
 
 		encryptWithPassword(data: Buffer, password: Buffer): Buffer {
 			const cipher = createVirgilCipher();
-			cipher.addPasswordRecipientSafe(password);
-			return cipher.encryptSafe(data, true);
+			try {
+				cipher.addPasswordRecipientSafe(password);
+				return cipher.encryptSafe(data, true);
+			} finally {
+				if (process.browser) cipher.delete();
+			}
 		},
 
 		decryptWithPassword(encryptedData: Buffer, password: Buffer): Buffer {
 			const cipher = createVirgilCipher();
-			return cipher.decryptWithPasswordSafe(encryptedData, password);
+			try {
+				return cipher.decryptWithPasswordSafe(encryptedData, password);
+			} finally {
+				if (process.browser) cipher.delete();
+			}
 		},
 
 		encrypt(data: Buffer, encryptionKey: EncryptionKey|EncryptionKey[] ): Buffer {
 			const encryptionKeys = toArray(encryptionKey)!;
 			const cipher = createVirgilCipher();
 
-			encryptionKeys.forEach(({ identifier, key }: EncryptionKey) => {
-				cipher.addKeyRecipientSafe(identifier, key);
-			});
-			return cipher.encryptSafe(data, true);
+			try {
+				encryptionKeys.forEach(({ identifier, key }: EncryptionKey) => {
+					cipher.addKeyRecipientSafe(identifier, key);
+				});
+				return cipher.encryptSafe(data, true);
+			} finally {
+				if (process.browser) cipher.delete();
+			}
 		},
 
 		decrypt(encryptedData: Buffer, decryptionKey: DecryptionKey): Buffer {
 			const { identifier, key, password = EMPTY_BUFFER } = decryptionKey;
 			const cipher = createVirgilCipher();
-			return cipher.decryptWithKeySafe(encryptedData, identifier, key, password);
+			try {
+				return cipher.decryptWithKeySafe(encryptedData, identifier, key, password);
+			} finally {
+				if (process.browser) cipher.delete();
+			}
 		},
 
 		sign (data: Buffer, signingKey: SigningKey): Buffer {
 			const { key, password = EMPTY_BUFFER } = signingKey;
 			const signer = createVirgilSigner();
-			return signer.signSafe(data, key, password);
+			try {
+				return signer.signSafe(data, key, password);
+			} finally {
+				if (process.browser) signer.delete();
+			}
 		},
 
 		verify (data: Buffer, signature: Buffer, verificationKey: VerificationKey): boolean {
 			const { key } = verificationKey;
 			const signer = createVirgilSigner();
-			return signer.verifySafe(data, signature, key);
+			try {
+				return signer.verifySafe(data, signature, key);
+			} finally {
+				if (process.browser) signer.delete();
+			}
 		},
 
 		signThenEncrypt(data: Buffer, signingKey: SigningKey, encryptionKey: EncryptionKey|EncryptionKey[]): Buffer {
@@ -237,70 +257,85 @@ export function createCryptoWrapper (lib: any): IVirgilCryptoWrapper {
 			const signerIdKey = Buffer.from(DATA_SIGNER_ID_KEY);
 			const customParams = cipher.customParams();
 
-			const signature = signer.signSafe(
-				data,
-				signingKey.key,
-				signingKey.password || EMPTY_BUFFER
-			);
-			customParams.setDataSafe(signatureKey, signature);
+			try {
+				const signature = signer.signSafe(
+					data,
+					signingKey.key,
+					signingKey.password || EMPTY_BUFFER
+				);
+				customParams.setDataSafe(signatureKey, signature);
 
-			if (signingKey.identifier != null) {
-				customParams.setDataSafe(signerIdKey, signingKey.identifier);
+				if (signingKey.identifier != null) {
+					customParams.setDataSafe(signerIdKey, signingKey.identifier);
+				}
+
+				encryptionKeys.forEach(({ identifier, key }: EncryptionKey) =>
+					cipher.addKeyRecipientSafe(identifier, key)
+				);
+
+				return cipher.encryptSafe(data, true);
+			} finally {
+				if (process.browser) {
+					cipher.delete();
+					signer.delete();
+				}
 			}
-
-			encryptionKeys.forEach(({ identifier, key }: EncryptionKey) =>
-				cipher.addKeyRecipientSafe(identifier, key)
-			);
-
-			return cipher.encryptSafe(data, true);
 		},
 
 		decryptThenVerify(
 			cipherData: Buffer, decryptionKey: DecryptionKey, verificationKey: VerificationKey|VerificationKey[]
 		): Buffer {
 			const verificationKeys = toArray(verificationKey)!;
-			const signer = createVirgilSigner();
+
 			const cipher = createVirgilCipher();
+			const signer = createVirgilSigner();
 			const signatureKey = Buffer.from(DATA_SIGNATURE_KEY);
 
-			const plainData = cipher.decryptWithKeySafe(
-				cipherData,
-				decryptionKey.identifier,
-				decryptionKey.key,
-				decryptionKey.password || EMPTY_BUFFER
-			);
-			const customParams = cipher.customParams();
-			const signature = customParams.getDataSafe(signatureKey);
+			try {
+				const plainData = cipher.decryptWithKeySafe(
+					cipherData,
+					decryptionKey.identifier,
+					decryptionKey.key,
+					decryptionKey.password || EMPTY_BUFFER
+				);
 
-			let isValid;
+				const customParams = cipher.customParams();
+				const signature = customParams.getDataSafe(signatureKey);
 
-			if (verificationKeys.length === 1) {
-				isValid = signer.verifySafe(plainData, signature, verificationKeys[0].key);
-			} else {
-					const signerId = tryGetSignerId(customParams);
-				if (signerId !== null) {
-					const theKey = verificationKeys.find(
-						(key: VerificationKey) => key.identifier != null && key.identifier.equals(signerId)
-					);
-					if (theKey === undefined) {
-						isValid = false;
-					} else {
-						isValid = signer.verifySafe(plainData, signature, theKey.key);
-					}
+				let isValid;
+
+				if (verificationKeys.length === 1) {
+					isValid = signer.verifySafe(plainData, signature, verificationKeys[0].key);
 				} else {
-					// no signer id in metadata, try all public keys in sequence
-					isValid = verificationKeys.some(
-						(key: VerificationKey) => signer.verifySafe(plainData, signature, key.key)
-					);
+					const signerId = tryGetSignerId(customParams);
+					if (signerId !== null) {
+						const theKey = verificationKeys.find(
+							(key: VerificationKey) => key.identifier != null && key.identifier.equals(signerId)
+						);
+						if (theKey === undefined) {
+							isValid = false;
+						} else {
+							isValid = signer.verifySafe(plainData, signature, theKey.key);
+						}
+					} else {
+						// no signer id in metadata, try all public keys in sequence
+						isValid = verificationKeys.some(
+							(key: VerificationKey) => signer.verifySafe(plainData, signature, key.key)
+						);
+					}
+				}
+
+				if (!isValid) {
+					throw new IntegrityCheckFailedError('Signature verification has failed.');
+				}
+
+				return plainData;
+			} finally {
+				if (process.browser) {
+					cipher.delete();
+					signer.delete();
 				}
 			}
-
-
-			if (!isValid) {
-				throw new IntegrityCheckFailedError('Signature verification has failed.');
-			}
-
-			return plainData;
 		},
 
 		getRandomBytes,
@@ -312,60 +347,76 @@ export function createCryptoWrapper (lib: any): IVirgilCryptoWrapper {
 			const cipher = createVirgilCipher();
 			const customParams = cipher.customParams();
 
-			const signature = signer.signSafe(data, privateKey.key, privateKey.password || EMPTY_BUFFER);
+			try {
+				const signature = signer.signSafe(data, privateKey.key, privateKey.password || EMPTY_BUFFER);
 
-			customParams.setDataSafe(Buffer.from(DATA_SIGNATURE_KEY), signature);
-			customParams.setDataSafe(Buffer.from(DATA_SIGNER_ID_KEY), privateKey.identifier);
+				customParams.setDataSafe(Buffer.from(DATA_SIGNATURE_KEY), signature);
+				customParams.setDataSafe(Buffer.from(DATA_SIGNER_ID_KEY), privateKey.identifier);
 
-			publicKeys.forEach(({ identifier, key }: EncryptionKey) =>
-				cipher.addKeyRecipientSafe(identifier, key)
-			);
+				publicKeys.forEach(({ identifier, key }: EncryptionKey) =>
+					cipher.addKeyRecipientSafe(identifier, key)
+				);
 
-			const encryptedData = cipher.encryptSafe(data, false);
-			const contentInfo = cipher.getContentInfoSafe();
-			return { encryptedData, metadata: contentInfo };
+				const encryptedData = cipher.encryptSafe(data, false);
+				const contentInfo = cipher.getContentInfoSafe();
+
+				return { encryptedData, metadata: contentInfo };
+			} finally {
+				if (process.browser) {
+					signer.delete();
+					cipher.delete();
+				}
+			}
 		},
 
 		decryptThenVerifyDetached (
 			encryptedData: Buffer, metadata: Buffer, privateKey: DecryptionKey, publicKeys: VerificationKey[]
 		): Buffer {
-			const signer = createVirgilSigner();
 			const cipher = createVirgilCipher();
+			const signer = createVirgilSigner();
 
-			cipher.setContentInfoSafe(metadata);
+			try {
+				cipher.setContentInfoSafe(metadata);
 
-			if (!cipher.keyRecipientExistsSafe(privateKey.identifier)) {
-				throw new VirgilCryptoError(
-					'Wrong private key. The data has not been encrypted with the corresponding public key.'
+				if (!cipher.keyRecipientExistsSafe(privateKey.identifier)) {
+					throw new VirgilCryptoError(
+						'Wrong private key. The data has not been encrypted with the corresponding public key.'
+					);
+				}
+
+				const decryptedData = cipher.decryptWithKeySafe(
+					encryptedData,
+					privateKey.identifier,
+					privateKey.key,
+					privateKey.password || EMPTY_BUFFER
 				);
+
+				const customParams = cipher.customParams();
+				const signature = customParams.getDataSafe(Buffer.from(DATA_SIGNATURE_KEY));
+				const signerId = tryGetSignerId(customParams);
+
+				if (!signerId) {
+					throw new VirgilCryptoError('Signer ID not found in the cryptogram.');
+				}
+
+				const matchingPublicKey = publicKeys.find(k => k.identifier!.equals(signerId));
+				if (!matchingPublicKey) {
+					throw new VirgilCryptoError(
+						'Wrong public key(s). The data has not been signed with the corresponding private key(s).'
+					);
+				}
+
+				if (!signer.verifySafe(decryptedData, signature, matchingPublicKey.key)) {
+					throw new IntegrityCheckFailedError('Signature verification has failed.');
+				}
+
+				return decryptedData;
+			} finally {
+				if (process.browser) {
+					cipher.delete();
+					signer.delete();
+				}
 			}
-
-			const decryptedData = cipher.decryptWithKeySafe(
-				encryptedData,
-				privateKey.identifier,
-				privateKey.key,
-				privateKey.password || EMPTY_BUFFER
-			);
-
-			const customParams = cipher.customParams();
-			const signature = customParams.getDataSafe(Buffer.from(DATA_SIGNATURE_KEY));
-			const signerId = tryGetSignerId(customParams);
-			if (!signerId) {
-				throw new VirgilCryptoError('Signer ID not found in the cryptogram.');
-			}
-
-			const matchingPublicKey = publicKeys.find(k => k.identifier!.equals(signerId));
-			if (!matchingPublicKey) {
-				throw new VirgilCryptoError(
-					'Wrong public key(s). The data has not been signed with the corresponding private key(s).'
-				);
-			}
-
-			if (!signer.verifySafe(decryptedData, signature, matchingPublicKey.key)) {
-				throw new IntegrityCheckFailedError('Signature verification has failed.');
-			}
-
-			return decryptedData;
 		},
 
 		createVirgilSeqCipher () {

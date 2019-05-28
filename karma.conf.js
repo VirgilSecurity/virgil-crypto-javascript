@@ -1,12 +1,14 @@
 const bundleTypes = require('./scripts/rollup/bundle-types');
 const getRollupPlugins = require('./scripts/rollup/get-rollup-plugins');
 
+const entry = process.env.TEST_ASMJS_MEMORY_MGMT ? 'src/tests/memory/index.ts' : 'src/tests/index.ts';
+
 module.exports = function (config) {
 	config.set({
 		frameworks: [ 'mocha', 'chai' ],
 		autoWatch: false,
 		browsers: [ 'ChromeHeadless' ],
-		files: [ { pattern: 'src/tests/index.ts', watched: false } ],
+		files: [ { pattern: entry, watched: false } ],
 		colors: true,
 		reporters: [ 'progress' ],
 		mime: { 'text/x-typescript': ['ts'] },

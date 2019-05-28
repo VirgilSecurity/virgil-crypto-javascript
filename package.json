@@ -43,6 +43,7 @@
     "version": "npm run build",
     "test:node": "cross-env TS_NODE_FILES=true mocha --require chai/register-assert --require ts-node/register \"src/tests/**/*.test.ts\"",
     "test:browser": "karma start",
+    "test:browser:memory": "cross-env TEST_ASMJS_MEMORY_MGMT=true karma start",
     "test": "npm-run-all test:*",
     "postinstall": "npm run update:node",
     "docs": "typedoc src",

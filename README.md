@@ -1,3 +1,5 @@
+> This README is for virgil-crypto v4. Check the [v3 branch](https://github.com/VirgilSecurity/virgil-crypto-javascript/tree/v3) for virgil-crypto v3 docs.
+
 # Virgil Security JavaScript Crypto Library
 [![Build Status](https://travis-ci.org/VirgilSecurity/virgil-crypto-javascript.svg)](https://travis-ci.org/VirgilSecurity/virgil-crypto-javascript)
 [![Build status](https://ci.appveyor.com/api/projects/status/7f65gm604d8sf6sm/branch/master?svg=true)](https://ci.appveyor.com/project/vadimavdeev/virgil-crypto-javascript/branch/master)

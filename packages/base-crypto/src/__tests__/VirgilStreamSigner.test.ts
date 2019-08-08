@@ -2,17 +2,16 @@ import { expect } from 'chai';
 
 import initFoundation from '@virgilsecurity/core-foundation';
 
-import { initBaseCrypto } from '../initBaseCrypto';
-import { VirgilCryptoType } from '../initVirgilCrypto';
+import { setFoundationModules, VirgilCrypto } from '..';
 
 describe('VirgilStreamSigner', () => {
-  let virgilCrypto: VirgilCryptoType;
+  let virgilCrypto: VirgilCrypto;
 
   beforeEach(() => {
     return new Promise(resolve => {
       initFoundation().then(foundationModules => {
-        const baseCrypto = initBaseCrypto(foundationModules);
-        virgilCrypto = new baseCrypto.VirgilCrypto();
+        setFoundationModules(foundationModules);
+        virgilCrypto = new VirgilCrypto();
         resolve();
       });
     });

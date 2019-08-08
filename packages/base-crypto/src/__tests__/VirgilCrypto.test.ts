@@ -3,18 +3,26 @@ import { expect } from 'chai';
 
 import initFoundation from '@virgilsecurity/core-foundation';
 
-import { initBaseCrypto, CryptoModules } from '../initBaseCrypto';
-import { VirgilCryptoType } from '../initVirgilCrypto';
+import {
+  setFoundationModules,
+  HashAlgorithm,
+  VirgilCrypto,
+  VirgilPrivateKey,
+  VirgilPublicKey,
+  VirgilStreamCipher,
+  VirgilStreamDecipher,
+  VirgilStreamSigner,
+  VirgilStreamVerifier,
+} from '..';
 
 describe('VirgilCrypto', () => {
-  let modules: CryptoModules;
-  let virgilCrypto: VirgilCryptoType;
+  let virgilCrypto: VirgilCrypto;
 
   beforeEach(() => {
     return new Promise(resolve => {
       initFoundation().then(foundationModules => {
-        modules = initBaseCrypto(foundationModules);
-        virgilCrypto = new modules.VirgilCrypto();
+        setFoundationModules(foundationModules);
+        virgilCrypto = new VirgilCrypto();
         resolve();
       });
     });
@@ -23,25 +31,22 @@ describe('VirgilCrypto', () => {
   describe('generateKeys', () => {
     it('returns key pair', () => {
       const keyPair = virgilCrypto.generateKeys();
-      expect(keyPair.privateKey).to.be.instanceOf(modules.VirgilPrivateKey);
-      expect(keyPair.publicKey).to.be.instanceOf(modules.VirgilPublicKey);
+      expect(keyPair.privateKey).to.be.instanceOf(VirgilPrivateKey);
+      expect(keyPair.publicKey).to.be.instanceOf(VirgilPublicKey);
     });
 
     it('uses SHA512 identifiers by default', () => {
       const keyPair = virgilCrypto.generateKeys();
       const publicKeyDer = virgilCrypto.exportPublicKey(keyPair.publicKey);
-      const publicKeyHash = virgilCrypto.calculateHash(publicKeyDer, modules.HashAlgorithm.SHA512);
+      const publicKeyHash = virgilCrypto.calculateHash(publicKeyDer, HashAlgorithm.SHA512);
       expect(publicKeyHash.slice(0, 8).equals(keyPair.publicKey.identifier)).to.be.true;
     });
 
     it('uses SHA256 identifiers', () => {
-      const virgilCrypto256 = new modules.VirgilCrypto({ useSha256Identifiers: true });
+      const virgilCrypto256 = new VirgilCrypto({ useSha256Identifiers: true });
       const keyPair = virgilCrypto256.generateKeys();
       const publicKeyDer = virgilCrypto256.exportPublicKey(keyPair.publicKey);
-      const publicKeyHash = virgilCrypto256.calculateHash(
-        publicKeyDer,
-        modules.HashAlgorithm.SHA256,
-      );
+      const publicKeyHash = virgilCrypto256.calculateHash(publicKeyDer, HashAlgorithm.SHA256);
       expect(publicKeyHash.equals(keyPair.publicKey.identifier)).to.be.true;
     });
   });
@@ -50,8 +55,8 @@ describe('VirgilCrypto', () => {
     it('returns key pair', () => {
       const seed = virgilCrypto.getRandomBytes(32);
       const keyPair = virgilCrypto.generateKeysFromKeyMaterial(seed);
-      expect(keyPair.privateKey).to.be.instanceOf(modules.VirgilPrivateKey);
-      expect(keyPair.publicKey).to.be.instanceOf(modules.VirgilPublicKey);
+      expect(keyPair.privateKey).to.be.instanceOf(VirgilPrivateKey);
+      expect(keyPair.publicKey).to.be.instanceOf(VirgilPublicKey);
     });
 
     it('returns same keys from the same seed', () => {
@@ -124,11 +129,11 @@ describe('VirgilCrypto', () => {
     it('produces different hash for different algorithms', () => {
       const hash1 = virgilCrypto.calculateHash(
         { value: 'data', encoding: 'utf8' },
-        modules.HashAlgorithm.SHA256,
+        HashAlgorithm.SHA256,
       );
       const hash2 = virgilCrypto.calculateHash(
         { value: 'data', encoding: 'utf8' },
-        modules.HashAlgorithm.SHA384,
+        HashAlgorithm.SHA384,
       );
       expect(hash1.equals(hash2)).to.be.false;
     });
@@ -241,18 +246,18 @@ describe('VirgilCrypto', () => {
   it('createStreamCipher', () => {
     const { publicKey } = virgilCrypto.generateKeys();
     const streamCipher = virgilCrypto.createStreamCipher(publicKey);
-    expect(streamCipher).to.be.instanceOf(modules.VirgilStreamCipher);
+    expect(streamCipher).to.be.instanceOf(VirgilStreamCipher);
   });
 
   it('createStreamDecipher', () => {
     const { privateKey } = virgilCrypto.generateKeys();
     const streamDecipher = virgilCrypto.createStreamDecipher(privateKey);
-    expect(streamDecipher).to.be.instanceOf(modules.VirgilStreamDecipher);
+    expect(streamDecipher).to.be.instanceOf(VirgilStreamDecipher);
   });
 
   it('createStreamSigner', () => {
     const streamSigner = virgilCrypto.createStreamSigner();
-    expect(streamSigner).to.be.instanceOf(modules.VirgilStreamSigner);
+    expect(streamSigner).to.be.instanceOf(VirgilStreamSigner);
   });
 
   it('createStreamVerifier', () => {
@@ -262,6 +267,6 @@ describe('VirgilCrypto', () => {
       keyPair.privateKey,
     );
     const streamVerifier = virgilCrypto.createStreamVerifier(signature);
-    expect(streamVerifier).to.be.instanceOf(modules.VirgilStreamVerifier);
+    expect(streamVerifier).to.be.instanceOf(VirgilStreamVerifier);
   });
 });

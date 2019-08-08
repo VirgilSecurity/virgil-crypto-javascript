@@ -1,5 +1,5 @@
 const { Buffer: NodeBuffer } = require('buffer');
-const { initCrypto } = require('virgil-crypto');
+const { initCrypto, VirgilCrypto: V4Crypto } = require('virgil-crypto');
 const { VirgilCrypto: V3Crypto } = require('virgil-crypto-3');
 
 const createSuite = (benchmark) => {
@@ -290,7 +290,7 @@ const decryptThenVerifyDetachedBenchmark = (benchmark, v3Crypto, v4Crypto) => {
 };
 
 const runBenchmark = benchmark => {
-  initCrypto().then(({ VirgilCrypto: V4Crypto }) => {
+  initCrypto().then(() => {
     const run = fn => {
       const v3Crypto = new V3Crypto();
       const v4Crypto = new V4Crypto();

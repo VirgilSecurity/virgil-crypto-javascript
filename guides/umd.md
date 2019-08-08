@@ -13,7 +13,10 @@ And then simply use the library:
 ```js
 // Use the global variable `VirgilCrypto` as a namespace object,
 // containing all of module exports as properties
-const { initCrypto } = VirgilCrypto;
+VirgilCrypto.initCrypto().then(() => {
+  const virgilCrypto = new VirgilCrypto.VirgilCrypto();
+  // ... your code here ...
+});
 ```
 
 Also make sure to get familiar with [usage examples](usage-examples.md) of the library.

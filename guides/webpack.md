@@ -28,7 +28,7 @@ node: false
 
 Last, you need to import the library:
 ```js
-import { initCrypto } 'virgil-crypto';
+import { initCrypto, VirgilCrypto } 'virgil-crypto';
 ```
 
 Here is [complete working demo](https://github.com/VirgilSecurity/virgil-crypto-javascript/tree/master/packages/webpack-demo) of this approach.
@@ -41,7 +41,7 @@ node: false
 
 And then simply import the library:
 ```js
-import { initCrypto } from 'virgil-crypto/dist/browser.asmjs.es';
+import { initCrypto, VirgilCrypto } from 'virgil-crypto/dist/browser.asmjs.es';
 ```
 
 ## Support

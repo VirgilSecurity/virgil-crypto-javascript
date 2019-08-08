@@ -1,5 +1,5 @@
 import {
-  VirgilCryptoType,
+  VirgilCrypto,
   IPrivateKey,
   IPublicKey,
   VirgilPrivateKey,
@@ -9,9 +9,9 @@ import {
 import { prepareData } from './utils';
 
 export class VirgilAccessTokenSigner {
-  readonly virgilCrypto: VirgilCryptoType;
+  readonly virgilCrypto: VirgilCrypto;
 
-  constructor(virgilCrypto: VirgilCryptoType) {
+  constructor(virgilCrypto: VirgilCrypto) {
     if (virgilCrypto == null) {
       throw new Error('`virgilCrypto` is required');
     }

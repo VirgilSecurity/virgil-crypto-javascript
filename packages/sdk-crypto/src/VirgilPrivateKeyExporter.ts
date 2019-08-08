@@ -1,11 +1,11 @@
-import { VirgilCryptoType, IPrivateKey, VirgilPrivateKey } from '@virgilsecurity/base-crypto';
+import { VirgilCrypto, IPrivateKey, VirgilPrivateKey } from '@virgilsecurity/base-crypto';
 
 import { prepareData } from './utils';
 
 export class VirgilPrivateKeyExporter {
-  readonly virgilCrypto: VirgilCryptoType;
+  readonly virgilCrypto: VirgilCrypto;
 
-  constructor(virgilCrypto: VirgilCryptoType) {
+  constructor(virgilCrypto: VirgilCrypto) {
     if (virgilCrypto == null) {
       throw new Error('`virgilCrypto` is required');
     }

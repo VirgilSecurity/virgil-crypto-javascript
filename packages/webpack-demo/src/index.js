@@ -1,6 +1,6 @@
-import { initCrypto } from 'virgil-crypto';
+import { initCrypto, VirgilCrypto } from 'virgil-crypto';
 
-initCrypto().then(({ VirgilCrypto }) => {
+initCrypto().then(() => {
   const virgilCrypto = new VirgilCrypto();
   const keys = virgilCrypto.generateKeys();
   const data = 'data';

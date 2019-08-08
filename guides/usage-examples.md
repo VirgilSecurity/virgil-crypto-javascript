@@ -3,38 +3,36 @@
 ## Generate a key pair
 Generate a Private Key with the default algorithm (EC_X25519):
 ```js
-import { initCrypto } from 'virgil-crypto';
+import { initCrypto, VirgilCrypto } from 'virgil-crypto';
 // You may replace this import with an import that suits your environment
 
-initCrypto()
-  .then(({ VirgilCrypto }) => {
-    const virgilCrypto = new VirgilCrypto();
-    const keyPair = virgilCrypto.generateKeys();
-  });
+initCrypto().then(() => {
+  const virgilCrypto = new VirgilCrypto();
+  const keyPair = virgilCrypto.generateKeys();
+});
 ```
 
 ## Generate and verify a signature
 Generate signature and sign data with a private key:
 ```js
-import { initCrypto } from 'virgil-crypto';
+import { initCrypto, VirgilCrypto } from 'virgil-crypto';
 // You may replace this import with an import that suits your environment
 
-initCrypto()
-  .then(({ VirgilCrypto }) => {
-    const virgilCrypto = new VirgilCrypto();
-    const signingKeypair = virgilCrypto.generateKeys();
+initCrypto().then(() => {
+  const virgilCrypto = new VirgilCrypto();
+  const signingKeypair = virgilCrypto.generateKeys();
 
-    // prepare a message
-    const messageToSign = 'Hello, Bob!';
+  // prepare a message
+  const messageToSign = 'Hello, Bob!';
 
-    // generate a signature
-    const signature = virgilCrypto.calculateSignature(
-      { value: messageToSign, encoding: 'utf8' },
-      signingKeypair.privateKey
-    );
-    // signature is a NodeJS Buffer (or polyfill if in the browser)
-    console.log(signature.toString('base64'));
-  });
+  // generate a signature
+  const signature = virgilCrypto.calculateSignature(
+    { value: messageToSign, encoding: 'utf8' },
+    signingKeypair.privateKey
+  );
+  // signature is a NodeJS Buffer (or polyfill if in the browser)
+  console.log(signature.toString('base64'));
+});
 ```
 
 Verify a signature with a public key:
@@ -50,25 +48,24 @@ const verified = virgilCrypto.verifySignature(
 ## Encrypt and decrypt data
 Encrypt Data on a Public Key:
 ```js
-import { initCrypto } from 'virgil-crypto';
+import { initCrypto, VirgilCrypto } from 'virgil-crypto';
 // You may replace this import with an import that suits your environment
 
-initCrypto()
-  .then(({ VirgilCrypto }) => {
-    const virgilCrypto = new VirgilCrypto();
-    const encryptionKeypair = virgilCrypto.generateKeys();
+initCrypto().then(() => {
+  const virgilCrypto = new VirgilCrypto();
+  const encryptionKeypair = virgilCrypto.generateKeys();
 
-    // prepare a message
-    const messageToEncrypt = 'Hello, Bob!';
+  // prepare a message
+  const messageToEncrypt = 'Hello, Bob!';
 
-    // generate a signature
-    const encryptedData = virgilCrypto.encrypt(
-      { value: messageToEncrypt, encoding: 'utf8' },
-      encryptionKeypair.publicKey
-    );
-    // encryptedData is a NodeJS Buffer (or polyfill if in the browser)
-    console.log(encryptedData.toString('base64'));
-  });
+  // generate a signature
+  const encryptedData = virgilCrypto.encrypt(
+    { value: messageToEncrypt, encoding: 'utf8' },
+    encryptionKeypair.publicKey
+  );
+  // encryptedData is a NodeJS Buffer (or polyfill if in the browser)
+  console.log(encryptedData.toString('base64'));
+});
 ```
 
 Decrypt the encrypted data with a Private Key:

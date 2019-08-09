@@ -1,0 +1,67 @@
+v3 - generateKeys x 75.59 ops/sec ±1.02% (53 runs sampled)
+v4 - generateKeys x 255 ops/sec ±9.68% (52 runs sampled)
+Fastest is v4 - generateKeys
+
+v3 - generateKeysFromKeyMaterial x 71.39 ops/sec ±2.73% (47 runs sampled)
+v4 - generateKeysFromKeyMaterial x 280 ops/sec ±3.37% (53 runs sampled)
+Fastest is v4 - generateKeysFromKeyMaterial
+
+v3 - importPrivateKey x 99.58 ops/sec ±4.31% (49 runs sampled)
+v4 - importPrivateKey x 267 ops/sec ±2.26% (54 runs sampled)
+Fastest is v4 - importPrivateKey
+
+v3 - exportPrivateKey x 29,809,228 ops/sec ±8.68% (54 runs sampled)
+v4 - exportPrivateKey x 274,198 ops/sec ±3.45% (54 runs sampled)
+Fastest is v3 - exportPrivateKey
+
+v3 - importPublicKey x 261 ops/sec ±5.15% (55 runs sampled)
+v4 - importPublicKey x 301 ops/sec ±3.79% (58 runs sampled)
+Fastest is v4 - importPublicKey
+
+v3 - exportPublicKey x 84,589,470 ops/sec ±3.02% (56 runs sampled)
+v4 - exportPublicKey x 329,655 ops/sec ±4.37% (60 runs sampled)
+Fastest is v3 - exportPublicKey
+
+v3 - encrypt x 84.17 ops/sec ±0.71% (53 runs sampled)
+v4 - encrypt x 3,124 ops/sec ±6.02% (56 runs sampled)
+Fastest is v4 - encrypt
+
+v3 - decrypt x 84.35 ops/sec ±1.87% (53 runs sampled)
+v4 - decrypt x 290 ops/sec ±5.66% (60 runs sampled)
+Fastest is v4 - decrypt
+
+v3 - calculateHash x 4,048 ops/sec ±5.45% (25 runs sampled)
+v4 - calculateHash x 130,365 ops/sec ±5.38% (60 runs sampled)
+Fastest is v4 - calculateHash
+
+v3 - extractPublicKey x 219 ops/sec ±3.92% (57 runs sampled)
+v4 - extractPublicKey x 7,302,102 ops/sec ±2.14% (60 runs sampled)
+Fastest is v4 - extractPublicKey
+
+v3 - calculateSignature x 139 ops/sec ±2.83% (53 runs sampled)
+v4 - calculateSignature x 6,290 ops/sec ±5.30% (36 runs sampled)
+Fastest is v4 - calculateSignature
+
+v3 - verifySignature x 128 ops/sec ±2.03% (54 runs sampled)
+v4 - verifySignature x 5,425 ops/sec ±4.71% (31 runs sampled)
+Fastest is v4 - verifySignature
+
+v3 - signThenEncrypt x 48.86 ops/sec ±5.05% (44 runs sampled)
+v4 - signThenEncrypt x 2,041 ops/sec ±4.74% (15 runs sampled)
+Fastest is v4 - signThenEncrypt
+
+v3 - decryptThenVerify x 42.73 ops/sec ±6.44% (43 runs sampled)
+v4 - decryptThenVerify x 263 ops/sec ±3.64% (56 runs sampled)
+Fastest is v4 - decryptThenVerify
+
+v3 - getRandomBytes x 265 ops/sec ±4.62% (55 runs sampled)
+v4 - getRandomBytes x 309,235 ops/sec ±7.79% (56 runs sampled)
+Fastest is v4 - getRandomBytes
+
+v3 - signThenEncryptDetached x 50.37 ops/sec ±3.40% (44 runs sampled)
+v4 - signThenEncryptDetached x 1,937 ops/sec ±4.42% (57 runs sampled)
+Fastest is v4 - signThenEncryptDetached
+
+v3 - decryptThenVerifyDetached x 49.97 ops/sec ±2.92% (51 runs sampled)
+v4 - decryptThenVerifyDetached x 277 ops/sec ±2.70% (60 runs sampled)
+Fastest is v4 - decryptThenVerifyDetached

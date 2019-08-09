@@ -1,0 +1,41 @@
+{
+  "name": "virgil-crypto",
+  "version": "4.0.0-alpha.0",
+  "description": "Virgil JavaScript Crypto Library is a high-level cryptographic library that allows you to perform all necessary operations for secure storing and transferring data and everything required to become HIPAA and GDPR compliant.",
+  "main": "./dist/node.cjs.js",
+  "module": "./dist/node.es.js",
+  "browser": {
+    "./dist/node.cjs.js": "./dist/browser.cjs.js",
+    "./dist/node.es.js": "./dist/browser.es.js"
+  },
+  "typings": "./index.d.ts",
+  "files": [
+    "dist",
+    "index.d.ts"
+  ],
+  "repository": "https://github.com/VirgilSecurity/virgil-javascript/tree/master/packages/crypto",
+  "author": "Virgil Security Inc. <support@virgilsecurity.com>",
+  "license": "BSD-3-Clause",
+  "scripts": {
+    "build:templates": "node templates.js",
+    "build:umd": "rollup -c",
+    "build:modules": "node modules.js",
+    "build": "npm run build:templates && npm run build:umd && npm run build:modules",
+    "clean": "rimraf .templates dist",
+    "prepare": "npm run clean && npm run build"
+  },
+  "dependencies": {
+    "@virgilsecurity/base-crypto": "^0.1.0",
+    "@virgilsecurity/core-foundation": "^0.1.0",
+    "@virgilsecurity/sdk-crypto": "^0.1.0"
+  },
+  "devDependencies": {
+    "lodash": "^4.17.15",
+    "rimraf": "^2.6.3",
+    "rollup": "^1.18.0",
+    "rollup-plugin-commonjs": "^10.0.2",
+    "rollup-plugin-copy": "^3.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-terser": "^5.1.1"
+  }
+}

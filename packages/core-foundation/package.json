@@ -1,0 +1,15 @@
+{
+  "name": "@virgilsecurity/core-foundation",
+  "version": "0.1.0",
+  "description": "Virgil Foundation",
+  "main": "./node.cjs.js",
+  "module": "./node.es.js",
+  "browser": {
+    "./node.cjs.js": "./browser.cjs.js",
+    "./node.es.js": "./browser.es.js"
+  },
+  "typings": "./index.d.ts",
+  "repository": "https://github.com/VirgilSecurity/virgil-crypto-javascript/tree/master/packages/core-foundation",
+  "author": "Virgil Security Inc. <support@virgilsecurity.com>",
+  "license": "BSD-3-Clause"
+}

@@ -11,5 +11,8 @@
   "typings": "./index.d.ts",
   "repository": "https://github.com/VirgilSecurity/virgil-crypto-javascript/tree/master/packages/core-pythia",
   "author": "Virgil Security Inc. <support@virgilsecurity.com>",
-  "license": "BSD-3-Clause"
+  "license": "BSD-3-Clause",
+  "publishConfig": {
+    "access": "public"
+  }
 }

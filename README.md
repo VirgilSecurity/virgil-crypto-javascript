@@ -2,7 +2,6 @@
 
 # Virgil Security JavaScript Crypto Library
 [![Build Status](https://travis-ci.org/VirgilSecurity/virgil-crypto-javascript.svg)](https://travis-ci.org/VirgilSecurity/virgil-crypto-javascript)
-[![Build status](https://ci.appveyor.com/api/projects/status/7f65gm604d8sf6sm/branch/master?svg=true)](https://ci.appveyor.com/project/vadimavdeev/virgil-crypto-javascript/branch/master)
 [![npm](https://img.shields.io/npm/v/virgil-crypto.svg)](https://www.npmjs.com/package/virgil-crypto)
 [![GitHub license](https://img.shields.io/badge/license-BSD%203--Clause-blue.svg)](https://github.com/VirgilSecurity/virgil/blob/master/LICENSE)
 

@@ -25,5 +25,8 @@
     "rollup": "^1.14.6",
     "rollup-plugin-typescript2": "^0.21.1",
     "typescript": "^3.5.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

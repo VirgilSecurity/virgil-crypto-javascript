@@ -27,7 +27,7 @@ enjoy the privacy and security they increasingly demand.
 ## Getting started
 First, you need to install the package from npm:
 ```sh
-npm install virgil-crypto
+npm install virgil-crypto@next
 ```
 > If you are not using npm, follow our [UMD guide](guides/umd.md) to get started.
 

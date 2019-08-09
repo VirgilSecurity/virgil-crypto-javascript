@@ -2,11 +2,11 @@
 First, you need to add a `<script>` tag depending on approach you have decided to follow:
 - WebAssembly. This is our recommended approach. [List of supported browsers](https://caniuse.com/#feat=wasm).
   ```html
-  <script type="text/javascript" src="https://unpkg.com/virgil-crypto/dist/browser.umd.js"></script>
+  <script type="text/javascript" src="https://unpkg.com/virgil-crypto@next/dist/browser.umd.js"></script>
   ```
 - asm.js. Use it only in case you need to support old web browsers.
   ```html
-  <script type="text/javascript" src="https://unpkg.com/virgil-crypto/dist/browser.asmjs.umd.js"></script>
+  <script type="text/javascript" src="https://unpkg.com/virgil-crypto@next/dist/browser.asmjs.umd.js"></script>
   ```
 
 And then simply use the library:

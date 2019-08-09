@@ -1,7 +1,7 @@
 # Virgil Security JavaScript Crypto Library - Usage Examples
 
 ## Generate a key pair
-Generate a Private Key with the default algorithm (EC_X25519):
+Generate a Private Key with the default algorithm (ED25519):
 ```js
 import { initCrypto, VirgilCrypto } from 'virgil-crypto';
 // You may replace this import with an import that suits your environment

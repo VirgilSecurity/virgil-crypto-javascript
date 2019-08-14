@@ -194,6 +194,7 @@ export class VirgilCrypto {
     const lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
 
     const recipientCipher = new this.foundationModules.RecipientCipher();
+    recipientCipher.random = this.random;
 
     recipientCipher.startDecryptionWithKey(
       privateKey.identifier,
@@ -333,6 +334,7 @@ export class VirgilCrypto {
     const lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
 
     const recipientCipher = new this.foundationModules.RecipientCipher();
+    recipientCipher.random = this.random;
 
     recipientCipher.startDecryptionWithKey(
       privateKey.identifier,
@@ -440,6 +442,7 @@ export class VirgilCrypto {
     validatePublicKeysArray(publicKeys);
 
     const recipientCipher = new this.foundationModules.RecipientCipher();
+    recipientCipher.random = this.random;
 
     recipientCipher.startDecryptionWithKey(privateKey.identifier, lowLevelPrivateKey, myMetadata);
     const processDecryption = recipientCipher.processDecryption(myEncryptedData);

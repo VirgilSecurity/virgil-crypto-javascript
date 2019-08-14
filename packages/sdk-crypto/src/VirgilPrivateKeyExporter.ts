@@ -1,6 +1,4 @@
-import { VirgilCrypto, IPrivateKey, VirgilPrivateKey } from '@virgilsecurity/base-crypto';
-
-import { prepareData } from './utils';
+import { Data, VirgilCrypto, VirgilPrivateKey } from '@virgilsecurity/base-crypto';
 
 export class VirgilPrivateKeyExporter {
   readonly virgilCrypto: VirgilCrypto;
@@ -12,12 +10,11 @@ export class VirgilPrivateKeyExporter {
     this.virgilCrypto = virgilCrypto;
   }
 
-  exportPrivateKey(key: IPrivateKey) {
-    return this.virgilCrypto.exportPrivateKey(key as VirgilPrivateKey);
+  exportPrivateKey(key: VirgilPrivateKey) {
+    return this.virgilCrypto.exportPrivateKey(key);
   }
 
-  importPrivateKey(keyData: Uint8Array | string) {
-    const myKeyData = prepareData(keyData, 'utf8');
-    return this.virgilCrypto.importPrivateKey(myKeyData);
+  importPrivateKey(keyData: Data) {
+    return this.virgilCrypto.importPrivateKey(keyData);
   }
 }

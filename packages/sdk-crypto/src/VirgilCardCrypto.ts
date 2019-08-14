@@ -1,12 +1,4 @@
-import {
-  VirgilCrypto,
-  IPrivateKey,
-  IPublicKey,
-  VirgilPrivateKey,
-  VirgilPublicKey,
-} from '@virgilsecurity/base-crypto';
-
-import { prepareData } from './utils';
+import { Data, VirgilCrypto, VirgilPrivateKey, VirgilPublicKey } from '@virgilsecurity/base-crypto';
 
 export class VirgilCardCrypto {
   readonly virgilCrypto: VirgilCrypto;
@@ -18,32 +10,23 @@ export class VirgilCardCrypto {
     this.virgilCrypto = virgilCrypto;
   }
 
-  generateSignature(data: Uint8Array | string, privateKey: IPrivateKey) {
-    const myData = prepareData(data, 'utf8');
-    return this.virgilCrypto.calculateSignature(myData, privateKey as VirgilPrivateKey);
+  generateSignature(data: Data, privateKey: VirgilPrivateKey) {
+    return this.virgilCrypto.calculateSignature(data, privateKey);
   }
 
-  verifySignature(
-    data: Uint8Array | string,
-    signature: Uint8Array | string,
-    publicKey: IPublicKey,
-  ) {
-    const myData = prepareData(data, 'utf8');
-    const mySignature = prepareData(signature, 'base64');
-    return this.virgilCrypto.verifySignature(myData, mySignature, publicKey as VirgilPublicKey);
+  verifySignature(data: Data, signature: Data, publicKey: VirgilPublicKey) {
+    return this.virgilCrypto.verifySignature(data, signature, publicKey);
   }
 
-  exportPublicKey(publicKey: IPublicKey) {
-    return this.virgilCrypto.exportPublicKey(publicKey as VirgilPublicKey);
+  exportPublicKey(publicKey: VirgilPublicKey) {
+    return this.virgilCrypto.exportPublicKey(publicKey);
   }
 
-  importPublicKey(publicKeyData: Uint8Array | string) {
-    const myPublicKeyData = prepareData(publicKeyData, 'base64');
-    return this.virgilCrypto.importPublicKey(myPublicKeyData);
+  importPublicKey(publicKeyData: Data) {
+    return this.virgilCrypto.importPublicKey(publicKeyData);
   }
 
-  generateSha512(data: Uint8Array | string) {
-    const myData = prepareData(data, 'utf8');
-    return this.virgilCrypto.calculateHash(myData, this.virgilCrypto.hashAlgorithm.SHA512);
+  generateSha512(data: Data) {
+    return this.virgilCrypto.calculateHash(data, this.virgilCrypto.hashAlgorithm.SHA512);
   }
 }

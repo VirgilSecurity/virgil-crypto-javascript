@@ -2,7 +2,13 @@ import { Buffer as NodeBuffer } from 'buffer';
 
 import { StringEncoding, Data } from './types';
 
-export const dataToUint8Array = (data: Data): Uint8Array => {
+export const dataToUint8Array = (
+  data: Data,
+  defaultEncoding?: keyof typeof StringEncoding,
+): Uint8Array => {
+  if (typeof data === 'string') {
+    return NodeBuffer.from(data, defaultEncoding);
+  }
   if (data instanceof Uint8Array) {
     return data;
   }
@@ -14,16 +20,6 @@ export const dataToUint8Array = (data: Data): Uint8Array => {
     return NodeBuffer.from(data.value, data.encoding);
   }
   throw new TypeError('Invalid format of Data');
-};
-
-export const uint8ArrayOrStringToUint8Array = (
-  value: Uint8Array | string,
-  encoding: keyof typeof StringEncoding,
-) => {
-  if (typeof value === 'string') {
-    return dataToUint8Array({ value, encoding });
-  }
-  return value;
 };
 
 export const toArray = <T>(val?: T | T[]): T[] => {

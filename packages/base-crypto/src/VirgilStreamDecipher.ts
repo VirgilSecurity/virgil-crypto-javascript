@@ -49,7 +49,7 @@ export class VirgilStreamDecipher {
 
   update(data: Data) {
     this.ensureLegalState();
-    const myData = dataToUint8Array(data);
+    const myData = dataToUint8Array(data, 'utf8');
     return toBuffer(this.recipientCipher.processDecryption(myData));
   }
 

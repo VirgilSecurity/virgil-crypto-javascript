@@ -12,7 +12,7 @@ export interface StringWithEncoding {
   encoding: keyof typeof StringEncoding;
 }
 
-export type Data = Uint8Array | StringWithEncoding;
+export type Data = Uint8Array | StringWithEncoding | string;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type LowLevelPrivateKey = any;

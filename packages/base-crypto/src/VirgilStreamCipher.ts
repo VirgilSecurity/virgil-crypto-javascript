@@ -36,7 +36,7 @@ export class VirgilStreamCipher {
     });
 
     if (signature) {
-      const mySignature = dataToUint8Array(signature);
+      const mySignature = dataToUint8Array(signature, 'base64');
       this.messageInfoCustomParams = this.recipientCipher.customParams();
       this.messageInfoCustomParams.addData(DATA_SIGNATURE_KEY, mySignature);
     }
@@ -52,7 +52,7 @@ export class VirgilStreamCipher {
   update(data: Data) {
     this.ensureLegalState();
     this.ensureIsRunning();
-    const myData = dataToUint8Array(data);
+    const myData = dataToUint8Array(data, 'utf8');
     return toBuffer(this.recipientCipher.processEncryption(myData));
   }
 

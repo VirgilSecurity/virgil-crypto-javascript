@@ -26,7 +26,7 @@ export class VirgilStreamSigner {
         'Illegal state. Cannot use signer after the `dispose` method has been called.',
       );
     }
-    const myData = dataToUint8Array(data);
+    const myData = dataToUint8Array(data, 'utf8');
     this.signer.appendData(myData);
     return this;
   }

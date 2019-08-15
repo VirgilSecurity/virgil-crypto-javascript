@@ -61,7 +61,7 @@ export class VirgilCrypto {
 
   generateKeysFromKeyMaterial(keyMaterial: Data, type?: KeyPairTypeType[keyof KeyPairTypeType]) {
     const keyPairType = type ? type : this.defaultKeyPairType;
-    const myKeyMaterial = dataToUint8Array(keyMaterial);
+    const myKeyMaterial = dataToUint8Array(keyMaterial, 'base64');
 
     const keyMaterialRng = new this.foundationModules.KeyMaterialRng();
     keyMaterialRng.resetKeyMaterial(myKeyMaterial);
@@ -85,7 +85,7 @@ export class VirgilCrypto {
   }
 
   importPrivateKey(rawPrivateKey: Data) {
-    const myRawPrivateKey = dataToUint8Array(rawPrivateKey);
+    const myRawPrivateKey = dataToUint8Array(rawPrivateKey, 'base64');
 
     const keyProvider = new this.foundationModules.KeyProvider();
     keyProvider.setupDefaults();
@@ -128,7 +128,7 @@ export class VirgilCrypto {
   }
 
   importPublicKey(rawPublicKey: Data) {
-    const myRawPublicKey = dataToUint8Array(rawPublicKey);
+    const myRawPublicKey = dataToUint8Array(rawPublicKey, 'base64');
 
     const keyProvider = new this.foundationModules.KeyProvider();
     keyProvider.setupDefaults();
@@ -162,7 +162,7 @@ export class VirgilCrypto {
   }
 
   encrypt(data: Data, publicKey: VirgilPublicKey | VirgilPublicKey[]) {
-    const myData = dataToUint8Array(data);
+    const myData = dataToUint8Array(data, 'utf8');
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
 
@@ -189,11 +189,12 @@ export class VirgilCrypto {
   }
 
   decrypt(encryptedData: Data, privateKey: VirgilPrivateKey) {
-    const myData = dataToUint8Array(encryptedData);
+    const myData = dataToUint8Array(encryptedData, 'base64');
     validatePrivateKey(privateKey);
     const lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
 
     const recipientCipher = new this.foundationModules.RecipientCipher();
+    recipientCipher.random = this.random;
 
     recipientCipher.startDecryptionWithKey(
       privateKey.identifier,
@@ -214,7 +215,7 @@ export class VirgilCrypto {
     data: Data,
     algorithm: HashAlgorithmType[keyof HashAlgorithmType] = HashAlgorithm.SHA512,
   ) {
-    const myData = dataToUint8Array(data);
+    const myData = dataToUint8Array(data, 'utf8');
     let result: Uint8Array;
     switch (algorithm) {
       case HashAlgorithm.SHA224:
@@ -243,7 +244,7 @@ export class VirgilCrypto {
   }
 
   calculateSignature(data: Data, privateKey: VirgilPrivateKey) {
-    const myData = dataToUint8Array(data);
+    const myData = dataToUint8Array(data, 'utf8');
     validatePrivateKey(privateKey);
     const lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
 
@@ -264,8 +265,8 @@ export class VirgilCrypto {
   }
 
   verifySignature(data: Data, signature: Data, publicKey: VirgilPublicKey) {
-    const myData = dataToUint8Array(data);
-    const mySignature = dataToUint8Array(signature);
+    const myData = dataToUint8Array(data, 'utf8');
+    const mySignature = dataToUint8Array(signature, 'base64');
     validatePublicKey(publicKey);
 
     const verifier = new this.foundationModules.Verifier();
@@ -284,7 +285,7 @@ export class VirgilCrypto {
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
   ) {
-    const myData = dataToUint8Array(data);
+    const myData = dataToUint8Array(data, 'utf8');
 
     validatePrivateKey(privateKey);
 
@@ -324,7 +325,7 @@ export class VirgilCrypto {
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
   ) {
-    const myEncryptedData = dataToUint8Array(encryptedData);
+    const myEncryptedData = dataToUint8Array(encryptedData, 'base64');
 
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
@@ -333,6 +334,7 @@ export class VirgilCrypto {
     const lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
 
     const recipientCipher = new this.foundationModules.RecipientCipher();
+    recipientCipher.random = this.random;
 
     recipientCipher.startDecryptionWithKey(
       privateKey.identifier,
@@ -386,7 +388,7 @@ export class VirgilCrypto {
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
   ) {
-    const myData = dataToUint8Array(data);
+    const myData = dataToUint8Array(data, 'utf8');
 
     validatePrivateKey(privateKey);
 
@@ -430,8 +432,8 @@ export class VirgilCrypto {
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
   ) {
-    const myEncryptedData = dataToUint8Array(encryptedData);
-    const myMetadata = dataToUint8Array(metadata);
+    const myEncryptedData = dataToUint8Array(encryptedData, 'base64');
+    const myMetadata = dataToUint8Array(metadata, 'base64');
 
     validatePrivateKey(privateKey);
     const lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
@@ -440,6 +442,7 @@ export class VirgilCrypto {
     validatePublicKeysArray(publicKeys);
 
     const recipientCipher = new this.foundationModules.RecipientCipher();
+    recipientCipher.random = this.random;
 
     recipientCipher.startDecryptionWithKey(privateKey.identifier, lowLevelPrivateKey, myMetadata);
     const processDecryption = recipientCipher.processDecryption(myEncryptedData);

@@ -11,7 +11,7 @@ export class VirgilStreamVerifier {
 
   constructor(signature: Data) {
     const foundationModules = getFoundationModules();
-    const mySignature = dataToUint8Array(signature);
+    const mySignature = dataToUint8Array(signature, 'base64');
     this.verifier = new foundationModules.Verifier();
     this.verifier.reset(mySignature);
   }
@@ -22,7 +22,7 @@ export class VirgilStreamVerifier {
         'Illegal state. Cannot use signer after the `dispose` method has been called.',
       );
     }
-    const myData = dataToUint8Array(data);
+    const myData = dataToUint8Array(data, 'utf8');
     this.verifier.appendData(myData);
     return this;
   }

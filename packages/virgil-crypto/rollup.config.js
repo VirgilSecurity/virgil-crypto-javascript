@@ -15,7 +15,7 @@ const createBundle = (entryName, outputName) => ({
     name: 'VirgilCrypto',
   },
   plugins: [
-    nodeResolve({ preferBuiltins: false }),
+    nodeResolve({ browser: true }),
     commonjs(),
     terser(),
   ],

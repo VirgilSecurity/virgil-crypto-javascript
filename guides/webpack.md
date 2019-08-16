@@ -21,11 +21,6 @@ Second, you need to add a [rule](https://webpack.js.org/configuration/module/#ru
 }
 ```
 
-Third, you need to [disable mocking of Node.js modules and globals](https://webpack.js.org/configuration/node) in your Webpack config:
-```js
-node: false
-```
-
 Last, you need to import the library:
 ```js
 import { initCrypto, VirgilCrypto } 'virgil-crypto';

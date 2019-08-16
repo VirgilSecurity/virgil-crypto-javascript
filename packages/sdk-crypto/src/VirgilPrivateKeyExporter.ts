@@ -1,4 +1,6 @@
-import { Data, VirgilCrypto, VirgilPrivateKey } from '@virgilsecurity/base-crypto';
+import { VirgilCrypto, VirgilPrivateKey } from '@virgilsecurity/base-crypto';
+
+import { Data } from './types';
 
 export class VirgilPrivateKeyExporter {
   readonly virgilCrypto: VirgilCrypto;

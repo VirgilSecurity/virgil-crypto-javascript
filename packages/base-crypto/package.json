@@ -19,7 +19,7 @@
     "lint": "eslint 'src/**/*.ts'"
   },
   "dependencies": {
-    "buffer": "^5.2.1"
+    "@virgilsecurity/data-utils": "^0.1.0"
   },
   "peerDependencies": {
     "@virgilsecurity/core-foundation": "^0.1.0"

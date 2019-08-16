@@ -1,5 +1,5 @@
 import { FoundationModules } from '@virgilsecurity/core-foundation';
-import { Buffer as NodeBuffer } from 'buffer';
+import { Buffer as NodeBuffer, dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 
 import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
 import { getFoundationModules } from './foundationModules';
@@ -7,7 +7,7 @@ import { HashAlgorithm, HashAlgorithmType } from './HashAlgorithm';
 import { KeyPairType, KeyPairTypeType } from './KeyPairType';
 import { getLowLevelPrivateKey } from './privateKeyUtils';
 import { Data, LowLevelPrivateKey, LowLevelPublicKey } from './types';
-import { dataToUint8Array, toArray, toBuffer } from './utils';
+import { toArray } from './utils';
 import { validatePrivateKey, validatePublicKey, validatePublicKeysArray } from './validators';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 import { VirgilPublicKey } from './VirgilPublicKey';

@@ -1,5 +1,7 @@
 const path = require('path');
 
+const commonjs = require('rollup-plugin-commonjs');
+const nodeResolve = require('rollup-plugin-node-resolve');
 const typescript = require('rollup-plugin-typescript2');
 
 const FORMAT = {
@@ -9,22 +11,33 @@ const FORMAT = {
 
 const sourcePath = path.join(__dirname, 'src');
 const outputPath = path.join(__dirname, 'dist');
-const browserEntry = path.join(sourcePath, 'browser.ts');
-const nodeEntry = path.join(sourcePath, 'node.ts');
 
-const createEntry = (entryPath, format) => ({
+const createNodeEntry = format => ({
   external: ['buffer/'],
-  input: entryPath,
+  input: path.join(sourcePath, 'node.ts'),
   output: {
     format,
-    file: path.join(outputPath, `${path.parse(entryPath).name}.${format}.js`),
+    file: path.join(outputPath, `node.${format}.js`),
   },
   plugins: [typescript({ useTsconfigDeclarationDir: true })],
 });
 
+const createBrowserEntry = format => ({
+  input: path.join(sourcePath, 'browser.ts'),
+  output: {
+    format,
+    file: path.join(outputPath, `browser.${format}.js`),
+  },
+  plugins: [
+    nodeResolve({ browser: true }),
+    commonjs(),
+    typescript({ useTsconfigDeclarationDir: true }),
+  ]
+});
+
 module.exports = [
-  createEntry(browserEntry, FORMAT.CJS),
-  createEntry(browserEntry, FORMAT.ES),
-  createEntry(nodeEntry, FORMAT.CJS),
-  createEntry(nodeEntry, FORMAT.ES),
+  createBrowserEntry(FORMAT.CJS),
+  createBrowserEntry(FORMAT.ES),
+  createNodeEntry(FORMAT.CJS),
+  createNodeEntry(FORMAT.ES),
 ];

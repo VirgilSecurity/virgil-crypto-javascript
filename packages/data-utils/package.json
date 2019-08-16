@@ -1,0 +1,41 @@
+{
+  "name": "@virgilsecurity/data-utils",
+  "version": "0.1.0",
+  "description": "Library that contains different functions / classes that are used for data manipulation in different Virgil Security libraries.",
+  "main": "./dist/node.cjs.js",
+  "module": "./dist/node.es.js",
+  "browser": {
+    "./dist/node.cjs.js": "./dist/browser.cjs.js",
+    "./dist/node.es.js": "./dist/browser.es.js"
+  },
+  "typings": "./dist/types/node.d.ts",
+  "files": [
+    "dist"
+  ],
+  "repository": "https://github.com/VirgilSecurity/virgil-crypto-javascript/tree/master/packages/data-utils",
+  "author": "Virgil Security Inc. <support@virgilsecurity.com>",
+  "license": "BSD-3-Clause",
+  "scripts": {
+    "test": "mocha -r ts-node/register src/**/*.test.ts",
+    "build": "rollup -c",
+    "clean": "rimraf .rpt2_cache dist",
+    "prepare": "npm run clean && npm run build"
+  },
+  "dependencies": {
+    "buffer": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.7",
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4",
+    "rimraf": "^2.6.3",
+    "rollup": "^1.18.0",
+    "rollup-plugin-typescript2": "^0.21.1",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.5.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

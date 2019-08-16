@@ -5,6 +5,6 @@ import { Buffer as BrowserBuffer } from 'buffer/';
 describe('browser', () => {
   it('exports correct Buffer', () => {
     const { Buffer } = require('../browser');
-    expect(Buffer === BrowserBuffer).to.be.true;
+    expect(Buffer).to.eql(BrowserBuffer);
   });
 });

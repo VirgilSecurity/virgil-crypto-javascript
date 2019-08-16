@@ -26,7 +26,7 @@ describe('dataToUint8Array', () => {
   it('returns the same Uint8Array if argument is an instance of Uint8Array', () => {
     const data = new Uint8Array(0);
     const result = dataToUint8Array(data);
-    expect(result === result).to.be.true;
+    expect(result).to.eql(data);
   });
 
   it('throws if first argument is not a string / Data object / Uint8Array', () => {

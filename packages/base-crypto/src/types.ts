@@ -1,18 +1,7 @@
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 import { VirgilPublicKey } from './VirgilPublicKey';
 
-export enum StringEncoding {
-  utf8 = 'utf8',
-  base64 = 'base64',
-  hex = 'hex',
-}
-
-export interface StringWithEncoding {
-  value: string;
-  encoding: keyof typeof StringEncoding;
-}
-
-export type Data = Uint8Array | StringWithEncoding | string;
+export type Data = import('@virgilsecurity/data-utils').Data;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type LowLevelPrivateKey = any;

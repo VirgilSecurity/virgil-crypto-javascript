@@ -7,7 +7,6 @@ const sourceRoot = path.join(__dirname, 'src');
 module.exports = {
   mode: 'development',
   entry: path.join(sourceRoot, 'index.js'),
-  node: false,
   module: {
     rules: [
       {

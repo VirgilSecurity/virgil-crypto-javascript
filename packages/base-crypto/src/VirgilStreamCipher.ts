@@ -1,7 +1,9 @@
+import { dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
+
 import { DATA_SIGNATURE_KEY } from './constants';
 import { getFoundationModules } from './foundationModules';
 import { Data } from './types';
-import { dataToUint8Array, toArray, toBuffer } from './utils';
+import { toArray } from './utils';
 import { validatePublicKeysArray } from './validators';
 import { VirgilPublicKey } from './VirgilPublicKey';
 

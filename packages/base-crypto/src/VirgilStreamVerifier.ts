@@ -1,6 +1,7 @@
+import { dataToUint8Array } from '@virgilsecurity/data-utils';
+
 import { getFoundationModules } from './foundationModules';
 import { Data } from './types';
-import { dataToUint8Array } from './utils';
 import { validatePublicKey } from './validators';
 import { VirgilPublicKey } from './VirgilPublicKey';
 

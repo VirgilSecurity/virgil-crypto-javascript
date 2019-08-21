@@ -1,34 +1,39 @@
-import { VirgilCrypto, VirgilPrivateKey, VirgilPublicKey } from '@virgilsecurity/base-crypto';
+import { dataToUint8Array } from '@virgilsecurity/data-utils';
 
-import { Data } from './types';
+import { IPrivateKey, IPublicKey, ICrypto, ICardCrypto, Data } from './types';
 
-export class VirgilCardCrypto {
-  readonly virgilCrypto: VirgilCrypto;
+export class VirgilCardCrypto implements ICardCrypto {
+  readonly virgilCrypto: ICrypto;
 
-  constructor(virgilCrypto: VirgilCrypto) {
+  constructor(virgilCrypto: ICrypto) {
     if (virgilCrypto == null) {
       throw new Error('`virgilCrypto` is required');
     }
     this.virgilCrypto = virgilCrypto;
   }
 
-  generateSignature(data: Data, privateKey: VirgilPrivateKey) {
-    return this.virgilCrypto.calculateSignature(data, privateKey);
+  generateSignature(data: Data, privateKey: IPrivateKey) {
+    const myData = dataToUint8Array(data, 'utf8');
+    return this.virgilCrypto.calculateSignature(myData, privateKey);
   }
 
-  verifySignature(data: Data, signature: Data, publicKey: VirgilPublicKey) {
-    return this.virgilCrypto.verifySignature(data, signature, publicKey);
+  verifySignature(data: Data, signature: Data, publicKey: IPublicKey) {
+    const myData = dataToUint8Array(data, 'utf8');
+    const mySignature = dataToUint8Array(signature, 'base64');
+    return this.virgilCrypto.verifySignature(myData, mySignature, publicKey);
   }
 
-  exportPublicKey(publicKey: VirgilPublicKey) {
+  exportPublicKey(publicKey: IPublicKey) {
     return this.virgilCrypto.exportPublicKey(publicKey);
   }
 
   importPublicKey(publicKeyData: Data) {
-    return this.virgilCrypto.importPublicKey(publicKeyData);
+    const myPublicKeyData = dataToUint8Array(publicKeyData, 'base64');
+    return this.virgilCrypto.importPublicKey(myPublicKeyData);
   }
 
   generateSha512(data: Data) {
-    return this.virgilCrypto.calculateHash(data, this.virgilCrypto.hashAlgorithm.SHA512);
+    const myData = dataToUint8Array(data, 'utf8');
+    return this.virgilCrypto.calculateHash(myData);
   }
 }

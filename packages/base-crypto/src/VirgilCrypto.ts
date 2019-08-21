@@ -6,7 +6,7 @@ import { getFoundationModules } from './foundationModules';
 import { HashAlgorithm, HashAlgorithmType } from './HashAlgorithm';
 import { KeyPairType, KeyPairTypeType } from './KeyPairType';
 import { getLowLevelPrivateKey } from './privateKeyUtils';
-import { Data, LowLevelPrivateKey, LowLevelPublicKey } from './types';
+import { ICrypto, Data, LowLevelPrivateKey, LowLevelPublicKey } from './types';
 import { toArray } from './utils';
 import { validatePrivateKey, validatePublicKey, validatePublicKeysArray } from './validators';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
@@ -21,7 +21,7 @@ export interface VirgilCryptoOptions {
   defaultKeyPairType?: KeyPairTypeType[keyof KeyPairTypeType];
 }
 
-export class VirgilCrypto {
+export class VirgilCrypto implements ICrypto {
   readonly useSha256Identifiers: boolean;
   readonly defaultKeyPairType: KeyPairTypeType[keyof KeyPairTypeType];
 

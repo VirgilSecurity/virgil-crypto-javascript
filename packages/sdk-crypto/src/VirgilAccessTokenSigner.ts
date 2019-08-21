@@ -1,11 +1,11 @@
-import { VirgilCrypto, VirgilPrivateKey, VirgilPublicKey } from '@virgilsecurity/base-crypto';
+import { dataToUint8Array } from '@virgilsecurity/data-utils';
 
-import { Data } from './types';
+import { IPrivateKey, IPublicKey, ICrypto, IAccessTokenSigner, Data } from './types';
 
-export class VirgilAccessTokenSigner {
-  readonly virgilCrypto: VirgilCrypto;
+export class VirgilAccessTokenSigner implements IAccessTokenSigner {
+  readonly virgilCrypto: ICrypto;
 
-  constructor(virgilCrypto: VirgilCrypto) {
+  constructor(virgilCrypto: ICrypto) {
     if (virgilCrypto == null) {
       throw new Error('`virgilCrypto` is required');
     }
@@ -16,11 +16,14 @@ export class VirgilAccessTokenSigner {
     return 'VEDS512';
   }
 
-  generateTokenSignature(token: Data, privateKey: VirgilPrivateKey) {
-    return this.virgilCrypto.calculateSignature(token, privateKey);
+  generateTokenSignature(token: Data, privateKey: IPrivateKey) {
+    const myToken = dataToUint8Array(token, 'utf8');
+    return this.virgilCrypto.calculateSignature(myToken, privateKey);
   }
 
-  verifyTokenSignature(token: Data, signature: Data, publicKey: VirgilPublicKey) {
-    return this.virgilCrypto.verifySignature(token, signature, publicKey);
+  verifyTokenSignature(token: Data, signature: Data, publicKey: IPublicKey) {
+    const myToken = dataToUint8Array(token, 'utf8');
+    const mySignature = dataToUint8Array(signature, 'base64');
+    return this.virgilCrypto.verifySignature(myToken, mySignature, publicKey);
   }
 };

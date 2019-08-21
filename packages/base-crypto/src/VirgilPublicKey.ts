@@ -1,5 +1,4 @@
-import { IPublicKey } from './interfaces';
-import { LowLevelPublicKey } from './types';
+import { IPublicKey, LowLevelPublicKey } from './types';
 
 export class VirgilPublicKey implements IPublicKey {
   public identifier: Uint8Array;

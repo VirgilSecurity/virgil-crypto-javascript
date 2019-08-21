@@ -1,6 +1,5 @@
-import { IPrivateKey } from './interfaces';
 import { setLowLevelPrivateKey } from './privateKeyUtils';
-import { LowLevelPrivateKey } from './types';
+import { IPrivateKey, LowLevelPrivateKey } from './types';
 
 export class VirgilPrivateKey implements IPrivateKey {
   public identifier: Uint8Array;

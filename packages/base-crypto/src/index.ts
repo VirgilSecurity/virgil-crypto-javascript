@@ -1,7 +1,6 @@
 export { setFoundationModules } from './foundationModules';
 export { HashAlgorithm } from './HashAlgorithm';
 export { KeyPairType } from './KeyPairType';
-export { IPrivateKey, IPublicKey } from './interfaces';
 export { VirgilKeyPair } from './types';
 export { VirgilCrypto } from './VirgilCrypto';
 export { VirgilPrivateKey } from './VirgilPrivateKey';

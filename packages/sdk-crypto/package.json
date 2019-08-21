@@ -16,11 +16,11 @@
     "clean": "rimraf .rpt2_cache dist",
     "prepare": "npm run clean && npm run build"
   },
-  "peerDependencies": {
-    "@virgilsecurity/base-crypto": "^0.3.0"
+  "dependencies": {
+    "@virgilsecurity/crypto-types": "^0.1.0",
+    "@virgilsecurity/data-utils": "^0.1.0"
   },
   "devDependencies": {
-    "@virgilsecurity/base-crypto": "^0.3.0",
     "rimraf": "^2.6.3",
     "rollup": "^1.14.6",
     "rollup-plugin-typescript2": "^0.21.1",

@@ -1,3 +1,9 @@
 export const createToBufferFunction = (NodeBuffer: any) => (
   array: Uint8Array
-) => NodeBuffer.from(array.buffer);
+) => {
+  let buffer = NodeBuffer.from(array.buffer);
+  if (array.byteLength !== array.buffer.byteLength) {
+    buffer = buffer.slice(array.byteOffset, array.byteOffset + array.byteLength);
+  }
+  return buffer;
+};

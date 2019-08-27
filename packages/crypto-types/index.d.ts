@@ -1,3 +1,12 @@
+export type StringEncoding = BufferEncoding;
+
+export interface StringWithEncoding {
+  value: string;
+  encoding: StringEncoding;
+}
+
+export type Data = Uint8Array | StringWithEncoding | string;
+
 export interface IPrivateKey {}
 
 export interface IPublicKey {}
@@ -9,63 +18,63 @@ export interface IKeyPair {
 
 export interface ICrypto {
   generateKeys(keyPairType?: unknown): IKeyPair;
-  generateKeysFromKeyMaterial(keyMaterial: Uint8Array, keyPairType?: unknown): IKeyPair;
-  importPrivateKey(rawPrivateKey: Uint8Array): IPrivateKey;
-  exportPrivateKey(privateKey: IPrivateKey): Uint8Array;
-  importPublicKey(rawPublicKey: Uint8Array): IPublicKey;
-  exportPublicKey(publicKey: IPublicKey): Uint8Array;
-  encrypt(data: Uint8Array, publicKey: IPublicKey | IPublicKey[]): Uint8Array;
-  decrypt(encryptedData: Uint8Array, privateKey: IPrivateKey): Uint8Array;
-  calculateHash(data: Uint8Array, algorithm?: unknown): Uint8Array;
+  generateKeysFromKeyMaterial(keyMaterial: Data, keyPairType?: unknown): IKeyPair;
+  importPrivateKey(rawPrivateKey: Data): IPrivateKey;
+  exportPrivateKey(privateKey: IPrivateKey): Buffer;
+  importPublicKey(rawPublicKey: Data): IPublicKey;
+  exportPublicKey(publicKey: IPublicKey): Buffer;
+  encrypt(data: Data, publicKey: IPublicKey | IPublicKey[]): Buffer;
+  decrypt(encryptedData: Data, privateKey: IPrivateKey): Buffer;
+  calculateHash(data: Data, algorithm?: unknown): Buffer;
   extractPublicKey(privateKey: IPrivateKey): IPublicKey;
-  calculateSignature(data: Uint8Array, privateKey: IPrivateKey): Uint8Array;
-  verifySignature(data: Uint8Array, signature: Uint8Array, publicKey: IPublicKey): boolean;
+  calculateSignature(data: Data, privateKey: IPrivateKey): Buffer;
+  verifySignature(data: Data, signature: Data, publicKey: IPublicKey): boolean;
   signThenEncrypt(
-    data: Uint8Array,
+    data: Data,
     privateKey: IPrivateKey,
     publicKey: IPublicKey | IPublicKey[],
-  ): Uint8Array;
+  ): Buffer;
   decryptThenVerify(
-    encryptedData: Uint8Array,
+    encryptedData: Data,
     privateKey: IPrivateKey,
     publicKey: IPublicKey | IPublicKey[],
-  ): Uint8Array;
-  getRandomBytes(length: number): Uint8Array;
+  ): Buffer;
+  getRandomBytes(length: number): Buffer;
   signThenEncryptDetached(
-    data: Uint8Array,
+    data: Data,
     privateKey: IPrivateKey,
     publicKey: IPublicKey | IPublicKey[],
-  ): { encryptedData: Uint8Array, metadata: Uint8Array };
+  ): { encryptedData: Buffer, metadata: Buffer };
   decryptThenVerifyDetached(
-    encryptedData: Uint8Array,
-    metadata: Uint8Array,
+    encryptedData: Data,
+    metadata: Data,
     privateKey: IPrivateKey,
     publicKey: IPublicKey | IPublicKey[],
-  ): Uint8Array;
+  ): Buffer;
 }
 
 export interface IAccessTokenSigner {
   getAlgorithm(): string;
   generateTokenSignature(
-    token: Uint8Array,
+    token: Data,
     privateKey: IPrivateKey,
-  ): Uint8Array;
+  ): Buffer;
   verifyTokenSignature(
-    token: Uint8Array,
-    signature: Uint8Array,
+    token: Data,
+    signature: Data,
     publicKey: IPublicKey,
   ): boolean;
 }
 
 export interface ICardCrypto {
-  generateSignature(data: Uint8Array, privateKey: IPrivateKey): Uint8Array;
-  verifySignature(data: Uint8Array, signature: Uint8Array, publicKey: IPublicKey): boolean;
-  exportPublicKey(publicKey: IPublicKey): Uint8Array;
-  importPublicKey(rawPublicKey: Uint8Array): IPublicKey;
-  generateSha512(data: Uint8Array): Uint8Array;
+  generateSignature(data: Data, privateKey: IPrivateKey): Buffer;
+  verifySignature(data: Data, signature: Data, publicKey: IPublicKey): boolean;
+  exportPublicKey(publicKey: IPublicKey): Buffer;
+  importPublicKey(rawPublicKey: Data): IPublicKey;
+  generateSha512(data: Data): Buffer;
 }
 
 export interface IPrivateKeyExporter {
-  exportPrivateKey(privateKey: IPrivateKey): Uint8Array;
-  importPrivateKey(rawPrivateKey: Uint8Array): IPrivateKey;
+  exportPrivateKey(privateKey: IPrivateKey): Buffer;
+  importPrivateKey(rawPrivateKey: Data): IPrivateKey;
 }

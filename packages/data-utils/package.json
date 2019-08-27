@@ -22,6 +22,7 @@
     "prepare": "npm run clean && npm run build"
   },
   "dependencies": {
+    "@virgilsecurity/crypto-types": "^0.1.0",
     "buffer": "^5.2.1"
   },
   "devDependencies": {

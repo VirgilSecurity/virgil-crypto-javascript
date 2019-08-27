@@ -17,8 +17,7 @@
     "prepare": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@virgilsecurity/crypto-types": "^0.1.0",
-    "@virgilsecurity/data-utils": "^0.1.1"
+    "@virgilsecurity/crypto-types": "^0.1.0"
   },
   "devDependencies": {
     "rimraf": "^2.6.3",

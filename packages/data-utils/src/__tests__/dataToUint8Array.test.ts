@@ -44,4 +44,20 @@ describe('dataToUint8Array', () => {
     };
     expect(error).to.throw;
   });
+
+  it('throws if default encoding is invalid', () => {
+    const error = () => {
+      // @ts-ignore
+      dataToUint8Array('123', 'hello');
+    };
+    expect(error).to.throw;
+  });
+
+  it('throws if Data object\'s encoding is invalid', () => {
+    const error = () => {
+      // @ts-ignore
+      dataToUint8Array({ value: '123', encoding: 'hello' });
+    };
+    expect(error).to.throw;
+  });
 });

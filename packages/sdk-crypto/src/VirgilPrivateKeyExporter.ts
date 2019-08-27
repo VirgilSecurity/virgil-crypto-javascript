@@ -1,23 +1,20 @@
-import { dataToUint8Array } from '@virgilsecurity/data-utils';
-
 import { IPrivateKey, ICrypto, IPrivateKeyExporter, Data } from './types';
 
 export class VirgilPrivateKeyExporter implements IPrivateKeyExporter {
-  readonly virgilCrypto: ICrypto;
+  readonly crypto: ICrypto;
 
-  constructor(virgilCrypto: ICrypto) {
-    if (virgilCrypto == null) {
-      throw new Error('`virgilCrypto` is required');
+  constructor(crypto: ICrypto) {
+    if (crypto == null) {
+      throw new Error('`crypto` is required');
     }
-    this.virgilCrypto = virgilCrypto;
+    this.crypto = crypto;
   }
 
   exportPrivateKey(key: IPrivateKey) {
-    return this.virgilCrypto.exportPrivateKey(key);
+    return this.crypto.exportPrivateKey(key);
   }
 
   importPrivateKey(keyData: Data) {
-    const myKeyData = dataToUint8Array(keyData, 'base64');
-    return this.virgilCrypto.importPrivateKey(myKeyData);
+    return this.crypto.importPrivateKey(keyData);
   }
 }

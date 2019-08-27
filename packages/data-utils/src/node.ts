@@ -1,8 +1,6 @@
 import { createDataToUint8ArrayFunction } from './dataToUint8Array';
 import { createToBufferFunction } from './toBuffer';
 
-export * from './types';
-
 const buffer = global.Buffer;
 export { buffer as Buffer };
 

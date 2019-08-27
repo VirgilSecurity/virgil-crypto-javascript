@@ -1,39 +1,32 @@
-import { dataToUint8Array } from '@virgilsecurity/data-utils';
-
 import { IPrivateKey, IPublicKey, ICrypto, ICardCrypto, Data } from './types';
 
 export class VirgilCardCrypto implements ICardCrypto {
-  readonly virgilCrypto: ICrypto;
+  readonly crypto: ICrypto;
 
-  constructor(virgilCrypto: ICrypto) {
-    if (virgilCrypto == null) {
-      throw new Error('`virgilCrypto` is required');
+  constructor(crypto: ICrypto) {
+    if (crypto == null) {
+      throw new Error('`crypto` is required');
     }
-    this.virgilCrypto = virgilCrypto;
+    this.crypto = crypto;
   }
 
   generateSignature(data: Data, privateKey: IPrivateKey) {
-    const myData = dataToUint8Array(data, 'utf8');
-    return this.virgilCrypto.calculateSignature(myData, privateKey);
+    return this.crypto.calculateSignature(data, privateKey);
   }
 
   verifySignature(data: Data, signature: Data, publicKey: IPublicKey) {
-    const myData = dataToUint8Array(data, 'utf8');
-    const mySignature = dataToUint8Array(signature, 'base64');
-    return this.virgilCrypto.verifySignature(myData, mySignature, publicKey);
+    return this.crypto.verifySignature(data, signature, publicKey);
   }
 
   exportPublicKey(publicKey: IPublicKey) {
-    return this.virgilCrypto.exportPublicKey(publicKey);
+    return this.crypto.exportPublicKey(publicKey);
   }
 
   importPublicKey(publicKeyData: Data) {
-    const myPublicKeyData = dataToUint8Array(publicKeyData, 'base64');
-    return this.virgilCrypto.importPublicKey(myPublicKeyData);
+    return this.crypto.importPublicKey(publicKeyData);
   }
 
   generateSha512(data: Data) {
-    const myData = dataToUint8Array(data, 'utf8');
-    return this.virgilCrypto.calculateHash(myData);
+    return this.crypto.calculateHash(data);
   }
 }

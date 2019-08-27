@@ -1,6 +1,6 @@
 {
   "name": "@virgilsecurity/crypto-types",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Types for Virgil JavaScript libraries",
   "typings": "./index.d.ts",
   "files": [
@@ -9,6 +9,9 @@
   "repository": "https://github.com/VirgilSecurity/virgil-crypto-javascript/tree/master/packages/crypto-types",
   "author": "Virgil Security Inc. <support@virgilsecurity.com>",
   "license": "BSD-3-Clause",
+  "dependencies": {
+    "@types/node": "^12.7.2"
+  },
   "publishConfig": {
     "access": "public"
   }

@@ -5,7 +5,5 @@ import { createToBufferFunction } from './toBuffer';
 
 export { Buffer } from 'buffer/';
 
-export * from './types';
-
 export const dataToUint8Array = createDataToUint8ArrayFunction(NodeBuffer);
 export const toBuffer = createToBufferFunction(NodeBuffer);

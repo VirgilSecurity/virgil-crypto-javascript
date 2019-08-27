@@ -1,15 +1,13 @@
-import { dataToUint8Array } from '@virgilsecurity/data-utils';
-
 import { IPrivateKey, IPublicKey, ICrypto, IAccessTokenSigner, Data } from './types';
 
 export class VirgilAccessTokenSigner implements IAccessTokenSigner {
-  readonly virgilCrypto: ICrypto;
+  readonly crypto: ICrypto;
 
-  constructor(virgilCrypto: ICrypto) {
-    if (virgilCrypto == null) {
-      throw new Error('`virgilCrypto` is required');
+  constructor(crypto: ICrypto) {
+    if (crypto == null) {
+      throw new Error('`crypto` is required');
     }
-    this.virgilCrypto = virgilCrypto;
+    this.crypto = crypto;
   }
 
   getAlgorithm() {
@@ -17,13 +15,10 @@ export class VirgilAccessTokenSigner implements IAccessTokenSigner {
   }
 
   generateTokenSignature(token: Data, privateKey: IPrivateKey) {
-    const myToken = dataToUint8Array(token, 'utf8');
-    return this.virgilCrypto.calculateSignature(myToken, privateKey);
+    return this.crypto.calculateSignature(token, privateKey);
   }
 
   verifyTokenSignature(token: Data, signature: Data, publicKey: IPublicKey) {
-    const myToken = dataToUint8Array(token, 'utf8');
-    const mySignature = dataToUint8Array(signature, 'base64');
-    return this.virgilCrypto.verifySignature(myToken, mySignature, publicKey);
+    return this.crypto.verifySignature(token, signature, publicKey);
   }
 };

@@ -1,5 +1,5 @@
 import { FoundationModules } from '@virgilsecurity/core-foundation';
-import { Buffer as NodeBuffer, dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
+import { NodeBuffer, dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 
 import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
 import { getFoundationModules } from './foundationModules';

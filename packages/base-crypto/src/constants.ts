@@ -1,4 +1,4 @@
-import { Buffer as NodeBuffer } from '@virgilsecurity/data-utils';
+import { NodeBuffer } from '@virgilsecurity/data-utils';
 
 export const DATA_SIGNATURE_KEY = NodeBuffer.from('VIRGIL-DATA-SIGNATURE', 'utf8');
 

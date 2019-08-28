@@ -2,6 +2,8 @@
 
 export type StringEncoding = BufferEncoding;
 
+export type NodeBuffer = Buffer;
+
 export interface StringWithEncoding {
   value: string;
   encoding: StringEncoding;
@@ -22,37 +24,37 @@ export interface ICrypto {
   generateKeys(keyPairType?: unknown): IKeyPair;
   generateKeysFromKeyMaterial(keyMaterial: Data, keyPairType?: unknown): IKeyPair;
   importPrivateKey(rawPrivateKey: Data): IPrivateKey;
-  exportPrivateKey(privateKey: IPrivateKey): Buffer;
+  exportPrivateKey(privateKey: IPrivateKey): NodeBuffer;
   importPublicKey(rawPublicKey: Data): IPublicKey;
-  exportPublicKey(publicKey: IPublicKey): Buffer;
-  encrypt(data: Data, publicKey: IPublicKey | IPublicKey[]): Buffer;
-  decrypt(encryptedData: Data, privateKey: IPrivateKey): Buffer;
-  calculateHash(data: Data, algorithm?: unknown): Buffer;
+  exportPublicKey(publicKey: IPublicKey): NodeBuffer;
+  encrypt(data: Data, publicKey: IPublicKey | IPublicKey[]): NodeBuffer;
+  decrypt(encryptedData: Data, privateKey: IPrivateKey): NodeBuffer;
+  calculateHash(data: Data, algorithm?: unknown): NodeBuffer;
   extractPublicKey(privateKey: IPrivateKey): IPublicKey;
-  calculateSignature(data: Data, privateKey: IPrivateKey): Buffer;
+  calculateSignature(data: Data, privateKey: IPrivateKey): NodeBuffer;
   verifySignature(data: Data, signature: Data, publicKey: IPublicKey): boolean;
   signThenEncrypt(
     data: Data,
     privateKey: IPrivateKey,
     publicKey: IPublicKey | IPublicKey[],
-  ): Buffer;
+  ): NodeBuffer;
   decryptThenVerify(
     encryptedData: Data,
     privateKey: IPrivateKey,
     publicKey: IPublicKey | IPublicKey[],
-  ): Buffer;
-  getRandomBytes(length: number): Buffer;
+  ): NodeBuffer;
+  getRandomBytes(length: number): NodeBuffer;
   signThenEncryptDetached(
     data: Data,
     privateKey: IPrivateKey,
     publicKey: IPublicKey | IPublicKey[],
-  ): { encryptedData: Buffer, metadata: Buffer };
+  ): { encryptedData: NodeBuffer, metadata: NodeBuffer };
   decryptThenVerifyDetached(
     encryptedData: Data,
     metadata: Data,
     privateKey: IPrivateKey,
     publicKey: IPublicKey | IPublicKey[],
-  ): Buffer;
+  ): NodeBuffer;
 }
 
 export interface IAccessTokenSigner {
@@ -60,7 +62,7 @@ export interface IAccessTokenSigner {
   generateTokenSignature(
     token: Data,
     privateKey: IPrivateKey,
-  ): Buffer;
+  ): NodeBuffer;
   verifyTokenSignature(
     token: Data,
     signature: Data,
@@ -69,14 +71,14 @@ export interface IAccessTokenSigner {
 }
 
 export interface ICardCrypto {
-  generateSignature(data: Data, privateKey: IPrivateKey): Buffer;
+  generateSignature(data: Data, privateKey: IPrivateKey): NodeBuffer;
   verifySignature(data: Data, signature: Data, publicKey: IPublicKey): boolean;
-  exportPublicKey(publicKey: IPublicKey): Buffer;
+  exportPublicKey(publicKey: IPublicKey): NodeBuffer;
   importPublicKey(rawPublicKey: Data): IPublicKey;
-  generateSha512(data: Data): Buffer;
+  generateSha512(data: Data): NodeBuffer;
 }
 
 export interface IPrivateKeyExporter {
-  exportPrivateKey(privateKey: IPrivateKey): Buffer;
+  exportPrivateKey(privateKey: IPrivateKey): NodeBuffer;
   importPrivateKey(rawPrivateKey: Data): IPrivateKey;
 }

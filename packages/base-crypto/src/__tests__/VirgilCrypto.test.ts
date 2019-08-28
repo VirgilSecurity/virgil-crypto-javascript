@@ -1,4 +1,4 @@
-import { Buffer as NodeBuffer } from 'buffer';
+import { NodeBuffer } from '@virgilsecurity/data-utils';
 import { expect } from 'chai';
 
 import initFoundation from '@virgilsecurity/core-foundation';

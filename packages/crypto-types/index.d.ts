@@ -9,7 +9,7 @@ export interface StringWithEncoding {
   encoding: StringEncoding;
 }
 
-export type Data = Uint8Array | StringWithEncoding | string;
+export type Data = NodeBuffer | Uint8Array | StringWithEncoding | string;
 
 export interface IPrivateKey {}
 
@@ -48,7 +48,7 @@ export interface ICrypto {
     data: Data,
     privateKey: IPrivateKey,
     publicKey: IPublicKey | IPublicKey[],
-  ): { encryptedData: NodeBuffer, metadata: NodeBuffer };
+  ): { encryptedData: NodeBuffer; metadata: NodeBuffer };
   decryptThenVerifyDetached(
     encryptedData: Data,
     metadata: Data,
@@ -59,15 +59,8 @@ export interface ICrypto {
 
 export interface IAccessTokenSigner {
   getAlgorithm(): string;
-  generateTokenSignature(
-    token: Data,
-    privateKey: IPrivateKey,
-  ): NodeBuffer;
-  verifyTokenSignature(
-    token: Data,
-    signature: Data,
-    publicKey: IPublicKey,
-  ): boolean;
+  generateTokenSignature(token: Data, privateKey: IPrivateKey): NodeBuffer;
+  verifyTokenSignature(token: Data, signature: Data, publicKey: IPublicKey): boolean;
 }
 
 export interface ICardCrypto {
@@ -81,4 +74,49 @@ export interface ICardCrypto {
 export interface IPrivateKeyExporter {
   exportPrivateKey(privateKey: IPrivateKey): NodeBuffer;
   importPrivateKey(rawPrivateKey: Data): IPrivateKey;
+}
+
+export interface IPythiaTransformationKeyPair {
+  privateKey: NodeBuffer;
+  publicKey: NodeBuffer;
+}
+
+export interface IBrainKeyCrypto {
+  blind(password: Data): { blindedPassword: NodeBuffer; blindingSecret: NodeBuffer };
+  deblind(options: { transformedPassword: Data; blindingSecret: Data }): NodeBuffer;
+}
+
+export interface IPythiaCrypto extends IBrainKeyCrypto {
+  computeTransformationKeyPair(options: {
+    transformationKeyId: Data;
+    pythiaSecret: Data;
+    pythiaScopeSecret: Data;
+  }): IPythiaTransformationKeyPair;
+  transform(options: {
+    blindedPassword: Data;
+    tweak: Data;
+    transformationPrivateKey: Data;
+  }): { transformedPassword: NodeBuffer; transformedTweak: NodeBuffer };
+  prove(options: {
+    transformedPassword: Data;
+    blindedPassword: Data;
+    transformedTweak: Data;
+    transformationKeyPair: IPythiaTransformationKeyPair;
+  }): { proofValueC: NodeBuffer; proofValueU: NodeBuffer };
+  verify(options: {
+    transformedPassword: Data;
+    blindedPassword: Data;
+    tweak: Data;
+    transformationPublicKey: Data;
+    proofValueC: Data;
+    proofValueU: Data;
+  }): boolean;
+  getPasswordUpdateToken(options: {
+    oldTransformationPrivateKey: Data;
+    newTransformationPrivateKey: Data;
+  }): NodeBuffer;
+  updateDeblindedWithToken(options: {
+    deblindedPassword: Data;
+    updateToken: Data;
+  }): NodeBuffer;
 }

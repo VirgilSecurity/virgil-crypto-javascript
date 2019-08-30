@@ -1,7 +1,7 @@
 import { Data, StringEncoding } from './types';
 
 export const createDataToUint8ArrayFunction = (NodeBuffer: any) =>
-  (data: Data, defaultEncoding?: StringEncoding) => {
+  (data: Data, defaultEncoding?: StringEncoding): Uint8Array => {
     if (typeof data === 'string') {
       if (typeof defaultEncoding === 'string' && !NodeBuffer.isEncoding(defaultEncoding)) {
         throw new TypeError('Invalid default encoding');

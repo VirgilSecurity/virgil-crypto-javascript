@@ -1,4 +1,4 @@
-import { PythiaModules } from "./types";
+import { PythiaModules } from './types';
 
 let pythiaModules: PythiaModules | undefined;
 
@@ -14,7 +14,7 @@ export const setPythiaModules = (modules: PythiaModules) => {
 
 export const getPythiaModules = () => {
   if (!pythiaModules) {
-    throw new Error("You need to call `setPythiaModules` first");
+    throw new Error('You need to call `setPythiaModules` first');
   }
   return pythiaModules;
 };

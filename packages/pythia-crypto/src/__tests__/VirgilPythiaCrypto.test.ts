@@ -1,10 +1,8 @@
 import { NodeBuffer } from "@virgilsecurity/data-utils";
 import { expect } from "chai";
 
-import { initPythia, VirgilPythiaCrypto } from "../index";
+import { initPythia, VirgilBrainKeyCrypto, VirgilPythiaCrypto } from "../index";
 import data from "./data.json";
-
-const DEBLINDED_PASSWORD = NodeBuffer.from(data.kDeblindedPassword, "hex");
 
 const PASSWORD = "password";
 const TRANSFORMATION_KEY_ID = NodeBuffer.from(data.kTransformationKeyID);
@@ -14,6 +12,7 @@ const NEW_PYTHIA_SECRET = NodeBuffer.from(data.kNewPythiaSecret);
 const PYTHIA_SCOPE_SECRET = NodeBuffer.from(data.kPythiaScopeSecret);
 
 describe("VirgilPythiaCrypto", () => {
+  let virgilBrainKeyCrypto: VirgilBrainKeyCrypto;
   let virgilPythiaCrypto: VirgilPythiaCrypto;
 
   before(async () => {
@@ -21,43 +20,8 @@ describe("VirgilPythiaCrypto", () => {
   });
 
   beforeEach(() => {
+    virgilBrainKeyCrypto = new VirgilBrainKeyCrypto();
     virgilPythiaCrypto = new VirgilPythiaCrypto();
-  });
-
-  describe("blind", () => {
-    it("returns `blindedPassword` and `blindingSecret`", () => {
-      const result = virgilPythiaCrypto.blind("password");
-      expect(Object.keys(result)).to.have.length(2);
-      expect(result.blindedPassword).to.be.instanceOf(NodeBuffer);
-      expect(result.blindingSecret).to.be.instanceOf(NodeBuffer);
-    });
-  });
-
-  describe("deblind", () => {
-    it("produces the same result for multiple iterations", () => {
-      for (let i = 0; i < 10; i += 1) {
-        const { blindingSecret, blindedPassword } = virgilPythiaCrypto.blind(
-          PASSWORD
-        );
-        const {
-          privateKey: transformationPrivateKey
-        } = virgilPythiaCrypto.computeTransformationKeyPair({
-          transformationKeyId: TRANSFORMATION_KEY_ID,
-          pythiaSecret: PYTHIA_SECRET,
-          pythiaScopeSecret: PYTHIA_SCOPE_SECRET
-        });
-        const { transformedPassword } = virgilPythiaCrypto.transform({
-          blindedPassword,
-          transformationPrivateKey,
-          tweak: TWEAK
-        });
-        const result = virgilPythiaCrypto.deblind({
-          transformedPassword,
-          blindingSecret
-        });
-        expect(result.equals(DEBLINDED_PASSWORD)).to.be.true;
-      }
-    });
   });
 
   describe("computeTransformationKeyPair", () => {
@@ -83,7 +47,7 @@ describe("VirgilPythiaCrypto", () => {
 
   describe("transform", () => {
     it("returns `transformedPassword` and `transformedTweak`", () => {
-      const { blindedPassword } = virgilPythiaCrypto.blind(PASSWORD);
+      const { blindedPassword } = virgilBrainKeyCrypto.blind(PASSWORD);
       const {
         privateKey: transformationPrivateKey
       } = virgilPythiaCrypto.computeTransformationKeyPair({
@@ -104,7 +68,7 @@ describe("VirgilPythiaCrypto", () => {
 
   describe("prove", () => {
     it("returns `proofValueC` and `proofValueU`", () => {
-      const { blindedPassword } = virgilPythiaCrypto.blind(PASSWORD);
+      const { blindedPassword } = virgilBrainKeyCrypto.blind(PASSWORD);
       const transformationKeyPair = virgilPythiaCrypto.computeTransformationKeyPair(
         {
           transformationKeyId: TRANSFORMATION_KEY_ID,
@@ -134,7 +98,7 @@ describe("VirgilPythiaCrypto", () => {
 
   describe("verify", () => {
     it("verifies transformed password", () => {
-      const { blindedPassword } = virgilPythiaCrypto.blind(PASSWORD);
+      const { blindedPassword } = virgilBrainKeyCrypto.blind(PASSWORD);
       const transformationKeyPair = virgilPythiaCrypto.computeTransformationKeyPair(
         {
           transformationKeyId: TRANSFORMATION_KEY_ID,
@@ -194,7 +158,7 @@ describe("VirgilPythiaCrypto", () => {
 
   describe("updateDeblindedWithToken", () => {
     it("updates deblinded password with token", () => {
-      const { blindingSecret, blindedPassword } = virgilPythiaCrypto.blind(
+      const { blindingSecret, blindedPassword } = virgilBrainKeyCrypto.blind(
         PASSWORD
       );
       const oldTransformationKeyPair = virgilPythiaCrypto.computeTransformationKeyPair(
@@ -209,7 +173,7 @@ describe("VirgilPythiaCrypto", () => {
         tweak: TWEAK,
         transformationPrivateKey: oldTransformationKeyPair.privateKey
       });
-      const deblindedPassword = virgilPythiaCrypto.deblind({
+      const deblindedPassword = virgilBrainKeyCrypto.deblind({
         transformedPassword,
         blindingSecret
       });
@@ -233,7 +197,7 @@ describe("VirgilPythiaCrypto", () => {
       const {
         blindingSecret: newBlindingSecret,
         blindedPassword: newBlindedPassword
-      } = virgilPythiaCrypto.blind(PASSWORD);
+      } = virgilBrainKeyCrypto.blind(PASSWORD);
       const {
         transformedPassword: newTransformedPassword
       } = virgilPythiaCrypto.transform({
@@ -241,7 +205,7 @@ describe("VirgilPythiaCrypto", () => {
         tweak: TWEAK,
         transformationPrivateKey: newTransformationKeyPair.privateKey
       });
-      const newDeblindedPassword = virgilPythiaCrypto.deblind({
+      const newDeblindedPassword = virgilBrainKeyCrypto.deblind({
         transformedPassword: newTransformedPassword,
         blindingSecret: newBlindingSecret
       });

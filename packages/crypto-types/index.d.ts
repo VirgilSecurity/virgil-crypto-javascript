@@ -86,7 +86,7 @@ export interface IBrainKeyCrypto {
   deblind(options: { transformedPassword: Data; blindingSecret: Data }): NodeBuffer;
 }
 
-export interface IPythiaCrypto extends IBrainKeyCrypto {
+export interface IPythiaCrypto {
   computeTransformationKeyPair(options: {
     transformationKeyId: Data;
     pythiaSecret: Data;

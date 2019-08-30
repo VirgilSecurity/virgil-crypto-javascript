@@ -2,8 +2,23 @@ import { dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 
 import { getPythiaModules } from './pythiaModules';
 import { Data, IPythiaTransformationKeyPair, IPythiaCrypto } from './types';
+import { VirgilBrainKeyCrypto } from './VirgilBrainKeyCrypto';
 
 export class VirgilPythiaCrypto implements IPythiaCrypto {
+  private readonly virgilBrainKeyCrypto: VirgilBrainKeyCrypto;
+
+  constructor(virgilBrainKeyCrypto?: VirgilBrainKeyCrypto) {
+    this.virgilBrainKeyCrypto = virgilBrainKeyCrypto || new VirgilBrainKeyCrypto();
+  }
+
+  blind(password: Data) {
+    return this.virgilBrainKeyCrypto.blind(password);
+  }
+
+  deblind(options: { transformedPassword: Data; blindingSecret: Data }) {
+    return this.virgilBrainKeyCrypto.deblind(options);
+  }
+
   computeTransformationKeyPair(options: {
     transformationKeyId: Data;
     pythiaSecret: Data;

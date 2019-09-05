@@ -14,7 +14,7 @@ export const createDataToUint8ArrayFunction = (NodeBuffer: any) =>
     if (
       typeof data === 'object' &&
       typeof data.value === 'string' &&
-      typeof NodeBuffer.isEncoding(data.encoding)
+      NodeBuffer.isEncoding(data.encoding)
     ) {
       return NodeBuffer.from(data.value, data.encoding);
     }

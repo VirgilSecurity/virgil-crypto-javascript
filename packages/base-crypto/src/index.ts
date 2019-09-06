@@ -1,4 +1,4 @@
-export { setFoundationModules } from './foundationModules';
+export { getFoundationModules, setFoundationModules } from './foundationModules';
 export { HashAlgorithm } from './HashAlgorithm';
 export { KeyPairType } from './KeyPairType';
 export { VirgilKeyPair } from './types';

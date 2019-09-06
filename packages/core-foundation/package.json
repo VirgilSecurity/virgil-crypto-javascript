@@ -1,6 +1,6 @@
 {
   "name": "@virgilsecurity/core-foundation",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Virgil Foundation",
   "main": "./node.cjs.js",
   "module": "./node.es.js",

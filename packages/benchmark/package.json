@@ -13,7 +13,7 @@
   "dependencies": {
     "benchmark": "^2.1.4",
     "buffer": "^5.2.1",
-    "virgil-crypto": "^4.0.0-alpha.7",
+    "virgil-crypto": "^4.0.0-alpha.8",
     "virgil-crypto-3": "npm:virgil-crypto@^3.2.6"
   },
   "devDependencies": {

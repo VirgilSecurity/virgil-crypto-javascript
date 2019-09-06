@@ -1,11 +1,11 @@
 declare module '@virgilsecurity/core-phe' {
   export type PheModules = any;
-  function initRatchet(): Promise<PheModules>;
-  export default initRatchet;
+  function initPhe(): Promise<PheModules>;
+  export default initPhe;
 }
 
 declare module '@virgilsecurity/core-phe/*' {
   export type PheModules = any;
-  function initRatchet(): Promise<PheModules>;
-  export default initRatchet;
+  function initPhe(): Promise<PheModules>;
+  export default initPhe;
 }

@@ -1,11 +1,11 @@
 declare module '@virgilsecurity/core-pythia' {
   export type PythiaModules = any;
   function initRatchet(): Promise<PythiaModules>;
-  export default initRatchet;
+  export default initPythia;
 }
 
 declare module '@virgilsecurity/core-pythia/*' {
   export type PythiaModules = any;
-  function initRatchet(): Promise<PythiaModules>;
-  export default initRatchet;
+  function initPythia(): Promise<PythiaModules>;
+  export default initPythia;
 }

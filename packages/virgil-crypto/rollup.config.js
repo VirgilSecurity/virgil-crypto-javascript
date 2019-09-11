@@ -18,13 +18,13 @@ const FORMAT = {
 
 const CRYPTO_TYPE = {
   WASM: 'wasm',
-  ASMJS: 'asmjs'
+  ASMJS: 'asmjs',
 };
 
 const TARGET = {
   BROWSER: 'browser',
   WORKER: 'worker',
-  NODE: 'node'
+  NODE: 'node',
 };
 
 const sourceDir = path.join(__dirname, 'src');
@@ -33,7 +33,7 @@ const outputDir = path.join(__dirname, 'dist');
 const getOutputFilename = (target, cryptoType, format) =>
   `${target}${cryptoType === CRYPTO_TYPE.ASMJS ? '.asmjs' : ''}.${format}.js`;
 
-const getCryptoEntryPointName = (target, cryptoType, format) =>
+const getCryptoEntryPointName = (target, cryptoType) =>
   `${target}${cryptoType === CRYPTO_TYPE.ASMJS ? '.asmjs' : ''}.es.js`;
 
 const createBrowserEntry = (target, cryptoType, format) => ({
@@ -52,32 +52,33 @@ const createBrowserEntry = (target, cryptoType, format) => ({
           replace: path.join(
             '@virgilsecurity',
             'core-foundation',
-            getCryptoEntryPointName(target, cryptoType, format),
+            getCryptoEntryPointName(target, cryptoType),
           ),
         },
       ],
     }),
-    nodeResolve({ browser: true, extensions: ['.js', '.ts' ] }),
+    nodeResolve({ browser: true, extensions: ['.js', '.ts'] }),
     commonjs(),
     typescript({
       exclude: ['**/*.test.ts'],
       objectHashIgnoreUnknownHack: true,
       useTsconfigDeclarationDir: true,
     }),
-    cryptoType === CRYPTO_TYPE.WASM && copy({
-      targets: [
-        {
-          src: path.join(
-            __dirname,
-            'node_modules',
-            '@virgilsecurity',
-            'core-foundation',
-            `libfoundation.${target}.wasm`,
-          ),
-          dest: outputDir,
-        },
-      ],
-    }),
+    cryptoType === CRYPTO_TYPE.WASM &&
+      copy({
+        targets: [
+          {
+            src: path.join(
+              __dirname,
+              'node_modules',
+              '@virgilsecurity',
+              'core-foundation',
+              `libfoundation.${target}.wasm`,
+            ),
+            dest: outputDir,
+          },
+        ],
+      }),
     format === FORMAT.UMD && terser(),
   ],
 });
@@ -98,12 +99,12 @@ const createNodeJsEntry = (cryptoType, format) => ({
           replace: path.join(
             '@virgilsecurity',
             'core-foundation',
-            getCryptoEntryPointName(TARGET.NODE, cryptoType, format),
+            getCryptoEntryPointName(TARGET.NODE, cryptoType),
           ),
         },
       ],
     }),
-    nodeResolve({ extensions: ['.js', '.ts' ] }),
+    nodeResolve({ extensions: ['.js', '.ts'] }),
     commonjs(),
     typescript({
       exclude: ['**/*.test.ts'],

@@ -44,13 +44,14 @@ export class VirgilStreamSigner {
     validatePrivateKey(privateKey);
     const lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
 
-    try {
-      return toBuffer(this.signer.sign(lowLevelPrivateKey));
-    } finally {
-      if (final) {
-        this.dispose();
-      }
+    const result = this.signer.sign(lowLevelPrivateKey);
+
+    lowLevelPrivateKey.delete();
+    if (final) {
+      this.dispose();
     }
+
+    return toBuffer(result);
   }
 
   dispose() {

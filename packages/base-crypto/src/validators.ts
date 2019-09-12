@@ -16,7 +16,7 @@ export function validatePublicKey(publicKey: VirgilPublicKey, label: string = 'p
   if (
     publicKey == null ||
     !(publicKey.identifier instanceof Uint8Array) ||
-    typeof publicKey.key !== 'object'
+    !(publicKey.key instanceof Uint8Array)
   ) {
     throw new TypeError(`\`${label}\` is not a VirgilPublicKey.`);
   }

@@ -13,6 +13,20 @@ export type LowLevelPrivateKey = any;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type LowLevelPublicKey = any;
 
+export interface KeyAsn1Serializer {
+  serializePrivateKey(lowLevelPrivateKey: LowLevelPrivateKey): Uint8Array;
+  serializePublicKey(lowLevelPublicKey: LowLevelPublicKey): Uint8Array;
+  setupDefaults(): void;
+  delete(): void;
+}
+
+export interface KeyProvider {
+  importPrivateKey(serializedPrivateKey: Uint8Array): LowLevelPrivateKey;
+  importPublicKey(serializedPublicKey: Uint8Array): LowLevelPublicKey;
+  setupDefaults(): void;
+  delete(): void;
+}
+
 export interface VirgilKeyPair extends IKeyPair {
   privateKey: VirgilPrivateKey;
   publicKey: VirgilPublicKey;

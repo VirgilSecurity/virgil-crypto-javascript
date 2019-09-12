@@ -2,7 +2,8 @@ import { dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 
 import { DATA_SIGNATURE_KEY } from './constants';
 import { getFoundationModules } from './foundationModules';
-import { Data } from './types';
+import { importPublicKey } from './keyProvider';
+import { Data, LowLevelPublicKey } from './types';
 import { toArray } from './utils';
 import { validatePublicKeysArray } from './validators';
 import { VirgilPublicKey } from './VirgilPublicKey';
@@ -21,8 +22,11 @@ export class VirgilStreamCipher {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private ctrDrbg: any;
 
+  private lowLevelPublicKeys: LowLevelPublicKey[];
+
   constructor(publicKey: VirgilPublicKey | VirgilPublicKey[], signature?: Data) {
     const foundationModules = getFoundationModules();
+
     this.recipientCipher = new foundationModules.RecipientCipher();
     this.aes256Gcm = new foundationModules.Aes256Gcm();
     this.ctrDrbg = new foundationModules.CtrDrbg();
@@ -32,9 +36,10 @@ export class VirgilStreamCipher {
 
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
+    this.lowLevelPublicKeys = publicKeys.map(publicKey => importPublicKey(publicKey.key));
 
-    publicKeys.forEach(myPublicKey => {
-      this.recipientCipher.addKeyRecipient(myPublicKey.identifier, myPublicKey.key);
+    publicKeys.forEach(({ identifier }, index) => {
+      this.recipientCipher.addKeyRecipient(identifier, this.lowLevelPublicKeys[index]);
     });
 
     if (signature) {
@@ -79,6 +84,7 @@ export class VirgilStreamCipher {
     if (this.messageInfoCustomParams) {
       this.messageInfoCustomParams.delete();
     }
+    this.lowLevelPublicKeys.forEach(lowLevelPublicKey => lowLevelPublicKey.delete());
     this.isDisposed = true;
   }
 

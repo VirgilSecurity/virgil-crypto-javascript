@@ -1,6 +1,7 @@
 import { dataToUint8Array } from '@virgilsecurity/data-utils';
 
 import { getFoundationModules } from './foundationModules';
+import { importPublicKey } from './keyProvider';
 import { Data } from './types';
 import { validatePublicKey } from './validators';
 import { VirgilPublicKey } from './VirgilPublicKey';
@@ -38,14 +39,16 @@ export class VirgilStreamVerifier {
     }
 
     validatePublicKey(publicKey);
+    const lowLevelPublicKey = importPublicKey(publicKey.key);
 
-    try {
-      return this.verifier.verify(publicKey.key);
-    } finally {
-      if (final) {
-        this.dispose();
-      }
+    const result = this.verifier.verify(lowLevelPublicKey);
+
+    lowLevelPublicKey.delete();
+    if (final) {
+      this.dispose();
     }
+
+    return result;
   }
 
   dispose() {

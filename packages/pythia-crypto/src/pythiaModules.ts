@@ -4,7 +4,10 @@ let pythiaModules: PythiaModules | undefined;
 
 export const setPythiaModules = (modules: PythiaModules) => {
   if (pythiaModules) {
-    console.warn('Pythia modules are already set. Further calls to `setPythiaModules` are ignored.');
+    // eslint-disable-next-line no-console
+    console.warn(
+      'Pythia modules are already set. Further calls to `setPythiaModules` are ignored.',
+    );
     return;
   }
   pythiaModules = modules;

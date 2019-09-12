@@ -301,7 +301,7 @@ export class VirgilCrypto implements ICrypto {
     const processEncryption = recipientCipher.processEncryption(myData);
     const finishEncryption = recipientCipher.finishEncryption();
 
-    const result = NodeBuffer.concat([messageInfo, processEncryption, finishEncryption]);;
+    const result = NodeBuffer.concat([messageInfo, processEncryption, finishEncryption]);
 
     recipientCipher.delete();
     aes256Gcm.delete();

@@ -4,8 +4,8 @@ let pythiaModules: PythiaModules | undefined;
 
 export const setPythiaModules = (modules: PythiaModules) => {
   if (pythiaModules) {
-    const { Pythia } = pythiaModules;
-    Pythia.cleanup();
+    console.warn('Pythia modules are already set. Further calls to `setPythiaModules` are ignored.');
+    return;
   }
   pythiaModules = modules;
   const { Pythia } = pythiaModules;

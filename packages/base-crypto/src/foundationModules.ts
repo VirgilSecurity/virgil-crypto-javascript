@@ -3,6 +3,10 @@ import { FoundationModules } from '@virgilsecurity/core-foundation';
 let foundationModules: FoundationModules | undefined;
 
 export const setFoundationModules = (modules: FoundationModules) => {
+  if (foundationModules) {
+    console.warn('Foundation modules are already set. Further calls to `setFoundationModules` are ignored.');
+    return;
+  }
   foundationModules = modules;
 };
 

@@ -24,12 +24,10 @@ module.exports = {
         type: 'javascript/auto',
         loader: 'file-loader',
         options: {
-          name: '[name].[ext]'
-        }
+          name: '[name].[ext]',
+        },
       },
     ],
   },
-  plugins: [
-    new HtmlWebpackPlugin({ template: path.join(__dirname, 'index.html') }),
-  ],
+  plugins: [new HtmlWebpackPlugin({ template: path.join(__dirname, 'index.html') })],
 };

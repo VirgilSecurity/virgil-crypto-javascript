@@ -1,10 +1,10 @@
-const benchmark = require("benchmark");
-const fs = require("fs");
-const path = require("path");
+const benchmark = require('benchmark');
+const fs = require('fs');
+const path = require('path');
 
-const runBenchmark = require("./benchmark");
+const runBenchmark = require('./benchmark');
 
-const outputPath = path.join(__dirname, "node.txt");
+const outputPath = path.join(__dirname, 'node.txt');
 
 if (fs.existsSync(outputPath)) {
   fs.unlinkSync(outputPath);

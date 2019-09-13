@@ -21,7 +21,6 @@
   "license": "BSD-3-Clause",
   "scripts": {
     "test": "mocha -t 0 -r ts-node/register src/**/*.test.ts",
-    "lint": "eslint 'src/**/*.ts'",
     "build": "node --max-old-space-size=4096 node_modules/.bin/rollup -c",
     "clean": "rimraf .rpt2_cache dist",
     "prepare": "npm run clean && npm run build"
@@ -34,12 +33,7 @@
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
-    "@typescript-eslint/eslint-plugin": "^1.11.0",
-    "@typescript-eslint/parser": "^1.11.0",
     "chai": "^4.2.0",
-    "eslint": "^5.3.0",
-    "eslint-config-prettier": "^6.0.0",
-    "eslint-plugin-prettier": "^3.1.0",
     "mocha": "^6.1.4",
     "prettier": "1.18.2",
     "rimraf": "^2.6.3",

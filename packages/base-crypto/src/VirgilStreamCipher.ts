@@ -63,7 +63,7 @@ export class VirgilStreamCipher {
     return toBuffer(this.recipientCipher.processEncryption(myData));
   }
 
-  final(dispose: boolean = true) {
+  final(dispose = true) {
     this.ensureLegalState();
     this.ensureIsRunning();
     try {

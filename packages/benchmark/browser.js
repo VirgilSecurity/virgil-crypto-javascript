@@ -1,3 +1,5 @@
+/* eslint-env browser */
+
 const runBenchmark = require('./benchmark');
 
 const log = str => {

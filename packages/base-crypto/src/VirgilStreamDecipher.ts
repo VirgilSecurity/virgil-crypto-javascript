@@ -56,7 +56,7 @@ export class VirgilStreamDecipher {
     return toBuffer(this.recipientCipher.processDecryption(myData));
   }
 
-  final(dispose: boolean = true) {
+  final(dispose = true) {
     this.ensureLegalState();
     try {
       return toBuffer(this.recipientCipher.finishDecryption());

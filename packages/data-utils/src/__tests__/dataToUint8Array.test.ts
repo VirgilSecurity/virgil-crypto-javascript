@@ -31,6 +31,7 @@ describe('dataToUint8Array', () => {
 
   it('throws if first argument is not a string / Data object / Uint8Array', () => {
     const error = () => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       dataToUint8Array(123);
     };
@@ -39,6 +40,7 @@ describe('dataToUint8Array', () => {
 
   it('throws if Data object is invalid', () => {
     const error = () => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       dataToUint8Array({ value: 123, encoding: 'utf8' });
     };
@@ -47,14 +49,16 @@ describe('dataToUint8Array', () => {
 
   it('throws if default encoding is invalid', () => {
     const error = () => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       dataToUint8Array('123', 'hello');
     };
     expect(error).to.throw;
   });
 
-  it('throws if Data object\'s encoding is invalid', () => {
+  it("throws if Data object's encoding is invalid", () => {
     const error = () => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       dataToUint8Array({ value: '123', encoding: 'hello' });
     };

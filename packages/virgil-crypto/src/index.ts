@@ -1,4 +1,5 @@
 import { hasFoundationModules, setFoundationModules } from '@virgilsecurity/base-crypto';
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 import initFoundation from '@virgilsecurity/core-foundation';
 

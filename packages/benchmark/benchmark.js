@@ -7,7 +7,7 @@ const createSuite = (benchmark, log) => {
   suite.on('cycle', event => {
     log(String(event.target));
   });
-  suite.on('complete', function (event) {
+  suite.on('complete', function() {
     log(`Fastest is ${this.filter('fastest').map('name')}\n`);
   });
   return suite;

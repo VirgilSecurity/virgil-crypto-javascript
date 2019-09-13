@@ -19,7 +19,6 @@ describe('VirgilStreamCipher', () => {
 
   it('throws if public keys are invalid', () => {
     const error = () => {
-      // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
       virgilCrypto.createStreamCipher({} as VirgilPublicKey);
     };
     expect(error).to.throw;

@@ -29,7 +29,7 @@ export class VirgilStreamVerifier {
     return this;
   }
 
-  verify(publicKey: VirgilPublicKey, final: boolean = true) {
+  verify(publicKey: VirgilPublicKey, final = true) {
     if (this.isDisposed) {
       throw new Error(
         'Illegal state. The VirgilStreamVerifier has been disposed. ' +

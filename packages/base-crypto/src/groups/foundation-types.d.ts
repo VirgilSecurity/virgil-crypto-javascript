@@ -28,7 +28,7 @@ export namespace FoundationModules {
 
   export class GroupSession extends FoundationObjectWithRng {
     addEpoch(message: GroupSessionMessage): void;
-    getSessionId(): void;
+    getSessionId(): Uint8Array;
     getCurrentEpoch(): number;
     createGroupTicket(): GroupSessionTicket;
     encrypt(data: Uint8Array, privateKey: LowLevelPrivateKey): GroupSessionMessage;

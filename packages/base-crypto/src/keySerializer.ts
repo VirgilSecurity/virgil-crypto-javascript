@@ -9,7 +9,13 @@ export const getKeySerializer = () => {
   }
   const foundationModules = getFoundationModules();
   keySerializer = new foundationModules.KeyAsn1Serializer() as KeyAsn1Serializer;
-  keySerializer.setupDefaults();
+  try {
+    keySerializer.setupDefaults();
+  } catch (error) {
+    keySerializer.delete();
+    keySerializer = undefined;
+    throw error;
+  }
   return keySerializer;
 };
 

@@ -1,5 +1,4 @@
 import { importPrivateKey } from './keyProvider';
-import { serializePrivateKey } from './keySerializer';
 import { LowLevelPrivateKey } from './types';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 
@@ -15,9 +14,8 @@ export function getLowLevelPrivateKey(privateKey: VirgilPrivateKey): LowLevelPri
 
 export function setLowLevelPrivateKey(
   privateKey: VirgilPrivateKey,
-  lowLevelPrivateKey: LowLevelPrivateKey,
+  serializedPrivateKey: Uint8Array,
 ): void {
-  const serializedPrivateKey = serializePrivateKey(lowLevelPrivateKey);
   setValue.call(privateKeys, privateKey, serializedPrivateKey);
 }
 

@@ -12,7 +12,12 @@ export const setPythiaModules = (modules: PythiaModules) => {
   }
   pythiaModules = modules;
   const { Pythia } = pythiaModules;
-  Pythia.configure();
+  try {
+    Pythia.configure();
+  } catch (error) {
+    Pythia.cleanup();
+    throw error;
+  }
 };
 
 export const getPythiaModules = () => {

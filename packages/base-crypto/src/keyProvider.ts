@@ -9,7 +9,13 @@ export const getKeyProvider = () => {
   }
   const foundationModules = getFoundationModules();
   keyProvider = new foundationModules.KeyProvider() as KeyProvider;
-  keyProvider.setupDefaults();
+  try {
+    keyProvider.setupDefaults();
+  } catch (error) {
+    keyProvider.delete();
+    keyProvider = undefined;
+    throw error;
+  }
   return keyProvider;
 };
 

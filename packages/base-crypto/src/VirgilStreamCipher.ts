@@ -22,21 +22,39 @@ export class VirgilStreamCipher {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private ctrDrbg: any;
 
-  private lowLevelPublicKeys: LowLevelPublicKey[];
+  private lowLevelPublicKeys: LowLevelPublicKey[] = [];
 
   constructor(publicKey: VirgilPublicKey | VirgilPublicKey[], signature?: Data) {
     const foundationModules = getFoundationModules();
 
+    this.ctrDrbg = new foundationModules.CtrDrbg();
+
+    try {
+      this.ctrDrbg.setupDefaults();
+    } catch (error) {
+      this.ctrDrbg.delete();
+      throw error;
+    }
+
     this.recipientCipher = new foundationModules.RecipientCipher();
     this.aes256Gcm = new foundationModules.Aes256Gcm();
-    this.ctrDrbg = new foundationModules.CtrDrbg();
-    this.ctrDrbg.setupDefaults();
     this.recipientCipher.encryptionCipher = this.aes256Gcm;
     this.recipientCipher.random = this.ctrDrbg;
 
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
-    this.lowLevelPublicKeys = publicKeys.map(publicKey => importPublicKey(publicKey.key));
+    publicKeys.forEach(({ key }) => {
+      try {
+        const lowLevelPublicKey = importPublicKey(key);
+        this.lowLevelPublicKeys.push(lowLevelPublicKey);
+      } catch (error) {
+        this.lowLevelPublicKeys.forEach(lowLevelPublicKey => lowLevelPublicKey.delete());
+        this.recipientCipher.delete();
+        this.aes256Gcm.delete();
+        this.ctrDrbg.delete();
+        throw error;
+      }
+    });
 
     publicKeys.forEach(({ identifier }, index) => {
       this.recipientCipher.addKeyRecipient(identifier, this.lowLevelPublicKeys[index]);
@@ -78,13 +96,13 @@ export class VirgilStreamCipher {
   }
 
   dispose() {
+    this.lowLevelPublicKeys.forEach(lowLevelPublicKey => lowLevelPublicKey.delete());
     this.recipientCipher.delete();
     this.aes256Gcm.delete();
     this.ctrDrbg.delete();
     if (this.messageInfoCustomParams) {
       this.messageInfoCustomParams.delete();
     }
-    this.lowLevelPublicKeys.forEach(lowLevelPublicKey => lowLevelPublicKey.delete());
     this.isDisposed = true;
   }
 

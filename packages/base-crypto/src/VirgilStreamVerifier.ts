@@ -13,9 +13,16 @@ export class VirgilStreamVerifier {
 
   constructor(signature: Data) {
     const foundationModules = getFoundationModules();
+
     const mySignature = dataToUint8Array(signature, 'base64');
+
     this.verifier = new foundationModules.Verifier();
-    this.verifier.reset(mySignature);
+    try {
+      this.verifier.reset(mySignature);
+    } catch (error) {
+      this.verifier.delete();
+      throw error;
+    }
   }
 
   update(data: Data) {
@@ -44,6 +51,7 @@ export class VirgilStreamVerifier {
     const result = this.verifier.verify(lowLevelPublicKey);
 
     lowLevelPublicKey.delete();
+
     if (final) {
       this.dispose();
     }

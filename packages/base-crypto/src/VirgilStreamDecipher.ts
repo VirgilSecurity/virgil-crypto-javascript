@@ -24,11 +24,17 @@ export class VirgilStreamDecipher {
 
     this.recipientCipher = new foundationModules.RecipientCipher();
 
-    this.recipientCipher.startDecryptionWithKey(
-      privateKey.identifier,
-      this.lowLevelPrivateKey,
-      new Uint8Array(0),
-    );
+    try {
+      this.recipientCipher.startDecryptionWithKey(
+        privateKey.identifier,
+        this.lowLevelPrivateKey,
+        new Uint8Array(0),
+      );
+    } catch (error) {
+      this.lowLevelPrivateKey.delete();
+      this.recipientCipher.delete();
+      throw error;
+    }
   }
 
   getSignature() {
@@ -69,8 +75,8 @@ export class VirgilStreamDecipher {
   }
 
   dispose() {
-    this.recipientCipher.delete();
     this.lowLevelPrivateKey.delete();
+    this.recipientCipher.delete();
     this.isDisposed = true;
   }
 

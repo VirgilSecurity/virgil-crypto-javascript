@@ -33,85 +33,100 @@ const outputDir = path.join(__dirname, 'dist');
 const getOutputFilename = (target, cryptoType, format) =>
   `${target}${cryptoType === CRYPTO_TYPE.ASMJS ? '.asmjs' : ''}.${format}.js`;
 
-const getCryptoEntryPointName = (target, cryptoType) =>
-  `${target}${cryptoType === CRYPTO_TYPE.ASMJS ? '.asmjs' : ''}.es.js`;
+const getCryptoEntryPointName = (target, cryptoType, format) => {
+  const myCryptoType = cryptoType === CRYPTO_TYPE.ASMJS ? '.asmjs' : '';
+  const myFormat = format === FORMAT.UMD ? 'es' : format;
+  return `${target}${myCryptoType}.${myFormat}.js`;
+};
 
-const createBrowserEntry = (target, cryptoType, format) => ({
-  input: path.join(sourceDir, 'index.ts'),
-  output: {
-    format,
-    file: path.join(outputDir, getOutputFilename(target, cryptoType, format)),
-    name: 'VirgilPythiaCrypto',
-  },
-  plugins: [
-    replace({
-      patterns: [
-        {
-          match: /(initPythia|types)\.ts$/,
-          test: '@virgilsecurity/core-pythia',
-          replace: path.join(
-            '@virgilsecurity',
-            'core-pythia',
-            getCryptoEntryPointName(target, cryptoType),
-          ),
-        },
-      ],
-    }),
-    nodeResolve({ browser: true, extensions: ['.js', '.ts'] }),
-    commonjs(),
-    typescript({
-      exclude: ['**/*.test.ts'],
-      objectHashIgnoreUnknownHack: true,
-      useTsconfigDeclarationDir: true,
-    }),
-    cryptoType === CRYPTO_TYPE.WASM &&
-      copy({
-        targets: [
+const createBrowserEntry = (target, cryptoType, format) => {
+  const pythiaEntryPoint = path.join(
+    '@virgilsecurity',
+    'core-pythia',
+    getCryptoEntryPointName(target, cryptoType, format),
+  );
+  return {
+    input: path.join(sourceDir, 'index.ts'),
+    output: {
+      format,
+      file: path.join(outputDir, getOutputFilename(target, cryptoType, format)),
+      name: 'VirgilPythiaCrypto',
+    },
+    external:
+      format !== FORMAT.ES &&
+      format !== FORMAT.UMD &&
+      Object.keys(packageJson.dependencies).concat([pythiaEntryPoint]),
+    plugins: [
+      replace({
+        patterns: [
           {
-            src: path.join(
-              __dirname,
-              'node_modules',
-              '@virgilsecurity',
-              'core-pythia',
-              `libpythia.${target}.wasm`,
-            ),
-            dest: outputDir,
+            match: /(initPythia|types)\.ts$/,
+            test: '@virgilsecurity/core-pythia',
+            replace: pythiaEntryPoint,
           },
         ],
       }),
-    format === FORMAT.UMD && terser(),
-  ],
-});
+      nodeResolve({ browser: true, extensions: ['.js', '.ts'] }),
+      commonjs(),
+      typescript({
+        exclude: ['**/*.test.ts'],
+        objectHashIgnoreUnknownHack: true,
+        useTsconfigDeclarationDir: true,
+      }),
+      cryptoType === CRYPTO_TYPE.WASM &&
+        copy({
+          targets: [
+            {
+              src: path.join(
+                __dirname,
+                'node_modules',
+                '@virgilsecurity',
+                'core-pythia',
+                `libpythia.${target}.wasm`,
+              ),
+              dest: outputDir,
+            },
+          ],
+        }),
+      (format === FORMAT.ES || format === FORMAT.UMD) && terser(),
+    ],
+  };
+};
 
-const createNodeJsEntry = (cryptoType, format) => ({
-  input: path.join(sourceDir, 'index.ts'),
-  output: {
-    format,
-    file: path.join(outputDir, getOutputFilename(TARGET.NODE, cryptoType, format)),
-  },
-  external: builtinModules.concat(Object.keys(packageJson.dependencies)),
-  plugins: [
-    replace({
-      patterns: [
-        {
-          match: /(initPythia|types)\.ts$/,
-          test: '@virgilsecurity/core-pythia',
-          replace: path.join(
-            '@virgilsecurity',
-            'core-pythia',
-            getCryptoEntryPointName(TARGET.NODE, cryptoType),
-          ),
-        },
-      ],
-    }),
-    nodeResolve({ extensions: ['.js', '.ts'] }),
-    commonjs(),
-    typescript({
-      exclude: ['**/*.test.ts'],
-      useTsconfigDeclarationDir: true,
-    }),
-  ],
-});
+const createNodeJsEntry = (cryptoType, format) => {
+  const pythiaEntryPoint = path.join(
+    '@virgilsecurity',
+    'core-pythia',
+    getCryptoEntryPointName(TARGET.NODE, cryptoType, format),
+  );
+  return {
+    input: path.join(sourceDir, 'index.ts'),
+    output: {
+      format,
+      file: path.join(outputDir, getOutputFilename(TARGET.NODE, cryptoType, format)),
+    },
+    external: builtinModules
+      .concat(Object.keys(packageJson.dependencies))
+      .concat([pythiaEntryPoint]),
+    plugins: [
+      replace({
+        patterns: [
+          {
+            match: /(initPythia|types)\.ts$/,
+            test: '@virgilsecurity/core-pythia',
+            replace: pythiaEntryPoint,
+          },
+        ],
+      }),
+      nodeResolve({ extensions: ['.js', '.ts'] }),
+      commonjs(),
+      typescript({
+        exclude: ['**/*.test.ts'],
+        useTsconfigDeclarationDir: true,
+      }),
+    ],
+  };
+};
 
 module.exports = [
   createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.ASMJS, FORMAT.CJS),

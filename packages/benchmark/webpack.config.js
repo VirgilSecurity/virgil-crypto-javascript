@@ -1,9 +1,9 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
+
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: 'production',
-  node: false,
   entry: path.join(__dirname, 'browser.js'),
   output: {
     path: path.join(__dirname, 'dist'),

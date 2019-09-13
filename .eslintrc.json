@@ -3,6 +3,7 @@
     {
       "files": "*.js",
       "env": {
+        "es6": true,
         "node": true
       },
       "extends": [

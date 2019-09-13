@@ -5,10 +5,10 @@ const { VirgilCrypto: V3Crypto } = require('virgil-crypto-3');
 const createSuite = (benchmark, log) => {
   const suite = new benchmark.Suite();
   suite.on('cycle', event => {
-    log(String(event.target));
+    log(`- ${String(event.target)}`);
   });
   suite.on('complete', function() {
-    log(`Fastest is ${this.filter('fastest').map('name')}\n`);
+    log(`\nFastest is ${this.filter('fastest').map('name')}`);
   });
   return suite;
 };
@@ -33,10 +33,11 @@ const generateKeyPair = (v3Crypto, v4Crypto) => {
 
 const generateKeysBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
   const suite = createSuite(benchmark, log);
-  suite.add('v3 - generateKeys', () => {
+  log('### generateKeys');
+  suite.add('v3', () => {
     v3Crypto.generateKeys();
   });
-  suite.add('v4 - generateKeys', () => {
+  suite.add('v4', () => {
     v4Crypto.generateKeys();
   });
   suite.run();
@@ -45,10 +46,11 @@ const generateKeysBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
 const generateKeysFromKeyMaterialBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
   const keyMaterial = v3Crypto.getRandomBytes(32);
   const suite = createSuite(benchmark, log);
-  suite.add('v3 - generateKeysFromKeyMaterial', () => {
+  log('### generateKeysFromKeyMaterial');
+  suite.add('v3', () => {
     v3Crypto.generateKeysFromKeyMaterial(keyMaterial);
   });
-  suite.add('v4 - generateKeysFromKeyMaterial', () => {
+  suite.add('v4', () => {
     v4Crypto.generateKeysFromKeyMaterial(keyMaterial);
   });
   suite.run();
@@ -58,10 +60,11 @@ const importPrivateKeyBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const privateKey = v3Crypto.exportPrivateKey(keyPair.v3.privateKey);
   const suite = createSuite(benchmark, log);
-  suite.add('v3 - importPrivateKey', () => {
+  log('### importPrivateKey');
+  suite.add('v3', () => {
     v3Crypto.importPrivateKey(privateKey);
   });
-  suite.add('v4 - importPrivateKey', () => {
+  suite.add('v4', () => {
     v4Crypto.importPrivateKey(privateKey);
   });
   suite.run();
@@ -70,10 +73,11 @@ const importPrivateKeyBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
 const exportPrivateKeyBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const suite = createSuite(benchmark, log);
-  suite.add('v3 - exportPrivateKey', () => {
+  log('### exportPrivateKey');
+  suite.add('v3', () => {
     v3Crypto.exportPrivateKey(keyPair.v3.privateKey);
   });
-  suite.add('v4 - exportPrivateKey', () => {
+  suite.add('v4', () => {
     v4Crypto.exportPrivateKey(keyPair.v4.privateKey);
   });
   suite.run();
@@ -83,10 +87,11 @@ const importPublicKeyBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const publicKey = v3Crypto.exportPublicKey(keyPair.v3.publicKey);
   const suite = createSuite(benchmark, log);
-  suite.add('v3 - importPublicKey', () => {
+  log('### importPublicKey');
+  suite.add('v3', () => {
     v3Crypto.importPublicKey(publicKey);
   });
-  suite.add('v4 - importPublicKey', () => {
+  suite.add('v4', () => {
     v4Crypto.importPublicKey(publicKey);
   });
   suite.run();
@@ -95,10 +100,11 @@ const importPublicKeyBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
 const exportPublicKeyBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const suite = createSuite(benchmark, log);
-  suite.add('v3 - exportPublicKey', () => {
+  log('### exportPublicKey');
+  suite.add('v3', () => {
     v3Crypto.exportPublicKey(keyPair.v3.publicKey);
   });
-  suite.add('v4 - exportPublicKey', () => {
+  suite.add('v4', () => {
     v4Crypto.exportPublicKey(keyPair.v4.publicKey);
   });
   suite.run();
@@ -111,10 +117,11 @@ const encryptBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
   );
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const suite = createSuite(benchmark, log);
-  suite.add('v3 - encrypt', () => {
+  log('### encrypt');
+  suite.add('v3', () => {
     v3Crypto.encrypt(data, keyPair.v3.publicKey);
   });
-  suite.add('v4 - encrypt', () => {
+  suite.add('v4', () => {
     v4Crypto.encrypt(data, keyPair.v4.publicKey);
   });
   suite.run();
@@ -128,10 +135,11 @@ const decryptBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const encrypted = v3Crypto.encrypt(data, keyPair.v3.publicKey);
   const suite = createSuite(benchmark, log);
-  suite.add('v3 - decrypt', () => {
+  log('### decrypt');
+  suite.add('v3', () => {
     v3Crypto.decrypt(encrypted, keyPair.v3.privateKey);
   });
-  suite.add('v4 - decrypt', () => {
+  suite.add('v4', () => {
     v4Crypto.decrypt(encrypted, keyPair.v4.privateKey);
   });
   suite.run();
@@ -143,10 +151,11 @@ const calculateHashBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
     'utf8',
   );
   const suite = createSuite(benchmark, log);
-  suite.add('v3 - calculateHash', () => {
+  log('### calculateHash');
+  suite.add('v3', () => {
     v3Crypto.calculateHash(data);
   });
-  suite.add('v4 - calculateHash', () => {
+  suite.add('v4', () => {
     v4Crypto.calculateHash(data);
   });
   suite.run();
@@ -155,10 +164,11 @@ const calculateHashBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
 const extractPublicKeyBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const suite = createSuite(benchmark, log);
-  suite.add('v3 - extractPublicKey', () => {
+  log('### extractPublicKey');
+  suite.add('v3', () => {
     v3Crypto.extractPublicKey(keyPair.v3.privateKey);
   });
-  suite.add('v4 - extractPublicKey', () => {
+  suite.add('v4', () => {
     v4Crypto.extractPublicKey(keyPair.v4.privateKey);
   });
   suite.run();
@@ -171,10 +181,11 @@ const calculateSignatureBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
   );
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const suite = createSuite(benchmark, log);
-  suite.add('v3 - calculateSignature', () => {
+  log('### calculateSignature');
+  suite.add('v3', () => {
     v3Crypto.calculateSignature(data, keyPair.v3.privateKey);
   });
-  suite.add('v4 - calculateSignature', () => {
+  suite.add('v4', () => {
     v4Crypto.calculateSignature(data, keyPair.v4.privateKey);
   });
   suite.run();
@@ -188,10 +199,11 @@ const verifySignatureBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const signature = v3Crypto.calculateSignature(data, keyPair.v3.privateKey);
   const suite = createSuite(benchmark, log);
-  suite.add('v3 - verifySignature', () => {
+  log('### verifySignature');
+  suite.add('v3', () => {
     v3Crypto.verifySignature(data, signature, keyPair.v3.publicKey);
   });
-  suite.add('v4 - verifySignature', () => {
+  suite.add('v4', () => {
     v4Crypto.verifySignature(data, signature, keyPair.v4.publicKey);
   });
   suite.run();
@@ -204,10 +216,11 @@ const signThenEncryptBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
   );
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const suite = createSuite(benchmark, log);
-  suite.add('v3 - signThenEncrypt', () => {
+  log('### signThenEncrypt');
+  suite.add('v3', () => {
     v3Crypto.signThenEncrypt(data, keyPair.v3.privateKey, keyPair.v3.publicKey);
   });
-  suite.add('v4 - signThenEncrypt', () => {
+  suite.add('v4', () => {
     v4Crypto.signThenEncrypt(data, keyPair.v4.privateKey, keyPair.v4.publicKey);
   });
   suite.run();
@@ -221,10 +234,11 @@ const decryptThenVerifyBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const encrypted = v3Crypto.signThenEncrypt(data, keyPair.v3.privateKey, keyPair.v3.publicKey);
   const suite = createSuite(benchmark, log);
-  suite.add('v3 - decryptThenVerify', () => {
+  log('### decryptThenVerify');
+  suite.add('v3', () => {
     v3Crypto.decryptThenVerify(encrypted, keyPair.v3.privateKey, keyPair.v3.publicKey);
   });
-  suite.add('v4 - decryptThenVerify', () => {
+  suite.add('v4', () => {
     v4Crypto.decryptThenVerify(encrypted, keyPair.v4.privateKey, keyPair.v4.publicKey);
   });
   suite.run();
@@ -233,10 +247,11 @@ const decryptThenVerifyBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
 const getRandomBytesBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
   const len = 64;
   const suite = createSuite(benchmark, log);
-  suite.add('v3 - getRandomBytes', () => {
+  log('### getRandomBytes');
+  suite.add('v3', () => {
     v3Crypto.getRandomBytes(len);
   });
-  suite.add('v4 - getRandomBytes', () => {
+  suite.add('v4', () => {
     v4Crypto.getRandomBytes(len);
   });
   suite.run();
@@ -249,10 +264,11 @@ const signThenEncryptDetachedBenchmark = (benchmark, log, v3Crypto, v4Crypto) =>
   );
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const suite = createSuite(benchmark, log);
-  suite.add('v3 - signThenEncryptDetached', () => {
+  log('### signThenEncryptDetached');
+  suite.add('v3', () => {
     v3Crypto.signThenEncryptDetached(data, keyPair.v3.privateKey, keyPair.v3.publicKey);
   });
-  suite.add('v4 - signThenEncryptDetached', () => {
+  suite.add('v4', () => {
     v4Crypto.signThenEncryptDetached(data, keyPair.v4.privateKey, keyPair.v4.publicKey);
   });
   suite.run();
@@ -270,7 +286,8 @@ const decryptThenVerifyDetachedBenchmark = (benchmark, log, v3Crypto, v4Crypto) 
     keyPair.v3.publicKey,
   );
   const suite = createSuite(benchmark, log);
-  suite.add('v3 - decryptThenVerifyDetached', () => {
+  log('### decryptThenVerifyDetached');
+  suite.add('v3', () => {
     v3Crypto.decryptThenVerifyDetached(
       encryptedData,
       metadata,
@@ -278,7 +295,7 @@ const decryptThenVerifyDetachedBenchmark = (benchmark, log, v3Crypto, v4Crypto) 
       keyPair.v3.publicKey,
     );
   });
-  suite.add('v4 - decryptThenVerifyDetached', () => {
+  suite.add('v4', () => {
     v4Crypto.decryptThenVerifyDetached(
       encryptedData,
       metadata,
@@ -289,32 +306,33 @@ const decryptThenVerifyDetachedBenchmark = (benchmark, log, v3Crypto, v4Crypto) 
   suite.run();
 };
 
-const runBenchmark = (benchmark, log) => {
-  initCrypto().then(() => {
-    const run = fn => {
-      const v3Crypto = new V3Crypto();
-      const v4Crypto = new V4Crypto();
-      return fn(benchmark, log, v3Crypto, v4Crypto);
-    };
+const runBenchmark = async (benchmark, log) => {
+  await initCrypto();
 
-    run(generateKeysBenchmark);
-    run(generateKeysFromKeyMaterialBenchmark);
-    run(importPrivateKeyBenchmark);
-    run(exportPrivateKeyBenchmark);
-    run(importPublicKeyBenchmark);
-    run(exportPublicKeyBenchmark);
-    run(encryptBenchmark);
-    run(decryptBenchmark);
-    run(calculateHashBenchmark);
-    run(extractPublicKeyBenchmark);
-    run(calculateSignatureBenchmark);
-    run(verifySignatureBenchmark);
-    run(signThenEncryptBenchmark);
-    run(decryptThenVerifyBenchmark);
-    run(getRandomBytesBenchmark);
-    run(signThenEncryptDetachedBenchmark);
-    run(decryptThenVerifyDetachedBenchmark);
-  });
+  const run = fn => {
+    const v3Crypto = new V3Crypto();
+    const v4Crypto = new V4Crypto();
+    fn(benchmark, log, v3Crypto, v4Crypto);
+    log('');
+  };
+
+  run(generateKeysBenchmark);
+  run(generateKeysFromKeyMaterialBenchmark);
+  run(importPrivateKeyBenchmark);
+  run(exportPrivateKeyBenchmark);
+  run(importPublicKeyBenchmark);
+  run(exportPublicKeyBenchmark);
+  run(encryptBenchmark);
+  run(decryptBenchmark);
+  run(calculateHashBenchmark);
+  run(extractPublicKeyBenchmark);
+  run(calculateSignatureBenchmark);
+  run(verifySignatureBenchmark);
+  run(signThenEncryptBenchmark);
+  run(decryptThenVerifyBenchmark);
+  run(getRandomBytesBenchmark);
+  run(signThenEncryptDetachedBenchmark);
+  run(decryptThenVerifyDetachedBenchmark);
 };
 
 module.exports = runBenchmark;

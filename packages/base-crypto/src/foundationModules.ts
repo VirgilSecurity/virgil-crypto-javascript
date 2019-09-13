@@ -19,3 +19,5 @@ export const getFoundationModules = () => {
   }
   return foundationModules;
 };
+
+export const hasFoundationModules = () => typeof foundationModules !== 'undefined';

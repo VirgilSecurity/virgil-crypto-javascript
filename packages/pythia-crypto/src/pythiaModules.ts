@@ -21,3 +21,5 @@ export const getPythiaModules = () => {
   }
   return pythiaModules;
 };
+
+export const hasPythiaModules = () => typeof pythiaModules !== 'undefined';

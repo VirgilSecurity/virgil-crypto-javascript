@@ -58,6 +58,7 @@ export class VirgilStreamSigner {
       this.dispose();
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return toBuffer(result!);
   }
 

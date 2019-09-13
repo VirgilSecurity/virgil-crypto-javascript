@@ -288,6 +288,7 @@ export class VirgilCrypto implements ICrypto {
     aes256Gcm.delete();
     lowLevelPublicKeys.forEach(lowLevelPublicKey => lowLevelPublicKey.delete());
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return result!;
   }
 
@@ -318,6 +319,7 @@ export class VirgilCrypto implements ICrypto {
     lowLevelPrivateKey.delete();
     recipientCipher.delete();
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return result!;
   }
 
@@ -393,6 +395,7 @@ export class VirgilCrypto implements ICrypto {
     sha512.delete();
     lowLevelPrivateKey.delete();
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return toBuffer(signature!);
   }
 
@@ -482,7 +485,8 @@ export class VirgilCrypto implements ICrypto {
     aes256Gcm.delete();
     messageInfoCustomParams.delete();
 
-    return result;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return result!;
   }
 
   decryptThenVerify(
@@ -533,6 +537,7 @@ export class VirgilCrypto implements ICrypto {
         throw error;
       }
       for (let i = 0; i < publicKeys.length; i += 1) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         if (NodeBuffer.compare(signerId!, publicKeys[i].identifier) === 0) {
           signerPublicKey = publicKeys[i];
           break;
@@ -553,7 +558,8 @@ export class VirgilCrypto implements ICrypto {
       throw error;
     }
 
-    const isValid = this.verifySignature(decryptedData, signature!, signerPublicKey);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const isValid = this.verifySignature(decryptedData!, signature!, signerPublicKey);
     if (!isValid) {
       throw new Error('Invalid signature');
     }
@@ -562,7 +568,8 @@ export class VirgilCrypto implements ICrypto {
     recipientCipher.delete();
     messageInfoCustomParams.delete();
 
-    return decryptedData;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return decryptedData!;
   }
 
   getRandomBytes(length: number) {
@@ -628,7 +635,8 @@ export class VirgilCrypto implements ICrypto {
     aes256Gcm.delete();
     messageInfoCustomParams.delete();
 
-    return { encryptedData, metadata };
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return { encryptedData: encryptedData!, metadata: metadata! };
   }
 
   decryptThenVerifyDetached(
@@ -677,6 +685,7 @@ export class VirgilCrypto implements ICrypto {
         throw error;
       }
       for (let i = 0; i < publicKeys.length; i += 1) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         if (NodeBuffer.compare(signerId!, publicKeys[i].identifier) === 0) {
           signerPublicKey = publicKeys[i];
           break;
@@ -697,7 +706,8 @@ export class VirgilCrypto implements ICrypto {
       throw error;
     }
 
-    const isValid = this.verifySignature(decryptedData, signature!, signerPublicKey);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const isValid = this.verifySignature(decryptedData!, signature!, signerPublicKey);
     if (!isValid) {
       throw new Error('Invalid signature');
     }
@@ -706,7 +716,8 @@ export class VirgilCrypto implements ICrypto {
     recipientCipher.delete();
     messageInfoCustomParams.delete();
 
-    return decryptedData;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return decryptedData!;
   }
 
   createStreamCipher(publicKey: VirgilPublicKey | VirgilPublicKey[], signature?: Data) {

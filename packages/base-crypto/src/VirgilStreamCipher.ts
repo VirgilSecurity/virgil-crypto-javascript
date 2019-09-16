@@ -2,9 +2,8 @@ import { dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 
 import { DATA_SIGNATURE_KEY } from './constants';
 import { getFoundationModules } from './foundationModules';
-import { importPublicKey } from './keyProvider';
 import { Data, LowLevelPublicKey } from './types';
-import { toArray } from './utils';
+import { toArray, getLowLevelPublicKeys } from './utils';
 import { validatePublicKeysArray } from './validators';
 import { VirgilPublicKey } from './VirgilPublicKey';
 
@@ -27,11 +26,15 @@ export class VirgilStreamCipher {
   constructor(publicKey: VirgilPublicKey | VirgilPublicKey[], signature?: Data) {
     const foundationModules = getFoundationModules();
 
-    this.ctrDrbg = new foundationModules.CtrDrbg();
+    const publicKeys = toArray(publicKey);
+    validatePublicKeysArray(publicKeys);
+    this.lowLevelPublicKeys = getLowLevelPublicKeys(publicKeys);
 
+    this.ctrDrbg = new foundationModules.CtrDrbg();
     try {
       this.ctrDrbg.setupDefaults();
     } catch (error) {
+      this.lowLevelPublicKeys.forEach(lowLevelPublicKey => lowLevelPublicKey.delete());
       this.ctrDrbg.delete();
       throw error;
     }
@@ -40,21 +43,6 @@ export class VirgilStreamCipher {
     this.aes256Gcm = new foundationModules.Aes256Gcm();
     this.recipientCipher.encryptionCipher = this.aes256Gcm;
     this.recipientCipher.random = this.ctrDrbg;
-
-    const publicKeys = toArray(publicKey);
-    validatePublicKeysArray(publicKeys);
-    publicKeys.forEach(({ key }) => {
-      try {
-        const lowLevelPublicKey = importPublicKey(key);
-        this.lowLevelPublicKeys.push(lowLevelPublicKey);
-      } catch (error) {
-        this.lowLevelPublicKeys.forEach(lowLevelPublicKey => lowLevelPublicKey.delete());
-        this.recipientCipher.delete();
-        this.aes256Gcm.delete();
-        this.ctrDrbg.delete();
-        throw error;
-      }
-    });
 
     publicKeys.forEach(({ identifier }, index) => {
       this.recipientCipher.addKeyRecipient(identifier, this.lowLevelPublicKeys[index]);

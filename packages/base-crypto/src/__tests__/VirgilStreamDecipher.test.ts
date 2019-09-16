@@ -19,7 +19,6 @@ describe('VirgilStreamDecipher', () => {
 
   it('throws if private key is invalid', () => {
     const error = () => {
-      // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
       virgilCrypto.createStreamDecipher({} as VirgilPrivateKey);
     };
     expect(error).to.throw;

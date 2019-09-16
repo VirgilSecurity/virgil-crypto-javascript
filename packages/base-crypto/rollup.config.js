@@ -18,9 +18,7 @@ const createEntry = format => ({
     format,
     file: path.join(outputPath, `base-crypto.${format}.js`),
   },
-  plugins: [
-    typescript({ useTsconfigDeclarationDir: true }),
-  ],
+  plugins: [typescript({ useTsconfigDeclarationDir: true })],
 });
 
 module.exports = formats.map(createEntry);

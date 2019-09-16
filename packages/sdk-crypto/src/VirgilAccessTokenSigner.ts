@@ -21,4 +21,4 @@ export class VirgilAccessTokenSigner implements IAccessTokenSigner {
   verifyTokenSignature(token: Data, signature: Data, publicKey: IPublicKey) {
     return this.crypto.verifySignature(token, signature, publicKey);
   }
-};
+}

@@ -2,8 +2,6 @@ const path = require('path');
 
 const typescript = require('rollup-plugin-typescript2');
 
-const packageJson = require('./package.json');
-
 const formats = ['cjs', 'es'];
 
 const sourcePath = path.join(__dirname, 'src');
@@ -15,9 +13,7 @@ const createEntry = format => ({
     format,
     file: path.join(outputPath, `sdk-crypto.${format}.js`),
   },
-  plugins: [
-    typescript({ useTsconfigDeclarationDir: true }),
-  ],
+  plugins: [typescript({ useTsconfigDeclarationDir: true })],
 });
 
 module.exports = formats.map(createEntry);

@@ -2,8 +2,8 @@ import { dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 
 import { DATA_SIGNATURE_KEY } from './constants';
 import { getFoundationModules } from './foundationModules';
-import { Data } from './types';
-import { toArray } from './utils';
+import { Data, LowLevelPublicKey } from './types';
+import { toArray, getLowLevelPublicKeys } from './utils';
 import { validatePublicKeysArray } from './validators';
 import { VirgilPublicKey } from './VirgilPublicKey';
 
@@ -21,20 +21,31 @@ export class VirgilStreamCipher {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private ctrDrbg: any;
 
+  private lowLevelPublicKeys: LowLevelPublicKey[] = [];
+
   constructor(publicKey: VirgilPublicKey | VirgilPublicKey[], signature?: Data) {
     const foundationModules = getFoundationModules();
-    this.recipientCipher = new foundationModules.RecipientCipher();
-    this.aes256Gcm = new foundationModules.Aes256Gcm();
-    this.ctrDrbg = new foundationModules.CtrDrbg();
-    this.ctrDrbg.setupDefaults();
-    this.recipientCipher.encryptionCipher = this.aes256Gcm;
-    this.recipientCipher.random = this.ctrDrbg;
 
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
+    this.lowLevelPublicKeys = getLowLevelPublicKeys(publicKeys);
 
-    publicKeys.forEach(myPublicKey => {
-      this.recipientCipher.addKeyRecipient(myPublicKey.identifier, myPublicKey.key);
+    this.ctrDrbg = new foundationModules.CtrDrbg();
+    try {
+      this.ctrDrbg.setupDefaults();
+    } catch (error) {
+      this.lowLevelPublicKeys.forEach(lowLevelPublicKey => lowLevelPublicKey.delete());
+      this.ctrDrbg.delete();
+      throw error;
+    }
+
+    this.recipientCipher = new foundationModules.RecipientCipher();
+    this.aes256Gcm = new foundationModules.Aes256Gcm();
+    this.recipientCipher.encryptionCipher = this.aes256Gcm;
+    this.recipientCipher.random = this.ctrDrbg;
+
+    publicKeys.forEach(({ identifier }, index) => {
+      this.recipientCipher.addKeyRecipient(identifier, this.lowLevelPublicKeys[index]);
     });
 
     if (signature) {
@@ -58,7 +69,7 @@ export class VirgilStreamCipher {
     return toBuffer(this.recipientCipher.processEncryption(myData));
   }
 
-  final(dispose: boolean = true) {
+  final(dispose = true) {
     this.ensureLegalState();
     this.ensureIsRunning();
     try {
@@ -73,6 +84,7 @@ export class VirgilStreamCipher {
   }
 
   dispose() {
+    this.lowLevelPublicKeys.forEach(lowLevelPublicKey => lowLevelPublicKey.delete());
     this.recipientCipher.delete();
     this.aes256Gcm.delete();
     this.ctrDrbg.delete();

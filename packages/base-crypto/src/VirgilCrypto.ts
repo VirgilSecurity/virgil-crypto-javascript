@@ -315,6 +315,7 @@ export class VirgilCrypto implements ICrypto {
     try {
       verifier.reset(mySignature);
     } catch (error) {
+      lowLevelPublicKey.delete();
       verifier.delete();
       throw error;
     }
@@ -346,16 +347,18 @@ export class VirgilCrypto implements ICrypto {
     recipientCipher.encryptionCipher = aes256Gcm;
     recipientCipher.random = this.random;
 
-    const signature = this.calculateSignature(myData, privateKey);
     publicKeys.forEach(({ identifier }, index) => {
       recipientCipher.addKeyRecipient(identifier, lowLevelPublicKeys[index]);
     });
 
     const messageInfoCustomParams = recipientCipher.customParams();
-    messageInfoCustomParams.addData(DATA_SIGNATURE_KEY, signature);
-    messageInfoCustomParams.addData(DATA_SIGNER_ID_KEY, privateKey.identifier);
 
     try {
+      const signature = this.calculateSignature(myData, privateKey);
+
+      messageInfoCustomParams.addData(DATA_SIGNATURE_KEY, signature);
+      messageInfoCustomParams.addData(DATA_SIGNER_ID_KEY, privateKey.identifier);
+
       recipientCipher.startEncryption();
       const messageInfo = recipientCipher.packMessageInfo();
       const processEncryption = recipientCipher.processEncryption(myData);
@@ -467,16 +470,18 @@ export class VirgilCrypto implements ICrypto {
     recipientCipher.encryptionCipher = aes256Gcm;
     recipientCipher.random = this.random;
 
-    const signature = this.calculateSignature(myData, privateKey);
     publicKeys.forEach(({ identifier }, index) => {
       recipientCipher.addKeyRecipient(identifier, lowLevelPublicKeys[index]);
     });
 
     const messageInfoCustomParams = recipientCipher.customParams();
-    messageInfoCustomParams.addData(DATA_SIGNATURE_KEY, signature);
-    messageInfoCustomParams.addData(DATA_SIGNER_ID_KEY, privateKey.identifier);
 
     try {
+      const signature = this.calculateSignature(myData, privateKey);
+
+      messageInfoCustomParams.addData(DATA_SIGNATURE_KEY, signature);
+      messageInfoCustomParams.addData(DATA_SIGNER_ID_KEY, privateKey.identifier);
+
       recipientCipher.startEncryption();
       const messageInfo = recipientCipher.packMessageInfo();
       const processEncryption = recipientCipher.processEncryption(myData);

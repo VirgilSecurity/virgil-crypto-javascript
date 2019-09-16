@@ -19,6 +19,7 @@ const addHashAlgorithm = (obj: any, algIdName: string) => {
   });
 };
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 export const HashAlgorithm: HashAlgorithmType = {};
 addHashAlgorithm(HashAlgorithm, 'SHA224');

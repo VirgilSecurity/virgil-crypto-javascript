@@ -1,6 +1,7 @@
 import { dataToUint8Array } from '@virgilsecurity/data-utils';
 
 import { getFoundationModules } from './foundationModules';
+import { importPublicKey } from './keyProvider';
 import { Data } from './types';
 import { validatePublicKey } from './validators';
 import { VirgilPublicKey } from './VirgilPublicKey';
@@ -12,9 +13,16 @@ export class VirgilStreamVerifier {
 
   constructor(signature: Data) {
     const foundationModules = getFoundationModules();
+
     const mySignature = dataToUint8Array(signature, 'base64');
+
     this.verifier = new foundationModules.Verifier();
-    this.verifier.reset(mySignature);
+    try {
+      this.verifier.reset(mySignature);
+    } catch (error) {
+      this.verifier.delete();
+      throw error;
+    }
   }
 
   update(data: Data) {
@@ -28,7 +36,7 @@ export class VirgilStreamVerifier {
     return this;
   }
 
-  verify(publicKey: VirgilPublicKey, final: boolean = true) {
+  verify(publicKey: VirgilPublicKey, final = true) {
     if (this.isDisposed) {
       throw new Error(
         'Illegal state. The VirgilStreamVerifier has been disposed. ' +
@@ -38,14 +46,17 @@ export class VirgilStreamVerifier {
     }
 
     validatePublicKey(publicKey);
+    const lowLevelPublicKey = importPublicKey(publicKey.key);
 
-    try {
-      return this.verifier.verify(publicKey.key);
-    } finally {
-      if (final) {
-        this.dispose();
-      }
+    const result = this.verifier.verify(lowLevelPublicKey);
+
+    lowLevelPublicKey.delete();
+
+    if (final) {
+      this.dispose();
     }
+
+    return result;
   }
 
   dispose() {

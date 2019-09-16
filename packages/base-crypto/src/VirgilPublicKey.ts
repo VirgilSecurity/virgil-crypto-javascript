@@ -1,11 +1,11 @@
-import { IPublicKey, LowLevelPublicKey } from './types';
+import { IPublicKey } from './types';
 
 export class VirgilPublicKey implements IPublicKey {
   public identifier: Uint8Array;
 
-  public key: LowLevelPublicKey;
+  public key: Uint8Array;
 
-  public constructor(identifier: Uint8Array, key: LowLevelPublicKey) {
+  public constructor(identifier: Uint8Array, key: Uint8Array) {
     this.identifier = identifier;
     this.key = key;
   }

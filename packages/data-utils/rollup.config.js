@@ -32,7 +32,7 @@ const createBrowserEntry = format => ({
     nodeResolve({ browser: true }),
     commonjs(),
     typescript({ useTsconfigDeclarationDir: true }),
-  ]
+  ],
 });
 
 module.exports = [

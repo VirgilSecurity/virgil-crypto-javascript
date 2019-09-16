@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/interface-name-prefix */
+
 /// <reference types="node" />
 
 export type StringEncoding = BufferEncoding;
@@ -11,8 +13,10 @@ export interface StringWithEncoding {
 
 export type Data = NodeBuffer | Uint8Array | StringWithEncoding | string;
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IPrivateKey {}
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IPublicKey {}
 
 export interface IKeyPair {
@@ -115,8 +119,5 @@ export interface IPythiaCrypto extends IBrainKeyCrypto {
     oldTransformationPrivateKey: Data;
     newTransformationPrivateKey: Data;
   }): NodeBuffer;
-  updateDeblindedWithToken(options: {
-    deblindedPassword: Data;
-    updateToken: Data;
-  }): NodeBuffer;
+  updateDeblindedWithToken(options: { deblindedPassword: Data; updateToken: Data }): NodeBuffer;
 }

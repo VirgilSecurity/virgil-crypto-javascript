@@ -1,0 +1,10 @@
+packages/*/dist
+packages/*/node_modules
+packages/core-foundation/*
+packages/core-phe/*
+packages/core-pythia/*
+packages/core-ratchet/*
+!packages/core-foundation/index.d.ts
+!packages/core-phe/index.d.ts
+!packages/core-pythia/index.d.ts
+!packages/core-ratchet/index.d.ts

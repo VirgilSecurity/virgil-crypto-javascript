@@ -31,6 +31,7 @@ export interface KeyPairTypeType {
   RSA_8192: KeyPairTypeObject;
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 export const KeyPairType: KeyPairTypeType = {};
 addKeyPairType(KeyPairType, 'Default', 'ED25519');

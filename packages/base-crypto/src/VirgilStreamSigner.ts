@@ -7,7 +7,7 @@ import { validatePrivateKey } from './validators';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 
 export class VirgilStreamSigner {
-  private isDisposed: boolean = false;
+  private isDisposed = false;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private signer: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,7 +32,7 @@ export class VirgilStreamSigner {
     return this;
   }
 
-  sign(privateKey: VirgilPrivateKey, final: boolean = true) {
+  sign(privateKey: VirgilPrivateKey, final = true) {
     if (this.isDisposed) {
       throw new Error(
         'Illegal state. The VirgilStreamSigner has been disposed. ' +
@@ -45,11 +45,13 @@ export class VirgilStreamSigner {
     const lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
 
     try {
-      return toBuffer(this.signer.sign(lowLevelPrivateKey));
-    } finally {
+      const result = this.signer.sign(lowLevelPrivateKey);
       if (final) {
         this.dispose();
       }
+      return toBuffer(result);
+    } finally {
+      lowLevelPrivateKey.delete();
     }
   }
 

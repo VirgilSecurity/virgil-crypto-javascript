@@ -1,9 +1,9 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
+
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: 'production',
-  node: false,
   entry: path.join(__dirname, 'browser.js'),
   output: {
     path: path.join(__dirname, 'dist'),
@@ -24,12 +24,10 @@ module.exports = {
         type: 'javascript/auto',
         loader: 'file-loader',
         options: {
-          name: '[name].[ext]'
-        }
+          name: '[name].[ext]',
+        },
       },
     ],
   },
-  plugins: [
-    new HtmlWebpackPlugin({ template: path.join(__dirname, 'index.html') }),
-  ],
+  plugins: [new HtmlWebpackPlugin({ template: path.join(__dirname, 'index.html') })],
 };

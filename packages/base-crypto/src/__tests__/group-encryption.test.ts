@@ -52,6 +52,56 @@ describe('group encryption', () => {
     });
   });
 
+  describe('addNewEpoch', () => {
+    it('adds new epoch message', () => {
+      const group = generateGroupSession(NodeBuffer.from('x'.repeat(10)));
+      group.addNewEpoch();
+      group.addNewEpoch();
+      expect(group.export()).to.have.length(3);
+    });
+
+    it('increments the currentEpochNumber', () => {
+      const group = generateGroupSession(NodeBuffer.from('x'.repeat(10)));
+      const oldEpochNumber = group.getCurrentEpochNumber();
+      group.addNewEpoch();
+      expect(group.getCurrentEpochNumber()).not.to.equal(oldEpochNumber);
+    });
+
+    it('returns epochNumber, sessionId and data from epoch message', () => {
+      const group = generateGroupSession(NodeBuffer.from('x'.repeat(10)));
+      const { epochNumber, sessionId, data } = group.addNewEpoch();
+      expect(epochNumber).to.equal(group.getCurrentEpochNumber());
+      expect(sessionId).to.equal(group.getSessionId());
+      const lastEpochData = group.export().pop();
+      expect(NodeBuffer.compare(lastEpochData!, data)).to.equal(0);
+    });
+  });
+
+  describe('getCurrentEpochNumber', () => {
+    it('returns zero for new group', () => {
+      const group = generateGroupSession(NodeBuffer.from('x'.repeat(10)));
+      expect(group.getCurrentEpochNumber()).to.equal(0);
+    });
+
+    it('increments after adding new epoch', () => {
+      const group = generateGroupSession(NodeBuffer.from('x'.repeat(10)));
+      group.addNewEpoch();
+      expect(group.getCurrentEpochNumber()).to.equal(1);
+    });
+  });
+
+  describe('parseMessage', () => {
+    it('returns epochNumber, sessionId and data from encrypted message', () => {
+      const keypair = virgilCrypto.generateKeys();
+      const group = generateGroupSession(NodeBuffer.from('x'.repeat(10)));
+      const encrypted = group.encrypt('secret', keypair.privateKey);
+      const { epochNumber, sessionId, data } = group.parseMessage(encrypted);
+      expect(epochNumber).to.equal(group.getCurrentEpochNumber());
+      expect(sessionId).to.equal(group.getSessionId());
+      expect(NodeBuffer.compare(encrypted, data)).to.equal(0);
+    });
+  });
+
   describe('encrypt and decrypt', () => {
     it('can encrypt and decrypt data', () => {
       const plaintext = 'secret';
@@ -79,21 +129,13 @@ describe('group encryption', () => {
       const encrypted = group1.encrypt(plaintext, keypair.privateKey);
       expect(() => group2.decrypt(encrypted, keypair.publicKey)).throws(/Session id doesnt match/);
     });
-  });
-
-  describe('addNewEpoch', () => {
-    it('adds new epoch message', () => {
-      const group = generateGroupSession(NodeBuffer.from('x'.repeat(10)));
-      group.addNewEpoch();
-      expect(group.export()).to.have.length(2);
-    });
 
     it('can decrypt data from previous epoch', () => {
       const plaintext = 'secret';
       const keypair = virgilCrypto.generateKeys();
       const group = generateGroupSession(NodeBuffer.from('x'.repeat(10)));
       const encrypted = group.encrypt(plaintext, keypair.privateKey);
-      const _ = group.addNewEpoch();
+      group.addNewEpoch();
       const decrypted = group.decrypt(encrypted, keypair.publicKey);
       expect(decrypted.toString('utf8')).to.equal(plaintext);
     });

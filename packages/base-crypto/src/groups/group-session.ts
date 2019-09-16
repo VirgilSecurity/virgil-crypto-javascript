@@ -14,17 +14,35 @@ const MIN_GROUP_ID_BYTE_LENGTH = 10;
 let foundationModules: typeof FoundationModules;
 let random: FoundationModules.CtrDrbg;
 
+export interface IVirgilGroupSessionMessageInfo {
+  sessionId: string;
+  epochNumber: number;
+  data: NodeBuffer;
+}
+
 export interface IVirgilGroupSession {
   getSessionId(): string;
   getCurrentEpochNumber(): number;
   encrypt(data: Data, signingPrivateKey: VirgilPrivateKey): NodeBuffer;
   decrypt(encryptedData: Data, verifyingPublicKey: VirgilPublicKey): NodeBuffer;
-  addNewEpoch(): NodeBuffer;
+  addNewEpoch(): IVirgilGroupSessionMessageInfo;
   export(): NodeBuffer[];
+  parseMessage(messageData: Data): IVirgilGroupSessionMessageInfo;
 }
 
-function getEpochNumberFromEpochMessage(epochMessage: Uint8Array) {
-  const epoch = foundationModules.GroupSessionMessage.deserialize(epochMessage);
+function parseGroupSessionMessage(messageData: Uint8Array) {
+  const message = foundationModules.GroupSessionMessage.deserialize(messageData);
+  const info: IVirgilGroupSessionMessageInfo = {
+    epochNumber: message.getEpoch(),
+    sessionId: toBuffer(message.getSessionId()).toString('hex'),
+    data: toBuffer(messageData)
+  };
+  message.delete();
+  return info;
+}
+
+function getEpochNumberFromEpochMessage(epochMessageData: Uint8Array) {
+  const epoch = foundationModules.GroupSessionMessage.deserialize(epochMessageData);
   const epochNumber = epoch.getEpoch();
   epoch.delete();
   return epochNumber;
@@ -36,8 +54,8 @@ function createLowLevelSession(epochMessages: Uint8Array[]) {
 
   let deleteQueue: FoundationModules.FoundationObject[] = [];
   try {
-    for (let epochMessage of epochMessages) {
-      const epoch = foundationModules.GroupSessionMessage.deserialize(epochMessage);
+    for (let epochMessageData of epochMessages) {
+      const epoch = foundationModules.GroupSessionMessage.deserialize(epochMessageData);
       deleteQueue.push(epoch);
       session.addEpoch(epoch);
     }
@@ -114,7 +132,7 @@ function createVirgilGroupSession(epochMessages: Uint8Array[]): IVirgilGroupSess
         newEpoch.delete();
         newEpochTicket.delete();
 
-        return toBuffer(newEpochMessage);
+        return parseGroupSessionMessage(newEpochMessage);
       } finally {
         session.delete();
       }
@@ -122,6 +140,11 @@ function createVirgilGroupSession(epochMessages: Uint8Array[]): IVirgilGroupSess
 
     export() {
       return epochMessages.map(toBuffer);
+    },
+
+    parseMessage(messageData: Data) {
+      const messageBytes = dataToUint8Array(messageData, 'base64');
+      return parseGroupSessionMessage(messageBytes);
     }
   }
 }

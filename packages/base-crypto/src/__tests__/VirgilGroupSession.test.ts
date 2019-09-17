@@ -44,6 +44,8 @@ describe('group encryption', () => {
       expect(epochNumber).to.equal(group.getCurrentEpochNumber());
       expect(sessionId).to.equal(group.getSessionId());
       const lastEpochData = group.export().pop();
+      expect(lastEpochData).not.to.be.undefined;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(NodeBuffer.compare(lastEpochData!, data)).to.equal(0);
     });
   });

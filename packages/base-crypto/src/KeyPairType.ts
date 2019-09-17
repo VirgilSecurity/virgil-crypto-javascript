@@ -1,11 +1,10 @@
 import { FoundationModules, getFoundationModules } from './foundationModules';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const addKeyPairType = (
-  obj: any,
+  obj: {},
   name: string,
   algIdName: keyof typeof FoundationModules.AlgId,
-  bitlen?: number
+  bitlen?: number,
 ) => {
   Object.defineProperty(obj, name, {
     configurable: false,

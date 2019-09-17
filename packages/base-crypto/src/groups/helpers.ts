@@ -3,20 +3,20 @@ import { FoundationModules, getFoundationModules } from '../foundationModules';
 import { IGroupSessionMessageInfo } from '../types';
 
 const getRandom = (() => {
-  let random: FoundationModules.CtrDrbg|undefined;
+  let random: FoundationModules.CtrDrbg | undefined;
   return () => {
     if (!random) {
       random = new (getFoundationModules()).CtrDrbg();
       try {
-        random!.setupDefaults();
+        random.setupDefaults();
       } catch (error) {
-        random!.delete();
+        random.delete();
         random = undefined;
         throw error;
       }
     }
     return random;
-  }
+  };
 })();
 
 export function parseGroupSessionMessage(messageData: Uint8Array) {
@@ -24,7 +24,7 @@ export function parseGroupSessionMessage(messageData: Uint8Array) {
   const info: IGroupSessionMessageInfo = {
     epochNumber: message.getEpoch(),
     sessionId: toBuffer(message.getSessionId()).toString('hex'),
-    data: toBuffer(messageData)
+    data: toBuffer(messageData),
   };
   message.delete();
   return info;
@@ -41,18 +41,19 @@ export function createLowLevelSession(epochMessages: Uint8Array[]) {
   const session = new (getFoundationModules()).GroupSession();
   session.rng = getRandom();
 
-  let deleteQueue: FoundationModules.FoundationObject[] = [];
+  const deleteQueue: FoundationModules.FoundationObject[] = [];
   try {
-    for (let epochMessageData of epochMessages) {
+    for (const epochMessageData of epochMessages) {
       const epoch = getFoundationModules().GroupSessionMessage.deserialize(epochMessageData);
       deleteQueue.push(epoch);
       session.addEpoch(epoch);
     }
     return session;
   } finally {
-    while(deleteQueue.length) {
-      deleteQueue.pop()!.delete();
-    };
+    while (deleteQueue.length) {
+      const obj = deleteQueue.pop();
+      obj && obj.delete();
+    }
   }
 }
 

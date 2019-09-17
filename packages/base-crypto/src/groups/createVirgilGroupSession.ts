@@ -9,7 +9,7 @@ import { FoundationModules, getFoundationModules } from '../foundationModules';
 import {
   createLowLevelSession,
   getEpochNumberFromEpochMessage,
-  parseGroupSessionMessage
+  parseGroupSessionMessage,
 } from './helpers';
 
 export function createVirgilGroupSession(epochMessages: Uint8Array[]): IGroupSession {
@@ -33,7 +33,7 @@ export function createVirgilGroupSession(epochMessages: Uint8Array[]): IGroupSes
       const dataBytes = dataToUint8Array(data, 'utf8');
       validatePrivateKey(signingPrivateKey);
       const lowLevelPrivateKey = getLowLevelPrivateKey(signingPrivateKey);
-      let session: FoundationModules.GroupSession|undefined;
+      let session: FoundationModules.GroupSession | undefined;
 
       try {
         session = createLowLevelSession(epochMessages);
@@ -51,8 +51,8 @@ export function createVirgilGroupSession(epochMessages: Uint8Array[]): IGroupSes
       const encryptedDataBytes = dataToUint8Array(encryptedData, 'base64');
       validatePublicKey(verifyingPublicKey);
       const lowLevelPublicKey = importPublicKey(verifyingPublicKey.key);
-      let session: FoundationModules.GroupSession|undefined;
-      let message: FoundationModules.GroupSessionMessage|undefined;
+      let session: FoundationModules.GroupSession | undefined;
+      let message: FoundationModules.GroupSessionMessage | undefined;
 
       try {
         session = createLowLevelSession(epochMessages);
@@ -90,6 +90,6 @@ export function createVirgilGroupSession(epochMessages: Uint8Array[]): IGroupSes
     parseMessage(messageData: Data) {
       const messageBytes = dataToUint8Array(messageData, 'base64');
       return parseGroupSessionMessage(messageBytes);
-    }
-  }
+    },
+  };
 }

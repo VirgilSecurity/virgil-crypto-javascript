@@ -33,8 +33,7 @@ export class VirgilCrypto implements ICrypto {
   readonly keyPairType = KeyPairType;
 
   private foundationModules: typeof FoundationModules;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private random: any;
+  private random: FoundationModules.CtrDrbg;
 
   constructor(options: VirgilCryptoOptions = {}) {
     this.foundationModules = getFoundationModules();
@@ -62,6 +61,7 @@ export class VirgilCrypto implements ICrypto {
       throw error;
     }
     if (keyPairType.algId === this.foundationModules.AlgId.RSA) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       keyProvider.setRsaParams(keyPairType.bitlen!);
     }
 
@@ -109,6 +109,7 @@ export class VirgilCrypto implements ICrypto {
     }
     keyProvider.random = keyMaterialRng;
     if (keyPairType.algId === this.foundationModules.AlgId.RSA) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       keyProvider.setRsaParams(keyPairType.bitlen!);
     }
 
@@ -591,7 +592,9 @@ export class VirgilCrypto implements ICrypto {
   generateGroupSession(groupId: Data) {
     const groupIdBytes = dataToUint8Array(groupId, 'utf8');
     if (groupIdBytes.byteLength < MIN_GROUP_ID_BYTE_LENGTH) {
-      throw new Error(`The given group Id is too short. Must be at least ${MIN_GROUP_ID_BYTE_LENGTH} bytes.`);
+      throw new Error(
+        `The given group Id is too short. Must be at least ${MIN_GROUP_ID_BYTE_LENGTH} bytes.`,
+      );
     }
 
     const sessionId = computeSessionId(groupIdBytes);

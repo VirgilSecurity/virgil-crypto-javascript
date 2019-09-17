@@ -18,12 +18,12 @@ declare module '@virgilsecurity/core-foundation' {
       HMAC = 14,
       HKDF = 15,
       PKCS5_PBKDF2 = 16,
-      PKCS5_PBES2 = 17
+      PKCS5_PBES2 = 17,
     }
 
     export enum GroupMsgType {
       GROUP_INFO = 0,
-      REGULAR = 1
+      REGULAR = 1,
     }
 
     export class FoundationObject {
@@ -150,14 +150,34 @@ declare module '@virgilsecurity/core-foundation' {
       serializePublicKey(lowLevelPublicKey: PublicKey): Uint8Array;
     }
 
-    export interface Cipher {}
+    export interface Cipher {
+      setNonce(nonce: Uint8Array): void;
+      setKey(key: Uint8Array): void;
+      startEncryption(): void;
+      startDecryption(): void;
+      update(data: Uint8Array): Uint8Array;
+      outLen(dataLen: number): number;
+      encryptedOutLen(dataLen: number): number;
+      decryptedOutLen(dataLen: number): number;
+      finish(): Uint8Array;
+    }
 
     export class MessageInfoCustomParams extends FoundationObject {
       addData(key: Uint8Array, value: Uint8Array): void;
       findData(key: Uint8Array): Uint8Array;
     }
 
-    export class Aes256Gcm extends FoundationObject implements Cipher {}
+    export class Aes256Gcm extends FoundationObject implements Cipher {
+      setNonce(nonce: Uint8Array): void;
+      setKey(key: Uint8Array): void;
+      startEncryption(): void;
+      startDecryption(): void;
+      update(data: Uint8Array): Uint8Array;
+      outLen(dataLen: number): number;
+      encryptedOutLen(dataLen: number): number;
+      decryptedOutLen(dataLen: number): number;
+      finish(): Uint8Array;
+    }
 
     export class RecipientCipher extends FoundationObject {
       set random(random: Random);
@@ -171,7 +191,11 @@ declare module '@virgilsecurity/core-foundation' {
       encryptionOutLen(dataLen: number): number;
       processEncryption(data: Uint8Array): Uint8Array;
       finishEncryption(): Uint8Array;
-      startDecryptionWithKey(recipientId: Uint8Array, privateKey: PrivateKey, messageInfo: Uint8Array): void;
+      startDecryptionWithKey(
+        recipientId: Uint8Array,
+        privateKey: PrivateKey,
+        messageInfo: Uint8Array,
+      ): void;
       decryptionOutLen(dataLen: number): number;
       processDecryption(data: Uint8Array): Uint8Array;
       finishDecryption(): Uint8Array;

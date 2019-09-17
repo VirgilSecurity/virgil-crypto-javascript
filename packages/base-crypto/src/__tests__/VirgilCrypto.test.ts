@@ -284,10 +284,9 @@ describe('VirgilCrypto', () => {
     });
 
     it('creates group with correct id', () => {
-      const expectedId = virgilCrypto.calculateHash(
-        'i_am_long_enough_to_be_a_group_id',
-        HashAlgorithm.SHA512
-      ).slice(0, 32);
+      const expectedId = virgilCrypto
+        .calculateHash('i_am_long_enough_to_be_a_group_id', HashAlgorithm.SHA512)
+        .slice(0, 32);
       const group = virgilCrypto.generateGroupSession('i_am_long_enough_to_be_a_group_id');
       expect(group.getSessionId()).to.equal(expectedId.toString('hex'));
     });
@@ -301,6 +300,7 @@ describe('VirgilCrypto', () => {
   describe('importGroupSession', () => {
     it('throws if epoch messages is not an array', () => {
       expect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         virgilCrypto.importGroupSession(undefined as any);
       }).throws(TypeError);
     });

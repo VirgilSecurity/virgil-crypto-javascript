@@ -15,6 +15,10 @@ import { VirgilStreamCipher } from './VirgilStreamCipher';
 import { VirgilStreamDecipher } from './VirgilStreamDecipher';
 import { VirgilStreamSigner } from './VirgilStreamSigner';
 import { VirgilStreamVerifier } from './VirgilStreamVerifier';
+import { computeSessionId, createInitialEpoch } from './groups/helpers';
+import { createVirgilGroupSession } from './groups/createVirgilGroupSession';
+
+export const MIN_GROUP_ID_BYTE_LENGTH = 10;
 
 export interface VirgilCryptoOptions {
   useSha256Identifiers?: boolean;
@@ -582,6 +586,32 @@ export class VirgilCrypto implements ICrypto {
 
   createStreamVerifier(signature: Data) {
     return new VirgilStreamVerifier(signature);
+  }
+
+  generateGroupSession(groupId: Data) {
+    const groupIdBytes = dataToUint8Array(groupId, 'utf8');
+    if (groupIdBytes.byteLength < MIN_GROUP_ID_BYTE_LENGTH) {
+      throw new Error(`The given group Id is too short. Must be at least ${MIN_GROUP_ID_BYTE_LENGTH} bytes.`);
+    }
+
+    const sessionId = computeSessionId(groupIdBytes);
+    const initialEpoch = createInitialEpoch(sessionId);
+
+    const initialEpochMessage = initialEpoch.serialize();
+    initialEpoch.delete();
+    return createVirgilGroupSession([initialEpochMessage]);
+  }
+
+  importGroupSession(epochMessages: Data[]) {
+    if (!Array.isArray(epochMessages)) {
+      throw new TypeError('Epoch messages must be an array.');
+    }
+
+    if (epochMessages.length === 0) {
+      throw new Error('Epoch messages must not be empty.');
+    }
+
+    return createVirgilGroupSession(epochMessages.map(it => dataToUint8Array(it, 'base64')));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

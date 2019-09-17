@@ -7,6 +7,8 @@ export type IPrivateKey = import('@virgilsecurity/crypto-types').IPrivateKey;
 export type IPublicKey = import('@virgilsecurity/crypto-types').IPublicKey;
 export type IKeyPair = import('@virgilsecurity/crypto-types').IKeyPair;
 export type ICrypto = import('@virgilsecurity/crypto-types').ICrypto;
+export type IGroupSession = import('@virgilsecurity/crypto-types').IGroupSession;
+export type IGroupSessionMessageInfo = import('@virgilsecurity/crypto-types').IGroupSessionMessageInfo;
 
 export interface VirgilKeyPair extends IKeyPair {
   privateKey: VirgilPrivateKey;

@@ -24,6 +24,22 @@ export interface IKeyPair {
   publicKey: IPublicKey;
 }
 
+export interface IGroupSessionMessageInfo {
+  sessionId: string;
+  epochNumber: number;
+  data: NodeBuffer;
+}
+
+export interface IGroupSession {
+  getSessionId(): string;
+  getCurrentEpochNumber(): number;
+  encrypt(data: Data, signingPrivateKey: IPrivateKey): NodeBuffer;
+  decrypt(encryptedData: Data, verifyingPublicKey: IPublicKey): NodeBuffer;
+  addNewEpoch(): IGroupSessionMessageInfo;
+  export(): NodeBuffer[];
+  parseMessage(messageData: Data): IGroupSessionMessageInfo;
+}
+
 export interface ICrypto {
   generateKeys(keyPairType?: unknown): IKeyPair;
   generateKeysFromKeyMaterial(keyMaterial: Data, keyPairType?: unknown): IKeyPair;
@@ -59,6 +75,8 @@ export interface ICrypto {
     privateKey: IPrivateKey,
     publicKey: IPublicKey | IPublicKey[],
   ): NodeBuffer;
+  generateGroupSession(groupId: Data): IGroupSession;
+  importGroupSession(epochMessages: Data[]): IGroupSession;
 }
 
 export interface IAccessTokenSigner {

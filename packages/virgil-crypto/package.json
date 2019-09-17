@@ -8,7 +8,7 @@
     "./dist/node.cjs.js": "./browser.cjs.js",
     "./dist/node.es.js": "./browser.es.js"
   },
-  "typings": "./dist/index.d.ts",
+  "typings": "./dist/types/index.d.ts",
   "files": [
     "dist",
     "browser.cjs.js",

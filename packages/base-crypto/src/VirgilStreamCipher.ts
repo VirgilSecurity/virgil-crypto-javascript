@@ -1,8 +1,8 @@
 import { dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 
 import { DATA_SIGNATURE_KEY } from './constants';
-import { getFoundationModules } from './foundationModules';
-import { Data, LowLevelPublicKey } from './types';
+import { FoundationModules, getFoundationModules } from './foundationModules';
+import { Data } from './types';
 import { toArray, getLowLevelPublicKeys } from './utils';
 import { validatePublicKeysArray } from './validators';
 import { VirgilPublicKey } from './VirgilPublicKey';
@@ -21,7 +21,7 @@ export class VirgilStreamCipher {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private ctrDrbg: any;
 
-  private lowLevelPublicKeys: LowLevelPublicKey[] = [];
+  private lowLevelPublicKeys: FoundationModules.PublicKey[] = [];
 
   constructor(publicKey: VirgilPublicKey | VirgilPublicKey[], signature?: Data) {
     const foundationModules = getFoundationModules();

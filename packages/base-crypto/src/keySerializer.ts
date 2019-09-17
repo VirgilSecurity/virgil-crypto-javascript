@@ -1,14 +1,13 @@
-import { getFoundationModules } from './foundationModules';
-import { LowLevelPrivateKey, LowLevelPublicKey, KeyAsn1Serializer } from './types';
+import { FoundationModules, getFoundationModules } from './foundationModules';
 
-let keySerializer: KeyAsn1Serializer | undefined;
+let keySerializer: FoundationModules.KeyAsn1Serializer | undefined;
 
 export const getKeySerializer = () => {
   if (keySerializer) {
     return keySerializer;
   }
   const foundationModules = getFoundationModules();
-  keySerializer = new foundationModules.KeyAsn1Serializer() as KeyAsn1Serializer;
+  keySerializer = new foundationModules.KeyAsn1Serializer();
   try {
     keySerializer.setupDefaults();
   } catch (error) {
@@ -19,8 +18,8 @@ export const getKeySerializer = () => {
   return keySerializer;
 };
 
-export const serializePrivateKey = (lowLevelPrivateKey: LowLevelPrivateKey) =>
+export const serializePrivateKey = (lowLevelPrivateKey: FoundationModules.PrivateKey) =>
   getKeySerializer().serializePrivateKey(lowLevelPrivateKey);
 
-export const serializePublicKey = (lowLevelPublicKey: LowLevelPublicKey) =>
+export const serializePublicKey = (lowLevelPublicKey: FoundationModules.PublicKey) =>
   getKeySerializer().serializePublicKey(lowLevelPublicKey);

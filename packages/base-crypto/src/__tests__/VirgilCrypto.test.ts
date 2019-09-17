@@ -5,6 +5,7 @@ import initFoundation from '@virgilsecurity/core-foundation';
 
 import {
   setFoundationModules,
+  hasFoundationModules,
   HashAlgorithm,
   VirgilCrypto,
   VirgilPrivateKey,
@@ -18,8 +19,13 @@ import {
 describe('VirgilCrypto', () => {
   let virgilCrypto: VirgilCrypto;
 
-  beforeEach(() => {
+  before(() => {
     return new Promise(resolve => {
+      if (hasFoundationModules()) {
+        virgilCrypto = new VirgilCrypto();
+        return resolve();
+      }
+
       initFoundation().then(foundationModules => {
         setFoundationModules(foundationModules);
         virgilCrypto = new VirgilCrypto();

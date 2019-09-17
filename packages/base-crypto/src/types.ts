@@ -8,29 +8,6 @@ export type IPublicKey = import('@virgilsecurity/crypto-types').IPublicKey;
 export type IKeyPair = import('@virgilsecurity/crypto-types').IKeyPair;
 export type ICrypto = import('@virgilsecurity/crypto-types').ICrypto;
 
-export interface LowLevelPrivateKey {
-  extractPublicKey(): LowLevelPublicKey;
-  delete(): void;
-}
-
-export interface LowLevelPublicKey {
-  delete(): void;
-}
-
-export interface KeyAsn1Serializer {
-  serializePrivateKey(lowLevelPrivateKey: LowLevelPrivateKey): Uint8Array;
-  serializePublicKey(lowLevelPublicKey: LowLevelPublicKey): Uint8Array;
-  setupDefaults(): void;
-  delete(): void;
-}
-
-export interface KeyProvider {
-  importPrivateKey(serializedPrivateKey: Uint8Array): LowLevelPrivateKey;
-  importPublicKey(serializedPublicKey: Uint8Array): LowLevelPublicKey;
-  setupDefaults(): void;
-  delete(): void;
-}
-
 export interface VirgilKeyPair extends IKeyPair {
   privateKey: VirgilPrivateKey;
   publicKey: VirgilPublicKey;

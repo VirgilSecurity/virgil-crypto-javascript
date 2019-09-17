@@ -1,14 +1,12 @@
-import { FoundationModules } from '@virgilsecurity/core-foundation';
 import { NodeBuffer, dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
-
 import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
-import { getFoundationModules } from './foundationModules';
+import { FoundationModules, getFoundationModules } from './foundationModules';
 import { HashAlgorithm, HashAlgorithmType } from './HashAlgorithm';
 import { KeyPairType, KeyPairTypeType } from './KeyPairType';
 import { importPrivateKey, importPublicKey } from './keyProvider';
 import { serializePrivateKey, serializePublicKey } from './keySerializer';
 import { getLowLevelPrivateKey } from './privateKeyUtils';
-import { ICrypto, NodeBuffer as BufferType, Data, LowLevelPrivateKey } from './types';
+import { ICrypto, NodeBuffer as BufferType, Data } from './types';
 import { toArray, getLowLevelPublicKeys } from './utils';
 import { validatePrivateKey, validatePublicKey, validatePublicKeysArray } from './validators';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
@@ -30,7 +28,7 @@ export class VirgilCrypto implements ICrypto {
   readonly hashAlgorithm = HashAlgorithm;
   readonly keyPairType = KeyPairType;
 
-  private foundationModules: FoundationModules;
+  private foundationModules: typeof FoundationModules;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private random: any;
 
@@ -60,10 +58,10 @@ export class VirgilCrypto implements ICrypto {
       throw error;
     }
     if (keyPairType.algId === this.foundationModules.AlgId.RSA) {
-      keyProvider.setRsaParams(keyPairType.bitlen);
+      keyProvider.setRsaParams(keyPairType.bitlen!);
     }
 
-    let lowLevelPrivateKey: LowLevelPrivateKey;
+    let lowLevelPrivateKey: FoundationModules.PrivateKey;
     try {
       lowLevelPrivateKey = keyProvider.generatePrivateKey(keyPairType.algId);
     } catch (error) {
@@ -107,10 +105,10 @@ export class VirgilCrypto implements ICrypto {
     }
     keyProvider.random = keyMaterialRng;
     if (keyPairType.algId === this.foundationModules.AlgId.RSA) {
-      keyProvider.setRsaParams(keyPairType.bitlen);
+      keyProvider.setRsaParams(keyPairType.bitlen!);
     }
 
-    let lowLevelPrivateKey: LowLevelPrivateKey;
+    let lowLevelPrivateKey: FoundationModules.PrivateKey;
     try {
       lowLevelPrivateKey = keyProvider.generatePrivateKey(keyPairType.algId);
     } catch (error) {

@@ -1,14 +1,13 @@
-import { getFoundationModules } from './foundationModules';
-import { KeyProvider } from './types';
+import { FoundationModules, getFoundationModules } from './foundationModules';
 
-let keyProvider: KeyProvider | undefined;
+let keyProvider: FoundationModules.KeyProvider | undefined;
 
 export const getKeyProvider = () => {
   if (keyProvider) {
     return keyProvider;
   }
   const foundationModules = getFoundationModules();
-  keyProvider = new foundationModules.KeyProvider() as KeyProvider;
+  keyProvider = new foundationModules.KeyProvider();
   try {
     keyProvider.setupDefaults();
   } catch (error) {

@@ -1,9 +1,9 @@
 import { dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 
 import { DATA_SIGNATURE_KEY } from './constants';
-import { getFoundationModules } from './foundationModules';
+import { FoundationModules, getFoundationModules } from './foundationModules';
 import { getLowLevelPrivateKey } from './privateKeyUtils';
-import { Data, LowLevelPrivateKey } from './types';
+import { Data } from './types';
 import { validatePrivateKey } from './validators';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 
@@ -14,7 +14,7 @@ export class VirgilStreamDecipher {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private recipientCipher: any;
 
-  private lowLevelPrivateKey: LowLevelPrivateKey;
+  private lowLevelPrivateKey: FoundationModules.PrivateKey;
 
   constructor(privateKey: VirgilPrivateKey) {
     const foundationModules = getFoundationModules();

@@ -1,8 +1,10 @@
 import { FoundationModules } from '@virgilsecurity/core-foundation';
 
-let foundationModules: FoundationModules | undefined;
+let foundationModules: typeof FoundationModules | undefined;
 
-export const setFoundationModules = (modules: FoundationModules) => {
+export { FoundationModules };
+
+export const setFoundationModules = (modules: typeof FoundationModules) => {
   if (foundationModules) {
     // eslint-disable-next-line no-console
     console.warn(

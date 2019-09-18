@@ -1,8 +1,7 @@
-import { FoundationModules } from '@virgilsecurity/core-foundation';
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="foundation-modules.d.ts" />
 
 let foundationModules: typeof FoundationModules | undefined;
-
-export { FoundationModules };
 
 export const setFoundationModules = (modules: typeof FoundationModules) => {
   if (foundationModules) {

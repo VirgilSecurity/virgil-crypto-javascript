@@ -10,8 +10,8 @@ import initAsmjsFoundation, {
 import { setFoundationModules, VirgilCrypto } from '..';
 
 describe('compatibility', () => {
-  let wasmFoundationModules: typeof WasmFoundationModules;
-  let asmjsFoundationModules: typeof AsmjsFoundationModules;
+  let wasmFoundationModules: WasmFoundationModules;
+  let asmjsFoundationModules: AsmjsFoundationModules;
 
   before(() => {
     return new Promise(resolve => {

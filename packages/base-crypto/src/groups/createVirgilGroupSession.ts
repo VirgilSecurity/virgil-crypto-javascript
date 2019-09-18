@@ -5,7 +5,7 @@ import { getLowLevelPrivateKey } from '../privateKeyUtils';
 import { importPublicKey } from '../keyProvider';
 import { VirgilPrivateKey } from '../VirgilPrivateKey';
 import { VirgilPublicKey } from '../VirgilPublicKey';
-import { FoundationModules, getFoundationModules } from '../foundationModules';
+import { getFoundationModules } from '../foundationModules';
 import {
   createLowLevelSession,
   getEpochNumberFromEpochMessage,

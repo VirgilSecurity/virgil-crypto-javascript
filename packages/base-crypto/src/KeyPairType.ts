@@ -1,4 +1,4 @@
-import { FoundationModules, getFoundationModules } from './foundationModules';
+import { getFoundationModules } from './foundationModules';
 
 const addKeyPairType = (
   obj: {},

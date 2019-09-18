@@ -1,12 +1,12 @@
 import { NodeBuffer, dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
-import { FoundationModules, getFoundationModules } from './foundationModules';
+import { getFoundationModules } from './foundationModules';
 import { HashAlgorithm, HashAlgorithmType } from './HashAlgorithm';
 import { KeyPairType, KeyPairTypeType } from './KeyPairType';
 import { importPrivateKey, importPublicKey } from './keyProvider';
 import { serializePrivateKey, serializePublicKey } from './keySerializer';
 import { getLowLevelPrivateKey } from './privateKeyUtils';
-import { ICrypto, NodeBuffer as BufferType, Data } from './types';
+import { ICrypto, NodeBuffer as BufferType, Data, IGroupSession } from './types';
 import { toArray, getLowLevelPublicKeys } from './utils';
 import { validatePrivateKey, validatePublicKey, validatePublicKeysArray } from './validators';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
@@ -589,7 +589,7 @@ export class VirgilCrypto implements ICrypto {
     return new VirgilStreamVerifier(signature);
   }
 
-  generateGroupSession(groupId: Data) {
+  generateGroupSession(groupId: Data): IGroupSession {
     const groupIdBytes = dataToUint8Array(groupId, 'utf8');
     if (groupIdBytes.byteLength < MIN_GROUP_ID_BYTE_LENGTH) {
       throw new Error(
@@ -605,7 +605,7 @@ export class VirgilCrypto implements ICrypto {
     return createVirgilGroupSession([initialEpochMessage]);
   }
 
-  importGroupSession(epochMessages: Data[]) {
+  importGroupSession(epochMessages: Data[]): IGroupSession {
     if (!Array.isArray(epochMessages)) {
       throw new TypeError('Epoch messages must be an array.');
     }

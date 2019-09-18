@@ -1,4 +1,4 @@
-import { FoundationModules, getFoundationModules } from './foundationModules';
+import { getFoundationModules } from './foundationModules';
 
 export interface HashAlgorithmType {
   SHA224: number;

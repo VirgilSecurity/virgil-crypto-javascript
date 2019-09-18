@@ -1,5 +1,5 @@
 import { toBuffer } from '@virgilsecurity/data-utils';
-import { FoundationModules, getFoundationModules } from '../foundationModules';
+import { getFoundationModules } from '../foundationModules';
 import { IGroupSessionMessageInfo } from '../types';
 
 const getRandom = (() => {
@@ -19,7 +19,7 @@ const getRandom = (() => {
   };
 })();
 
-export function parseGroupSessionMessage(messageData: Uint8Array) {
+export function parseGroupSessionMessage(messageData: Uint8Array): IGroupSessionMessageInfo {
   const message = getFoundationModules().GroupSessionMessage.deserialize(messageData);
   const info: IGroupSessionMessageInfo = {
     epochNumber: message.getEpoch(),

@@ -1,4 +1,3 @@
-import { FoundationModules } from './foundationModules';
 import { importPrivateKey } from './keyProvider';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 

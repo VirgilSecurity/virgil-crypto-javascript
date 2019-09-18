@@ -1,4 +1,4 @@
-import { FoundationModules, getFoundationModules } from './foundationModules';
+import { getFoundationModules } from './foundationModules';
 
 let keySerializer: FoundationModules.KeyAsn1Serializer | undefined;
 

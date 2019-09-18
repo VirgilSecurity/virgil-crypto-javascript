@@ -24,7 +24,7 @@
     "regenerator-runtime": "^0.13.3",
     "rimraf": "^3.0.0",
     "serve-handler": "^6.1.1",
-    "virgil-crypto": "^4.0.0-alpha.10",
+    "virgil-crypto": "^4.0.0-alpha.11",
     "virgil-crypto-3": "npm:virgil-crypto@^3.2.6",
     "webpack": "^4.37.0"
   }

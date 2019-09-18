@@ -4,9 +4,11 @@ require('core-js/stable');
 require('regenerator-runtime/runtime');
 
 const runBenchmark = require('./benchmark');
+const { detect } = require('detect-browser');
 
 (async () => {
-  const lines = ['## Browser'];
+  const browser = detect();
+  const lines = [`## Browser (${browser.name}/${browser.version})\n`];
   await runBenchmark(window.Benchmark, str => lines.push(str));
   await fetch('/lines', {
     method: 'POST',

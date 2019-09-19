@@ -1,6 +1,4 @@
-import { FoundationModules } from '@virgilsecurity/core-foundation';
 import { NodeBuffer, dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
-
 import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
 import { getFoundationModules } from './foundationModules';
 import { HashAlgorithm, HashAlgorithmType } from './HashAlgorithm';
@@ -8,7 +6,7 @@ import { KeyPairType, KeyPairTypeType } from './KeyPairType';
 import { importPrivateKey, importPublicKey } from './keyProvider';
 import { serializePrivateKey, serializePublicKey } from './keySerializer';
 import { getLowLevelPrivateKey } from './privateKeyUtils';
-import { ICrypto, NodeBuffer as BufferType, Data, LowLevelPrivateKey } from './types';
+import { ICrypto, NodeBuffer as BufferType, Data, IGroupSession } from './types';
 import { toArray, getLowLevelPublicKeys } from './utils';
 import { validatePrivateKey, validatePublicKey, validatePublicKeysArray } from './validators';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
@@ -17,6 +15,10 @@ import { VirgilStreamCipher } from './VirgilStreamCipher';
 import { VirgilStreamDecipher } from './VirgilStreamDecipher';
 import { VirgilStreamSigner } from './VirgilStreamSigner';
 import { VirgilStreamVerifier } from './VirgilStreamVerifier';
+import { computeSessionId, createInitialEpoch } from './groups/helpers';
+import { createVirgilGroupSession } from './groups/createVirgilGroupSession';
+
+export const MIN_GROUP_ID_BYTE_LENGTH = 10;
 
 export interface VirgilCryptoOptions {
   useSha256Identifiers?: boolean;
@@ -30,9 +32,8 @@ export class VirgilCrypto implements ICrypto {
   readonly hashAlgorithm = HashAlgorithm;
   readonly keyPairType = KeyPairType;
 
-  private foundationModules: FoundationModules;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private random: any;
+  private foundationModules: typeof FoundationModules;
+  private random: FoundationModules.CtrDrbg;
 
   constructor(options: VirgilCryptoOptions = {}) {
     this.foundationModules = getFoundationModules();
@@ -60,10 +61,11 @@ export class VirgilCrypto implements ICrypto {
       throw error;
     }
     if (keyPairType.algId === this.foundationModules.AlgId.RSA) {
-      keyProvider.setRsaParams(keyPairType.bitlen);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      keyProvider.setRsaParams(keyPairType.bitlen!);
     }
 
-    let lowLevelPrivateKey: LowLevelPrivateKey;
+    let lowLevelPrivateKey: FoundationModules.PrivateKey;
     try {
       lowLevelPrivateKey = keyProvider.generatePrivateKey(keyPairType.algId);
     } catch (error) {
@@ -107,10 +109,11 @@ export class VirgilCrypto implements ICrypto {
     }
     keyProvider.random = keyMaterialRng;
     if (keyPairType.algId === this.foundationModules.AlgId.RSA) {
-      keyProvider.setRsaParams(keyPairType.bitlen);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      keyProvider.setRsaParams(keyPairType.bitlen!);
     }
 
-    let lowLevelPrivateKey: LowLevelPrivateKey;
+    let lowLevelPrivateKey: FoundationModules.PrivateKey;
     try {
       lowLevelPrivateKey = keyProvider.generatePrivateKey(keyPairType.algId);
     } catch (error) {
@@ -584,6 +587,34 @@ export class VirgilCrypto implements ICrypto {
 
   createStreamVerifier(signature: Data) {
     return new VirgilStreamVerifier(signature);
+  }
+
+  generateGroupSession(groupId: Data): IGroupSession {
+    const groupIdBytes = dataToUint8Array(groupId, 'utf8');
+    if (groupIdBytes.byteLength < MIN_GROUP_ID_BYTE_LENGTH) {
+      throw new Error(
+        `The given group Id is too short. Must be at least ${MIN_GROUP_ID_BYTE_LENGTH} bytes.`,
+      );
+    }
+
+    const sessionId = computeSessionId(groupIdBytes);
+    const initialEpoch = createInitialEpoch(sessionId);
+
+    const initialEpochMessage = initialEpoch.serialize();
+    initialEpoch.delete();
+    return createVirgilGroupSession([initialEpochMessage]);
+  }
+
+  importGroupSession(epochMessages: Data[]): IGroupSession {
+    if (!Array.isArray(epochMessages)) {
+      throw new TypeError('Epoch messages must be an array.');
+    }
+
+    if (epochMessages.length === 0) {
+      throw new Error('Epoch messages must not be empty.');
+    }
+
+    return createVirgilGroupSession(epochMessages.map(it => dataToUint8Array(it, 'base64')));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

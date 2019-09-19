@@ -5,6 +5,7 @@ import initFoundation from '@virgilsecurity/core-foundation';
 
 import {
   setFoundationModules,
+  hasFoundationModules,
   HashAlgorithm,
   VirgilCrypto,
   VirgilPrivateKey,
@@ -18,8 +19,13 @@ import {
 describe('VirgilCrypto', () => {
   let virgilCrypto: VirgilCrypto;
 
-  beforeEach(() => {
+  before(() => {
     return new Promise(resolve => {
+      if (hasFoundationModules()) {
+        virgilCrypto = new VirgilCrypto();
+        return resolve();
+      }
+
       initFoundation().then(foundationModules => {
         setFoundationModules(foundationModules);
         virgilCrypto = new VirgilCrypto();
@@ -268,5 +274,51 @@ describe('VirgilCrypto', () => {
     );
     const streamVerifier = virgilCrypto.createStreamVerifier(signature);
     expect(streamVerifier).to.be.instanceOf(VirgilStreamVerifier);
+  });
+
+  describe('generateGroupSession', () => {
+    it('throws if groupId is less than 10 bytes long', () => {
+      expect(() => {
+        virgilCrypto.generateGroupSession('short_id');
+      }, 'should have thrown').throws(Error);
+    });
+
+    it('creates group with correct id', () => {
+      const expectedId = virgilCrypto
+        .calculateHash('i_am_long_enough_to_be_a_group_id', HashAlgorithm.SHA512)
+        .slice(0, 32);
+      const group = virgilCrypto.generateGroupSession('i_am_long_enough_to_be_a_group_id');
+      expect(group.getSessionId()).to.equal(expectedId.toString('hex'));
+    });
+
+    it('creates group with one epoch', () => {
+      const group = virgilCrypto.generateGroupSession('i_am_long_enough_to_be_a_group_id');
+      expect(group.export()).to.have.length(1);
+    });
+  });
+
+  describe('importGroupSession', () => {
+    it('throws if epoch messages is not an array', () => {
+      expect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        virgilCrypto.importGroupSession(undefined as any);
+      }).throws(TypeError);
+    });
+
+    it('throws if epoch messages array is empty', () => {
+      expect(() => {
+        virgilCrypto.importGroupSession([]);
+      }).throws(Error);
+    });
+
+    it('reconstructs the group session object from epoch messages', () => {
+      const myGroup = virgilCrypto.generateGroupSession(NodeBuffer.from('x'.repeat(10)));
+      myGroup.addNewEpoch();
+      const epochMessages = myGroup.export();
+      const theirGroup = virgilCrypto.importGroupSession(epochMessages);
+
+      expect(myGroup.getSessionId()).to.equal(theirGroup.getSessionId());
+      expect(myGroup.getCurrentEpochNumber()).to.equal(theirGroup.getCurrentEpochNumber());
+    });
   });
 });

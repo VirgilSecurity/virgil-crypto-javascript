@@ -45,7 +45,7 @@ Last, you need to get familiar with [usage examples](guides/usage-examples.md) o
 
 ## Docs
 - [API Reference](http://virgilsecurity.github.io/virgil-crypto-javascript/)
-- [Crypto Core Library](https://github.com/VirgilSecurity/virgil-crypto)
+- [Crypto Core Library](https://github.com/VirgilSecurity/virgil-crypto-c)
 - [More usage examples](https://developer.virgilsecurity.com/docs/how-to#cryptography)
 
 ## License

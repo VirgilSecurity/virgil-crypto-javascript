@@ -2,13 +2,18 @@ import { expect } from 'chai';
 
 import initFoundation from '@virgilsecurity/core-foundation';
 
-import { setFoundationModules, VirgilCrypto, VirgilPublicKey } from '..';
+import { setFoundationModules, hasFoundationModules, VirgilCrypto, VirgilPublicKey } from '..';
 
 describe('VirgilStreamCipher', () => {
   let virgilCrypto: VirgilCrypto;
 
-  beforeEach(() => {
+  before(() => {
     return new Promise(resolve => {
+      if (hasFoundationModules()) {
+        virgilCrypto = new VirgilCrypto();
+        return resolve();
+      }
+
       initFoundation().then(foundationModules => {
         setFoundationModules(foundationModules);
         virgilCrypto = new VirgilCrypto();

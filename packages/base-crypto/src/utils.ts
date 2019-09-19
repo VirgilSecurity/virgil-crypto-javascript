@@ -1,5 +1,4 @@
 import { importPublicKey } from './keyProvider';
-import { LowLevelPublicKey } from './types';
 import { VirgilPublicKey } from './VirgilPublicKey';
 
 export const toArray = <T>(val?: T | T[]): T[] => {
@@ -7,7 +6,7 @@ export const toArray = <T>(val?: T | T[]): T[] => {
 };
 
 export const getLowLevelPublicKeys = (publicKeys: VirgilPublicKey[]) => {
-  const lowLevelPublicKeys: LowLevelPublicKey[] = [];
+  const lowLevelPublicKeys: FoundationModules.PublicKey[] = [];
   publicKeys.forEach(({ key }) => {
     try {
       const lowLevelPublicKey = importPublicKey(key);

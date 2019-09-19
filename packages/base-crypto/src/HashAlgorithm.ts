@@ -8,7 +8,7 @@ export interface HashAlgorithmType {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const addHashAlgorithm = (obj: any, algIdName: string) => {
+const addHashAlgorithm = (obj: any, algIdName: keyof typeof FoundationModules.AlgId) => {
   Object.defineProperty(obj, algIdName, {
     configurable: false,
     enumerable: true,

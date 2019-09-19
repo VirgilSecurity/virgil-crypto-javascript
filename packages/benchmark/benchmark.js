@@ -2,6 +2,11 @@ const { Buffer: NodeBuffer } = require('buffer');
 const { initCrypto, VirgilCrypto: V4Crypto } = require('virgil-crypto');
 const { VirgilCrypto: V3Crypto } = require('virgil-crypto-3');
 
+const data = NodeBuffer.from(
+  'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+  'utf8',
+);
+
 const createSuite = (benchmark, log) => {
   const suite = new benchmark.Suite();
   suite.on('cycle', event => {
@@ -111,10 +116,6 @@ const exportPublicKeyBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
 };
 
 const encryptBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
-  const data = NodeBuffer.from(
-    'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    'utf8',
-  );
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const suite = createSuite(benchmark, log);
   log('### encrypt');
@@ -128,10 +129,6 @@ const encryptBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
 };
 
 const decryptBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
-  const data = NodeBuffer.from(
-    'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    'utf8',
-  );
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const encrypted = v3Crypto.encrypt(data, keyPair.v3.publicKey);
   const suite = createSuite(benchmark, log);
@@ -146,10 +143,6 @@ const decryptBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
 };
 
 const calculateHashBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
-  const data = NodeBuffer.from(
-    'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    'utf8',
-  );
   const suite = createSuite(benchmark, log);
   log('### calculateHash');
   suite.add('v3', () => {
@@ -175,10 +168,6 @@ const extractPublicKeyBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
 };
 
 const calculateSignatureBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
-  const data = NodeBuffer.from(
-    'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    'utf8',
-  );
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const suite = createSuite(benchmark, log);
   log('### calculateSignature');
@@ -192,10 +181,6 @@ const calculateSignatureBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
 };
 
 const verifySignatureBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
-  const data = NodeBuffer.from(
-    'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    'utf8',
-  );
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const signature = v3Crypto.calculateSignature(data, keyPair.v3.privateKey);
   const suite = createSuite(benchmark, log);
@@ -210,10 +195,6 @@ const verifySignatureBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
 };
 
 const signThenEncryptBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
-  const data = NodeBuffer.from(
-    'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    'utf8',
-  );
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const suite = createSuite(benchmark, log);
   log('### signThenEncrypt');
@@ -227,10 +208,6 @@ const signThenEncryptBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
 };
 
 const decryptThenVerifyBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
-  const data = NodeBuffer.from(
-    'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    'utf8',
-  );
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const encrypted = v3Crypto.signThenEncrypt(data, keyPair.v3.privateKey, keyPair.v3.publicKey);
   const suite = createSuite(benchmark, log);
@@ -258,10 +235,6 @@ const getRandomBytesBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
 };
 
 const signThenEncryptDetachedBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
-  const data = NodeBuffer.from(
-    'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    'utf8',
-  );
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const suite = createSuite(benchmark, log);
   log('### signThenEncryptDetached');
@@ -275,10 +248,6 @@ const signThenEncryptDetachedBenchmark = (benchmark, log, v3Crypto, v4Crypto) =>
 };
 
 const decryptThenVerifyDetachedBenchmark = (benchmark, log, v3Crypto, v4Crypto) => {
-  const data = NodeBuffer.from(
-    'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    'utf8',
-  );
   const keyPair = generateKeyPair(v3Crypto, v4Crypto);
   const { encryptedData, metadata } = v3Crypto.signThenEncryptDetached(
     data,
@@ -303,6 +272,43 @@ const decryptThenVerifyDetachedBenchmark = (benchmark, log, v3Crypto, v4Crypto) 
       keyPair.v4.publicKey,
     );
   });
+  suite.run();
+};
+
+const groupEncryptBenchmark = (benchmark, log, _, v4Crypto) => {
+  const keyPair = v4Crypto.generateKeys();
+  const groupId = NodeBuffer.from('x'.repeat(10), 'utf8');
+  const groupSession = v4Crypto.generateGroupSession(groupId);
+
+  const suite = new benchmark.Suite();
+  log('### Group Encryption (v4 only)');
+  suite.on('cycle', event => {
+    log(`- ${String(event.target)}`);
+  });
+
+  suite.add('encrypt', () => {
+    groupSession.encrypt(data, keyPair.privateKey);
+  });
+
+  suite.run();
+};
+
+const groupDecryptBenchmark = (benchmark, log, _, v4Crypto) => {
+  const keyPair = v4Crypto.generateKeys();
+  const groupId = NodeBuffer.from('x'.repeat(10), 'utf8');
+  const groupSession = v4Crypto.generateGroupSession(groupId);
+  const encrypted = groupSession.encrypt(data, keyPair.privateKey);
+
+  const suite = new benchmark.Suite();
+  log('### Group Decryption (v4 only)');
+  suite.on('cycle', event => {
+    log(`- ${String(event.target)}`);
+  });
+
+  suite.add('decrypt', () => {
+    groupSession.decrypt(encrypted, keyPair.publicKey);
+  });
+
   suite.run();
 };
 
@@ -333,6 +339,8 @@ const runBenchmark = async (benchmark, log) => {
   run(getRandomBytesBenchmark);
   run(signThenEncryptDetachedBenchmark);
   run(decryptThenVerifyDetachedBenchmark);
+  run(groupEncryptBenchmark);
+  run(groupDecryptBenchmark);
 };
 
 module.exports = runBenchmark;

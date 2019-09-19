@@ -13,7 +13,7 @@ describe('compatibility', () => {
   let wasmFoundationModules: WasmFoundationModules;
   let asmjsFoundationModules: AsmjsFoundationModules;
 
-  beforeEach(() => {
+  before(() => {
     return new Promise(resolve => {
       Promise.all([initWasmFoundation(), initAsmjsFoundation()]).then(
         ([wasmModules, asmjsModules]) => {

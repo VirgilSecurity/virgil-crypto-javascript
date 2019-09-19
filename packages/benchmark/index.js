@@ -1,6 +1,8 @@
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
+const os = require('os');
+const osName = require('os-name');
 
 const benchmark = require('benchmark');
 const puppeteer = require('puppeteer');
@@ -13,8 +15,11 @@ const webpackConfig = require('./webpack.config');
 const SERVER_PORT = 3000;
 const OUTPUT_FILE_PATH = path.join(__dirname, 'README.md');
 
+const getSystemInfo = () =>
+  `\nResults below were obtained on ${osName()} with ${os.cpus()[0].model}\n`;
+
 const runNodeBenchmark = async () => {
-  const lines = ['## Node.js'];
+  const lines = [`## Node.js (Version: ${process.version})\n`];
   await runBenchmark(benchmark, str => lines.push(str));
   return lines;
 };
@@ -64,7 +69,7 @@ const runBrowserBenchmark = async () => {
     runNodeBenchmark(),
     runBrowserBenchmark(),
   ]);
-  const lines = ['# Benchmarks', ...nodejsLines, ...browserLines];
+  const lines = ['# Benchmarks', getSystemInfo(), ...nodejsLines, ...browserLines];
   fs.writeFileSync(OUTPUT_FILE_PATH, lines.join('\n'));
   console.log(`${OUTPUT_FILE_PATH} was created`);
 })();

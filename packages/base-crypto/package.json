@@ -1,6 +1,6 @@
 {
   "name": "@virgilsecurity/base-crypto",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "Virgil JavaScript Crypto Library is a high-level cryptographic library that allows you to perform all necessary operations for secure storing and transferring data and everything required to become HIPAA and GDPR compliant.",
   "main": "./dist/base-crypto.cjs.js",
   "module": "./dist/base-crypto.es.js",
@@ -18,8 +18,8 @@
     "prepare": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@virgilsecurity/crypto-types": "^0.1.4",
-    "@virgilsecurity/data-utils": "^0.1.5"
+    "@virgilsecurity/crypto-types": "^0.2.0",
+    "@virgilsecurity/data-utils": "^0.1.6"
   },
   "peerDependencies": {
     "@virgilsecurity/core-foundation": "^0.2.0"

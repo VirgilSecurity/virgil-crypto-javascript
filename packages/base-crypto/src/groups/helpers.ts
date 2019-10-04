@@ -24,7 +24,7 @@ export function parseGroupSessionMessage(messageData: Uint8Array): IGroupSession
   const info: IGroupSessionMessageInfo = {
     epochNumber: message.getEpoch(),
     sessionId: toBuffer(message.getSessionId()).toString('hex'),
-    data: toBuffer(messageData),
+    data: toBuffer(messageData).toString('base64'),
   };
   message.delete();
   return info;

@@ -46,7 +46,7 @@ describe('group encryption', () => {
       const lastEpochData = group.export().pop();
       expect(lastEpochData).not.to.be.undefined;
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      expect(NodeBuffer.compare(lastEpochData!, data)).to.equal(0);
+      expect(lastEpochData!.toString('base64')).to.equal(data);
     });
   });
 
@@ -71,7 +71,7 @@ describe('group encryption', () => {
       const { epochNumber, sessionId, data } = group.parseMessage(encrypted);
       expect(epochNumber).to.equal(group.getCurrentEpochNumber());
       expect(sessionId).to.equal(group.getSessionId());
-      expect(NodeBuffer.compare(encrypted, data)).to.equal(0);
+      expect(encrypted.toString('base64')).to.equal(data);
     });
   });
 

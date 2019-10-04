@@ -27,7 +27,7 @@ export interface IKeyPair {
 export interface IGroupSessionMessageInfo {
   sessionId: string;
   epochNumber: number;
-  data: NodeBuffer;
+  data: string;
 }
 
 export interface IGroupSession {

@@ -77,6 +77,7 @@ export interface ICrypto {
   ): NodeBuffer;
   generateGroupSession(groupId: Data): IGroupSession;
   importGroupSession(epochMessages: Data[]): IGroupSession;
+  calculateGroupSessionId(groupId: Data): string;
 }
 
 export interface IAccessTokenSigner {

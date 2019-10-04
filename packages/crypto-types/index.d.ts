@@ -27,7 +27,7 @@ export interface IKeyPair {
 export interface IGroupSessionMessageInfo {
   sessionId: string;
   epochNumber: number;
-  data: NodeBuffer;
+  data: string;
 }
 
 export interface IGroupSession {
@@ -77,6 +77,7 @@ export interface ICrypto {
   ): NodeBuffer;
   generateGroupSession(groupId: Data): IGroupSession;
   importGroupSession(epochMessages: Data[]): IGroupSession;
+  calculateGroupSessionId(groupId: Data): string;
 }
 
 export interface IAccessTokenSigner {

@@ -591,12 +591,7 @@ export class VirgilCrypto implements ICrypto {
 
   generateGroupSession(groupId: Data): IGroupSession {
     const groupIdBytes = dataToUint8Array(groupId, 'utf8');
-    if (groupIdBytes.byteLength < MIN_GROUP_ID_BYTE_LENGTH) {
-      throw new Error(
-        `The given group Id is too short. Must be at least ${MIN_GROUP_ID_BYTE_LENGTH} bytes.`,
-      );
-    }
-
+    this.validateGroupId(groupIdBytes);
     const sessionId = computeSessionId(groupIdBytes);
     const initialEpoch = createInitialEpoch(sessionId);
 
@@ -615,6 +610,20 @@ export class VirgilCrypto implements ICrypto {
     }
 
     return createVirgilGroupSession(epochMessages.map(it => dataToUint8Array(it, 'base64')));
+  }
+
+  calculateGroupSessionId(groupId: Data) {
+    const groupIdBytes = dataToUint8Array(groupId, 'utf8');
+    this.validateGroupId(groupIdBytes);
+    return toBuffer(computeSessionId(groupIdBytes)).toString('hex');
+  }
+
+  private validateGroupId(groupId: Uint8Array) {
+    if (groupId.byteLength < MIN_GROUP_ID_BYTE_LENGTH) {
+      throw new Error(
+        `The given group Id is too short. Must be at least ${MIN_GROUP_ID_BYTE_LENGTH} bytes.`,
+      );
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

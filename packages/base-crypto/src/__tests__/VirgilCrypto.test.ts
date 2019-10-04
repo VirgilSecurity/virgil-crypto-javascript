@@ -321,4 +321,22 @@ describe('VirgilCrypto', () => {
       expect(myGroup.getCurrentEpochNumber()).to.equal(theirGroup.getCurrentEpochNumber());
     });
   });
+
+  describe('calculateGroupSessionId', () => {
+    it('throws if groupId is less than 10 bytes long', () => {
+      expect(() => {
+        virgilCrypto.calculateGroupSessionId('short_id');
+      }, 'should have thrown').throws(Error);
+    });
+
+    it('returns correct session id as hex string', () => {
+      const expectedId = virgilCrypto
+        .calculateHash('i_am_long_enough_to_be_a_group_id', HashAlgorithm.SHA512)
+        .slice(0, 32);
+      const groupSessionId = virgilCrypto.calculateGroupSessionId(
+        'i_am_long_enough_to_be_a_group_id',
+      );
+      expect(groupSessionId).to.equal(expectedId.toString('hex'));
+    });
+  });
 });

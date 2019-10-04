@@ -329,7 +329,7 @@ describe('VirgilCrypto', () => {
       }, 'should have thrown').throws(Error);
     });
 
-    it('returns correct as hex string', () => {
+    it('returns correct session id as hex string', () => {
       const expectedId = virgilCrypto
         .calculateHash('i_am_long_enough_to_be_a_group_id', HashAlgorithm.SHA512)
         .slice(0, 32);

@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="foundation-modules.d.ts" />
+/// <reference types="@virgilsecurity/core-foundation" />
 
 let foundationModules: typeof FoundationModules | undefined;
 

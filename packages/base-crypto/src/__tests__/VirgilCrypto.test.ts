@@ -181,7 +181,6 @@ describe('VirgilCrypto', () => {
       const decryptedMessage = virgilCrypto.decryptThenVerify(
         cipherData,
         recipientKeyPair.privateKey,
-        senderKeyPair.publicKey,
       );
       expect(decryptedMessage.toString()).to.equal(message);
     });
@@ -200,7 +199,6 @@ describe('VirgilCrypto', () => {
       const decryptedData = virgilCrypto.decryptThenVerify(
         encryptedData,
         recipientKeyPair.privateKey,
-        [additionalKeyPair.publicKey, anotherKeyPair.publicKey, senderKeyPair.publicKey],
       );
       expect(decryptedData.equals(data)).to.be.true;
     });
@@ -217,10 +215,7 @@ describe('VirgilCrypto', () => {
         recipientKeyPair.publicKey,
       );
       const error = () => {
-        virgilCrypto.decryptThenVerify(encryptedData, recipientKeyPair.privateKey, [
-          additionalKeyPair.publicKey,
-          anotherKeyPair.publicKey,
-        ]);
+        virgilCrypto.decryptThenVerify(encryptedData, recipientKeyPair.privateKey);
       };
       expect(error).to.throw;
     });

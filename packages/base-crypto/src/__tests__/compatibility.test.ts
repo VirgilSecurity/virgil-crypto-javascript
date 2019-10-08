@@ -1,17 +1,13 @@
 import { expect } from 'chai';
 
-import initWasmFoundation, {
-  FoundationModules as WasmFoundationModules,
-} from '@virgilsecurity/core-foundation';
-import initAsmjsFoundation, {
-  FoundationModules as AsmjsFoundationModules,
-} from '@virgilsecurity/core-foundation/node.asmjs.cjs';
+import initWasmFoundation from '@virgilsecurity/core-foundation';
+import initAsmjsFoundation from '@virgilsecurity/core-foundation/node.asmjs.cjs';
 
 import { setFoundationModules, VirgilCrypto } from '..';
 
 describe('compatibility', () => {
-  let wasmFoundationModules: WasmFoundationModules;
-  let asmjsFoundationModules: AsmjsFoundationModules;
+  let wasmFoundationModules: typeof FoundationModules;
+  let asmjsFoundationModules: typeof FoundationModules;
 
   before(() => {
     return new Promise(resolve => {

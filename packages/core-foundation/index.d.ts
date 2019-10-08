@@ -183,9 +183,12 @@ declare namespace FoundationModules {
     encryptionCipher: Cipher;
     addKeyRecipient(recipientId: Uint8Array, publicKey: PublicKey): void;
     clearRecipients(): void;
+    addSigner(signerId: Uint8Array, privateKey: PrivateKey): void;
+    clearSigners(): void;
     customParams(): MessageInfoCustomParams;
     messageInfoLen(): number;
     startEncryption(): void;
+    startSignedEncryption(dataSize: number): void;
     packMessageInfo(): Uint8Array;
     encryptionOutLen(dataLen: number): number;
     processEncryption(data: Uint8Array): Uint8Array;
@@ -195,9 +198,18 @@ declare namespace FoundationModules {
       privateKey: PrivateKey,
       messageInfo: Uint8Array,
     ): void;
+    startVerifiedDecryptionWithKey(
+      recipientId: Uint8Array,
+      privateKey: PrivateKey,
+      messageInfo: Uint8Array,
+      messageInfoFooter: Uint8Array,
+    ): void;
     decryptionOutLen(dataLen: number): number;
     processDecryption(data: Uint8Array): Uint8Array;
     finishDecryption(): Uint8Array;
+    isDataSigned(): boolean;
+    messageInfoFooterLen(): number;
+    packMessageInfoFooter(): Uint8Array;
   }
 
   export class Signer extends FoundationObject {

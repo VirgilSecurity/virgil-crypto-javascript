@@ -340,6 +340,7 @@ export class VirgilCrypto implements ICrypto {
     const myData = dataToUint8Array(data, 'utf8');
 
     validatePrivateKey(privateKey);
+    const lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
 
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
@@ -357,17 +358,20 @@ export class VirgilCrypto implements ICrypto {
     const messageInfoCustomParams = recipientCipher.customParams();
 
     try {
-      const signature = this.calculateSignature(myData, privateKey);
-
-      messageInfoCustomParams.addData(DATA_SIGNATURE_KEY, signature);
-      messageInfoCustomParams.addData(DATA_SIGNER_ID_KEY, privateKey.identifier);
-
-      recipientCipher.startEncryption();
+      recipientCipher.addSigner(privateKey.identifier, lowLevelPrivateKey);
+      recipientCipher.startSignedEncryption(myData.byteLength);
       const messageInfo = recipientCipher.packMessageInfo();
       const processEncryption = recipientCipher.processEncryption(myData);
       const finishEncryption = recipientCipher.finishEncryption();
-      return NodeBuffer.concat([messageInfo, processEncryption, finishEncryption]);
+      const messageInfoFooter = recipientCipher.packMessageInfoFooter();
+      return NodeBuffer.concat([
+        messageInfo,
+        processEncryption,
+        finishEncryption,
+        messageInfoFooter,
+      ]);
     } finally {
+      lowLevelPrivateKey.delete();
       lowLevelPublicKeys.forEach(lowLevelPublicKey => lowLevelPublicKey.delete());
       recipientCipher.delete();
       aes256Gcm.delete();
@@ -375,15 +379,8 @@ export class VirgilCrypto implements ICrypto {
     }
   }
 
-  decryptThenVerify(
-    encryptedData: Data,
-    privateKey: VirgilPrivateKey,
-    publicKey: VirgilPublicKey | VirgilPublicKey[],
-  ) {
+  decryptThenVerify(encryptedData: Data, privateKey: VirgilPrivateKey) {
     const myEncryptedData = dataToUint8Array(encryptedData, 'base64');
-
-    const publicKeys = toArray(publicKey);
-    validatePublicKeysArray(publicKeys);
 
     validatePrivateKey(privateKey);
     const lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
@@ -391,62 +388,22 @@ export class VirgilCrypto implements ICrypto {
     const recipientCipher = new this.foundationModules.RecipientCipher();
     recipientCipher.random = this.random;
 
-    let decryptedData: BufferType;
     try {
-      recipientCipher.startDecryptionWithKey(
+      recipientCipher.startVerifiedDecryptionWithKey(
         privateKey.identifier,
         lowLevelPrivateKey,
+        new Uint8Array(0),
         new Uint8Array(0),
       );
       const processDecryption = recipientCipher.processDecryption(myEncryptedData);
       const finishDecryption = recipientCipher.finishDecryption();
-      decryptedData = NodeBuffer.concat([processDecryption, finishDecryption]);
-    } catch (error) {
-      lowLevelPrivateKey.delete();
-      recipientCipher.delete();
-      throw error;
-    }
-
-    const messageInfoCustomParams = recipientCipher.customParams();
-
-    let signerPublicKey: VirgilPublicKey | undefined;
-    if (publicKeys.length === 1) {
-      signerPublicKey = publicKeys[0];
-    } else {
-      let signerId: Uint8Array;
-      try {
-        signerId = messageInfoCustomParams.findData(DATA_SIGNER_ID_KEY);
-      } catch (error) {
-        lowLevelPrivateKey.delete();
-        recipientCipher.delete();
-        messageInfoCustomParams.delete();
-        throw error;
-      }
-      for (let i = 0; i < publicKeys.length; i += 1) {
-        if (NodeBuffer.compare(signerId, publicKeys[i].identifier) === 0) {
-          signerPublicKey = publicKeys[i];
-          break;
-        }
-      }
-      if (!signerPublicKey) {
-        lowLevelPrivateKey.delete();
-        recipientCipher.delete();
-        messageInfoCustomParams.delete();
-        throw new Error('Signer not found');
-      }
-    }
-
-    try {
-      const signature = messageInfoCustomParams.findData(DATA_SIGNATURE_KEY);
-      const isValid = this.verifySignature(decryptedData, signature, signerPublicKey);
-      if (!isValid) {
+      if (!recipientCipher.isDataSigned()) {
         throw new Error('Invalid signature');
       }
-      return decryptedData;
+      return NodeBuffer.concat([processDecryption, finishDecryption]);
     } finally {
       lowLevelPrivateKey.delete();
       recipientCipher.delete();
-      messageInfoCustomParams.delete();
     }
   }
 

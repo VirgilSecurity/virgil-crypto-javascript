@@ -140,3 +140,52 @@ export interface IPythiaCrypto extends IBrainKeyCrypto {
   }): NodeBuffer;
   updateDeblindedWithToken(options: { deblindedPassword: Data; updateToken: Data }): NodeBuffer;
 }
+
+export interface IPheCipher {
+  encrypt(plainText: Data, accountKey: Data): NodeBuffer;
+  decrypt(cipherText: Data, accountKey: Data): NodeBuffer;
+  authEncrypt(plainText: Data, additionalData: Data, accountKey: Data): NodeBuffer;
+  authDecrypt(cipherText: Data, additionalData: Data, accountKey: Data): NodeBuffer;
+}
+
+export interface IPheClient {
+  setKeys(clientPrivateKey: Data, serverPublicKey: Data): void;
+  generateClientPrivateKey(): NodeBuffer;
+  enrollAccount(
+    enrollmentResponse: Data,
+    password: Data,
+  ): {
+    enrollmentRecord: NodeBuffer;
+    accountKey: NodeBuffer;
+  };
+  createVerifyPasswordRequest(password: Data, enrollmentRecord: Data): NodeBuffer;
+  checkResponseAndDecrypt(
+    password: Data,
+    enrollmentRecord: Data,
+    verifyPasswordResponse: Data,
+  ): NodeBuffer;
+  rotateKeys(
+    updateToken: Data,
+  ): {
+    newClientPrivateKey: NodeBuffer;
+    newServerPublicKey: NodeBuffer;
+  };
+  updateEnrollmentRecord(enrollmentRecord: Data, updateToken: Data): NodeBuffer;
+}
+
+export interface IPheServer {
+  generateServerKeyPair(): { serverPrivateKey: NodeBuffer; serverPublicKey: NodeBuffer };
+  getEnrollment(serverPrivateKey: Data, serverPublicKey: Data): NodeBuffer;
+  verifyPassword(
+    serverPrivateKey: Data,
+    serverPublicKey: Data,
+    verifyPasswordRequest: Data,
+  ): NodeBuffer;
+  rotateKeys(
+    serverPrivateKey: Data,
+  ): {
+    newServerPrivateKey: NodeBuffer;
+    newServerPublicKey: NodeBuffer;
+    updateToken: NodeBuffer;
+  };
+}

@@ -4,16 +4,25 @@ import { getPheModules } from './pheModules';
 import { PheModules, Data, IPheCipher } from './types';
 
 export class PheCipher implements IPheCipher {
-  private pheModules: PheModules;
-  private random: any;
-  private pheCipher: any;
+  private readonly pheModules: PheModules;
+  private readonly random: any;
+  private readonly pheCipher: any;
 
   constructor() {
     this.pheModules = getPheModules();
     this.random = new this.pheModules.CtrDrbg();
     this.pheCipher = new this.pheModules.PheCipher();
     this.pheCipher.random = this.random;
-    this.pheCipher.setupDefaults();
+    try {
+      this.pheCipher.setupDefaults();
+    } finally {
+      this.disponse();
+    }
+  }
+
+  disponse() {
+    this.pheCipher.delete();
+    this.random.delete();
   }
 
   encrypt(plainText: Data, accountKey: Data) {

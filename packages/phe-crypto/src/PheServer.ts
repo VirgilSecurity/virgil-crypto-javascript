@@ -13,7 +13,16 @@ export class PheServer implements IPheServer {
     this.random = new this.pheModules.CtrDrbg();
     this.pheServer = new this.pheModules.PheServer();
     this.pheServer.random = this.random;
-    this.pheServer.setupDefaults();
+    try {
+      this.pheServer.setupDefaults();
+    } finally {
+      this.disponse();
+    }
+  }
+
+  disponse() {
+    this.pheServer.delete();
+    this.random.delete();
   }
 
   generateServerKeyPair() {

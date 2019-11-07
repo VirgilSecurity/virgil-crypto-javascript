@@ -16,8 +16,7 @@ export class PheClient implements IPheClient {
     try {
       this.pheClient.setupDefaults();
     } finally {
-      this.pheClient.delete();
-      this.random.delete();
+      this.dispose();
     }
   }
 

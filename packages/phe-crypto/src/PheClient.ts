@@ -5,38 +5,42 @@ import { PheModules, Data, IPheClient } from './types';
 
 export class PheClient implements IPheClient {
   private readonly pheModules: PheModules;
-  private readonly random: any;
   private readonly pheClient: any;
+
+  private disposed: boolean;
 
   constructor() {
     this.pheModules = getPheModules();
-    this.random = new this.pheModules.CtrDrbg();
     this.pheClient = new this.pheModules.PheClient();
-    this.pheClient.random = this.random;
     try {
       this.pheClient.setupDefaults();
-    } finally {
+      this.disposed = false;
+    } catch (error) {
       this.dispose();
+      throw error;
     }
   }
 
   dispose() {
     this.pheClient.delete();
-    this.random.delete();
+    this.disposed = true;
   }
 
   setKeys(clientPrivateKey: Data, serverPublicKey: Data) {
+    this.throwIfDisposed();
     const myClientPrivateKey = dataToUint8Array(clientPrivateKey, 'base64');
     const myServerPublicKey = dataToUint8Array(serverPublicKey, 'base64');
     this.pheClient.setKeys(myClientPrivateKey, myServerPublicKey);
   }
 
   generateClientPrivateKey() {
+    this.throwIfDisposed();
     const clientPrivateKey = this.pheClient.generateClientPrivateKey();
     return toBuffer(clientPrivateKey);
   }
 
   enrollAccount(enrollmentResponse: Data, password: Data) {
+    this.throwIfDisposed();
     const myEnrollmentResponse = dataToUint8Array(enrollmentResponse, 'base64');
     const myPassword = dataToUint8Array(password, 'utf8');
     const { enrollmentRecord, accountKey } = this.pheClient.enrollAccount(
@@ -50,6 +54,7 @@ export class PheClient implements IPheClient {
   }
 
   createVerifyPasswordRequest(password: Data, enrollmentRecord: Data) {
+    this.throwIfDisposed();
     const myPassword = dataToUint8Array(password, 'utf8');
     const myEnrollmentRecord = dataToUint8Array(enrollmentRecord, 'base64');
     const verifyPasswordRequest = this.pheClient.createVerifyPasswordRequest(
@@ -60,6 +65,7 @@ export class PheClient implements IPheClient {
   }
 
   checkResponseAndDecrypt(password: Data, enrollmentRecord: Data, verifyPasswordResponse: Data) {
+    this.throwIfDisposed();
     const myPassword = dataToUint8Array(password, 'utf8');
     const myEnrollmentRecord = dataToUint8Array(enrollmentRecord, 'base64');
     const myVerifyPasswordResponse = dataToUint8Array(verifyPasswordResponse, 'base64');
@@ -72,6 +78,7 @@ export class PheClient implements IPheClient {
   }
 
   rotateKeys(updateToken: Data) {
+    this.throwIfDisposed();
     const myUpdateToken = dataToUint8Array(updateToken, 'base64');
     const { newClientPrivateKey, newServerPublicKey } = this.pheClient.rotateKeys(myUpdateToken);
     return {
@@ -81,6 +88,7 @@ export class PheClient implements IPheClient {
   }
 
   updateEnrollmentRecord(enrollmentRecord: Data, updateToken: Data) {
+    this.throwIfDisposed();
     const myEnrollmentRecord = dataToUint8Array(enrollmentRecord, 'base64');
     const myUpdateToken = dataToUint8Array(updateToken, 'base64');
     const newEnrollmentRecord = this.pheClient.updateEnrollmentRecord(
@@ -88,5 +96,13 @@ export class PheClient implements IPheClient {
       myUpdateToken,
     );
     return toBuffer(newEnrollmentRecord);
+  }
+
+  private throwIfDisposed() {
+    if (this.disposed) {
+      throw new Error(
+        'Cannot use an instance of `PheClient` class after the `dispose` method has been called',
+      );
+    }
   }
 }

@@ -5,27 +5,29 @@ import { PheModules, Data, IPheServer } from './types';
 
 export class PheServer implements IPheServer {
   private readonly pheModules: PheModules;
-  private readonly random: any;
   private readonly pheServer: any;
+
+  private disposed: boolean;
 
   constructor() {
     this.pheModules = getPheModules();
-    this.random = new this.pheModules.CtrDrbg();
     this.pheServer = new this.pheModules.PheServer();
-    this.pheServer.random = this.random;
     try {
       this.pheServer.setupDefaults();
-    } finally {
-      this.disponse();
+      this.disposed = false;
+    } catch (error) {
+      this.dispose();
+      throw error;
     }
   }
 
-  disponse() {
+  dispose() {
     this.pheServer.delete();
-    this.random.delete();
+    this.disposed = true;
   }
 
   generateServerKeyPair() {
+    this.throwIfDisposed();
     const { serverPrivateKey, serverPublicKey } = this.pheServer.generateServerKeyPair();
     return {
       serverPrivateKey: toBuffer(serverPrivateKey),
@@ -34,6 +36,7 @@ export class PheServer implements IPheServer {
   }
 
   getEnrollment(serverPrivateKey: Data, serverPublicKey: Data) {
+    this.throwIfDisposed();
     const myServerPrivateKey = dataToUint8Array(serverPrivateKey, 'base64');
     const myServerPublicKey = dataToUint8Array(serverPublicKey, 'base64');
     const enrollmentResponse = this.pheServer.getEnrollment(myServerPrivateKey, myServerPublicKey);
@@ -41,6 +44,7 @@ export class PheServer implements IPheServer {
   }
 
   verifyPassword(serverPrivateKey: Data, serverPublicKey: Data, verifyPasswordRequest: Data) {
+    this.throwIfDisposed();
     const myServerPrivateKey = dataToUint8Array(serverPrivateKey, 'base64');
     const myServerPublicKey = dataToUint8Array(serverPublicKey, 'base64');
     const myVerifyPasswordRequest = dataToUint8Array(verifyPasswordRequest, 'base64');
@@ -53,6 +57,7 @@ export class PheServer implements IPheServer {
   }
 
   rotateKeys(serverPrivateKey: Data) {
+    this.throwIfDisposed();
     const myServerPrivateKey = dataToUint8Array(serverPrivateKey, 'base64');
     const { newServerPrivateKey, newServerPublicKey, updateToken } = this.pheServer.rotateKeys(
       myServerPrivateKey,
@@ -62,5 +67,13 @@ export class PheServer implements IPheServer {
       newServerPublicKey: toBuffer(newServerPublicKey),
       updateToken: toBuffer(updateToken),
     };
+  }
+
+  private throwIfDisposed() {
+    if (this.disposed) {
+      throw new Error(
+        'Cannot use an instance of `PheServer` class after the `dispose` method has been called',
+      );
+    }
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@virgilsecurity/crypto-types",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Types for Virgil JavaScript libraries",
   "typings": "./index.d.ts",
   "files": [

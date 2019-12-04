@@ -1,8 +1,6 @@
 import { toBuffer, dataToUint8Array } from '@virgilsecurity/data-utils';
 import { Data, IGroupSession } from '../types';
 import { validatePrivateKey, validatePublicKey } from '../validators';
-import { getLowLevelPrivateKey } from '../privateKeyUtils';
-import { importPublicKey } from '../keyProvider';
 import { VirgilPrivateKey } from '../VirgilPrivateKey';
 import { VirgilPublicKey } from '../VirgilPublicKey';
 import { getFoundationModules } from '../foundationModules';
@@ -32,36 +30,32 @@ export function createVirgilGroupSession(epochMessages: Uint8Array[]): IGroupSes
     encrypt(data: Data, signingPrivateKey: VirgilPrivateKey) {
       const dataBytes = dataToUint8Array(data, 'utf8');
       validatePrivateKey(signingPrivateKey);
-      const lowLevelPrivateKey = getLowLevelPrivateKey(signingPrivateKey);
       let session: FoundationModules.GroupSession | undefined;
 
       try {
         session = createLowLevelSession(epochMessages);
-        const message = session.encrypt(dataBytes, lowLevelPrivateKey);
+        const message = session.encrypt(dataBytes, signingPrivateKey.lowLevelPrivateKey);
         const encrypted = message.serialize();
         message.delete();
         return toBuffer(encrypted);
       } finally {
         session && session.delete();
-        lowLevelPrivateKey.delete();
       }
     },
 
     decrypt(encryptedData: Data, verifyingPublicKey: VirgilPublicKey) {
       const encryptedDataBytes = dataToUint8Array(encryptedData, 'base64');
       validatePublicKey(verifyingPublicKey);
-      const lowLevelPublicKey = importPublicKey(verifyingPublicKey.key);
       let session: FoundationModules.GroupSession | undefined;
       let message: FoundationModules.GroupSessionMessage | undefined;
 
       try {
         session = createLowLevelSession(epochMessages);
         message = getFoundationModules().GroupSessionMessage.deserialize(encryptedDataBytes);
-        return toBuffer(session.decrypt(message, lowLevelPublicKey));
+        return toBuffer(session.decrypt(message, verifyingPublicKey.lowLevelPublicKey));
       } finally {
         message && message.delete();
         session && session.delete();
-        lowLevelPublicKey.delete();
       }
     },
 

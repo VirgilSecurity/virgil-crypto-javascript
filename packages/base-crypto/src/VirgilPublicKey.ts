@@ -1,12 +1,23 @@
 import { IPublicKey } from './types';
 
 export class VirgilPublicKey implements IPublicKey {
-  public identifier: Uint8Array;
+  public readonly identifier: Uint8Array;
+  public readonly lowLevelPublicKey: FoundationModules.PublicKey;
 
-  public key: Uint8Array;
+  private _isDisposed: boolean;
 
-  public constructor(identifier: Uint8Array, key: Uint8Array) {
+  get isDisposed() {
+    return this._isDisposed;
+  }
+
+  constructor(identifier: Uint8Array, lowLevelPublicKey: FoundationModules.PublicKey) {
     this.identifier = identifier;
-    this.key = key;
+    this.lowLevelPublicKey = lowLevelPublicKey;
+    this._isDisposed = false;
+  }
+
+  dispose() {
+    this.lowLevelPublicKey.delete();
+    this._isDisposed = true;
   }
 }

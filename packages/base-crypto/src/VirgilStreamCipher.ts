@@ -3,38 +3,34 @@ import { dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 import { DATA_SIGNATURE_KEY } from './constants';
 import { getFoundationModules } from './foundationModules';
 import { Data } from './types';
-import { toArray, getLowLevelPublicKeys } from './utils';
+import { toArray } from './utils';
 import { validatePublicKeysArray } from './validators';
 import { VirgilPublicKey } from './VirgilPublicKey';
 
 export class VirgilStreamCipher {
-  isFinished = false;
-
+  private _isFinished = false;
   private isRunning = false;
   private isDisposed = false;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private recipientCipher: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private messageInfoCustomParams?: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private aes256Gcm: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private ctrDrbg: any;
+  private recipientCipher: FoundationModules.RecipientCipher;
+  private messageInfoCustomParams?: FoundationModules.MessageInfoCustomParams;
+  private aes256Gcm: FoundationModules.Aes256Gcm;
+  private ctrDrbg: FoundationModules.CtrDrbg;
+  private publicKeys: VirgilPublicKey[];
 
-  private lowLevelPublicKeys: FoundationModules.PublicKey[] = [];
+  get isFinished() {
+    return this._isFinished;
+  }
 
   constructor(publicKey: VirgilPublicKey | VirgilPublicKey[], signature?: Data) {
     const foundationModules = getFoundationModules();
 
-    const publicKeys = toArray(publicKey);
-    validatePublicKeysArray(publicKeys);
-    this.lowLevelPublicKeys = getLowLevelPublicKeys(publicKeys);
+    this.publicKeys = toArray(publicKey);
+    validatePublicKeysArray(this.publicKeys);
 
     this.ctrDrbg = new foundationModules.CtrDrbg();
     try {
       this.ctrDrbg.setupDefaults();
     } catch (error) {
-      this.lowLevelPublicKeys.forEach(lowLevelPublicKey => lowLevelPublicKey.delete());
       this.ctrDrbg.delete();
       throw error;
     }
@@ -44,8 +40,8 @@ export class VirgilStreamCipher {
     this.recipientCipher.encryptionCipher = this.aes256Gcm;
     this.recipientCipher.random = this.ctrDrbg;
 
-    publicKeys.forEach(({ identifier }, index) => {
-      this.recipientCipher.addKeyRecipient(identifier, this.lowLevelPublicKeys[index]);
+    this.publicKeys.forEach(({ identifier }, index) => {
+      this.recipientCipher.addKeyRecipient(identifier, this.publicKeys[index].lowLevelPublicKey);
     });
 
     if (signature) {
@@ -75,7 +71,7 @@ export class VirgilStreamCipher {
     try {
       return toBuffer(this.recipientCipher.finishEncryption());
     } finally {
-      this.isFinished = true;
+      this._isFinished = true;
       this.isRunning = false;
       if (dispose) {
         this.dispose();
@@ -84,7 +80,6 @@ export class VirgilStreamCipher {
   }
 
   dispose() {
-    this.lowLevelPublicKeys.forEach(lowLevelPublicKey => lowLevelPublicKey.delete());
     this.recipientCipher.delete();
     this.aes256Gcm.delete();
     this.ctrDrbg.delete();
@@ -95,7 +90,7 @@ export class VirgilStreamCipher {
   }
 
   private ensureLegalState() {
-    if (this.isFinished) {
+    if (this._isFinished) {
       throw new Error('Illegal state. Cannot use cipher after the `final` method has been called.');
     }
     if (this.isDisposed) {

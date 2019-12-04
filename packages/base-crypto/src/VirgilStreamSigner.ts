@@ -1,17 +1,14 @@
 import { dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 
 import { getFoundationModules } from './foundationModules';
-import { getLowLevelPrivateKey } from './privateKeyUtils';
 import { Data } from './types';
 import { validatePrivateKey } from './validators';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 
 export class VirgilStreamSigner {
   private isDisposed = false;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private signer: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private sha512: any;
+  private signer: FoundationModules.Signer;
+  private sha512: FoundationModules.Sha512;
 
   constructor() {
     const foundationModules = getFoundationModules();
@@ -42,17 +39,12 @@ export class VirgilStreamSigner {
     }
 
     validatePrivateKey(privateKey);
-    const lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
 
-    try {
-      const result = this.signer.sign(lowLevelPrivateKey);
-      if (final) {
-        this.dispose();
-      }
-      return toBuffer(result);
-    } finally {
-      lowLevelPrivateKey.delete();
+    const result = this.signer.sign(privateKey.lowLevelPrivateKey);
+    if (final) {
+      this.dispose();
     }
+    return toBuffer(result);
   }
 
   dispose() {

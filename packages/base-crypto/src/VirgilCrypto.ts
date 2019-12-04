@@ -3,11 +3,8 @@ import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
 import { getFoundationModules } from './foundationModules';
 import { HashAlgorithm, HashAlgorithmType } from './HashAlgorithm';
 import { KeyPairType, KeyPairTypeType } from './KeyPairType';
-import { importPrivateKey, importPublicKey } from './keyProvider';
-import { serializePrivateKey, serializePublicKey } from './keySerializer';
-import { getLowLevelPrivateKey } from './privateKeyUtils';
 import { ICrypto, NodeBuffer as BufferType, Data, IGroupSession } from './types';
-import { toArray, getLowLevelPublicKeys } from './utils';
+import { toArray } from './utils';
 import { validatePrivateKey, validatePublicKey, validatePublicKeysArray } from './validators';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 import { VirgilPublicKey } from './VirgilPublicKey';
@@ -32,25 +29,49 @@ export class VirgilCrypto implements ICrypto {
   readonly hashAlgorithm = HashAlgorithm;
   readonly keyPairType = KeyPairType;
 
-  private foundationModules: typeof FoundationModules;
-  private random: FoundationModules.CtrDrbg;
+  private readonly foundationModules: typeof FoundationModules;
+  private readonly keyAsn1Serializer: FoundationModules.KeyAsn1Serializer;
+  private readonly random: FoundationModules.CtrDrbg;
+  private _isDisposed: boolean;
+
+  get isDisposed() {
+    return this._isDisposed;
+  }
 
   constructor(options: VirgilCryptoOptions = {}) {
     this.foundationModules = getFoundationModules();
+
+    this.keyAsn1Serializer = new this.foundationModules.KeyAsn1Serializer();
+    try {
+      this.keyAsn1Serializer.setupDefaults();
+    } catch (error) {
+      this.keyAsn1Serializer.delete();
+      throw error;
+    }
 
     this.random = new this.foundationModules.CtrDrbg();
     try {
       this.random.setupDefaults();
     } catch (error) {
+      this.keyAsn1Serializer.delete();
       this.random.delete();
       throw error;
     }
 
     this.defaultKeyPairType = options.defaultKeyPairType || KeyPairType.Default;
     this.useSha256Identifiers = options.useSha256Identifiers || false;
+    this._isDisposed = false;
+  }
+
+  dispose() {
+    this.keyAsn1Serializer.delete();
+    this.random.delete();
+    this._isDisposed = true;
   }
 
   generateKeys(type?: KeyPairTypeType[keyof KeyPairTypeType]) {
+    this.throwUnlessDisposed();
+
     const keyPairType = type ? type : this.defaultKeyPairType;
 
     const keyProvider = new this.foundationModules.KeyProvider();
@@ -75,24 +96,23 @@ export class VirgilCrypto implements ICrypto {
     const lowLevelPublicKey = lowLevelPrivateKey.extractPublicKey();
 
     try {
-      const serializedPublicKey = serializePublicKey(lowLevelPublicKey);
-      const serializedPrivateKey = serializePrivateKey(lowLevelPrivateKey);
+      const serializedPublicKey = this.keyAsn1Serializer.serializePublicKey(lowLevelPublicKey);
       const identifier = this.calculateKeypairIdentifier(
         serializedPublicKey,
         this.useSha256Identifiers,
       );
       return {
-        privateKey: new VirgilPrivateKey(identifier, serializedPrivateKey),
-        publicKey: new VirgilPublicKey(identifier, serializedPublicKey),
+        privateKey: new VirgilPrivateKey(identifier, lowLevelPrivateKey),
+        publicKey: new VirgilPublicKey(identifier, lowLevelPublicKey),
       };
     } finally {
       keyProvider.delete();
-      lowLevelPrivateKey.delete();
-      lowLevelPublicKey.delete();
     }
   }
 
   generateKeysFromKeyMaterial(keyMaterial: Data, type?: KeyPairTypeType[keyof KeyPairTypeType]) {
+    this.throwUnlessDisposed();
+
     const keyPairType = type ? type : this.defaultKeyPairType;
     const myKeyMaterial = dataToUint8Array(keyMaterial, 'base64');
 
@@ -124,80 +144,92 @@ export class VirgilCrypto implements ICrypto {
     const lowLevelPublicKey = lowLevelPrivateKey.extractPublicKey();
 
     try {
-      const serializedPublicKey = serializePublicKey(lowLevelPublicKey);
-      const serializedPrivateKey = serializePrivateKey(lowLevelPrivateKey);
+      const serializedPublicKey = this.keyAsn1Serializer.serializePublicKey(lowLevelPublicKey);
       const identifier = this.calculateKeypairIdentifier(
         serializedPublicKey,
         this.useSha256Identifiers,
       );
       return {
-        privateKey: new VirgilPrivateKey(identifier, serializedPrivateKey),
-        publicKey: new VirgilPublicKey(identifier, serializedPublicKey),
+        privateKey: new VirgilPrivateKey(identifier, lowLevelPrivateKey),
+        publicKey: new VirgilPublicKey(identifier, lowLevelPublicKey),
       };
     } finally {
       keyMaterialRng.delete();
       keyProvider.delete();
-      lowLevelPrivateKey.delete();
-      lowLevelPublicKey.delete();
     }
   }
 
   importPrivateKey(rawPrivateKey: Data) {
+    this.throwUnlessDisposed();
+
     const serializedPrivateKey = dataToUint8Array(rawPrivateKey, 'base64');
 
-    const lowLevelPrivateKey = importPrivateKey(serializedPrivateKey);
+    const keyProvider = new this.foundationModules.KeyProvider();
+    try {
+      keyProvider.setupDefaults();
+    } catch (error) {
+      keyProvider.delete();
+      throw error;
+    }
+
+    const lowLevelPrivateKey = keyProvider.importPrivateKey(serializedPrivateKey);
     const lowLevelPublicKey = lowLevelPrivateKey.extractPublicKey();
 
     try {
-      const serializedPublicKey = serializePublicKey(lowLevelPublicKey);
+      const serializedPublicKey = this.keyAsn1Serializer.serializePublicKey(lowLevelPublicKey);
       const identifier = this.calculateKeypairIdentifier(
         serializedPublicKey,
         this.useSha256Identifiers,
       );
-      return new VirgilPrivateKey(identifier, serializedPrivateKey);
+      return new VirgilPrivateKey(identifier, lowLevelPrivateKey);
     } finally {
-      lowLevelPrivateKey.delete();
       lowLevelPublicKey.delete();
+      keyProvider.delete();
     }
   }
 
   exportPrivateKey(privateKey: VirgilPrivateKey) {
+    this.throwUnlessDisposed();
     validatePrivateKey(privateKey);
-    const lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
-
-    try {
-      const serializedPrivateKey = serializePrivateKey(lowLevelPrivateKey);
-      return toBuffer(serializedPrivateKey);
-    } finally {
-      lowLevelPrivateKey.delete();
-    }
+    return toBuffer(this.keyAsn1Serializer.serializePrivateKey(privateKey.lowLevelPrivateKey));
   }
 
   importPublicKey(rawPublicKey: Data) {
+    this.throwUnlessDisposed();
+
     const serializedPublicKey = dataToUint8Array(rawPublicKey, 'base64');
 
-    const lowLevelPublicKey = importPublicKey(serializedPublicKey);
+    const keyProvider = new this.foundationModules.KeyProvider();
+    try {
+      keyProvider.setupDefaults();
+    } catch (error) {
+      keyProvider.delete();
+      throw error;
+    }
 
+    const lowLevelPublicKey = keyProvider.importPublicKey(serializedPublicKey);
     const identifier = this.calculateKeypairIdentifier(
       serializedPublicKey,
       this.useSha256Identifiers,
     );
 
-    lowLevelPublicKey.delete();
+    keyProvider.delete();
 
-    return new VirgilPublicKey(identifier, serializedPublicKey);
+    return new VirgilPublicKey(identifier, lowLevelPublicKey);
   }
 
   exportPublicKey(publicKey: VirgilPublicKey) {
-    return toBuffer(publicKey.key);
+    this.throwUnlessDisposed();
+    return toBuffer(this.keyAsn1Serializer.serializePublicKey(publicKey.lowLevelPublicKey));
   }
 
   encrypt(data: Data, publicKey: VirgilPublicKey | VirgilPublicKey[]) {
+    this.throwUnlessDisposed();
+
     const myData = dataToUint8Array(data, 'utf8');
 
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
-    const lowLevelPublicKeys = getLowLevelPublicKeys(publicKeys);
 
     const recipientCipher = new this.foundationModules.RecipientCipher();
     const aes256Gcm = new this.foundationModules.Aes256Gcm();
@@ -205,7 +237,7 @@ export class VirgilCrypto implements ICrypto {
     recipientCipher.random = this.random;
 
     publicKeys.forEach(({ identifier }, index) => {
-      recipientCipher.addKeyRecipient(identifier, lowLevelPublicKeys[index]);
+      recipientCipher.addKeyRecipient(identifier, publicKeys[index].lowLevelPublicKey);
     });
 
     try {
@@ -217,15 +249,15 @@ export class VirgilCrypto implements ICrypto {
     } finally {
       recipientCipher.delete();
       aes256Gcm.delete();
-      lowLevelPublicKeys.forEach(lowLevelPublicKey => lowLevelPublicKey.delete());
     }
   }
 
   decrypt(encryptedData: Data, privateKey: VirgilPrivateKey) {
+    this.throwUnlessDisposed();
+
     const myData = dataToUint8Array(encryptedData, 'base64');
 
     validatePrivateKey(privateKey);
-    const lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
 
     const recipientCipher = new this.foundationModules.RecipientCipher();
     recipientCipher.random = this.random;
@@ -233,14 +265,13 @@ export class VirgilCrypto implements ICrypto {
     try {
       recipientCipher.startDecryptionWithKey(
         privateKey.identifier,
-        lowLevelPrivateKey,
+        privateKey.lowLevelPrivateKey,
         new Uint8Array(0),
       );
       const processDecryption = recipientCipher.processDecryption(myData);
       const finishDecryption = recipientCipher.finishDecryption();
       return NodeBuffer.concat([processDecryption, finishDecryption]);
     } finally {
-      lowLevelPrivateKey.delete();
       recipientCipher.delete();
     }
   }
@@ -271,25 +302,18 @@ export class VirgilCrypto implements ICrypto {
   }
 
   extractPublicKey(privateKey: VirgilPrivateKey) {
+    this.throwUnlessDisposed();
     validatePrivateKey(privateKey);
-
-    const lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
-    const lowLevelPublicKey = lowLevelPrivateKey.extractPublicKey();
-
-    try {
-      const serializedPublicKey = serializePublicKey(lowLevelPublicKey);
-      return new VirgilPublicKey(privateKey.identifier, serializedPublicKey);
-    } finally {
-      lowLevelPrivateKey.delete();
-      lowLevelPublicKey.delete();
-    }
+    const lowLevelPublicKey = privateKey.lowLevelPrivateKey.extractPublicKey();
+    return new VirgilPublicKey(privateKey.identifier, lowLevelPublicKey);
   }
 
   calculateSignature(data: Data, privateKey: VirgilPrivateKey) {
+    this.throwUnlessDisposed();
+
     const myData = dataToUint8Array(data, 'utf8');
 
     validatePrivateKey(privateKey);
-    const lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
 
     const signer = new this.foundationModules.Signer();
     const sha512 = new this.foundationModules.Sha512();
@@ -298,36 +322,34 @@ export class VirgilCrypto implements ICrypto {
     signer.reset();
     signer.appendData(myData);
     try {
-      const signature = signer.sign(lowLevelPrivateKey);
+      const signature = signer.sign(privateKey.lowLevelPrivateKey);
       return toBuffer(signature);
     } finally {
       signer.delete();
       sha512.delete();
-      lowLevelPrivateKey.delete();
     }
   }
 
   verifySignature(data: Data, signature: Data, publicKey: VirgilPublicKey) {
+    this.throwUnlessDisposed();
+
     const myData = dataToUint8Array(data, 'utf8');
     const mySignature = dataToUint8Array(signature, 'base64');
 
     validatePublicKey(publicKey);
-    const lowLevelPublicKey = importPublicKey(publicKey.key);
 
     const verifier = new this.foundationModules.Verifier();
     try {
       verifier.reset(mySignature);
     } catch (error) {
-      lowLevelPublicKey.delete();
       verifier.delete();
       throw error;
     }
     verifier.appendData(myData);
 
-    const result = verifier.verify(lowLevelPublicKey);
+    const result = verifier.verify(publicKey.lowLevelPublicKey);
 
     verifier.delete();
-    lowLevelPublicKey.delete();
 
     return result;
   }
@@ -337,13 +359,14 @@ export class VirgilCrypto implements ICrypto {
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
   ) {
+    this.throwUnlessDisposed();
+
     const myData = dataToUint8Array(data, 'utf8');
 
     validatePrivateKey(privateKey);
 
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
-    const lowLevelPublicKeys = getLowLevelPublicKeys(publicKeys);
 
     const recipientCipher = new this.foundationModules.RecipientCipher();
     const aes256Gcm = new this.foundationModules.Aes256Gcm();
@@ -351,7 +374,7 @@ export class VirgilCrypto implements ICrypto {
     recipientCipher.random = this.random;
 
     publicKeys.forEach(({ identifier }, index) => {
-      recipientCipher.addKeyRecipient(identifier, lowLevelPublicKeys[index]);
+      recipientCipher.addKeyRecipient(identifier, publicKeys[index].lowLevelPublicKey);
     });
 
     const messageInfoCustomParams = recipientCipher.customParams();
@@ -368,7 +391,6 @@ export class VirgilCrypto implements ICrypto {
       const finishEncryption = recipientCipher.finishEncryption();
       return NodeBuffer.concat([messageInfo, processEncryption, finishEncryption]);
     } finally {
-      lowLevelPublicKeys.forEach(lowLevelPublicKey => lowLevelPublicKey.delete());
       recipientCipher.delete();
       aes256Gcm.delete();
       messageInfoCustomParams.delete();
@@ -380,13 +402,14 @@ export class VirgilCrypto implements ICrypto {
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
   ) {
+    this.throwUnlessDisposed();
+
     const myEncryptedData = dataToUint8Array(encryptedData, 'base64');
 
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
 
     validatePrivateKey(privateKey);
-    const lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
 
     const recipientCipher = new this.foundationModules.RecipientCipher();
     recipientCipher.random = this.random;
@@ -395,14 +418,13 @@ export class VirgilCrypto implements ICrypto {
     try {
       recipientCipher.startDecryptionWithKey(
         privateKey.identifier,
-        lowLevelPrivateKey,
+        privateKey.lowLevelPrivateKey,
         new Uint8Array(0),
       );
       const processDecryption = recipientCipher.processDecryption(myEncryptedData);
       const finishDecryption = recipientCipher.finishDecryption();
       decryptedData = NodeBuffer.concat([processDecryption, finishDecryption]);
     } catch (error) {
-      lowLevelPrivateKey.delete();
       recipientCipher.delete();
       throw error;
     }
@@ -417,7 +439,6 @@ export class VirgilCrypto implements ICrypto {
       try {
         signerId = messageInfoCustomParams.findData(DATA_SIGNER_ID_KEY);
       } catch (error) {
-        lowLevelPrivateKey.delete();
         recipientCipher.delete();
         messageInfoCustomParams.delete();
         throw error;
@@ -429,7 +450,6 @@ export class VirgilCrypto implements ICrypto {
         }
       }
       if (!signerPublicKey) {
-        lowLevelPrivateKey.delete();
         recipientCipher.delete();
         messageInfoCustomParams.delete();
         throw new Error('Signer not found');
@@ -444,13 +464,13 @@ export class VirgilCrypto implements ICrypto {
       }
       return decryptedData;
     } finally {
-      lowLevelPrivateKey.delete();
       recipientCipher.delete();
       messageInfoCustomParams.delete();
     }
   }
 
   getRandomBytes(length: number) {
+    this.throwUnlessDisposed();
     const bytes = this.random.random(length);
     return toBuffer(bytes);
   }
@@ -460,13 +480,14 @@ export class VirgilCrypto implements ICrypto {
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
   ) {
+    this.throwUnlessDisposed();
+
     const myData = dataToUint8Array(data, 'utf8');
 
     validatePrivateKey(privateKey);
 
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
-    const lowLevelPublicKeys = getLowLevelPublicKeys(publicKeys);
 
     const recipientCipher = new this.foundationModules.RecipientCipher();
     const aes256Gcm = new this.foundationModules.Aes256Gcm();
@@ -474,7 +495,7 @@ export class VirgilCrypto implements ICrypto {
     recipientCipher.random = this.random;
 
     publicKeys.forEach(({ identifier }, index) => {
-      recipientCipher.addKeyRecipient(identifier, lowLevelPublicKeys[index]);
+      recipientCipher.addKeyRecipient(identifier, publicKeys[index].lowLevelPublicKey);
     });
 
     const messageInfoCustomParams = recipientCipher.customParams();
@@ -493,7 +514,6 @@ export class VirgilCrypto implements ICrypto {
       const metadata = toBuffer(messageInfo);
       return { encryptedData, metadata };
     } finally {
-      lowLevelPublicKeys.forEach(lowLevelPublicKey => lowLevelPublicKey.delete());
       recipientCipher.delete();
       aes256Gcm.delete();
       messageInfoCustomParams.delete();
@@ -506,11 +526,12 @@ export class VirgilCrypto implements ICrypto {
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
   ) {
+    this.throwUnlessDisposed();
+
     const myEncryptedData = dataToUint8Array(encryptedData, 'base64');
     const myMetadata = dataToUint8Array(metadata, 'base64');
 
     validatePrivateKey(privateKey);
-    const lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
 
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
@@ -520,12 +541,15 @@ export class VirgilCrypto implements ICrypto {
 
     let decryptedData: BufferType;
     try {
-      recipientCipher.startDecryptionWithKey(privateKey.identifier, lowLevelPrivateKey, myMetadata);
+      recipientCipher.startDecryptionWithKey(
+        privateKey.identifier,
+        privateKey.lowLevelPrivateKey,
+        myMetadata,
+      );
       const processDecryption = recipientCipher.processDecryption(myEncryptedData);
       const finishDecryption = recipientCipher.finishDecryption();
       decryptedData = NodeBuffer.concat([processDecryption, finishDecryption]);
     } catch (error) {
-      lowLevelPrivateKey.delete();
       recipientCipher.delete();
       throw error;
     }
@@ -540,7 +564,6 @@ export class VirgilCrypto implements ICrypto {
       try {
         signerId = messageInfoCustomParams.findData(DATA_SIGNER_ID_KEY);
       } catch (error) {
-        lowLevelPrivateKey.delete();
         recipientCipher.delete();
         messageInfoCustomParams.delete();
         throw error;
@@ -552,7 +575,6 @@ export class VirgilCrypto implements ICrypto {
         }
       }
       if (!signerPublicKey) {
-        lowLevelPrivateKey.delete();
         recipientCipher.delete();
         messageInfoCustomParams.delete();
         throw new Error('Signer not found');
@@ -567,29 +589,34 @@ export class VirgilCrypto implements ICrypto {
       }
       return decryptedData;
     } finally {
-      lowLevelPrivateKey.delete();
       recipientCipher.delete();
       messageInfoCustomParams.delete();
     }
   }
 
   createStreamCipher(publicKey: VirgilPublicKey | VirgilPublicKey[], signature?: Data) {
+    this.throwUnlessDisposed();
     return new VirgilStreamCipher(publicKey, signature);
   }
 
   createStreamDecipher(privateKey: VirgilPrivateKey) {
+    this.throwUnlessDisposed();
     return new VirgilStreamDecipher(privateKey);
   }
 
   createStreamSigner() {
+    this.throwUnlessDisposed();
     return new VirgilStreamSigner();
   }
 
   createStreamVerifier(signature: Data) {
+    this.throwUnlessDisposed();
     return new VirgilStreamVerifier(signature);
   }
 
   generateGroupSession(groupId: Data): IGroupSession {
+    this.throwUnlessDisposed();
+
     const groupIdBytes = dataToUint8Array(groupId, 'utf8');
     this.validateGroupId(groupIdBytes);
     const sessionId = computeSessionId(groupIdBytes);
@@ -601,6 +628,8 @@ export class VirgilCrypto implements ICrypto {
   }
 
   importGroupSession(epochMessages: Data[]): IGroupSession {
+    this.throwUnlessDisposed();
+
     if (!Array.isArray(epochMessages)) {
       throw new TypeError('Epoch messages must be an array.');
     }
@@ -613,6 +642,7 @@ export class VirgilCrypto implements ICrypto {
   }
 
   calculateGroupSessionId(groupId: Data) {
+    this.throwUnlessDisposed();
     const groupIdBytes = dataToUint8Array(groupId, 'utf8');
     this.validateGroupId(groupIdBytes);
     return toBuffer(computeSessionId(groupIdBytes)).toString('hex');
@@ -642,5 +672,13 @@ export class VirgilCrypto implements ICrypto {
       return this.createHash(serializedPublicKey, this.foundationModules.Sha256);
     }
     return this.createHash(serializedPublicKey, this.foundationModules.Sha512).slice(0, 8);
+  }
+
+  private throwUnlessDisposed() {
+    if (this._isDisposed) {
+      throw new Error(
+        'Cannot use an instance of `VirgilCrypto` class after the `dispose` method has been called.',
+      );
+    }
   }
 }

@@ -1,15 +1,13 @@
 import { dataToUint8Array } from '@virgilsecurity/data-utils';
 
 import { getFoundationModules } from './foundationModules';
-import { importPublicKey } from './keyProvider';
 import { Data } from './types';
 import { validatePublicKey } from './validators';
 import { VirgilPublicKey } from './VirgilPublicKey';
 
 export class VirgilStreamVerifier {
   private isDisposed = false;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private verifier: any;
+  private verifier: FoundationModules.Verifier;
 
   constructor(signature: Data) {
     const foundationModules = getFoundationModules();
@@ -46,11 +44,8 @@ export class VirgilStreamVerifier {
     }
 
     validatePublicKey(publicKey);
-    const lowLevelPublicKey = importPublicKey(publicKey.key);
 
-    const result = this.verifier.verify(lowLevelPublicKey);
-
-    lowLevelPublicKey.delete();
+    const result = this.verifier.verify(publicKey.lowLevelPublicKey);
 
     if (final) {
       this.dispose();

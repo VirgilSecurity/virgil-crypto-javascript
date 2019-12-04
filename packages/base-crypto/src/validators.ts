@@ -1,4 +1,3 @@
-import { hasLowLevelPrivateKey } from './privateKeyUtils';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 import { VirgilPublicKey } from './VirgilPublicKey';
 
@@ -6,9 +5,13 @@ export function validatePrivateKey(privateKey: VirgilPrivateKey, label = 'privat
   if (
     privateKey == null ||
     !(privateKey.identifier instanceof Uint8Array) ||
-    !hasLowLevelPrivateKey(privateKey)
+    !(typeof privateKey.lowLevelPrivateKey === 'object') ||
+    !(typeof privateKey.isDisposed === 'boolean')
   ) {
     throw new TypeError(`\`${label}\` is not a VirgilPrivateKey.`);
+  }
+  if (privateKey.isDisposed) {
+    throw new Error(`Cannot use \`${label}\` after it was disposed.`);
   }
 }
 
@@ -16,9 +19,13 @@ export function validatePublicKey(publicKey: VirgilPublicKey, label = 'publicKey
   if (
     publicKey == null ||
     !(publicKey.identifier instanceof Uint8Array) ||
-    !(publicKey.key instanceof Uint8Array)
+    !(typeof publicKey.lowLevelPublicKey === 'object') ||
+    !(typeof publicKey.isDisposed === 'boolean')
   ) {
     throw new TypeError(`\`${label}\` is not a VirgilPublicKey.`);
+  }
+  if (publicKey.isDisposed) {
+    throw new Error(`Cannot use \`${label}\` after is was disposed.`);
   }
 }
 

@@ -2,43 +2,42 @@ import { dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 
 import { DATA_SIGNATURE_KEY } from './constants';
 import { getFoundationModules } from './foundationModules';
-import { getLowLevelPrivateKey } from './privateKeyUtils';
 import { Data } from './types';
 import { validatePrivateKey } from './validators';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 
 export class VirgilStreamDecipher {
-  isFinished = false;
-
+  private _isFinished = false;
   private isDisposed = false;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private recipientCipher: any;
+  private recipientCipher: FoundationModules.RecipientCipher;
+  private privateKey: VirgilPrivateKey;
 
-  private lowLevelPrivateKey: FoundationModules.PrivateKey;
+  get isFinished() {
+    return this._isFinished;
+  }
 
   constructor(privateKey: VirgilPrivateKey) {
     const foundationModules = getFoundationModules();
 
     validatePrivateKey(privateKey);
-    this.lowLevelPrivateKey = getLowLevelPrivateKey(privateKey);
+    this.privateKey = privateKey;
 
     this.recipientCipher = new foundationModules.RecipientCipher();
 
     try {
       this.recipientCipher.startDecryptionWithKey(
         privateKey.identifier,
-        this.lowLevelPrivateKey,
+        this.privateKey.lowLevelPrivateKey,
         new Uint8Array(0),
       );
     } catch (error) {
-      this.lowLevelPrivateKey.delete();
       this.recipientCipher.delete();
       throw error;
     }
   }
 
   getSignature() {
-    if (!this.isFinished) {
+    if (!this._isFinished) {
       throw new Error(
         'Illegal state. Cannot get signature before the `final` method has been called.',
       );
@@ -67,7 +66,7 @@ export class VirgilStreamDecipher {
     try {
       return toBuffer(this.recipientCipher.finishDecryption());
     } finally {
-      this.isFinished = true;
+      this._isFinished = true;
       if (dispose) {
         this.dispose();
       }
@@ -75,13 +74,12 @@ export class VirgilStreamDecipher {
   }
 
   dispose() {
-    this.lowLevelPrivateKey.delete();
     this.recipientCipher.delete();
     this.isDisposed = true;
   }
 
   private ensureLegalState() {
-    if (this.isFinished) {
+    if (this._isFinished) {
       throw new Error('Illegal state. Cannot use cipher after the `final` method has been called.');
     }
     if (this.isDisposed) {

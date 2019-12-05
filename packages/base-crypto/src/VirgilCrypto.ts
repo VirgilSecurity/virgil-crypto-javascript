@@ -30,7 +30,7 @@ export class VirgilCrypto implements ICrypto {
   readonly keyPairType = KeyPairType;
 
   private readonly foundationModules: typeof FoundationModules;
-  private readonly keyAsn1Serializer: FoundationModules.KeyAsn1Serializer;
+  private readonly keyProvider: FoundationModules.KeyProvider;
   private readonly random: FoundationModules.CtrDrbg;
   private _isDisposed: boolean;
 
@@ -41,11 +41,11 @@ export class VirgilCrypto implements ICrypto {
   constructor(options: VirgilCryptoOptions = {}) {
     this.foundationModules = getFoundationModules();
 
-    this.keyAsn1Serializer = new this.foundationModules.KeyAsn1Serializer();
+    this.keyProvider = new this.foundationModules.KeyProvider();
     try {
-      this.keyAsn1Serializer.setupDefaults();
+      this.keyProvider.setupDefaults();
     } catch (error) {
-      this.keyAsn1Serializer.delete();
+      this.keyProvider.delete();
       throw error;
     }
 
@@ -53,8 +53,8 @@ export class VirgilCrypto implements ICrypto {
     try {
       this.random.setupDefaults();
     } catch (error) {
-      this.keyAsn1Serializer.delete();
       this.random.delete();
+      this.keyProvider.delete();
       throw error;
     }
 
@@ -64,7 +64,7 @@ export class VirgilCrypto implements ICrypto {
   }
 
   dispose() {
-    this.keyAsn1Serializer.delete();
+    this.keyProvider.delete();
     this.random.delete();
     this._isDisposed = true;
   }
@@ -96,7 +96,7 @@ export class VirgilCrypto implements ICrypto {
     const lowLevelPublicKey = lowLevelPrivateKey.extractPublicKey();
 
     try {
-      const serializedPublicKey = this.keyAsn1Serializer.serializePublicKey(lowLevelPublicKey);
+      const serializedPublicKey = this.keyProvider.exportPublicKey(lowLevelPublicKey);
       const identifier = this.calculateKeypairIdentifier(
         serializedPublicKey,
         this.useSha256Identifiers,
@@ -144,7 +144,7 @@ export class VirgilCrypto implements ICrypto {
     const lowLevelPublicKey = lowLevelPrivateKey.extractPublicKey();
 
     try {
-      const serializedPublicKey = this.keyAsn1Serializer.serializePublicKey(lowLevelPublicKey);
+      const serializedPublicKey = this.keyProvider.exportPublicKey(lowLevelPublicKey);
       const identifier = this.calculateKeypairIdentifier(
         serializedPublicKey,
         this.useSha256Identifiers,
@@ -164,19 +164,11 @@ export class VirgilCrypto implements ICrypto {
 
     const serializedPrivateKey = dataToUint8Array(rawPrivateKey, 'base64');
 
-    const keyProvider = new this.foundationModules.KeyProvider();
-    try {
-      keyProvider.setupDefaults();
-    } catch (error) {
-      keyProvider.delete();
-      throw error;
-    }
-
-    const lowLevelPrivateKey = keyProvider.importPrivateKey(serializedPrivateKey);
+    const lowLevelPrivateKey = this.keyProvider.importPrivateKey(serializedPrivateKey);
     const lowLevelPublicKey = lowLevelPrivateKey.extractPublicKey();
 
     try {
-      const serializedPublicKey = this.keyAsn1Serializer.serializePublicKey(lowLevelPublicKey);
+      const serializedPublicKey = this.keyProvider.exportPublicKey(lowLevelPublicKey);
       const identifier = this.calculateKeypairIdentifier(
         serializedPublicKey,
         this.useSha256Identifiers,
@@ -184,43 +176,29 @@ export class VirgilCrypto implements ICrypto {
       return new VirgilPrivateKey(identifier, lowLevelPrivateKey);
     } finally {
       lowLevelPublicKey.delete();
-      keyProvider.delete();
     }
   }
 
   exportPrivateKey(privateKey: VirgilPrivateKey) {
     this.throwUnlessDisposed();
     validatePrivateKey(privateKey);
-    return toBuffer(this.keyAsn1Serializer.serializePrivateKey(privateKey.lowLevelPrivateKey));
+    return toBuffer(this.keyProvider.exportPrivateKey(privateKey.lowLevelPrivateKey));
   }
 
   importPublicKey(rawPublicKey: Data) {
     this.throwUnlessDisposed();
-
     const serializedPublicKey = dataToUint8Array(rawPublicKey, 'base64');
-
-    const keyProvider = new this.foundationModules.KeyProvider();
-    try {
-      keyProvider.setupDefaults();
-    } catch (error) {
-      keyProvider.delete();
-      throw error;
-    }
-
-    const lowLevelPublicKey = keyProvider.importPublicKey(serializedPublicKey);
+    const lowLevelPublicKey = this.keyProvider.importPublicKey(serializedPublicKey);
     const identifier = this.calculateKeypairIdentifier(
       serializedPublicKey,
       this.useSha256Identifiers,
     );
-
-    keyProvider.delete();
-
     return new VirgilPublicKey(identifier, lowLevelPublicKey);
   }
 
   exportPublicKey(publicKey: VirgilPublicKey) {
     this.throwUnlessDisposed();
-    return toBuffer(this.keyAsn1Serializer.serializePublicKey(publicKey.lowLevelPublicKey));
+    return toBuffer(this.keyProvider.exportPublicKey(publicKey.lowLevelPublicKey));
   }
 
   encrypt(data: Data, publicKey: VirgilPublicKey | VirgilPublicKey[]) {

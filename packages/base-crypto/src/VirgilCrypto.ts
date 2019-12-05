@@ -70,7 +70,7 @@ export class VirgilCrypto implements ICrypto {
   }
 
   generateKeys(type?: KeyPairTypeType[keyof KeyPairTypeType]) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
 
     const keyPairType = type ? type : this.defaultKeyPairType;
 
@@ -111,7 +111,7 @@ export class VirgilCrypto implements ICrypto {
   }
 
   generateKeysFromKeyMaterial(keyMaterial: Data, type?: KeyPairTypeType[keyof KeyPairTypeType]) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
 
     const keyPairType = type ? type : this.defaultKeyPairType;
     const myKeyMaterial = dataToUint8Array(keyMaterial, 'base64');
@@ -160,7 +160,7 @@ export class VirgilCrypto implements ICrypto {
   }
 
   importPrivateKey(rawPrivateKey: Data) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
 
     const serializedPrivateKey = dataToUint8Array(rawPrivateKey, 'base64');
 
@@ -180,13 +180,13 @@ export class VirgilCrypto implements ICrypto {
   }
 
   exportPrivateKey(privateKey: VirgilPrivateKey) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
     validatePrivateKey(privateKey);
     return toBuffer(this.keyProvider.exportPrivateKey(privateKey.lowLevelPrivateKey));
   }
 
   importPublicKey(rawPublicKey: Data) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
     const serializedPublicKey = dataToUint8Array(rawPublicKey, 'base64');
     const lowLevelPublicKey = this.keyProvider.importPublicKey(serializedPublicKey);
     const identifier = this.calculateKeypairIdentifier(
@@ -197,12 +197,12 @@ export class VirgilCrypto implements ICrypto {
   }
 
   exportPublicKey(publicKey: VirgilPublicKey) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
     return toBuffer(this.keyProvider.exportPublicKey(publicKey.lowLevelPublicKey));
   }
 
   encrypt(data: Data, publicKey: VirgilPublicKey | VirgilPublicKey[]) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
 
     const myData = dataToUint8Array(data, 'utf8');
 
@@ -231,7 +231,7 @@ export class VirgilCrypto implements ICrypto {
   }
 
   decrypt(encryptedData: Data, privateKey: VirgilPrivateKey) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
 
     const myData = dataToUint8Array(encryptedData, 'base64');
 
@@ -280,14 +280,14 @@ export class VirgilCrypto implements ICrypto {
   }
 
   extractPublicKey(privateKey: VirgilPrivateKey) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
     validatePrivateKey(privateKey);
     const lowLevelPublicKey = privateKey.lowLevelPrivateKey.extractPublicKey();
     return new VirgilPublicKey(privateKey.identifier, lowLevelPublicKey);
   }
 
   calculateSignature(data: Data, privateKey: VirgilPrivateKey) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
 
     const myData = dataToUint8Array(data, 'utf8');
 
@@ -309,7 +309,7 @@ export class VirgilCrypto implements ICrypto {
   }
 
   verifySignature(data: Data, signature: Data, publicKey: VirgilPublicKey) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
 
     const myData = dataToUint8Array(data, 'utf8');
     const mySignature = dataToUint8Array(signature, 'base64');
@@ -337,7 +337,7 @@ export class VirgilCrypto implements ICrypto {
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
   ) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
 
     const myData = dataToUint8Array(data, 'utf8');
 
@@ -380,7 +380,7 @@ export class VirgilCrypto implements ICrypto {
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
   ) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
 
     const myEncryptedData = dataToUint8Array(encryptedData, 'base64');
 
@@ -448,7 +448,7 @@ export class VirgilCrypto implements ICrypto {
   }
 
   getRandomBytes(length: number) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
     const bytes = this.random.random(length);
     return toBuffer(bytes);
   }
@@ -458,7 +458,7 @@ export class VirgilCrypto implements ICrypto {
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
   ) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
 
     const myData = dataToUint8Array(data, 'utf8');
 
@@ -504,7 +504,7 @@ export class VirgilCrypto implements ICrypto {
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
   ) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
 
     const myEncryptedData = dataToUint8Array(encryptedData, 'base64');
     const myMetadata = dataToUint8Array(metadata, 'base64');
@@ -573,27 +573,27 @@ export class VirgilCrypto implements ICrypto {
   }
 
   createStreamCipher(publicKey: VirgilPublicKey | VirgilPublicKey[], signature?: Data) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
     return new VirgilStreamCipher(publicKey, signature);
   }
 
   createStreamDecipher(privateKey: VirgilPrivateKey) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
     return new VirgilStreamDecipher(privateKey);
   }
 
   createStreamSigner() {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
     return new VirgilStreamSigner();
   }
 
   createStreamVerifier(signature: Data) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
     return new VirgilStreamVerifier(signature);
   }
 
   generateGroupSession(groupId: Data): IGroupSession {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
 
     const groupIdBytes = dataToUint8Array(groupId, 'utf8');
     this.validateGroupId(groupIdBytes);
@@ -606,7 +606,7 @@ export class VirgilCrypto implements ICrypto {
   }
 
   importGroupSession(epochMessages: Data[]): IGroupSession {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
 
     if (!Array.isArray(epochMessages)) {
       throw new TypeError('Epoch messages must be an array.');
@@ -620,7 +620,7 @@ export class VirgilCrypto implements ICrypto {
   }
 
   calculateGroupSessionId(groupId: Data) {
-    this.throwUnlessDisposed();
+    this.throwIfDisposed();
     const groupIdBytes = dataToUint8Array(groupId, 'utf8');
     this.validateGroupId(groupIdBytes);
     return toBuffer(computeSessionId(groupIdBytes)).toString('hex');
@@ -652,7 +652,7 @@ export class VirgilCrypto implements ICrypto {
     return this.createHash(serializedPublicKey, this.foundationModules.Sha512).slice(0, 8);
   }
 
-  private throwUnlessDisposed() {
+  private throwIfDisposed() {
     if (this._isDisposed) {
       throw new Error(
         'Cannot use an instance of `VirgilCrypto` class after the `dispose` method has been called.',

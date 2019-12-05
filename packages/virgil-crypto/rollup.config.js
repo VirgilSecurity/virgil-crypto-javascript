@@ -60,7 +60,7 @@ const createBrowserEntry = (target, cryptoType, format) => {
       replace({
         patterns: [
           {
-            match: /index\.ts$/,
+            match: /foundationModules\.ts$/,
             test: '@virgilsecurity/core-foundation',
             replace: foundationEntryPoint,
           },
@@ -112,7 +112,7 @@ const createNodeJsEntry = (cryptoType, format) => {
       replace({
         patterns: [
           {
-            match: /index\.ts$/,
+            match: /foundationModules\.ts$/,
             test: '@virgilsecurity/core-foundation',
             replace: foundationEntryPoint,
           },

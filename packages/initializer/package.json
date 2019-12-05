@@ -1,0 +1,34 @@
+{
+  "name": "@virgilsecurity/initializer",
+  "version": "0.1.0",
+  "description": "Initialization utility for our libraries",
+  "main": "./dist/initializer.cjs.js",
+  "module": "./dist/initializer.es.js",
+  "typings": "./dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "repository": "https://github.com/VirgilSecurity/virgil-crypto-javascript/tree/master/packages/initializer",
+  "author": "Virgil Security Inc. <support@virgilsecurity.com>",
+  "license": "BSD-3-Clause",
+  "scripts": {
+    "test": "mocha -r ts-node/register src/**/*.test.ts",
+    "build": "rollup -c",
+    "clean": "rimraf .rpt2_cache dist",
+    "prepare": "npm run clean && npm run build"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.6",
+    "@types/mocha": "^5.2.7",
+    "chai": "^4.2.0",
+    "mocha": "^6.2.2",
+    "rimraf": "^3.0.0",
+    "rollup": "^1.27.8",
+    "rollup-plugin-typescript2": "^0.25.3",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -11,7 +11,7 @@ const createEntry = format => ({
   input: path.join(sourcePath, 'index.ts'),
   output: {
     format,
-    file: path.join(outputPath, `initializer.${format}.js`),
+    file: path.join(outputPath, `init-utils.${format}.js`),
   },
   plugins: [typescript({ useTsconfigDeclarationDir: true })],
 });

@@ -1,14 +1,14 @@
 {
-  "name": "@virgilsecurity/initializer",
+  "name": "@virgilsecurity/init-utils",
   "version": "0.1.0",
-  "description": "Initialization utility for our libraries",
-  "main": "./dist/initializer.cjs.js",
-  "module": "./dist/initializer.es.js",
+  "description": "Initialization utility for Virgil Security Inc. libraries",
+  "main": "./dist/init-utils.cjs.js",
+  "module": "./dist/init-utils.es.js",
   "typings": "./dist/types/index.d.ts",
   "files": [
     "dist"
   ],
-  "repository": "https://github.com/VirgilSecurity/virgil-crypto-javascript/tree/master/packages/initializer",
+  "repository": "https://github.com/VirgilSecurity/virgil-crypto-javascript/tree/master/packages/init-utils",
   "author": "Virgil Security Inc. <support@virgilsecurity.com>",
   "license": "BSD-3-Clause",
   "scripts": {

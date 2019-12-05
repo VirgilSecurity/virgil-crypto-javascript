@@ -1,5 +1,5 @@
 import initPythiaModules from '@virgilsecurity/core-pythia';
-import { ModuleInitializer } from '@virgilsecurity/initializer';
+import { ModuleInitializer } from '@virgilsecurity/init-utils';
 
 import { PythiaModules } from './types';
 

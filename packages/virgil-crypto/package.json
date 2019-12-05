@@ -29,7 +29,7 @@
     "@virgilsecurity/core-foundation": "^0.3.2",
     "@virgilsecurity/crypto-types": "^0.2.0",
     "@virgilsecurity/data-utils": "^0.1.6",
-    "@virgilsecurity/initializer": "^0.1.0",
+    "@virgilsecurity/init-utils": "^0.1.0",
     "@virgilsecurity/sdk-crypto": "^0.4.5"
   },
   "devDependencies": {

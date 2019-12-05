@@ -1,5 +1,5 @@
 import initFoundationModules from '@virgilsecurity/core-foundation';
-import { ModuleInitializer } from '@virgilsecurity/initializer';
+import { ModuleInitializer } from '@virgilsecurity/init-utils';
 
 import { FoundationModules } from './types';
 

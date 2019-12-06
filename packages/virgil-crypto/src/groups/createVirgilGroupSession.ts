@@ -1,6 +1,6 @@
 import { toBuffer, dataToUint8Array } from '@virgilsecurity/data-utils';
 
-import { getFoundationModules } from '../foundationModules';
+import { foundationInitializer } from '../foundationModules';
 import { Data, IGroupSession } from '../types';
 import { validatePrivateKey, validatePublicKey } from '../validators';
 import { VirgilPrivateKey } from '../VirgilPrivateKey';
@@ -52,7 +52,7 @@ export function createVirgilGroupSession(epochMessages: Uint8Array[]): IGroupSes
 
       try {
         session = createLowLevelSession(epochMessages);
-        message = getFoundationModules().GroupSessionMessage.deserialize(encryptedDataBytes);
+        message = foundationInitializer.module.GroupSessionMessage.deserialize(encryptedDataBytes);
         return toBuffer(session.decrypt(message, verifyingPublicKey.lowLevelPublicKey));
       } finally {
         message && message.delete();

@@ -1,13 +1,13 @@
 import { toBuffer } from '@virgilsecurity/data-utils';
 
-import { getFoundationModules } from '../foundationModules';
+import { foundationInitializer } from '../foundationModules';
 import { IGroupSessionMessageInfo } from '../types';
 
 const getRandom = (() => {
   let random: FoundationModules.CtrDrbg | undefined;
   return () => {
     if (!random) {
-      random = new (getFoundationModules()).CtrDrbg();
+      random = new foundationInitializer.module.CtrDrbg();
       try {
         random.setupDefaults();
       } catch (error) {
@@ -21,7 +21,7 @@ const getRandom = (() => {
 })();
 
 export function parseGroupSessionMessage(messageData: Uint8Array): IGroupSessionMessageInfo {
-  const message = getFoundationModules().GroupSessionMessage.deserialize(messageData);
+  const message = foundationInitializer.module.GroupSessionMessage.deserialize(messageData);
   const info: IGroupSessionMessageInfo = {
     epochNumber: message.getEpoch(),
     sessionId: toBuffer(message.getSessionId()).toString('hex'),
@@ -32,20 +32,20 @@ export function parseGroupSessionMessage(messageData: Uint8Array): IGroupSession
 }
 
 export function getEpochNumberFromEpochMessage(epochMessageData: Uint8Array) {
-  const epoch = getFoundationModules().GroupSessionMessage.deserialize(epochMessageData);
+  const epoch = foundationInitializer.module.GroupSessionMessage.deserialize(epochMessageData);
   const epochNumber = epoch.getEpoch();
   epoch.delete();
   return epochNumber;
 }
 
 export function createLowLevelSession(epochMessages: Uint8Array[]) {
-  const session = new (getFoundationModules()).GroupSession();
+  const session = new foundationInitializer.module.GroupSession();
   session.rng = getRandom();
 
   const deleteQueue: FoundationModules.FoundationObject[] = [];
   try {
     for (const epochMessageData of epochMessages) {
-      const epoch = getFoundationModules().GroupSessionMessage.deserialize(epochMessageData);
+      const epoch = foundationInitializer.module.GroupSessionMessage.deserialize(epochMessageData);
       deleteQueue.push(epoch);
       session.addEpoch(epoch);
     }
@@ -59,7 +59,7 @@ export function createLowLevelSession(epochMessages: Uint8Array[]) {
 }
 
 export function computeSessionId(groupId: Uint8Array) {
-  const sha512 = new (getFoundationModules()).Sha512();
+  const sha512 = new foundationInitializer.module.Sha512();
   try {
     return sha512.hash(groupId).subarray(0, 32);
   } finally {
@@ -68,7 +68,7 @@ export function computeSessionId(groupId: Uint8Array) {
 }
 
 export function createInitialEpoch(sessionId: Uint8Array) {
-  const ticket = new (getFoundationModules()).GroupSessionTicket();
+  const ticket = new foundationInitializer.module.GroupSessionTicket();
   ticket.rng = getRandom();
   try {
     ticket.setupTicketAsNew(sessionId);

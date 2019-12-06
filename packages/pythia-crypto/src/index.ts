@@ -1,4 +1,3 @@
-export { initPythia } from './initPythia';
-export { getPythiaModules, hasPythiaModules, setPythiaModules } from './pythiaModules';
+export { getPythiaModules, hasPythiaModules, setPythiaModules, initPythia } from './pythiaModules';
 export { VirgilBrainKeyCrypto } from './VirgilBrainKeyCrypto';
 export { VirgilPythiaCrypto } from './VirgilPythiaCrypto';

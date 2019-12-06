@@ -1,6 +1,6 @@
 import { dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 
-import { getFoundationModules } from './foundationModules';
+import { foundationInitializer } from './foundationModules';
 import { Data } from './types';
 import { validatePrivateKey } from './validators';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
@@ -11,7 +11,7 @@ export class VirgilStreamSigner {
   private sha512: FoundationModules.Sha512;
 
   constructor() {
-    const foundationModules = getFoundationModules();
+    const foundationModules = foundationInitializer.module;
     this.signer = new foundationModules.Signer();
     this.sha512 = new foundationModules.Sha512();
     this.signer.hash = this.sha512;

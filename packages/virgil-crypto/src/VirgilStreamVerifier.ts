@@ -1,6 +1,6 @@
 import { dataToUint8Array } from '@virgilsecurity/data-utils';
 
-import { getFoundationModules } from './foundationModules';
+import { foundationInitializer } from './foundationModules';
 import { Data } from './types';
 import { validatePublicKey } from './validators';
 import { VirgilPublicKey } from './VirgilPublicKey';
@@ -10,7 +10,7 @@ export class VirgilStreamVerifier {
   private verifier: FoundationModules.Verifier;
 
   constructor(signature: Data) {
-    const foundationModules = getFoundationModules();
+    const foundationModules = foundationInitializer.module;
 
     const mySignature = dataToUint8Array(signature, 'base64');
 

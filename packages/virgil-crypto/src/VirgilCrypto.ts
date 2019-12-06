@@ -1,6 +1,9 @@
 import { NodeBuffer, dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
+
+import { createVirgilGroupSession } from './groups/createVirgilGroupSession';
+import { computeSessionId, createInitialEpoch } from './groups/helpers';
 import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
-import { getFoundationModules } from './foundationModules';
+import { foundationInitializer } from './foundationModules';
 import { HashAlgorithm, HashAlgorithmType } from './HashAlgorithm';
 import { KeyPairType, KeyPairTypeType } from './KeyPairType';
 import { ICrypto, NodeBuffer as BufferType, Data, IGroupSession } from './types';
@@ -12,8 +15,6 @@ import { VirgilStreamCipher } from './VirgilStreamCipher';
 import { VirgilStreamDecipher } from './VirgilStreamDecipher';
 import { VirgilStreamSigner } from './VirgilStreamSigner';
 import { VirgilStreamVerifier } from './VirgilStreamVerifier';
-import { computeSessionId, createInitialEpoch } from './groups/helpers';
-import { createVirgilGroupSession } from './groups/createVirgilGroupSession';
 
 export const MIN_GROUP_ID_BYTE_LENGTH = 10;
 
@@ -29,7 +30,6 @@ export class VirgilCrypto implements ICrypto {
   readonly hashAlgorithm = HashAlgorithm;
   readonly keyPairType = KeyPairType;
 
-  private readonly foundationModules: typeof FoundationModules;
   private readonly keyProvider: FoundationModules.KeyProvider;
   private readonly random: FoundationModules.CtrDrbg;
   private _isDisposed: boolean;
@@ -39,9 +39,7 @@ export class VirgilCrypto implements ICrypto {
   }
 
   constructor(options: VirgilCryptoOptions = {}) {
-    this.foundationModules = getFoundationModules();
-
-    this.keyProvider = new this.foundationModules.KeyProvider();
+    this.keyProvider = new foundationInitializer.module.KeyProvider();
     try {
       this.keyProvider.setupDefaults();
     } catch (error) {
@@ -49,7 +47,7 @@ export class VirgilCrypto implements ICrypto {
       throw error;
     }
 
-    this.random = new this.foundationModules.CtrDrbg();
+    this.random = new foundationInitializer.module.CtrDrbg();
     try {
       this.random.setupDefaults();
     } catch (error) {
@@ -74,14 +72,14 @@ export class VirgilCrypto implements ICrypto {
 
     const keyPairType = type ? type : this.defaultKeyPairType;
 
-    const keyProvider = new this.foundationModules.KeyProvider();
+    const keyProvider = new foundationInitializer.module.KeyProvider();
     try {
       keyProvider.setupDefaults();
     } catch (error) {
       keyProvider.delete();
       throw error;
     }
-    if (keyPairType.algId === this.foundationModules.AlgId.RSA) {
+    if (keyPairType.algId === foundationInitializer.module.AlgId.RSA) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       keyProvider.setRsaParams(keyPairType.bitlen!);
     }
@@ -116,10 +114,10 @@ export class VirgilCrypto implements ICrypto {
     const keyPairType = type ? type : this.defaultKeyPairType;
     const myKeyMaterial = dataToUint8Array(keyMaterial, 'base64');
 
-    const keyMaterialRng = new this.foundationModules.KeyMaterialRng();
+    const keyMaterialRng = new foundationInitializer.module.KeyMaterialRng();
     keyMaterialRng.resetKeyMaterial(myKeyMaterial);
 
-    const keyProvider = new this.foundationModules.KeyProvider();
+    const keyProvider = new foundationInitializer.module.KeyProvider();
     try {
       keyProvider.setupDefaults();
     } catch (error) {
@@ -128,7 +126,7 @@ export class VirgilCrypto implements ICrypto {
       throw error;
     }
     keyProvider.random = keyMaterialRng;
-    if (keyPairType.algId === this.foundationModules.AlgId.RSA) {
+    if (keyPairType.algId === foundationInitializer.module.AlgId.RSA) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       keyProvider.setRsaParams(keyPairType.bitlen!);
     }
@@ -209,8 +207,8 @@ export class VirgilCrypto implements ICrypto {
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
 
-    const recipientCipher = new this.foundationModules.RecipientCipher();
-    const aes256Gcm = new this.foundationModules.Aes256Gcm();
+    const recipientCipher = new foundationInitializer.module.RecipientCipher();
+    const aes256Gcm = new foundationInitializer.module.Aes256Gcm();
     recipientCipher.encryptionCipher = aes256Gcm;
     recipientCipher.random = this.random;
 
@@ -237,7 +235,7 @@ export class VirgilCrypto implements ICrypto {
 
     validatePrivateKey(privateKey);
 
-    const recipientCipher = new this.foundationModules.RecipientCipher();
+    const recipientCipher = new foundationInitializer.module.RecipientCipher();
     recipientCipher.random = this.random;
 
     try {
@@ -262,16 +260,16 @@ export class VirgilCrypto implements ICrypto {
     let result: Uint8Array;
     switch (algorithm) {
       case HashAlgorithm.SHA224:
-        result = this.createHash(myData, this.foundationModules.Sha224);
+        result = this.createHash(myData, foundationInitializer.module.Sha224);
         break;
       case HashAlgorithm.SHA256:
-        result = this.createHash(myData, this.foundationModules.Sha256);
+        result = this.createHash(myData, foundationInitializer.module.Sha256);
         break;
       case HashAlgorithm.SHA384:
-        result = this.createHash(myData, this.foundationModules.Sha384);
+        result = this.createHash(myData, foundationInitializer.module.Sha384);
         break;
       case HashAlgorithm.SHA512:
-        result = this.createHash(myData, this.foundationModules.Sha512);
+        result = this.createHash(myData, foundationInitializer.module.Sha512);
         break;
       default:
         throw new TypeError('Unknown hash algorithm');
@@ -293,8 +291,8 @@ export class VirgilCrypto implements ICrypto {
 
     validatePrivateKey(privateKey);
 
-    const signer = new this.foundationModules.Signer();
-    const sha512 = new this.foundationModules.Sha512();
+    const signer = new foundationInitializer.module.Signer();
+    const sha512 = new foundationInitializer.module.Sha512();
     signer.hash = sha512;
 
     signer.reset();
@@ -316,7 +314,7 @@ export class VirgilCrypto implements ICrypto {
 
     validatePublicKey(publicKey);
 
-    const verifier = new this.foundationModules.Verifier();
+    const verifier = new foundationInitializer.module.Verifier();
     try {
       verifier.reset(mySignature);
     } catch (error) {
@@ -346,8 +344,8 @@ export class VirgilCrypto implements ICrypto {
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
 
-    const recipientCipher = new this.foundationModules.RecipientCipher();
-    const aes256Gcm = new this.foundationModules.Aes256Gcm();
+    const recipientCipher = new foundationInitializer.module.RecipientCipher();
+    const aes256Gcm = new foundationInitializer.module.Aes256Gcm();
     recipientCipher.encryptionCipher = aes256Gcm;
     recipientCipher.random = this.random;
 
@@ -389,7 +387,7 @@ export class VirgilCrypto implements ICrypto {
 
     validatePrivateKey(privateKey);
 
-    const recipientCipher = new this.foundationModules.RecipientCipher();
+    const recipientCipher = new foundationInitializer.module.RecipientCipher();
     recipientCipher.random = this.random;
 
     let decryptedData: BufferType;
@@ -467,8 +465,8 @@ export class VirgilCrypto implements ICrypto {
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
 
-    const recipientCipher = new this.foundationModules.RecipientCipher();
-    const aes256Gcm = new this.foundationModules.Aes256Gcm();
+    const recipientCipher = new foundationInitializer.module.RecipientCipher();
+    const aes256Gcm = new foundationInitializer.module.Aes256Gcm();
     recipientCipher.encryptionCipher = aes256Gcm;
     recipientCipher.random = this.random;
 
@@ -514,7 +512,7 @@ export class VirgilCrypto implements ICrypto {
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
 
-    const recipientCipher = new this.foundationModules.RecipientCipher();
+    const recipientCipher = new foundationInitializer.module.RecipientCipher();
     recipientCipher.random = this.random;
 
     let decryptedData: BufferType;
@@ -647,9 +645,9 @@ export class VirgilCrypto implements ICrypto {
     useSha256Identifiers: boolean,
   ) {
     if (useSha256Identifiers) {
-      return this.createHash(serializedPublicKey, this.foundationModules.Sha256);
+      return this.createHash(serializedPublicKey, foundationInitializer.module.Sha256);
     }
-    return this.createHash(serializedPublicKey, this.foundationModules.Sha512).slice(0, 8);
+    return this.createHash(serializedPublicKey, foundationInitializer.module.Sha512).slice(0, 8);
   }
 
   private throwIfDisposed() {

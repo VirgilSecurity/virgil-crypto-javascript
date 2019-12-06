@@ -1,6 +1,6 @@
 import { dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 
-import { getPythiaModules } from './pythiaModules';
+import { pythiaInitializer } from './pythiaModules';
 import { Data, IPythiaTransformationKeyPair, IPythiaCrypto } from './types';
 import { VirgilBrainKeyCrypto } from './VirgilBrainKeyCrypto';
 
@@ -24,7 +24,7 @@ export class VirgilPythiaCrypto implements IPythiaCrypto {
     pythiaSecret: Data;
     pythiaScopeSecret: Data;
   }) {
-    const { Pythia } = getPythiaModules();
+    const { Pythia } = pythiaInitializer.module;
     const myTransformationKeyId = dataToUint8Array(options.transformationKeyId, 'base64');
     const myPythiaSecret = dataToUint8Array(options.pythiaSecret, 'base64');
     const myPythiaScopeSecret = dataToUint8Array(options.pythiaScopeSecret, 'base64');
@@ -43,7 +43,7 @@ export class VirgilPythiaCrypto implements IPythiaCrypto {
   }
 
   transform(options: { blindedPassword: Data; tweak: Data; transformationPrivateKey: Data }) {
-    const { Pythia } = getPythiaModules();
+    const { Pythia } = pythiaInitializer.module;
     const myBlindedPassword = dataToUint8Array(options.blindedPassword, 'base64');
     const myTweak = dataToUint8Array(options.tweak, 'base64');
     const myTransformationPrivateKey = dataToUint8Array(options.transformationPrivateKey, 'base64');
@@ -64,7 +64,7 @@ export class VirgilPythiaCrypto implements IPythiaCrypto {
     transformedTweak: Data;
     transformationKeyPair: IPythiaTransformationKeyPair;
   }) {
-    const { Pythia } = getPythiaModules();
+    const { Pythia } = pythiaInitializer.module;
     const myTransformedPassword = dataToUint8Array(options.transformedPassword, 'base64');
     const myBlindedPassword = dataToUint8Array(options.blindedPassword, 'base64');
     const myTransformedTweak = dataToUint8Array(options.transformedTweak, 'base64');
@@ -89,7 +89,7 @@ export class VirgilPythiaCrypto implements IPythiaCrypto {
     proofValueC: Data;
     proofValueU: Data;
   }) {
-    const { Pythia } = getPythiaModules();
+    const { Pythia } = pythiaInitializer.module;
     const myTransformedPassword = dataToUint8Array(options.transformedPassword, 'base64');
     const myBlindedPassword = dataToUint8Array(options.blindedPassword, 'base64');
     const myTweak = dataToUint8Array(options.tweak, 'base64');
@@ -110,7 +110,7 @@ export class VirgilPythiaCrypto implements IPythiaCrypto {
     oldTransformationPrivateKey: Data;
     newTransformationPrivateKey: Data;
   }) {
-    const { Pythia } = getPythiaModules();
+    const { Pythia } = pythiaInitializer.module;
     const myOldTransformationPrivateKey = dataToUint8Array(
       options.oldTransformationPrivateKey,
       'base64',
@@ -127,7 +127,7 @@ export class VirgilPythiaCrypto implements IPythiaCrypto {
   }
 
   updateDeblindedWithToken(options: { deblindedPassword: Data; updateToken: Data }) {
-    const { Pythia } = getPythiaModules();
+    const { Pythia } = pythiaInitializer.module;
     const myDeblindedPassword = dataToUint8Array(options.deblindedPassword, 'base64');
     const myUpdateToken = dataToUint8Array(options.updateToken, 'base64');
     const result = Pythia.updateDeblindedWithToken(myDeblindedPassword, myUpdateToken);

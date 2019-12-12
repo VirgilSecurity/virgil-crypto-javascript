@@ -8,6 +8,33 @@ declare namespace PheModules {
     reseed(): void;
   }
 
+  export interface Hash {
+    DIGEST_LEN: number;
+    BLOCK_LEN: number;
+    hash(data: Uint8Array): Uint8Array;
+    start(): void;
+    update(data: Uint8Array): void;
+    finish(): Uint8Array;
+  }
+
+  export interface Kdf {
+    derive(data: Uint8Array, keyLen: number): Uint8Array;
+  }
+
+  export interface SaltedKdf {
+    reset(salt: Uint8Array, iterationCount: number): void;
+    setInfo(info: Uint8Array): void;
+  }
+
+  export interface Mac {
+    digestLen(): number;
+    mac(key: Uint8Array, data: Uint8Array): Uint8Array;
+    start(key: Uint8Array): void;
+    update(data: Uint8Array): void;
+    finish(): Uint8Array;
+    reset(): void;
+  }
+
   export class PheCipher extends PheObject {
     random: Random;
     setupDefaults(): void;
@@ -66,6 +93,43 @@ declare namespace PheModules {
     rotateKeys(
       serverPrivateKey: Uint8Array,
     ): { newServerPrivateKey: Uint8Array; newServerPublicKey: Uint8Array; updateToken: Uint8Array };
+  }
+
+  export class CtrDrbg extends PheObject implements Random {
+    RESEED_INTERVAL: number;
+    ENTROPY_LEN: number;
+    random(dataLen: number): Uint8Array;
+    reseed(): void;
+    setupDefaults(): void;
+    enablePredictionResistance(): void;
+    setReseedInterval(interval: number): void;
+    setReseedInterval(len: number): void;
+  }
+
+  export class Hkdf extends PheObject implements Kdf, SaltedKdf {
+    hash: Hash;
+    derive(data: Uint8Array, keyLen: number): Uint8Array;
+    reset(salt: Uint8Array, iterationCount: number): void;
+    setInfo(info: Uint8Array): void;
+  }
+
+  export class Hmac extends PheObject implements Mac {
+    hash: Hash;
+    digestLen(): number;
+    mac(key: Uint8Array, data: Uint8Array): Uint8Array;
+    start(key: Uint8Array): void;
+    update(data: Uint8Array): void;
+    finish(): Uint8Array;
+    reset(): void;
+  }
+
+  export class Sha512 extends PheObject implements Hash {
+    DIGEST_LEN: number;
+    BLOCK_LEN: number;
+    hash(data: Uint8Array): Uint8Array;
+    start(): void;
+    update(data: Uint8Array): void;
+    finish(): Uint8Array;
   }
 }
 

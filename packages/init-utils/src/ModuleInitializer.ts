@@ -26,7 +26,7 @@ export class ModuleInitializer<T> {
     this.initializationFunction = initializationFunction;
   }
 
-  initialize(...args: any[]) {
+  initialize = (...args: any[]) => {
     if (!this.initializationPromise) {
       this.initializationPromise = this.initializationFunction(...args).then(module => {
         this._module = module;
@@ -34,9 +34,9 @@ export class ModuleInitializer<T> {
       });
     }
     return this.initializationPromise;
-  }
+  };
 
-  reset() {
+  reset = () => {
     this.initializationPromise = undefined;
-  }
+  };
 }

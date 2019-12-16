@@ -161,6 +161,18 @@ declare namespace FoundationModules {
     finish(): Uint8Array;
   }
 
+  export class MessageInfoEditor extends FoundationObject {
+    random: Random;
+    setupDefaults(): void;
+    unpack(messageInfoData: Uint8Array): void;
+    unlock(ownerRecipientId: Uint8Array, ownerPrivateKey: PrivateKey): void;
+    addKeyRecipient(recipientId: Uint8Array, publicKey: PublicKey): void;
+    removeKeyRecipient(recipientId: Uint8Array): boolean;
+    removeAll(): void;
+    packedLen(): number;
+    pack(): Uint8Array;
+  }
+
   export class MessageInfoCustomParams extends FoundationObject {
     addData(key: Uint8Array, value: Uint8Array): void;
     findData(key: Uint8Array): Uint8Array;
@@ -181,11 +193,16 @@ declare namespace FoundationModules {
   export class RecipientCipher extends FoundationObject {
     random: Random;
     encryptionCipher: Cipher;
+    signerHash: Hash;
+    hasKeyRecipient(hasKeyRecipient: Uint8Array): boolean;
     addKeyRecipient(recipientId: Uint8Array, publicKey: PublicKey): void;
     clearRecipients(): void;
+    addSigner(signerId: Uint8Array, privateKey: PrivateKey): void;
+    clearSigners(): void;
     customParams(): MessageInfoCustomParams;
-    messageInfoLen(): number;
     startEncryption(): void;
+    startSignedEncryption(dataSize: number): void;
+    messageInfoLen(): number;
     packMessageInfo(): Uint8Array;
     encryptionOutLen(dataLen: number): number;
     processEncryption(data: Uint8Array): Uint8Array;
@@ -195,9 +212,20 @@ declare namespace FoundationModules {
       privateKey: PrivateKey,
       messageInfo: Uint8Array,
     ): void;
+    startDecryptionWithKey(
+      recipientId: Uint8Array,
+      privateKey: PrivateKey,
+      messageInfo: Uint8Array,
+      messageInfoFooter: Uint8Array,
+    ): void;
     decryptionOutLen(dataLen: number): number;
     processDecryption(data: Uint8Array): Uint8Array;
     finishDecryption(): Uint8Array;
+    isDataSigned(): boolean;
+    signerInfos(): SignerInfoList;
+    verifySignerInfo(signerInfo: SignerInfo, publicKey: PublicKey): boolean;
+    messageInfoFooterLen(): number;
+    packMessageInfoFooter(): Uint8Array;
   }
 
   export class Signer extends FoundationObject {
@@ -207,6 +235,21 @@ declare namespace FoundationModules {
     appendData(data: Uint8Array): void;
     signatureLen(privateKey: PrivateKey): number;
     sign(privateKey: PrivateKey): Uint8Array;
+  }
+
+  export class SignerInfo extends FoundationObject {
+    signerId(): Uint8Array;
+    signature(): Uint8Array;
+  }
+
+  export class SignerInfoList extends FoundationObject {
+    hasItem(): boolean;
+    item(): SignerInfo;
+    hasNext(): boolean;
+    next(): SignerInfoList;
+    hasPrev(): boolean;
+    prev(): SignerInfoList;
+    clear(): void;
   }
 
   export class Verifier extends FoundationObject {

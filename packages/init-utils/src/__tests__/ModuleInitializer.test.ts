@@ -51,5 +51,34 @@ describe('ModuleInitializer', () => {
         expect.fail();
       }
     });
+
+    it('returns memoized promise', () => {
+      const module = {};
+      const initializer = new ModuleInitializer<typeof module>(() => Promise.resolve(module));
+      try {
+        const promise1 = initializer.initialize();
+        const promise2 = initializer.initialize();
+        expect(promise1).to.equal(promise2);
+      } catch (_) {
+        expect.fail();
+      }
+    });
+  });
+
+  describe('reset', () => {
+    it('resets the memoized promise', async () => {
+      const module = {};
+      const initializer = new ModuleInitializer<typeof module>(() => Promise.resolve(module));
+      try {
+        await initializer.initialize();
+        const promise1 = initializer.initialize();
+        initializer.reset();
+        await initializer.initialize();
+        const promise2 = initializer.initialize();
+        expect(promise1).not.to.equal(promise2);
+      } catch (_) {
+        expect.fail();
+      }
+    });
   });
 });

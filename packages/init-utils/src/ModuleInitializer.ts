@@ -1,6 +1,6 @@
 import { ModuleInitializerError } from './errors';
 
-type InitializationFunction<T> = () => Promise<T>;
+type InitializationFunction<T> = (...args: any[]) => Promise<T>;
 
 export class ModuleInitializer<T> {
   private readonly initializationFunction: InitializationFunction<T>;
@@ -19,11 +19,6 @@ export class ModuleInitializer<T> {
   }
 
   set module(module: T) {
-    if (console && console.warn) {
-      console.warn(
-        "Please prefer `initialize()` method over this setter. Otherwise we hope that you know what you're doing.",
-      );
-    }
     this._module = module;
   }
 
@@ -31,15 +26,17 @@ export class ModuleInitializer<T> {
     this.initializationFunction = initializationFunction;
   }
 
-  initialize = () => {
+  initialize(...args: any[]) {
     if (!this.initializationPromise) {
-      this.initializationPromise = this.initializationFunction().then(this.onInitialization);
+      this.initializationPromise = this.initializationFunction(...args).then(module => {
+        this._module = module;
+        return Promise.resolve();
+      });
     }
     return this.initializationPromise;
-  };
+  }
 
-  private onInitialization = (module: T) => {
-    this._module = module;
-    return Promise.resolve();
-  };
+  reset() {
+    this.initializationPromise = undefined;
+  }
 }

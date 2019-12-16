@@ -1,6 +1,6 @@
 {
   "name": "@virgilsecurity/core-phe",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Virgil PHE",
   "main": "./node.cjs.js",
   "module": "./node.es.js",

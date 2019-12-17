@@ -1,7 +1,15 @@
-export class ModuleInitializerError extends Error {
-  constructor(message: string) {
-    super(message);
-    Object.setPrototypeOf(this, ModuleInitializerError.prototype);
-    this.name = 'ModuleInitializerError';
+export class ModuleAlreadyExistsError extends Error {
+  constructor() {
+    super('Module already exists.');
+    Object.setPrototypeOf(this, ModuleAlreadyExistsError.prototype);
+    this.name = 'ModuleAlreadyExistsError';
+  }
+}
+
+export class ModuleNotFoundError extends Error {
+  constructor() {
+    super('Module not found.');
+    Object.setPrototypeOf(this, ModuleNotFoundError.prototype);
+    this.name = 'ModuleNotFoundError';
   }
 }

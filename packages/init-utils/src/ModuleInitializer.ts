@@ -1,45 +1,68 @@
-import { ModuleInitializerError } from './errors';
+import { ModuleAlreadyExistsError, ModuleNotFoundError } from './errors';
 
-type InitializationFunction<T> = () => Promise<T>;
+type InitializationFunction<T> = (...args: any[]) => Promise<T>;
 
-export class ModuleInitializer<T> {
-  private readonly initializationFunction: InitializationFunction<T>;
-  private initializationPromise: Promise<void> | undefined;
-  private _module: T | undefined;
+export class ModuleInitializer {
+  private readonly initFns = new Map<string, InitializationFunction<any>>();
+  private readonly initPromises = new Map<string, Promise<void>>();
+  private readonly modules = new Map<string, any>();
+  private loadModulesPromise: Promise<void> | undefined;
 
-  get isInitialized() {
-    return typeof this._module !== 'undefined';
-  }
-
-  get module() {
-    if (!this.isInitialized) {
-      throw new ModuleInitializerError('Cannot get module before it was initialized.');
+  addModule = <T>(name: string, initFn: InitializationFunction<T>) => {
+    if (this.initFns.has(name)) {
+      throw new ModuleAlreadyExistsError();
     }
-    return this._module as T;
-  }
-
-  set module(module: T) {
-    if (console && console.warn) {
-      console.warn(
-        "Please prefer `initialize()` method over this setter. Otherwise we hope that you know what you're doing.",
-      );
-    }
-    this._module = module;
-  }
-
-  constructor(initializationFunction: InitializationFunction<T>) {
-    this.initializationFunction = initializationFunction;
-  }
-
-  initialize = () => {
-    if (!this.initializationPromise) {
-      this.initializationPromise = this.initializationFunction().then(this.onInitialization);
-    }
-    return this.initializationPromise;
+    this.loadModulesPromise = undefined;
+    this.initFns.set(name, initFn);
   };
 
-  private onInitialization = (module: T) => {
-    this._module = module;
-    return Promise.resolve();
+  getModule = <T>(name: string) => {
+    if (!this.modules.has(name)) {
+      throw new ModuleNotFoundError();
+    }
+    return this.modules.get(name) as T;
+  };
+
+  hasModule = (name: string) => this.modules.has(name);
+
+  setModule = <T>(name: string, module: T) => {
+    this.modules.set(name, module);
+  };
+
+  removeModule = (name: string) => {
+    this.initFns.delete(name);
+    this.initPromises.delete(name);
+    this.modules.delete(name);
+  };
+
+  loadModule = (name: string, ...args: any[]) => {
+    if (!this.initFns.has(name)) {
+      throw new ModuleNotFoundError();
+    }
+    if (this.initPromises.has(name)) {
+      return this.initPromises.get(name)!;
+    }
+    const initPromise = this.initFns.get(name)!(...args).then(module => {
+      this.modules.set(name, module);
+      return Promise.resolve();
+    });
+    this.initPromises.set(name, initPromise);
+    return initPromise;
+  };
+
+  loadModules = (args?: { [name: string]: any[] }) => {
+    if (this.loadModulesPromise) {
+      return this.loadModulesPromise;
+    }
+    const myArgs = args || {};
+    const names = Array.from(this.initFns.keys());
+    const loadModules = names.map(name => {
+      if (myArgs[name]) {
+        return this.loadModule(name, ...myArgs[name]);
+      }
+      return this.loadModule(name);
+    });
+    this.loadModulesPromise = Promise.all(loadModules).then(() => Promise.resolve());
+    return this.loadModulesPromise;
   };
 }

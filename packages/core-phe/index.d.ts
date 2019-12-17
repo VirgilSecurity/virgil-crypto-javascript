@@ -56,6 +56,7 @@ declare namespace PheModules {
 
   export class PheClient extends PheObject {
     random: Random;
+    operationRandom: Random;
     setupDefaults(): void;
     setKeys(clientPrivateKey: Uint8Array, serverPublicKey: Uint8Array): void;
     generateClientPrivateKey(): Uint8Array;
@@ -79,6 +80,7 @@ declare namespace PheModules {
 
   export class PheServer extends PheObject {
     random: Random;
+    operationRandom: Random;
     setupDefaults(): void;
     generateServerKeyPair(): { serverPrivateKey: Uint8Array; serverPublicKey: Uint8Array };
     generateServerKeyPair(): number;

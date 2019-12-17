@@ -1,7 +1,7 @@
 import { dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 
 import { DATA_SIGNATURE_KEY } from './constants';
-import { foundationInitializer } from './foundationModules';
+import { getFoundationModules } from './foundationModules';
 import { Data } from './types';
 import { validatePrivateKey } from './validators';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
@@ -17,7 +17,7 @@ export class VirgilStreamDecipher {
   }
 
   constructor(privateKey: VirgilPrivateKey) {
-    const foundationModules = foundationInitializer.module;
+    const foundationModules = getFoundationModules();
 
     validatePrivateKey(privateKey);
     this.privateKey = privateKey;

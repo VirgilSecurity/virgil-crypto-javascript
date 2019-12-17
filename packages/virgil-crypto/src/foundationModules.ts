@@ -3,13 +3,13 @@ import { ModuleInitializer } from '@virgilsecurity/init-utils';
 
 import { FoundationModules } from './types';
 
-export const foundationInitializer = new ModuleInitializer<FoundationModules>(
-  initFoundationModules,
-);
+export const moduleInitializer = new ModuleInitializer();
+moduleInitializer.addModule<FoundationModules>('foundation', initFoundationModules);
 
-export const hasFoundationModules = () => foundationInitializer.isInitialized;
-export const getFoundationModules = () => foundationInitializer.module;
+export const hasFoundationModules = () => moduleInitializer.hasModule('foundation');
+export const getFoundationModules = () =>
+  moduleInitializer.getModule<FoundationModules>('foundation');
 export const setFoundationModules = (foundationModules: FoundationModules) => {
-  foundationInitializer.module = foundationModules;
+  moduleInitializer.setModule<FoundationModules>('foundation', foundationModules);
 };
-export const initCrypto = foundationInitializer.initialize;
+export const initCrypto = moduleInitializer.loadModules;

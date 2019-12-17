@@ -1,5 +1,5 @@
-import { foundationInitializer } from './foundationModules';
-import { IPublicKey } from './types';
+import { getFoundationModules } from './foundationModules';
+import { FoundationModules, IPublicKey } from './types';
 
 export class VirgilPublicKey implements IPublicKey {
   public readonly identifier: Uint8Array;
@@ -12,7 +12,7 @@ export class VirgilPublicKey implements IPublicKey {
   }
 
   get key() {
-    const foundationModules = foundationInitializer.module;
+    const foundationModules = getFoundationModules();
     const keyAsn1Serializer = new foundationModules.KeyAsn1Serializer();
     try {
       keyAsn1Serializer.setupDefaults();

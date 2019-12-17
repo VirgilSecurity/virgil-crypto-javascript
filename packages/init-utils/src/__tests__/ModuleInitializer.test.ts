@@ -1,84 +1,121 @@
 import { expect } from 'chai';
 
-import { ModuleInitializerError } from '../errors';
+import { ModuleAlreadyExistsError, ModuleNotFoundError } from '../errors';
 import { ModuleInitializer } from '../ModuleInitializer';
 
 describe('ModuleInitializer', () => {
-  describe('module', () => {
-    it('returns initialized module', async () => {
-      const module = {};
-      const initializer = new ModuleInitializer<typeof module>(() => Promise.resolve(module));
-      await initializer.initialize();
-      expect(initializer.module).to.equal(module);
-    });
+  let moduleInitializer: ModuleInitializer;
 
-    it('allows us to set the module', () => {
-      const module = {};
-      const initializer = new ModuleInitializer<typeof module>(() => Promise.resolve(module));
-      initializer.module = module;
-      expect(initializer.module).to.equal(module);
-    });
+  beforeEach(() => {
+    moduleInitializer = new ModuleInitializer();
+  });
 
-    it('throws `ModuleInitializerError` if module is not initialized', () => {
-      const module = {};
-      const initializer = new ModuleInitializer<typeof module>(() => Promise.resolve(module));
-      const error = () => initializer.module;
-      expect(error).to.throw(ModuleInitializerError);
+  describe('addModule', () => {
+    it("throws 'ModuleAlreadyExistsError' if module already added", () => {
+      const moduleName = 'module';
+      moduleInitializer.addModule(moduleName, () => Promise.resolve());
+      const error = () => moduleInitializer.addModule(moduleName, () => Promise.resolve());
+      expect(error).to.throw(ModuleAlreadyExistsError);
     });
   });
 
-  describe('isInitialized', () => {
-    it('returns true if module is initialized', async () => {
+  describe('getModule', () => {
+    it('returns the module', () => {
+      const moduleName = 'module';
       const module = {};
-      const initializer = new ModuleInitializer<typeof module>(() => Promise.resolve(module));
-      expect(initializer.isInitialized).to.be.false;
+      moduleInitializer.setModule(moduleName, module);
+      const result = moduleInitializer.getModule(moduleName);
+      expect(result).to.equal(module);
     });
 
-    it('returns false if module is not initialized', () => {
-      const module = {};
-      const initializer = new ModuleInitializer<typeof module>(() => Promise.resolve(module));
-      expect(initializer.isInitialized).to.be.false;
-    });
-  });
-
-  describe('initialize', () => {
-    it('initializes module successfully', async () => {
-      const module = {};
-      const initializer = new ModuleInitializer<typeof module>(() => Promise.resolve(module));
-      try {
-        await initializer.initialize();
-      } catch (_) {
-        expect.fail();
-      }
-    });
-
-    it('returns memoized promise', () => {
-      const module = {};
-      const initializer = new ModuleInitializer<typeof module>(() => Promise.resolve(module));
-      try {
-        const promise1 = initializer.initialize();
-        const promise2 = initializer.initialize();
-        expect(promise1).to.equal(promise2);
-      } catch (_) {
-        expect.fail();
-      }
+    it("throws 'ModuleNotFoundError' if module not found", () => {
+      const error = () => moduleInitializer.getModule('module');
+      expect(error).to.throw(ModuleNotFoundError);
     });
   });
 
-  describe('reset', () => {
-    it('resets the memoized promise', async () => {
-      const module = {};
-      const initializer = new ModuleInitializer<typeof module>(() => Promise.resolve(module));
+  describe('hasModule', () => {
+    it('returns true if module was found', () => {
+      const moduleName = 'module';
+      moduleInitializer.setModule(moduleName, {});
+      expect(moduleInitializer.hasModule(moduleName)).to.be.true;
+    });
+
+    it('returns false if module was not found', () => {
+      moduleInitializer.setModule('module1', {});
+      expect(moduleInitializer.hasModule('module2')).to.be.false;
+    });
+  });
+
+  describe('setModule', () => {
+    it('sets the module', () => {
+      const moduleName = 'module';
+      moduleInitializer.setModule(moduleName, {});
+      expect(moduleInitializer.hasModule(moduleName)).to.be.true;
+    });
+  });
+
+  describe('removeModule', () => {
+    it('removes the module', () => {
+      const moduleName = 'module';
+      moduleInitializer.setModule(moduleName, {});
+      moduleInitializer.removeModule(moduleName);
+      expect(moduleInitializer.hasModule(moduleName)).to.be.false;
+    });
+  });
+
+  describe('loadModule', () => {
+    it('returns memoized promise', async () => {
+      const moduleName = 'module';
+      moduleInitializer.addModule(moduleName, () => Promise.resolve());
+      const promise1 = moduleInitializer.loadModule(moduleName);
+      await moduleInitializer.loadModule(moduleName);
+      const promise2 = moduleInitializer.loadModule(moduleName);
+      expect(promise1).to.equal(promise2);
+    });
+
+    it("throws 'ModuleNotFoundError' if module was removed", async () => {
+      const moduleName = 'module';
+      moduleInitializer.addModule(moduleName, () => Promise.resolve());
+      moduleInitializer.removeModule(moduleName);
       try {
-        await initializer.initialize();
-        const promise1 = initializer.initialize();
-        initializer.reset();
-        await initializer.initialize();
-        const promise2 = initializer.initialize();
-        expect(promise1).not.to.equal(promise2);
-      } catch (_) {
-        expect.fail();
+        await moduleInitializer.loadModule(moduleName);
+      } catch (error) {
+        expect(error).to.be.instanceOf(ModuleNotFoundError);
       }
+    });
+  });
+
+  describe('loadModules', () => {
+    it('loads all modules', async () => {
+      const module1Name = 'module1';
+      const module1 = {};
+      const module2Name = 'module2';
+      const module2 = {};
+      moduleInitializer.addModule(module1Name, () => Promise.resolve(module1));
+      moduleInitializer.addModule(module2Name, () => Promise.resolve(module2));
+      await moduleInitializer.loadModules();
+      expect(moduleInitializer.getModule(module1Name)).to.equal(module1);
+      expect(moduleInitializer.getModule(module2Name)).to.equal(module2);
+    });
+
+    it('returns memoized promise', async () => {
+      moduleInitializer.addModule('module1', () => Promise.resolve());
+      moduleInitializer.addModule('module2', () => Promise.resolve());
+      const promise1 = moduleInitializer.loadModules();
+      await moduleInitializer.loadModules();
+      const promise2 = moduleInitializer.loadModules();
+      expect(promise1).to.equal(promise2);
+    });
+
+    it('returns new promise if called after new module was added', async () => {
+      moduleInitializer.addModule('module1', () => Promise.resolve());
+      moduleInitializer.addModule('module2', () => Promise.resolve());
+      await moduleInitializer.loadModules();
+      const promise1 = moduleInitializer.loadModules();
+      moduleInitializer.addModule('module3', () => Promise.resolve());
+      const promise2 = moduleInitializer.loadModules();
+      expect(promise1).not.to.equal(promise2);
     });
   });
 });

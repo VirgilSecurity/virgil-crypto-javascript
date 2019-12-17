@@ -1,5 +1,6 @@
 export * from '@virgilsecurity/sdk-crypto';
 export {
+  moduleInitializer,
   getFoundationModules,
   hasFoundationModules,
   setFoundationModules,

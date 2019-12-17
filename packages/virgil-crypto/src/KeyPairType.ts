@@ -1,4 +1,5 @@
-import { foundationInitializer } from './foundationModules';
+import { moduleInitializer } from './foundationModules';
+import { FoundationModules } from './types';
 
 const addKeyPairType = (
   obj: {},
@@ -10,7 +11,7 @@ const addKeyPairType = (
     configurable: false,
     enumerable: true,
     get: () => {
-      const { AlgId } = foundationInitializer.module;
+      const { AlgId } = moduleInitializer.getModule<FoundationModules>('foundation');
       return {
         bitlen,
         algId: AlgId[algIdName] as number,

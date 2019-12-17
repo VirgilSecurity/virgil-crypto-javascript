@@ -2,7 +2,7 @@ import { expect } from 'chai';
 
 import initFoundation from '@virgilsecurity/core-foundation';
 
-import { foundationInitializer } from '../foundationModules';
+import { hasFoundationModules, setFoundationModules } from '../foundationModules';
 import { VirgilCrypto } from '../VirgilCrypto';
 import { VirgilPrivateKey } from '../VirgilPrivateKey';
 
@@ -11,13 +11,13 @@ describe('VirgilStreamDecipher', () => {
 
   before(() => {
     return new Promise(resolve => {
-      if (foundationInitializer.isInitialized) {
+      if (hasFoundationModules()) {
         virgilCrypto = new VirgilCrypto();
         return resolve();
       }
 
       initFoundation().then(foundationModules => {
-        foundationInitializer.module = foundationModules;
+        setFoundationModules(foundationModules);
         virgilCrypto = new VirgilCrypto();
         resolve();
       });

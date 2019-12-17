@@ -3,7 +3,8 @@ import { ModuleInitializer } from '@virgilsecurity/init-utils';
 
 import { PythiaModules } from './types';
 
-export const pythiaInitializer = new ModuleInitializer<PythiaModules>(async () => {
+export const moduleInitializer = new ModuleInitializer();
+moduleInitializer.addModule<PythiaModules>('pythia', async () => {
   const pythiaModules = await initPythiaModules();
   try {
     pythiaModules.Pythia.configure();
@@ -14,9 +15,9 @@ export const pythiaInitializer = new ModuleInitializer<PythiaModules>(async () =
   return pythiaModules;
 });
 
-export const hasPythiaModules = () => pythiaInitializer.isInitialized;
-export const getPythiaModules = () => pythiaInitializer.module;
+export const hasPythiaModules = () => moduleInitializer.hasModule('pythia');
+export const getPythiaModules = () => moduleInitializer.getModule<PythiaModules>('pythia');
 export const setPythiaModules = (pythiaModules: PythiaModules) => {
-  pythiaInitializer.module = pythiaModules;
+  moduleInitializer.setModule<PythiaModules>('pythia', pythiaModules);
 };
-export const initPythia = pythiaInitializer.initialize;
+export const initPythia = moduleInitializer.loadModules;

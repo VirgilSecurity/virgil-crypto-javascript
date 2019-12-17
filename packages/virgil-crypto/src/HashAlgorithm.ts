@@ -1,4 +1,5 @@
-import { foundationInitializer } from './foundationModules';
+import { getFoundationModules } from './foundationModules';
+import { FoundationModules } from './types';
 
 export interface HashAlgorithmType {
   SHA224: number;
@@ -13,7 +14,7 @@ const addHashAlgorithm = (obj: any, algIdName: keyof typeof FoundationModules.Al
     configurable: false,
     enumerable: true,
     get: () => {
-      const { AlgId } = foundationInitializer.module;
+      const { AlgId } = getFoundationModules();
       return AlgId[algIdName] as number;
     },
   });

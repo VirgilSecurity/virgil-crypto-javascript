@@ -8,16 +8,20 @@ declare namespace FoundationModules {
     KDF1 = 5,
     KDF2 = 6,
     RSA = 7,
-    ECC = 8,
-    ED25519 = 9,
-    CURVE25519 = 10,
-    SECP256R1 = 11,
-    AES256_GCM = 12,
-    AES256_CBC = 13,
-    HMAC = 14,
-    HKDF = 15,
-    PKCS5_PBKDF2 = 16,
-    PKCS5_PBES2 = 17,
+    ED25519 = 8,
+    CURVE25519 = 9,
+    SECP256R1 = 10,
+    AES256_GCM = 11,
+    AES256_CBC = 12,
+    HMAC = 13,
+    HKDF = 14,
+    PKCS5_PBKDF2 = 15,
+    PKCS5_PBES2 = 16,
+    COMPOUND_KEY = 17,
+    HYBRID_KEY = 18,
+    FALCON = 19,
+    ROUND5_ND_5KEM_5D = 20,
+    RANDOM_PADDING = 21,
   }
 
   export enum GroupMsgType {
@@ -46,6 +50,48 @@ declare namespace FoundationModules {
   }
 
   export interface PublicKey extends FoundationObject, Key {}
+
+  export class PaddingParams extends FoundationObject {
+    static DEFAULT_FRAME_MIN: number;
+    DEFAULT_FRAME_MIN: number;
+    static DEFAULT_FRAME: number;
+    DEFAULT_FRAME: number;
+    static DEFAULT_FRAME_MAX: number;
+    DEFAULT_FRAME_MAX: number;
+    static newWithConstraints(frame: number, frameMax: number): PaddingParams;
+    frame(): number;
+    frameMax(): number;
+  }
+
+  export interface Padding extends FoundationObject {
+    configure(params: PaddingParams): void;
+    paddedDataLen(dataLen: number): number;
+    len(): number;
+    lenMax(): number;
+    startDataProcessing(): void;
+    processData(data: Uint8Array): Uint8Array;
+    finishDataProcessing(): Uint8Array;
+    startPaddedDataProcessing(): void;
+    processPaddedData(data: Uint8Array): Uint8Array;
+    finishPaddedDataProcessingOutLen(): number;
+    finishPaddedDataProcessing(): Uint8Array;
+  }
+
+  export class RandomPadding implements Padding {
+    random: Random;
+    delete(): void;
+    configure(params: PaddingParams): void;
+    paddedDataLen(dataLen: number): number;
+    len(): number;
+    lenMax(): number;
+    startDataProcessing(): void;
+    processData(data: Uint8Array): Uint8Array;
+    finishDataProcessing(): Uint8Array;
+    startPaddedDataProcessing(): void;
+    processPaddedData(data: Uint8Array): Uint8Array;
+    finishPaddedDataProcessingOutLen(): number;
+    finishPaddedDataProcessing(): Uint8Array;
+  }
 
   export class GroupSessionMessage extends FoundationObject {
     getEpoch(): number;
@@ -137,9 +183,20 @@ declare namespace FoundationModules {
     setupDefaults(): void;
     setRsaParams(bitLen: number): void;
     generatePrivateKey(algId: AlgId): PrivateKey;
+    generatePostQuantumPrivateKey(): PrivateKey;
+    generateCompoundPrivateKey(cipherAlgId: AlgId, signerAlgId: AlgId): PrivateKey;
+    generateHybridPrivateKey(firstKeyAlgId: AlgId, secondKeyAlgId: AlgId): PrivateKey;
+    generateCompoundHybridPrivateKey(
+      cipherFirstKeyAlgId: AlgId,
+      cipherSecondKeyAlgId: AlgId,
+      signerFirstKeyAlgId: AlgId,
+      signerSecondKeyAlgId: AlgId,
+    ): PrivateKey;
     importPrivateKey(keyData: Uint8Array): PrivateKey;
     importPublicKey(keyData: Uint8Array): PublicKey;
+    exportedPublicKeyLen(publicKey: PublicKey): number;
     exportPublicKey(publicKey: PublicKey): Uint8Array;
+    exportedPrivateKeyLen(privateKey: PrivateKey): number;
     exportPrivateKey(privateKey: PrivateKey): Uint8Array;
   }
 
@@ -193,6 +250,8 @@ declare namespace FoundationModules {
   export class RecipientCipher extends FoundationObject {
     random: Random;
     encryptionCipher: Cipher;
+    encryptionPadding: Padding;
+    paddingParams: PaddingParams;
     signerHash: Hash;
     hasKeyRecipient(hasKeyRecipient: Uint8Array): boolean;
     addKeyRecipient(recipientId: Uint8Array, publicKey: PublicKey): void;
@@ -212,7 +271,7 @@ declare namespace FoundationModules {
       privateKey: PrivateKey,
       messageInfo: Uint8Array,
     ): void;
-    startDecryptionWithKey(
+    startVerifiedDecryptionWithKey(
       recipientId: Uint8Array,
       privateKey: PrivateKey,
       messageInfo: Uint8Array,

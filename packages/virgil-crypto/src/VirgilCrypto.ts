@@ -236,25 +236,31 @@ export class VirgilCrypto implements ICrypto {
     return toBuffer(this.keyProvider.exportPublicKey(publicKey.lowLevelPublicKey));
   }
 
-  encrypt(data: Data, publicKey: VirgilPublicKey | VirgilPublicKey[]) {
+  encrypt(data: Data, publicKey: VirgilPublicKey | VirgilPublicKey[], enablePadding?: boolean) {
     this.throwIfDisposed();
-
     const myData = dataToUint8Array(data, 'utf8');
-
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
-
     const foundation = getFoundationModules();
-
     const recipientCipher = new foundation.RecipientCipher();
     const aes256Gcm = new foundation.Aes256Gcm();
     recipientCipher.encryptionCipher = aes256Gcm;
     recipientCipher.random = this.random;
-
+    let randomPadding: FoundationModules.RandomPadding | undefined;
+    let paddingParams: FoundationModules.PaddingParams | undefined;
+    if (enablePadding) {
+      randomPadding = new foundation.RandomPadding();
+      randomPadding.random = this.random;
+      recipientCipher.encryptionPadding = randomPadding;
+      paddingParams = foundation.PaddingParams.newWithConstraints(
+        VirgilCrypto.PADDING_LEN,
+        VirgilCrypto.PADDING_LEN,
+      );
+      recipientCipher.paddingParams = paddingParams;
+    }
     publicKeys.forEach(({ identifier }, index) => {
       recipientCipher.addKeyRecipient(identifier, publicKeys[index].lowLevelPublicKey);
     });
-
     try {
       recipientCipher.startEncryption();
       const messageInfo = recipientCipher.packMessageInfo();
@@ -264,21 +270,27 @@ export class VirgilCrypto implements ICrypto {
     } finally {
       recipientCipher.delete();
       aes256Gcm.delete();
+      if (paddingParams) {
+        paddingParams.delete();
+      }
+      if (randomPadding) {
+        randomPadding.delete();
+      }
     }
   }
 
   decrypt(encryptedData: Data, privateKey: VirgilPrivateKey) {
     this.throwIfDisposed();
-
     const myData = dataToUint8Array(encryptedData, 'base64');
-
     validatePrivateKey(privateKey);
-
     const foundation = getFoundationModules();
-
     const recipientCipher = new foundation.RecipientCipher();
     recipientCipher.random = this.random;
-
+    const paddingParams = foundation.PaddingParams.newWithConstraints(
+      VirgilCrypto.PADDING_LEN,
+      VirgilCrypto.PADDING_LEN,
+    );
+    recipientCipher.paddingParams = paddingParams;
     try {
       recipientCipher.startDecryptionWithKey(
         privateKey.identifier,
@@ -289,6 +301,7 @@ export class VirgilCrypto implements ICrypto {
       const finishDecryption = recipientCipher.finishDecryption();
       return NodeBuffer.concat([processDecryption, finishDecryption]);
     } finally {
+      paddingParams.delete();
       recipientCipher.delete();
     }
   }

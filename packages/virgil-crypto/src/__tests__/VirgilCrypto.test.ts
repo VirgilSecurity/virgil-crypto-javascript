@@ -98,12 +98,26 @@ describe('VirgilCrypto', () => {
     expect(exportedKey.toString('hex')).to.equal(publicKeyHex);
   });
 
-  it('encrypt -> decrypt', () => {
-    const data = 'data';
-    const keyPair = virgilCrypto.generateKeys();
-    const cipherData = virgilCrypto.encrypt({ value: data, encoding: 'utf8' }, keyPair.publicKey);
-    const decryptedData = virgilCrypto.decrypt(cipherData, keyPair.privateKey);
-    expect(decryptedData.toString()).to.equal(data);
+  describe('encrypt -> decrypt', () => {
+    it('encrypts and decrypts data', () => {
+      const data = 'data';
+      const keyPair = virgilCrypto.generateKeys();
+      const cipherData = virgilCrypto.encrypt({ value: data, encoding: 'utf8' }, keyPair.publicKey);
+      const decryptedData = virgilCrypto.decrypt(cipherData, keyPair.privateKey);
+      expect(decryptedData.toString()).to.equal(data);
+    });
+
+    it('encrypts and decrypts data with padding', () => {
+      const data = 'data';
+      const keyPair = virgilCrypto.generateKeys();
+      const cipherData = virgilCrypto.encrypt(
+        { value: data, encoding: 'utf8' },
+        keyPair.publicKey,
+        true,
+      );
+      const decryptedData = virgilCrypto.decrypt(cipherData, keyPair.privateKey);
+      expect(decryptedData.toString()).to.equal(data);
+    });
   });
 
   it('throws if `encrypt` is called with an empty array of recipients', () => {

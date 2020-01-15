@@ -165,6 +165,64 @@ describe('VirgilCrypto', () => {
     expect(isValid).to.be.true;
   });
 
+  describe('signAndEncrypt -> decryptAndVerify', () => {
+    it('decrypts and verifies', () => {
+      const senderKeyPair = virgilCrypto.generateKeys();
+      const recipientKeyPair = virgilCrypto.generateKeys();
+      const message = 'Secret message';
+      const cipherData = virgilCrypto.signAndEncrypt(
+        { value: message, encoding: 'utf8' },
+        senderKeyPair.privateKey,
+        recipientKeyPair.publicKey,
+      );
+      const decryptedMessage = virgilCrypto.decryptAndVerify(
+        cipherData,
+        recipientKeyPair.privateKey,
+        senderKeyPair.publicKey,
+      );
+      expect(decryptedMessage.toString()).to.equal(message);
+    });
+
+    it('decrypts and verifies given the right keys', () => {
+      const data = NodeBuffer.from('Secret message');
+      const senderKeyPair = virgilCrypto.generateKeys();
+      const recipientKeyPair = virgilCrypto.generateKeys();
+      const additionalKeyPair = virgilCrypto.generateKeys();
+      const anotherKeyPair = virgilCrypto.generateKeys();
+      const encryptedData = virgilCrypto.signAndEncrypt(
+        data,
+        senderKeyPair.privateKey,
+        recipientKeyPair.publicKey,
+      );
+      const decryptedData = virgilCrypto.decryptAndVerify(
+        encryptedData,
+        recipientKeyPair.privateKey,
+        [additionalKeyPair.publicKey, anotherKeyPair.publicKey, senderKeyPair.publicKey],
+      );
+      expect(decryptedData.equals(data)).to.be.true;
+    });
+
+    it('fails verification given the wrong keys', () => {
+      const data = NodeBuffer.from('Secret message');
+      const senderKeyPair = virgilCrypto.generateKeys();
+      const recipientKeyPair = virgilCrypto.generateKeys();
+      const additionalKeyPair = virgilCrypto.generateKeys();
+      const anotherKeyPair = virgilCrypto.generateKeys();
+      const encryptedData = virgilCrypto.signAndEncrypt(
+        data,
+        senderKeyPair.privateKey,
+        recipientKeyPair.publicKey,
+      );
+      const error = () => {
+        virgilCrypto.decryptAndVerify(encryptedData, recipientKeyPair.privateKey, [
+          additionalKeyPair.publicKey,
+          anotherKeyPair.publicKey,
+        ]);
+      };
+      expect(error).to.throw;
+    });
+  });
+
   describe('signThenEncrypt -> decryptThenVerify', () => {
     it('decrypts and verifies', () => {
       const senderKeyPair = virgilCrypto.generateKeys();

@@ -388,6 +388,46 @@ export class VirgilCrypto implements ICrypto {
     return result;
   }
 
+  signAndEncrypt(
+    data: Data,
+    privateKey: VirgilPrivateKey,
+    publicKey: VirgilPublicKey | VirgilPublicKey[],
+  ) {
+    this.throwIfDisposed();
+    const myData = dataToUint8Array(data, 'utf8');
+    validatePrivateKey(privateKey);
+    const publicKeys = toArray(publicKey);
+    validatePublicKeysArray(publicKeys);
+    const foundation = getFoundationModules();
+    const recipientCipher = new foundation.RecipientCipher();
+    const aes256Gcm = new foundation.Aes256Gcm();
+    const sha512 = new foundation.Sha512();
+    recipientCipher.encryptionCipher = aes256Gcm;
+    recipientCipher.random = this.random;
+    recipientCipher.signerHash = sha512;
+    publicKeys.forEach(({ identifier }, index) => {
+      recipientCipher.addKeyRecipient(identifier, publicKeys[index].lowLevelPublicKey);
+    });
+    try {
+      recipientCipher.addSigner(privateKey.identifier, privateKey.lowLevelPrivateKey);
+      recipientCipher.startSignedEncryption(myData.length);
+      const messageInfo = recipientCipher.packMessageInfo();
+      const processEncryption = recipientCipher.processEncryption(myData);
+      const finishEncryption = recipientCipher.finishEncryption();
+      const messageInfoFooter = recipientCipher.packMessageInfoFooter();
+      return NodeBuffer.concat([
+        messageInfo,
+        processEncryption,
+        finishEncryption,
+        messageInfoFooter,
+      ]);
+    } finally {
+      sha512.delete();
+      aes256Gcm.delete();
+      recipientCipher.delete();
+    }
+  }
+
   signThenEncrypt(
     data: Data,
     privateKey: VirgilPrivateKey,
@@ -431,6 +471,69 @@ export class VirgilCrypto implements ICrypto {
       aes256Gcm.delete();
       messageInfoCustomParams.delete();
     }
+  }
+
+  decryptAndVerify(
+    encryptedData: Data,
+    privateKey: VirgilPrivateKey,
+    publicKey: VirgilPublicKey | VirgilPublicKey[],
+  ) {
+    this.throwIfDisposed();
+    const myEncryptedData = dataToUint8Array(encryptedData, 'base64');
+    const publicKeys = toArray(publicKey);
+    validatePublicKeysArray(publicKeys);
+    validatePrivateKey(privateKey);
+    const foundation = getFoundationModules();
+    const recipientCipher = new foundation.RecipientCipher();
+    recipientCipher.random = this.random;
+    let decryptedData: BufferType;
+    try {
+      recipientCipher.startDecryptionWithKey(
+        privateKey.identifier,
+        privateKey.lowLevelPrivateKey,
+        new Uint8Array(0),
+      );
+      const processDecryption = recipientCipher.processDecryption(myEncryptedData);
+      const finishDecryption = recipientCipher.finishDecryption();
+      decryptedData = NodeBuffer.concat([processDecryption, finishDecryption]);
+    } catch (error) {
+      recipientCipher.delete();
+      throw error;
+    }
+    if (!recipientCipher.isDataSigned()) {
+      recipientCipher.delete();
+      throw new Error('Data is not signed');
+    }
+    const signerInfoList = recipientCipher.signerInfos();
+    if (!signerInfoList.hasItem()) {
+      signerInfoList.delete();
+      recipientCipher.delete();
+      throw new Error('Data is not signed');
+    }
+    const signerInfo = signerInfoList.item();
+    let signerPublicKey: VirgilPublicKey;
+    for (let i = 0; i < publicKeys.length; i += 1) {
+      if (NodeBuffer.compare(signerInfo.signerId(), publicKeys[i].identifier) === 0) {
+        signerPublicKey = publicKeys[i];
+        break;
+      }
+      if (i === publicKeys.length - 1) {
+        signerInfo.delete();
+        signerInfoList.delete();
+        recipientCipher.delete();
+        throw new Error('Signer not found');
+      }
+    }
+    if (!recipientCipher.verifySignerInfo(signerInfo, signerPublicKey!.lowLevelPublicKey)) {
+      signerInfo.delete();
+      signerInfoList.delete();
+      recipientCipher.delete();
+      throw new Error('Invalid signature');
+    }
+    signerInfo.delete();
+    signerInfoList.delete();
+    recipientCipher.delete();
+    return decryptedData;
   }
 
   decryptThenVerify(

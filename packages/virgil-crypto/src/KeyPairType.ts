@@ -22,7 +22,9 @@ export interface KeyPairTypeConfig {
   signerAlgIds?: FoundationModules.AlgId[];
 }
 
-export const getKeyPairTypeConfig = (keyPairType: KeyPairType): KeyPairTypeConfig => {
+export const getKeyPairTypeConfig = (
+  keyPairType: KeyPairType[keyof KeyPairType],
+): KeyPairTypeConfig => {
   const { AlgId } = moduleInitializer.getModule<FoundationModules>('foundation');
   switch (keyPairType) {
     case KeyPairType.DEFAULT:
@@ -86,12 +88,12 @@ export const getKeyPairTypeConfig = (keyPairType: KeyPairType): KeyPairTypeConfi
   }
 };
 
-export const isRSAKeyPairType = (keyPairType: KeyPairType) =>
+export const isRSAKeyPairType = (keyPairType: KeyPairType[keyof KeyPairType]) =>
   keyPairType === KeyPairType.RSA_2048 ||
   keyPairType === KeyPairType.RSA_3072 ||
   keyPairType === KeyPairType.RSA_4096 ||
   keyPairType === KeyPairType.RSA_8192;
 
-export const isCompoundKeyPairType = (keyPairType: KeyPairType) =>
+export const isCompoundKeyPairType = (keyPairType: KeyPairType[keyof KeyPairType]) =>
   keyPairType === KeyPairType.CURVE25519_ROUND5_ED25519_FALCON ||
   keyPairType === KeyPairType.CURVE25519_ED25519;

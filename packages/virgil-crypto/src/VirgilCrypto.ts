@@ -77,7 +77,7 @@ export class VirgilCrypto implements ICrypto {
     this._isDisposed = true;
   }
 
-  generateKeys(type?: KeyPairType) {
+  generateKeys(type?: KeyPairType[keyof KeyPairType]) {
     this.throwIfDisposed();
     const keyPairType = type ? type : this.defaultKeyPairType;
     const keyPairTypeConfig = getKeyPairTypeConfig(keyPairType);
@@ -131,7 +131,7 @@ export class VirgilCrypto implements ICrypto {
     }
   }
 
-  generateKeysFromKeyMaterial(keyMaterial: Data, type?: KeyPairType) {
+  generateKeysFromKeyMaterial(keyMaterial: Data, type?: KeyPairType[keyof KeyPairType]) {
     this.throwIfDisposed();
     const keyPairType = type ? type : this.defaultKeyPairType;
     const keyPairTypeConfig = getKeyPairTypeConfig(keyPairType);

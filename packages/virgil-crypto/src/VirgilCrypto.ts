@@ -392,6 +392,7 @@ export class VirgilCrypto implements ICrypto {
     data: Data,
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
+    enablePadding?: boolean,
   ) {
     this.throwIfDisposed();
     const myData = dataToUint8Array(data, 'utf8');
@@ -405,6 +406,18 @@ export class VirgilCrypto implements ICrypto {
     recipientCipher.encryptionCipher = aes256Gcm;
     recipientCipher.random = this.random;
     recipientCipher.signerHash = sha512;
+    let randomPadding: FoundationModules.RandomPadding | undefined;
+    let paddingParams: FoundationModules.PaddingParams | undefined;
+    if (enablePadding) {
+      randomPadding = new foundation.RandomPadding();
+      randomPadding.random = this.random;
+      recipientCipher.encryptionPadding = randomPadding;
+      paddingParams = foundation.PaddingParams.newWithConstraints(
+        VirgilCrypto.PADDING_LEN,
+        VirgilCrypto.PADDING_LEN,
+      );
+      recipientCipher.paddingParams = paddingParams;
+    }
     publicKeys.forEach(({ identifier }, index) => {
       recipientCipher.addKeyRecipient(identifier, publicKeys[index].lowLevelPublicKey);
     });
@@ -424,6 +437,12 @@ export class VirgilCrypto implements ICrypto {
     } finally {
       sha512.delete();
       aes256Gcm.delete();
+      if (randomPadding) {
+        randomPadding.delete();
+      }
+      if (paddingParams) {
+        paddingParams.delete();
+      }
       recipientCipher.delete();
     }
   }
@@ -432,6 +451,7 @@ export class VirgilCrypto implements ICrypto {
     data: Data,
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
+    enablePadding?: boolean,
   ) {
     this.throwIfDisposed();
 
@@ -448,6 +468,18 @@ export class VirgilCrypto implements ICrypto {
     const aes256Gcm = new foundation.Aes256Gcm();
     recipientCipher.encryptionCipher = aes256Gcm;
     recipientCipher.random = this.random;
+    let randomPadding: FoundationModules.RandomPadding | undefined;
+    let paddingParams: FoundationModules.PaddingParams | undefined;
+    if (enablePadding) {
+      randomPadding = new foundation.RandomPadding();
+      randomPadding.random = this.random;
+      recipientCipher.encryptionPadding = randomPadding;
+      paddingParams = foundation.PaddingParams.newWithConstraints(
+        VirgilCrypto.PADDING_LEN,
+        VirgilCrypto.PADDING_LEN,
+      );
+      recipientCipher.paddingParams = paddingParams;
+    }
 
     publicKeys.forEach(({ identifier }, index) => {
       recipientCipher.addKeyRecipient(identifier, publicKeys[index].lowLevelPublicKey);
@@ -467,6 +499,12 @@ export class VirgilCrypto implements ICrypto {
       const finishEncryption = recipientCipher.finishEncryption();
       return NodeBuffer.concat([messageInfo, processEncryption, finishEncryption]);
     } finally {
+      if (randomPadding) {
+        randomPadding.delete();
+      }
+      if (paddingParams) {
+        paddingParams.delete();
+      }
       recipientCipher.delete();
       aes256Gcm.delete();
       messageInfoCustomParams.delete();
@@ -484,8 +522,13 @@ export class VirgilCrypto implements ICrypto {
     validatePublicKeysArray(publicKeys);
     validatePrivateKey(privateKey);
     const foundation = getFoundationModules();
+    const paddingParams = foundation.PaddingParams.newWithConstraints(
+      VirgilCrypto.PADDING_LEN,
+      VirgilCrypto.PADDING_LEN,
+    );
     const recipientCipher = new foundation.RecipientCipher();
     recipientCipher.random = this.random;
+    recipientCipher.paddingParams = paddingParams;
     let decryptedData: BufferType;
     try {
       recipientCipher.startDecryptionWithKey(
@@ -497,15 +540,18 @@ export class VirgilCrypto implements ICrypto {
       const finishDecryption = recipientCipher.finishDecryption();
       decryptedData = NodeBuffer.concat([processDecryption, finishDecryption]);
     } catch (error) {
+      paddingParams.delete();
       recipientCipher.delete();
       throw error;
     }
     if (!recipientCipher.isDataSigned()) {
+      paddingParams.delete();
       recipientCipher.delete();
       throw new Error('Data is not signed');
     }
     const signerInfoList = recipientCipher.signerInfos();
     if (!signerInfoList.hasItem()) {
+      paddingParams.delete();
       signerInfoList.delete();
       recipientCipher.delete();
       throw new Error('Data is not signed');
@@ -518,6 +564,7 @@ export class VirgilCrypto implements ICrypto {
         break;
       }
       if (i === publicKeys.length - 1) {
+        paddingParams.delete();
         signerInfo.delete();
         signerInfoList.delete();
         recipientCipher.delete();
@@ -525,11 +572,13 @@ export class VirgilCrypto implements ICrypto {
       }
     }
     if (!recipientCipher.verifySignerInfo(signerInfo, signerPublicKey!.lowLevelPublicKey)) {
+      paddingParams.delete();
       signerInfo.delete();
       signerInfoList.delete();
       recipientCipher.delete();
       throw new Error('Invalid signature');
     }
+    paddingParams.delete();
     signerInfo.delete();
     signerInfoList.delete();
     recipientCipher.delete();
@@ -552,8 +601,13 @@ export class VirgilCrypto implements ICrypto {
 
     const foundation = getFoundationModules();
 
+    const paddingParams = foundation.PaddingParams.newWithConstraints(
+      VirgilCrypto.PADDING_LEN,
+      VirgilCrypto.PADDING_LEN,
+    );
     const recipientCipher = new foundation.RecipientCipher();
     recipientCipher.random = this.random;
+    recipientCipher.paddingParams = paddingParams;
 
     let decryptedData: BufferType;
     try {
@@ -566,6 +620,7 @@ export class VirgilCrypto implements ICrypto {
       const finishDecryption = recipientCipher.finishDecryption();
       decryptedData = NodeBuffer.concat([processDecryption, finishDecryption]);
     } catch (error) {
+      paddingParams.delete();
       recipientCipher.delete();
       throw error;
     }
@@ -580,6 +635,7 @@ export class VirgilCrypto implements ICrypto {
       try {
         signerId = messageInfoCustomParams.findData(DATA_SIGNER_ID_KEY);
       } catch (error) {
+        paddingParams.delete();
         recipientCipher.delete();
         messageInfoCustomParams.delete();
         throw error;
@@ -591,6 +647,7 @@ export class VirgilCrypto implements ICrypto {
         }
       }
       if (!signerPublicKey) {
+        paddingParams.delete();
         recipientCipher.delete();
         messageInfoCustomParams.delete();
         throw new Error('Signer not found');
@@ -605,6 +662,7 @@ export class VirgilCrypto implements ICrypto {
       }
       return decryptedData;
     } finally {
+      paddingParams.delete();
       recipientCipher.delete();
       messageInfoCustomParams.delete();
     }
@@ -620,6 +678,7 @@ export class VirgilCrypto implements ICrypto {
     data: Data,
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
+    enablePadding?: boolean,
   ) {
     this.throwIfDisposed();
 
@@ -636,6 +695,18 @@ export class VirgilCrypto implements ICrypto {
     const aes256Gcm = new foundation.Aes256Gcm();
     recipientCipher.encryptionCipher = aes256Gcm;
     recipientCipher.random = this.random;
+    let randomPadding: FoundationModules.RandomPadding | undefined;
+    let paddingParams: FoundationModules.PaddingParams | undefined;
+    if (enablePadding) {
+      randomPadding = new foundation.RandomPadding();
+      randomPadding.random = this.random;
+      recipientCipher.encryptionPadding = randomPadding;
+      paddingParams = foundation.PaddingParams.newWithConstraints(
+        VirgilCrypto.PADDING_LEN,
+        VirgilCrypto.PADDING_LEN,
+      );
+      recipientCipher.paddingParams = paddingParams;
+    }
 
     publicKeys.forEach(({ identifier }, index) => {
       recipientCipher.addKeyRecipient(identifier, publicKeys[index].lowLevelPublicKey);
@@ -657,6 +728,12 @@ export class VirgilCrypto implements ICrypto {
       const metadata = toBuffer(messageInfo);
       return { encryptedData, metadata };
     } finally {
+      if (randomPadding) {
+        randomPadding.delete();
+      }
+      if (paddingParams) {
+        paddingParams.delete();
+      }
       recipientCipher.delete();
       aes256Gcm.delete();
       messageInfoCustomParams.delete();
@@ -681,8 +758,13 @@ export class VirgilCrypto implements ICrypto {
 
     const foundation = getFoundationModules();
 
+    const paddingParams = foundation.PaddingParams.newWithConstraints(
+      VirgilCrypto.PADDING_LEN,
+      VirgilCrypto.PADDING_LEN,
+    );
     const recipientCipher = new foundation.RecipientCipher();
     recipientCipher.random = this.random;
+    recipientCipher.paddingParams = paddingParams;
 
     let decryptedData: BufferType;
     try {
@@ -695,6 +777,7 @@ export class VirgilCrypto implements ICrypto {
       const finishDecryption = recipientCipher.finishDecryption();
       decryptedData = NodeBuffer.concat([processDecryption, finishDecryption]);
     } catch (error) {
+      paddingParams.delete();
       recipientCipher.delete();
       throw error;
     }
@@ -709,6 +792,7 @@ export class VirgilCrypto implements ICrypto {
       try {
         signerId = messageInfoCustomParams.findData(DATA_SIGNER_ID_KEY);
       } catch (error) {
+        paddingParams.delete();
         recipientCipher.delete();
         messageInfoCustomParams.delete();
         throw error;
@@ -720,6 +804,7 @@ export class VirgilCrypto implements ICrypto {
         }
       }
       if (!signerPublicKey) {
+        paddingParams.delete();
         recipientCipher.delete();
         messageInfoCustomParams.delete();
         throw new Error('Signer not found');
@@ -734,6 +819,7 @@ export class VirgilCrypto implements ICrypto {
       }
       return decryptedData;
     } finally {
+      paddingParams.delete();
       recipientCipher.delete();
       messageInfoCustomParams.delete();
     }

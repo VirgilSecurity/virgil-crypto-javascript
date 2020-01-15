@@ -47,7 +47,7 @@ export interface ICrypto {
   exportPrivateKey(privateKey: IPrivateKey): NodeBuffer;
   importPublicKey(rawPublicKey: Data): IPublicKey;
   exportPublicKey(publicKey: IPublicKey): NodeBuffer;
-  encrypt(data: Data, publicKey: IPublicKey | IPublicKey[]): NodeBuffer;
+  encrypt(data: Data, publicKey: IPublicKey | IPublicKey[], enablePadding?: boolean): NodeBuffer;
   decrypt(encryptedData: Data, privateKey: IPrivateKey): NodeBuffer;
   calculateHash(data: Data, algorithm?: unknown): NodeBuffer;
   extractPublicKey(privateKey: IPrivateKey): IPublicKey;
@@ -57,11 +57,13 @@ export interface ICrypto {
     data: Data,
     privateKey: IPrivateKey,
     publicKey: IPublicKey | IPublicKey[],
+    enablePadding?: boolean,
   ): NodeBuffer;
   signThenEncrypt(
     data: Data,
     privateKey: IPrivateKey,
     publicKey: IPublicKey | IPublicKey[],
+    enablePadding?: boolean,
   ): NodeBuffer;
   decryptAndVerify(
     encryptedData: Data,
@@ -78,6 +80,7 @@ export interface ICrypto {
     data: Data,
     privateKey: IPrivateKey,
     publicKey: IPublicKey | IPublicKey[],
+    enablePadding?: boolean,
   ): { encryptedData: NodeBuffer; metadata: NodeBuffer };
   decryptThenVerifyDetached(
     encryptedData: Data,

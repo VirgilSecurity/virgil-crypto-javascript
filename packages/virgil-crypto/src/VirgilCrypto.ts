@@ -5,7 +5,12 @@ import { computeSessionId, createInitialEpoch } from './groups/helpers';
 import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
 import { getFoundationModules } from './foundationModules';
 import { HashAlgorithm, HashAlgorithmType } from './HashAlgorithm';
-import { KeyPairType, KeyPairTypeType } from './KeyPairType';
+import {
+  KeyPairType,
+  getKeyPairTypeConfig,
+  isRSAKeyPairType,
+  isCompoundKeyPairType,
+} from './KeyPairType';
 import { FoundationModules, ICrypto, NodeBuffer as BufferType, Data, IGroupSession } from './types';
 import { toArray } from './utils';
 import { validatePrivateKey, validatePublicKey, validatePublicKeysArray } from './validators';
@@ -20,12 +25,16 @@ export const MIN_GROUP_ID_BYTE_LENGTH = 10;
 
 export interface VirgilCryptoOptions {
   useSha256Identifiers?: boolean;
-  defaultKeyPairType?: KeyPairTypeType[keyof KeyPairTypeType];
+  defaultKeyPairType?: KeyPairType;
 }
 
 export class VirgilCrypto implements ICrypto {
+  static get PADDING_LEN() {
+    return 160;
+  }
+
   readonly useSha256Identifiers: boolean;
-  readonly defaultKeyPairType: KeyPairTypeType[keyof KeyPairTypeType];
+  readonly defaultKeyPairType: KeyPairType;
 
   readonly hashAlgorithm = HashAlgorithm;
   readonly keyPairType = KeyPairType;
@@ -57,7 +66,7 @@ export class VirgilCrypto implements ICrypto {
       throw error;
     }
 
-    this.defaultKeyPairType = options.defaultKeyPairType || KeyPairType.Default;
+    this.defaultKeyPairType = options.defaultKeyPairType || KeyPairType.DEFAULT;
     this.useSha256Identifiers = options.useSha256Identifiers || false;
     this._isDisposed = false;
   }
@@ -68,9 +77,10 @@ export class VirgilCrypto implements ICrypto {
     this._isDisposed = true;
   }
 
-  generateKeys(type?: KeyPairTypeType[keyof KeyPairTypeType]) {
+  generateKeys(type?: KeyPairType) {
     this.throwIfDisposed();
     const keyPairType = type ? type : this.defaultKeyPairType;
+    const keyPairTypeConfig = getKeyPairTypeConfig(keyPairType);
     const foundation = getFoundationModules();
     const keyProvider = new foundation.KeyProvider();
     try {
@@ -79,20 +89,33 @@ export class VirgilCrypto implements ICrypto {
       keyProvider.delete();
       throw error;
     }
-    if (keyPairType.algId === foundation.AlgId.RSA) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      keyProvider.setRsaParams(keyPairType.bitlen!);
-    }
-
     let lowLevelPrivateKey: FoundationModules.PrivateKey;
-    try {
-      lowLevelPrivateKey = keyProvider.generatePrivateKey(keyPairType.algId);
-    } catch (error) {
-      keyProvider.delete();
-      throw error;
+    if (isCompoundKeyPairType(keyPairType)) {
+      try {
+        const [cipherFirstKeyAlgId, cipherSecondKeyAlgId] = keyPairTypeConfig.cipherAlgIds!;
+        const [signerFirstKeyAlgId, signerSecondKeyAlgId] = keyPairTypeConfig.signerAlgIds!;
+        lowLevelPrivateKey = this.keyProvider.generateCompoundHybridPrivateKey(
+          cipherFirstKeyAlgId,
+          cipherSecondKeyAlgId,
+          signerFirstKeyAlgId,
+          signerSecondKeyAlgId,
+        );
+      } catch (error) {
+        keyProvider.delete();
+        throw error;
+      }
+    } else {
+      if (isRSAKeyPairType(keyPairType)) {
+        keyProvider.setRsaParams(keyPairTypeConfig.bitlen!);
+      }
+      try {
+        lowLevelPrivateKey = keyProvider.generatePrivateKey(keyPairTypeConfig.algId!);
+      } catch (error) {
+        keyProvider.delete();
+        throw error;
+      }
     }
     const lowLevelPublicKey = lowLevelPrivateKey.extractPublicKey();
-
     try {
       const serializedPublicKey = this.keyProvider.exportPublicKey(lowLevelPublicKey);
       const identifier = this.calculateKeypairIdentifier(
@@ -108,17 +131,14 @@ export class VirgilCrypto implements ICrypto {
     }
   }
 
-  generateKeysFromKeyMaterial(keyMaterial: Data, type?: KeyPairTypeType[keyof KeyPairTypeType]) {
+  generateKeysFromKeyMaterial(keyMaterial: Data, type?: KeyPairType) {
     this.throwIfDisposed();
-
     const keyPairType = type ? type : this.defaultKeyPairType;
+    const keyPairTypeConfig = getKeyPairTypeConfig(keyPairType);
     const myKeyMaterial = dataToUint8Array(keyMaterial, 'base64');
-
     const foundation = getFoundationModules();
-
     const keyMaterialRng = new foundation.KeyMaterialRng();
     keyMaterialRng.resetKeyMaterial(myKeyMaterial);
-
     const keyProvider = new foundation.KeyProvider();
     try {
       keyProvider.setupDefaults();
@@ -128,21 +148,36 @@ export class VirgilCrypto implements ICrypto {
       throw error;
     }
     keyProvider.random = keyMaterialRng;
-    if (keyPairType.algId === foundation.AlgId.RSA) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      keyProvider.setRsaParams(keyPairType.bitlen!);
-    }
-
     let lowLevelPrivateKey: FoundationModules.PrivateKey;
-    try {
-      lowLevelPrivateKey = keyProvider.generatePrivateKey(keyPairType.algId);
-    } catch (error) {
-      keyMaterialRng.delete();
-      keyProvider.delete();
-      throw error;
+    if (isCompoundKeyPairType(keyPairType)) {
+      try {
+        const [cipherFirstKeyAlgId, cipherSecondKeyAlgId] = keyPairTypeConfig.cipherAlgIds!;
+        const [signerFirstKeyAlgId, signerSecondKeyAlgId] = keyPairTypeConfig.signerAlgIds!;
+        lowLevelPrivateKey = this.keyProvider.generateCompoundHybridPrivateKey(
+          cipherFirstKeyAlgId,
+          cipherSecondKeyAlgId,
+          signerFirstKeyAlgId,
+          signerSecondKeyAlgId,
+        );
+      } catch (error) {
+        keyMaterialRng.delete();
+        keyProvider.delete();
+        throw error;
+      }
+    } else {
+      if (isRSAKeyPairType(keyPairType)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        keyProvider.setRsaParams(keyPairTypeConfig.bitlen!);
+      }
+      try {
+        lowLevelPrivateKey = keyProvider.generatePrivateKey(keyPairTypeConfig.algId!);
+      } catch (error) {
+        keyMaterialRng.delete();
+        keyProvider.delete();
+        throw error;
+      }
     }
     const lowLevelPublicKey = lowLevelPrivateKey.extractPublicKey();
-
     try {
       const serializedPublicKey = this.keyProvider.exportPublicKey(lowLevelPublicKey);
       const identifier = this.calculateKeypairIdentifier(

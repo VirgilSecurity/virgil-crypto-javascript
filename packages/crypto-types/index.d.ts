@@ -53,8 +53,18 @@ export interface ICrypto {
   extractPublicKey(privateKey: IPrivateKey): IPublicKey;
   calculateSignature(data: Data, privateKey: IPrivateKey): NodeBuffer;
   verifySignature(data: Data, signature: Data, publicKey: IPublicKey): boolean;
+  signAndEncrypt(
+    data: Data,
+    privateKey: IPrivateKey,
+    publicKey: IPublicKey | IPublicKey[],
+  ): NodeBuffer;
   signThenEncrypt(
     data: Data,
+    privateKey: IPrivateKey,
+    publicKey: IPublicKey | IPublicKey[],
+  ): NodeBuffer;
+  decryptAndVerify(
+    encryptedData: Data,
     privateKey: IPrivateKey,
     publicKey: IPublicKey | IPublicKey[],
   ): NodeBuffer;

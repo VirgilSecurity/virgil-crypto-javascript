@@ -4,7 +4,7 @@ import { createVirgilGroupSession } from './groups/createVirgilGroupSession';
 import { computeSessionId, createInitialEpoch } from './groups/helpers';
 import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
 import { getFoundationModules } from './foundationModules';
-import { HashAlgorithm, HashAlgorithmType } from './HashAlgorithm';
+import { HashAlgorithm } from './HashAlgorithm';
 import {
   KeyPairType,
   KeyPairTypeConfig,
@@ -256,10 +256,7 @@ export class VirgilCrypto implements ICrypto {
     }
   }
 
-  calculateHash(
-    data: Data,
-    algorithm: HashAlgorithmType[keyof HashAlgorithmType] = HashAlgorithm.SHA512,
-  ) {
+  calculateHash(data: Data, algorithm: HashAlgorithm[keyof HashAlgorithm] = HashAlgorithm.SHA512) {
     const myData = dataToUint8Array(data, 'utf8');
     let result: Uint8Array;
     switch (algorithm) {
@@ -838,8 +835,10 @@ export class VirgilCrypto implements ICrypto {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private createHash(data: Uint8Array, HashClass: any) {
+  private createHash(
+    data: Uint8Array,
+    HashClass: { new (): FoundationModules.Hash & FoundationModules.FoundationObject },
+  ) {
     const hashInstance = new HashClass();
     const hash = hashInstance.hash(data);
     hashInstance.delete();

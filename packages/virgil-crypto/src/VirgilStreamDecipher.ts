@@ -8,7 +8,7 @@ import { VirgilPrivateKey } from './VirgilPrivateKey';
 
 export class VirgilStreamDecipher {
   private _isFinished = false;
-  private isDisposed = false;
+  private _isDisposed = false;
   private recipientCipher: FoundationModules.RecipientCipher;
   private privateKey: VirgilPrivateKey;
 
@@ -16,14 +16,15 @@ export class VirgilStreamDecipher {
     return this._isFinished;
   }
 
+  get isDisposed() {
+    return this._isDisposed;
+  }
+
   constructor(privateKey: VirgilPrivateKey) {
     const foundationModules = getFoundationModules();
-
     validatePrivateKey(privateKey);
     this.privateKey = privateKey;
-
     this.recipientCipher = new foundationModules.RecipientCipher();
-
     try {
       this.recipientCipher.startDecryptionWithKey(
         privateKey.identifier,
@@ -42,7 +43,7 @@ export class VirgilStreamDecipher {
         'Illegal state. Cannot get signature before the `final` method has been called.',
       );
     }
-    if (this.isDisposed) {
+    if (this._isDisposed) {
       throw new Error(
         'Illegal state. Cannot get signature after the `dispose` method has been called.',
       );
@@ -75,14 +76,14 @@ export class VirgilStreamDecipher {
 
   dispose() {
     this.recipientCipher.delete();
-    this.isDisposed = true;
+    this._isDisposed = true;
   }
 
   private ensureLegalState() {
     if (this._isFinished) {
       throw new Error('Illegal state. Cannot use cipher after the `final` method has been called.');
     }
-    if (this.isDisposed) {
+    if (this._isDisposed) {
       throw new Error(
         'Illegal state. Cannot use cipher after the `dispose` method has been called.',
       );

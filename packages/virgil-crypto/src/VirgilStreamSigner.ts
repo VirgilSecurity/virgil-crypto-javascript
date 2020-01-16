@@ -6,10 +6,14 @@ import { validatePrivateKey } from './validators';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 
 export class VirgilStreamSigner {
-  private isDisposed = false;
+  private _isDisposed = false;
   private signer: FoundationModules.Signer;
   private random: FoundationModules.CtrDrbg;
   private sha512: FoundationModules.Sha512;
+
+  get isDisposed() {
+    return this._isDisposed;
+  }
 
   constructor() {
     const foundationModules = getFoundationModules();
@@ -22,7 +26,7 @@ export class VirgilStreamSigner {
   }
 
   update(data: Data) {
-    if (this.isDisposed) {
+    if (this._isDisposed) {
       throw new Error(
         'Illegal state. Cannot use signer after the `dispose` method has been called.',
       );
@@ -33,16 +37,14 @@ export class VirgilStreamSigner {
   }
 
   sign(privateKey: VirgilPrivateKey, final = true) {
-    if (this.isDisposed) {
+    if (this._isDisposed) {
       throw new Error(
         'Illegal state. The VirgilStreamSigner has been disposed. ' +
           'Pass `false` as the second argument to the `sign` method ' +
           'if you need to generate more than one signature.',
       );
     }
-
     validatePrivateKey(privateKey);
-
     const result = this.signer.sign(privateKey.lowLevelPrivateKey);
     if (final) {
       this.dispose();
@@ -54,5 +56,6 @@ export class VirgilStreamSigner {
     this.signer.delete();
     this.random.delete();
     this.sha512.delete();
+    this._isDisposed = true;
   }
 }

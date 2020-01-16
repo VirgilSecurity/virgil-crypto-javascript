@@ -24,6 +24,10 @@ describe('group encryption', () => {
     });
   });
 
+  after(() => {
+    virgilCrypto.dispose();
+  });
+
   describe('addNewEpoch', () => {
     it('adds new epoch message', () => {
       const group = virgilCrypto.generateGroupSession(NodeBuffer.from('x'.repeat(10)));

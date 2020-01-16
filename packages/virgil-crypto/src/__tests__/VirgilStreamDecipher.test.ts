@@ -24,6 +24,10 @@ describe('VirgilStreamDecipher', () => {
     });
   });
 
+  after(() => {
+    virgilCrypto.dispose();
+  });
+
   it('throws if private key is invalid', () => {
     const error = () => {
       virgilCrypto.createStreamDecipher({} as VirgilPrivateKey);

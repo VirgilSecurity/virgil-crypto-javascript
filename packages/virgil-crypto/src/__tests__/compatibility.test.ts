@@ -39,6 +39,8 @@ describe('compatibility', () => {
     const privateKey = asmjsVirgilCrypto.importPrivateKey(exportedPrivateKey);
     const decryptedData = asmjsVirgilCrypto.decrypt(encryptedData, privateKey);
     expect(decryptedData.toString()).to.equal(data);
+
+    wasmVirgilCrypto.dispose();
   });
 
   it('encrypts with asm.js and decrypts with WebAssembly', () => {
@@ -58,5 +60,7 @@ describe('compatibility', () => {
     const privateKey = wasmVirgilCrypto.importPrivateKey(exportedPrivateKey);
     const decryptedData = wasmVirgilCrypto.decrypt(encryptedData, privateKey);
     expect(decryptedData.toString()).to.equal(data);
+
+    wasmVirgilCrypto.dispose();
   });
 });

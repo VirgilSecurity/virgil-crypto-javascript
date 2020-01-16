@@ -31,6 +31,10 @@ describe('VirgilCrypto', () => {
     });
   });
 
+  after(() => {
+    virgilCrypto.dispose();
+  });
+
   describe('generateKeys', () => {
     it('returns key pair', () => {
       const keyPair = virgilCrypto.generateKeys();

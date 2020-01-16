@@ -24,6 +24,10 @@ describe('VirgilStreamCipher', () => {
     });
   });
 
+  after(() => {
+    virgilCrypto.dispose();
+  });
+
   it('throws if public keys are invalid', () => {
     const error = () => {
       virgilCrypto.createStreamCipher({} as VirgilPublicKey);

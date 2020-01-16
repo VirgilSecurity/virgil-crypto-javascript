@@ -23,6 +23,10 @@ describe('VirgilStreamSigner', () => {
     });
   });
 
+  after(() => {
+    virgilCrypto.dispose();
+  });
+
   it('throws if sign is called more than once by default', () => {
     const streamSigner = virgilCrypto.createStreamSigner();
     const keyPair1 = virgilCrypto.generateKeys();

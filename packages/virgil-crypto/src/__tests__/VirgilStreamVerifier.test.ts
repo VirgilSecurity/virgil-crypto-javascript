@@ -24,6 +24,10 @@ describe('VrigilStreamVerifier', () => {
     });
   });
 
+  after(() => {
+    virgilCrypto.dispose();
+  });
+
   it('throws if signature is invalid', () => {
     const error = () => {
       virgilCrypto.createStreamVerifier((undefined as unknown) as Uint8Array);

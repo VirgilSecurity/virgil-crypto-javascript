@@ -7,6 +7,7 @@ import { getFoundationModules } from './foundationModules';
 import { HashAlgorithm, HashAlgorithmType } from './HashAlgorithm';
 import {
   KeyPairType,
+  KeyPairTypeConfig,
   getKeyPairTypeConfig,
   isRSAKeyPairType,
   isCompoundKeyPairType,
@@ -39,7 +40,6 @@ export class VirgilCrypto implements ICrypto {
   readonly hashAlgorithm = HashAlgorithm;
   readonly keyPairType = KeyPairType;
 
-  private readonly keyProvider: FoundationModules.KeyProvider;
   private readonly random: FoundationModules.CtrDrbg;
   private _isDisposed: boolean;
 
@@ -49,30 +49,19 @@ export class VirgilCrypto implements ICrypto {
 
   constructor(options: VirgilCryptoOptions = {}) {
     const foundation = getFoundationModules();
-    this.keyProvider = new foundation.KeyProvider();
-    try {
-      this.keyProvider.setupDefaults();
-    } catch (error) {
-      this.keyProvider.delete();
-      throw error;
-    }
-
     this.random = new foundation.CtrDrbg();
     try {
       this.random.setupDefaults();
     } catch (error) {
       this.random.delete();
-      this.keyProvider.delete();
       throw error;
     }
-
     this.defaultKeyPairType = options.defaultKeyPairType || KeyPairType.DEFAULT;
     this.useSha256Identifiers = options.useSha256Identifiers || false;
     this._isDisposed = false;
   }
 
   dispose() {
-    this.keyProvider.delete();
     this.random.delete();
     this._isDisposed = true;
   }
@@ -83,49 +72,15 @@ export class VirgilCrypto implements ICrypto {
     const keyPairTypeConfig = getKeyPairTypeConfig(keyPairType);
     const foundation = getFoundationModules();
     const keyProvider = new foundation.KeyProvider();
+    keyProvider.random = this.random;
     try {
       keyProvider.setupDefaults();
     } catch (error) {
       keyProvider.delete();
       throw error;
     }
-    let lowLevelPrivateKey: FoundationModules.PrivateKey;
-    if (isCompoundKeyPairType(keyPairType)) {
-      try {
-        const [cipherFirstKeyAlgId, cipherSecondKeyAlgId] = keyPairTypeConfig.cipherAlgIds!;
-        const [signerFirstKeyAlgId, signerSecondKeyAlgId] = keyPairTypeConfig.signerAlgIds!;
-        lowLevelPrivateKey = this.keyProvider.generateCompoundHybridPrivateKey(
-          cipherFirstKeyAlgId,
-          cipherSecondKeyAlgId,
-          signerFirstKeyAlgId,
-          signerSecondKeyAlgId,
-        );
-      } catch (error) {
-        keyProvider.delete();
-        throw error;
-      }
-    } else {
-      if (isRSAKeyPairType(keyPairType)) {
-        keyProvider.setRsaParams(keyPairTypeConfig.bitlen!);
-      }
-      try {
-        lowLevelPrivateKey = keyProvider.generatePrivateKey(keyPairTypeConfig.algId!);
-      } catch (error) {
-        keyProvider.delete();
-        throw error;
-      }
-    }
-    const lowLevelPublicKey = lowLevelPrivateKey.extractPublicKey();
     try {
-      const serializedPublicKey = this.keyProvider.exportPublicKey(lowLevelPublicKey);
-      const identifier = this.calculateKeypairIdentifier(
-        serializedPublicKey,
-        this.useSha256Identifiers,
-      );
-      return {
-        privateKey: new VirgilPrivateKey(identifier, lowLevelPrivateKey),
-        publicKey: new VirgilPublicKey(identifier, lowLevelPublicKey),
-      };
+      return this.generateKeyPair(keyProvider, keyPairTypeConfig);
     } finally {
       keyProvider.delete();
     }
@@ -140,6 +95,7 @@ export class VirgilCrypto implements ICrypto {
     const keyMaterialRng = new foundation.KeyMaterialRng();
     keyMaterialRng.resetKeyMaterial(myKeyMaterial);
     const keyProvider = new foundation.KeyProvider();
+    keyProvider.random = keyMaterialRng;
     try {
       keyProvider.setupDefaults();
     } catch (error) {
@@ -147,47 +103,8 @@ export class VirgilCrypto implements ICrypto {
       keyProvider.delete();
       throw error;
     }
-    keyProvider.random = keyMaterialRng;
-    let lowLevelPrivateKey: FoundationModules.PrivateKey;
-    if (isCompoundKeyPairType(keyPairType)) {
-      try {
-        const [cipherFirstKeyAlgId, cipherSecondKeyAlgId] = keyPairTypeConfig.cipherAlgIds!;
-        const [signerFirstKeyAlgId, signerSecondKeyAlgId] = keyPairTypeConfig.signerAlgIds!;
-        lowLevelPrivateKey = this.keyProvider.generateCompoundHybridPrivateKey(
-          cipherFirstKeyAlgId,
-          cipherSecondKeyAlgId,
-          signerFirstKeyAlgId,
-          signerSecondKeyAlgId,
-        );
-      } catch (error) {
-        keyMaterialRng.delete();
-        keyProvider.delete();
-        throw error;
-      }
-    } else {
-      if (isRSAKeyPairType(keyPairType)) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        keyProvider.setRsaParams(keyPairTypeConfig.bitlen!);
-      }
-      try {
-        lowLevelPrivateKey = keyProvider.generatePrivateKey(keyPairTypeConfig.algId!);
-      } catch (error) {
-        keyMaterialRng.delete();
-        keyProvider.delete();
-        throw error;
-      }
-    }
-    const lowLevelPublicKey = lowLevelPrivateKey.extractPublicKey();
     try {
-      const serializedPublicKey = this.keyProvider.exportPublicKey(lowLevelPublicKey);
-      const identifier = this.calculateKeypairIdentifier(
-        serializedPublicKey,
-        this.useSha256Identifiers,
-      );
-      return {
-        privateKey: new VirgilPrivateKey(identifier, lowLevelPrivateKey),
-        publicKey: new VirgilPublicKey(identifier, lowLevelPublicKey),
-      };
+      return this.generateKeyPair(keyProvider, keyPairTypeConfig);
     } finally {
       keyMaterialRng.delete();
       keyProvider.delete();
@@ -196,44 +113,77 @@ export class VirgilCrypto implements ICrypto {
 
   importPrivateKey(rawPrivateKey: Data) {
     this.throwIfDisposed();
-
-    const serializedPrivateKey = dataToUint8Array(rawPrivateKey, 'base64');
-
-    const lowLevelPrivateKey = this.keyProvider.importPrivateKey(serializedPrivateKey);
-    const lowLevelPublicKey = lowLevelPrivateKey.extractPublicKey();
-
+    const foundation = getFoundationModules();
+    const keyProvider = new foundation.KeyProvider();
+    keyProvider.random = this.random;
     try {
-      const serializedPublicKey = this.keyProvider.exportPublicKey(lowLevelPublicKey);
-      const identifier = this.calculateKeypairIdentifier(
-        serializedPublicKey,
-        this.useSha256Identifiers,
-      );
+      keyProvider.setupDefaults();
+    } catch (error) {
+      keyProvider.delete();
+      throw error;
+    }
+    const serializedPrivateKey = dataToUint8Array(rawPrivateKey, 'base64');
+    const lowLevelPrivateKey = keyProvider.importPrivateKey(serializedPrivateKey);
+    const lowLevelPublicKey = lowLevelPrivateKey.extractPublicKey();
+    try {
+      const serializedPublicKey = keyProvider.exportPublicKey(lowLevelPublicKey);
+      const identifier = this.calculateKeyPairIdentifier(serializedPublicKey);
       return new VirgilPrivateKey(identifier, lowLevelPrivateKey);
     } finally {
       lowLevelPublicKey.delete();
+      keyProvider.delete();
     }
   }
 
   exportPrivateKey(privateKey: VirgilPrivateKey) {
     this.throwIfDisposed();
     validatePrivateKey(privateKey);
-    return toBuffer(this.keyProvider.exportPrivateKey(privateKey.lowLevelPrivateKey));
+    const foundation = getFoundationModules();
+    const keyProvider = new foundation.KeyProvider();
+    keyProvider.random = this.random;
+    try {
+      keyProvider.setupDefaults();
+    } catch (error) {
+      keyProvider.delete();
+      throw error;
+    }
+    const publicKeyData = keyProvider.exportPrivateKey(privateKey.lowLevelPrivateKey);
+    keyProvider.delete();
+    return toBuffer(publicKeyData);
   }
 
   importPublicKey(rawPublicKey: Data) {
     this.throwIfDisposed();
     const serializedPublicKey = dataToUint8Array(rawPublicKey, 'base64');
-    const lowLevelPublicKey = this.keyProvider.importPublicKey(serializedPublicKey);
-    const identifier = this.calculateKeypairIdentifier(
-      serializedPublicKey,
-      this.useSha256Identifiers,
-    );
+    const foundation = getFoundationModules();
+    const keyProvider = new foundation.KeyProvider();
+    keyProvider.random = this.random;
+    try {
+      keyProvider.setupDefaults();
+    } catch (error) {
+      keyProvider.delete();
+      throw error;
+    }
+    const lowLevelPublicKey = keyProvider.importPublicKey(serializedPublicKey);
+    const identifier = this.calculateKeyPairIdentifier(serializedPublicKey);
+    keyProvider.delete();
     return new VirgilPublicKey(identifier, lowLevelPublicKey);
   }
 
   exportPublicKey(publicKey: VirgilPublicKey) {
     this.throwIfDisposed();
-    return toBuffer(this.keyProvider.exportPublicKey(publicKey.lowLevelPublicKey));
+    const foundation = getFoundationModules();
+    const keyProvider = new foundation.KeyProvider();
+    keyProvider.random = this.random;
+    try {
+      keyProvider.setupDefaults();
+    } catch (error) {
+      keyProvider.delete();
+      throw error;
+    }
+    const publicKeyData = keyProvider.exportPublicKey(publicKey.lowLevelPublicKey);
+    keyProvider.delete();
+    return toBuffer(publicKeyData);
   }
 
   encrypt(data: Data, publicKey: VirgilPublicKey | VirgilPublicKey[], enablePadding?: boolean) {
@@ -896,14 +846,47 @@ export class VirgilCrypto implements ICrypto {
     return hash;
   }
 
-  private calculateKeypairIdentifier(
-    serializedPublicKey: Uint8Array,
-    useSha256Identifiers: boolean,
-  ) {
-    if (useSha256Identifiers) {
+  private calculateKeyPairIdentifier(serializedPublicKey: Uint8Array) {
+    if (this.useSha256Identifiers) {
       return this.createHash(serializedPublicKey, getFoundationModules().Sha256);
     }
     return this.createHash(serializedPublicKey, getFoundationModules().Sha512).slice(0, 8);
+  }
+
+  private generateKeyPair(
+    keyProvider: FoundationModules.KeyProvider,
+    keyPairTypeConfig: KeyPairTypeConfig,
+  ) {
+    let lowLevelPrivateKey: FoundationModules.PrivateKey;
+    if (isCompoundKeyPairType(keyPairTypeConfig.type)) {
+      const [cipherFirstKeyAlgId, cipherSecondKeyAlgId] = keyPairTypeConfig.cipherAlgIds!;
+      const [signerFirstKeyAlgId, signerSecondKeyAlgId] = keyPairTypeConfig.signerAlgIds!;
+      lowLevelPrivateKey = keyProvider.generateCompoundHybridPrivateKey(
+        cipherFirstKeyAlgId,
+        cipherSecondKeyAlgId,
+        signerFirstKeyAlgId,
+        signerSecondKeyAlgId,
+      );
+    } else {
+      if (isRSAKeyPairType(keyPairTypeConfig.type)) {
+        keyProvider.setRsaParams(keyPairTypeConfig.bitlen!);
+      }
+      lowLevelPrivateKey = keyProvider.generatePrivateKey(keyPairTypeConfig.algId!);
+    }
+    const lowLevelPublicKey = lowLevelPrivateKey.extractPublicKey();
+    let serializedPublicKey: Uint8Array;
+    try {
+      serializedPublicKey = keyProvider.exportPublicKey(lowLevelPublicKey);
+    } catch (error) {
+      lowLevelPrivateKey.delete();
+      lowLevelPublicKey.delete();
+      throw error;
+    }
+    const identifier = this.calculateKeyPairIdentifier(serializedPublicKey);
+    return {
+      privateKey: new VirgilPrivateKey(identifier, lowLevelPrivateKey),
+      publicKey: new VirgilPublicKey(identifier, lowLevelPublicKey),
+    };
   }
 
   private throwIfDisposed() {

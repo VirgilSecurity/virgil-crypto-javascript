@@ -349,6 +349,7 @@ export class VirgilCrypto implements ICrypto {
 
     const signer = new foundation.Signer();
     const sha512 = new foundation.Sha512();
+    signer.random = this.random;
     signer.hash = sha512;
 
     signer.reset();

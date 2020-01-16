@@ -20,7 +20,7 @@
   "author": "Virgil Security Inc. <support@virgilsecurity.com>",
   "license": "BSD-3-Clause",
   "scripts": {
-    "test": "mocha -r ts-node/register src/**/*.test.ts",
+    "test": "mocha -t 0 -r ts-node/register src/**/*.test.ts",
     "build": "node --max-old-space-size=4096 node_modules/.bin/rollup -c",
     "clean": "rimraf .rpt2_cache dist",
     "prepare": "npm run clean && npm run build"
@@ -35,6 +35,7 @@
   "devDependencies": {
     "@types/chai": "^4.2.6",
     "@types/mocha": "^5.2.7",
+    "@types/node": "^13.1.7",
     "chai": "^4.2.0",
     "builtin-modules": "^3.1.0",
     "mocha": "^6.2.2",

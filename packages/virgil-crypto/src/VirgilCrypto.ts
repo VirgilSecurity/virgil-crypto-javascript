@@ -4,6 +4,7 @@ import { createVirgilGroupSession } from './groups/createVirgilGroupSession';
 import { computeSessionId, createInitialEpoch } from './groups/helpers';
 import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
 import { getFoundationModules } from './foundationModules';
+import { getRandom } from './getRandom';
 import { HashAlgorithm } from './HashAlgorithm';
 import {
   KeyPairType,
@@ -48,21 +49,13 @@ export class VirgilCrypto implements ICrypto {
   }
 
   constructor(options: VirgilCryptoOptions = {}) {
-    const foundation = getFoundationModules();
-    this.random = new foundation.CtrDrbg();
-    try {
-      this.random.setupDefaults();
-    } catch (error) {
-      this.random.delete();
-      throw error;
-    }
+    this.random = getRandom();
     this.defaultKeyPairType = options.defaultKeyPairType || KeyPairType.DEFAULT;
     this.useSha256Identifiers = options.useSha256Identifiers || false;
     this._isDisposed = false;
   }
 
   dispose() {
-    this.random.delete();
     this._isDisposed = true;
   }
 

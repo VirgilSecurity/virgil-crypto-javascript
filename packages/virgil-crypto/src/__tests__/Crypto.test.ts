@@ -1,4 +1,6 @@
 import { expect } from 'chai';
+import fs from 'fs';
+import path from 'path';
 
 import initFoundation from '@virgilsecurity/core-foundation';
 import { NodeBuffer } from '@virgilsecurity/data-utils';
@@ -124,12 +126,76 @@ describe('Crypto', () => {
     });
   });
 
+  const streamSignVerifyTest = (keyPairType: KeyPairType) =>
+    new Promise(resolve => {
+      const filePath = path.join(__dirname, 'testData.txt');
+      const keyPair1 = virgilCrypto.generateKeys(keyPairType);
+      const keyPair2 = virgilCrypto.generateKeys(keyPairType);
+      const signer = virgilCrypto.createStreamSigner();
+      const readStream1 = fs.createReadStream(filePath);
+      readStream1.on('data', data => {
+        signer.update(data);
+      });
+      readStream1.on('close', () => {
+        const signature = signer.sign(keyPair1.privateKey, true);
+        const verifier = virgilCrypto.createStreamVerifier(signature);
+        const readStream2 = fs.createReadStream(filePath);
+        readStream2.on('data', data => {
+          verifier.update(data);
+        });
+        readStream2.on('close', () => {
+          expect(verifier.verify(keyPair1.publicKey, false)).to.be.true;
+          expect(verifier.verify(keyPair2.publicKey, true)).to.be.false;
+          resolve();
+        });
+      });
+    });
+
   it('test06__sign_stream__file__should_verify', async () => {
-    // TODO: add this test
+    const promises = signingKeyTypes.map(streamSignVerifyTest);
+    await Promise.all(promises);
   });
 
-  it('test07__encrypt_stream__file__should_decrypt', () => {
-    // TODO: add this test
+  const streamEncryptDecryptTest = (keyPairType: KeyPairType) =>
+    new Promise(resolve => {
+      const filePath = path.join(__dirname, 'testData.txt');
+      const keyPair1 = virgilCrypto.generateKeys(keyPairType);
+      const keyPair2 = virgilCrypto.generateKeys(keyPairType);
+      const cipher = virgilCrypto.createStreamCipher(keyPair1.publicKey);
+      const readStream1 = fs.createReadStream(filePath);
+      const encryptedBufferStart = cipher.start();
+      const encryptedBuffers = new Array<Buffer>();
+      const fileData = new Array<Buffer>();
+      readStream1.on('data', data => {
+        encryptedBuffers.push(cipher.update(data));
+        fileData.push(data);
+      });
+      readStream1.on('close', () => {
+        const encryptedBufferEnd = cipher.final(true);
+        const encrypted = NodeBuffer.concat([
+          encryptedBufferStart,
+          ...encryptedBuffers,
+          encryptedBufferEnd,
+        ]);
+        const decipher1 = virgilCrypto.createStreamDecipher(keyPair1.privateKey);
+        const decipher2 = virgilCrypto.createStreamDecipher(keyPair2.privateKey);
+        const decryptedBuffers = new Array<Buffer>();
+        decryptedBuffers.push(decipher1.update(encrypted));
+        const decryptedBufferEnd = decipher1.final(true);
+        const decrypted = NodeBuffer.concat([...decryptedBuffers, decryptedBufferEnd]);
+        const file = NodeBuffer.concat(fileData);
+        const error = () => {
+          decipher2.update(encrypted);
+        };
+        expect(decrypted.equals(file)).to.be.true;
+        expect(error).to.throw;
+        resolve();
+      });
+    });
+
+  it('test07__encrypt_stream__file__should_decrypt', async () => {
+    const promises = allKeyTypes.map(streamEncryptDecryptTest);
+    await Promise.all(promises);
   });
 
   it('test08__generate_key_using_seed__fixed_seed__should_match', () => {

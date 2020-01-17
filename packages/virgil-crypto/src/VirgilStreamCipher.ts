@@ -2,6 +2,7 @@ import { dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 
 import { DATA_SIGNATURE_KEY } from './constants';
 import { getFoundationModules } from './foundationModules';
+import { getRandom } from './getRandom';
 import { Data } from './types';
 import { toArray } from './utils';
 import { validatePublicKeysArray } from './validators';
@@ -33,13 +34,7 @@ export class VirgilStreamCipher {
     const foundationModules = getFoundationModules();
     this.publicKeys = toArray(publicKey);
     validatePublicKeysArray(this.publicKeys);
-    this.ctrDrbg = new foundationModules.CtrDrbg();
-    try {
-      this.ctrDrbg.setupDefaults();
-    } catch (error) {
-      this.ctrDrbg.delete();
-      throw error;
-    }
+    this.ctrDrbg = getRandom();
     this.recipientCipher = new foundationModules.RecipientCipher();
     this.aes256Gcm = new foundationModules.Aes256Gcm();
     this.recipientCipher.encryptionCipher = this.aes256Gcm;
@@ -85,7 +80,6 @@ export class VirgilStreamCipher {
   dispose() {
     this.recipientCipher.delete();
     this.aes256Gcm.delete();
-    this.ctrDrbg.delete();
     if (this.messageInfoCustomParams) {
       this.messageInfoCustomParams.delete();
     }

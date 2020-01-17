@@ -1,6 +1,7 @@
 import { dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 
 import { getFoundationModules } from './foundationModules';
+import { getRandom } from './getRandom';
 import { Data } from './types';
 import { validatePrivateKey } from './validators';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
@@ -19,7 +20,7 @@ export class VirgilStreamSigner {
     const foundationModules = getFoundationModules();
     this.signer = new foundationModules.Signer();
     this.sha512 = new foundationModules.Sha512();
-    this.random = new foundationModules.CtrDrbg();
+    this.random = getRandom();
     this.signer.hash = this.sha512;
     this.signer.random = this.random;
     this.signer.reset();
@@ -54,7 +55,6 @@ export class VirgilStreamSigner {
 
   dispose() {
     this.signer.delete();
-    this.random.delete();
     this.sha512.delete();
     this._isDisposed = true;
   }

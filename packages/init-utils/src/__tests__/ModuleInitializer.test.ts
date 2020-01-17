@@ -118,4 +118,47 @@ describe('ModuleInitializer', () => {
       expect(promise1).not.to.equal(promise2);
     });
   });
+
+  describe('events', () => {
+    it("emits 'load' event", done => {
+      const moduleName = 'module1';
+      const modulePayload = {};
+      moduleInitializer.on('load', (name, module) => {
+        expect(name).to.equal(moduleName);
+        expect(module).to.equal(modulePayload);
+        done();
+      });
+      moduleInitializer.addModule(moduleName, () => Promise.resolve(modulePayload));
+      moduleInitializer.loadModules();
+    });
+
+    it("emits 'remove' event", done => {
+      const moduleName = 'module1';
+      const modulePayload = {};
+      moduleInitializer.on('remove', (name, module) => {
+        expect(name).to.equal(moduleName);
+        expect(module).to.equal(modulePayload);
+        done();
+      });
+      moduleInitializer.addModule(moduleName, () => Promise.resolve(modulePayload));
+      moduleInitializer.loadModules().then(() => {
+        moduleInitializer.removeModule(moduleName);
+      });
+    });
+
+    it("emits 'error' event", done => {
+      const moduleName = 'module1';
+      moduleInitializer.on('error', (error, name) => {
+        expect(error).to.be.instanceOf(ModuleAlreadyExistsError);
+        expect(name).to.equal(moduleName);
+        done();
+      });
+      moduleInitializer.addModule(moduleName, () => Promise.resolve());
+      try {
+        moduleInitializer.addModule(moduleName, () => Promise.resolve());
+      } catch (error) {
+        expect(error).to.be.instanceOf(ModuleAlreadyExistsError);
+      }
+    });
+  });
 });

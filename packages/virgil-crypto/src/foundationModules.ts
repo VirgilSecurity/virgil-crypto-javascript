@@ -8,9 +8,11 @@ export const moduleInitializer = new ModuleInitializer();
 
 moduleInitializer.addModule<FoundationModules>('foundation', initFoundationModules);
 
-moduleInitializer.on('load', (_, foundationModules) => {
-  resetGlobalInstances();
-  createGlobalInstances(foundationModules);
+moduleInitializer.on('load', (name, modules) => {
+  if (name === 'foundation') {
+    resetGlobalInstances();
+    createGlobalInstances(modules);
+  }
 });
 
 moduleInitializer.on('remove', name => {

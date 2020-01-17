@@ -23,8 +23,6 @@ import { VirgilStreamDecipher } from './VirgilStreamDecipher';
 import { VirgilStreamSigner } from './VirgilStreamSigner';
 import { VirgilStreamVerifier } from './VirgilStreamVerifier';
 
-export const MIN_GROUP_ID_BYTE_LENGTH = 10;
-
 export interface VirgilCryptoOptions {
   useSha256Identifiers?: boolean;
   defaultKeyPairType?: KeyPairType;
@@ -35,11 +33,15 @@ export class VirgilCrypto implements ICrypto {
     return 160;
   }
 
-  readonly useSha256Identifiers: boolean;
-  readonly defaultKeyPairType: KeyPairType;
+  static get MIN_GROUP_ID_BYTE_LENGTH() {
+    return 10;
+  }
 
   readonly hashAlgorithm = HashAlgorithm;
   readonly keyPairType = KeyPairType;
+
+  readonly useSha256Identifiers: boolean;
+  readonly defaultKeyPairType: KeyPairType;
 
   constructor(options: VirgilCryptoOptions = {}) {
     this.defaultKeyPairType = options.defaultKeyPairType || KeyPairType.DEFAULT;
@@ -111,9 +113,11 @@ export class VirgilCrypto implements ICrypto {
     return toBuffer(publicKeyData);
   }
 
-  encrypt(data: Data, publicKey: VirgilPublicKey | VirgilPublicKey[], enablePadding?: boolean) {
-    const myData = dataToUint8Array(data, 'utf8');
-    const publicKeys = toArray(publicKey);
+  encrypt(data: Data, publicKey: VirgilPublicKey, enablePadding?: boolean): BufferType;
+  encrypt(data: Data, publicKeys: VirgilPublicKey[], enablePadding?: boolean): BufferType;
+  encrypt(arg0: Data, arg1: VirgilPublicKey | VirgilPublicKey[], arg2?: boolean) {
+    const data = dataToUint8Array(arg0, 'utf8');
+    const publicKeys = toArray(arg1);
     validatePublicKeysArray(publicKeys);
     const foundation = getFoundationModules();
     const random = getRandom();
@@ -123,7 +127,7 @@ export class VirgilCrypto implements ICrypto {
     recipientCipher.random = random;
     let randomPadding: FoundationModules.RandomPadding | undefined;
     let paddingParams: FoundationModules.PaddingParams | undefined;
-    if (enablePadding) {
+    if (arg2) {
       randomPadding = new foundation.RandomPadding();
       randomPadding.random = random;
       recipientCipher.encryptionPadding = randomPadding;
@@ -139,11 +143,10 @@ export class VirgilCrypto implements ICrypto {
     try {
       recipientCipher.startEncryption();
       const messageInfo = recipientCipher.packMessageInfo();
-      const processEncryption = recipientCipher.processEncryption(myData);
+      const processEncryption = recipientCipher.processEncryption(data);
       const finishEncryption = recipientCipher.finishEncryption();
       return NodeBuffer.concat([messageInfo, processEncryption, finishEncryption]);
     } finally {
-      recipientCipher.delete();
       aes256Gcm.delete();
       if (paddingParams) {
         paddingParams.delete();
@@ -151,6 +154,7 @@ export class VirgilCrypto implements ICrypto {
       if (randomPadding) {
         randomPadding.delete();
       }
+      recipientCipher.delete();
     }
   }
 
@@ -169,7 +173,7 @@ export class VirgilCrypto implements ICrypto {
       recipientCipher.startDecryptionWithKey(
         privateKey.identifier,
         privateKey.lowLevelPrivateKey,
-        new Uint8Array(0),
+        new Uint8Array(),
       );
       const processDecryption = recipientCipher.processDecryption(myData);
       const finishDecryption = recipientCipher.finishDecryption();
@@ -248,260 +252,99 @@ export class VirgilCrypto implements ICrypto {
   signAndEncrypt(
     data: Data,
     privateKey: VirgilPrivateKey,
-    publicKey: VirgilPublicKey | VirgilPublicKey[],
+    publicKey: VirgilPublicKey,
     enablePadding?: boolean,
+  ): BufferType;
+  signAndEncrypt(
+    data: Data,
+    privateKey: VirgilPrivateKey,
+    publicKeys: VirgilPublicKey[],
+    enablePadding?: boolean,
+  ): BufferType;
+  signAndEncrypt(
+    arg0: Data,
+    arg1: VirgilPrivateKey,
+    arg2: VirgilPublicKey | VirgilPublicKey[],
+    arg3?: boolean,
   ) {
-    const myData = dataToUint8Array(data, 'utf8');
-    validatePrivateKey(privateKey);
-    const publicKeys = toArray(publicKey);
+    const data = dataToUint8Array(arg0, 'utf8');
+    validatePrivateKey(arg1);
+    const publicKeys = toArray(arg2);
     validatePublicKeysArray(publicKeys);
-    const foundation = getFoundationModules();
-    const random = getRandom();
-    const recipientCipher = new foundation.RecipientCipher();
-    const aes256Gcm = new foundation.Aes256Gcm();
-    const sha512 = new foundation.Sha512();
-    recipientCipher.encryptionCipher = aes256Gcm;
-    recipientCipher.random = random;
-    recipientCipher.signerHash = sha512;
-    let randomPadding: FoundationModules.RandomPadding | undefined;
-    let paddingParams: FoundationModules.PaddingParams | undefined;
-    if (enablePadding) {
-      randomPadding = new foundation.RandomPadding();
-      randomPadding.random = random;
-      recipientCipher.encryptionPadding = randomPadding;
-      paddingParams = foundation.PaddingParams.newWithConstraints(
-        VirgilCrypto.PADDING_LEN,
-        VirgilCrypto.PADDING_LEN,
-      );
-      recipientCipher.paddingParams = paddingParams;
-    }
-    publicKeys.forEach(({ identifier }, index) => {
-      recipientCipher.addKeyRecipient(identifier, publicKeys[index].lowLevelPublicKey);
-    });
-    try {
-      recipientCipher.addSigner(privateKey.identifier, privateKey.lowLevelPrivateKey);
-      recipientCipher.startSignedEncryption(myData.length);
-      const messageInfo = recipientCipher.packMessageInfo();
-      const processEncryption = recipientCipher.processEncryption(myData);
-      const finishEncryption = recipientCipher.finishEncryption();
-      const messageInfoFooter = recipientCipher.packMessageInfoFooter();
-      return NodeBuffer.concat([
-        messageInfo,
-        processEncryption,
-        finishEncryption,
-        messageInfoFooter,
-      ]);
-    } finally {
-      sha512.delete();
-      aes256Gcm.delete();
-      if (randomPadding) {
-        randomPadding.delete();
-      }
-      if (paddingParams) {
-        paddingParams.delete();
-      }
-      recipientCipher.delete();
-    }
+    const {
+      messageInfo,
+      processEncryption,
+      finishEncryption,
+      messageInfoFooter,
+    } = this._signAndEncrypt(data, arg1, publicKeys, arg3);
+    return NodeBuffer.concat([messageInfo, processEncryption, finishEncryption, messageInfoFooter]);
   }
 
   signThenEncrypt(
     data: Data,
     privateKey: VirgilPrivateKey,
-    publicKey: VirgilPublicKey | VirgilPublicKey[],
+    publicKey: VirgilPublicKey,
     enablePadding?: boolean,
+  ): BufferType;
+  signThenEncrypt(
+    data: Data,
+    privateKey: VirgilPrivateKey,
+    publicKeys: VirgilPublicKey[],
+    enablePadding?: boolean,
+  ): BufferType;
+  signThenEncrypt(
+    arg0: Data,
+    arg1: VirgilPrivateKey,
+    arg2: VirgilPublicKey | VirgilPublicKey[],
+    arg3?: boolean,
   ) {
-    const myData = dataToUint8Array(data, 'utf8');
-    validatePrivateKey(privateKey);
-    const publicKeys = toArray(publicKey);
+    const data = dataToUint8Array(arg0, 'utf8');
+    validatePrivateKey(arg1);
+    const publicKeys = toArray(arg2);
     validatePublicKeysArray(publicKeys);
-    const foundation = getFoundationModules();
-    const random = getRandom();
-    const recipientCipher = new foundation.RecipientCipher();
-    const aes256Gcm = new foundation.Aes256Gcm();
-    recipientCipher.encryptionCipher = aes256Gcm;
-    recipientCipher.random = random;
-    let randomPadding: FoundationModules.RandomPadding | undefined;
-    let paddingParams: FoundationModules.PaddingParams | undefined;
-    if (enablePadding) {
-      randomPadding = new foundation.RandomPadding();
-      randomPadding.random = random;
-      recipientCipher.encryptionPadding = randomPadding;
-      paddingParams = foundation.PaddingParams.newWithConstraints(
-        VirgilCrypto.PADDING_LEN,
-        VirgilCrypto.PADDING_LEN,
-      );
-      recipientCipher.paddingParams = paddingParams;
-    }
-    publicKeys.forEach(({ identifier }, index) => {
-      recipientCipher.addKeyRecipient(identifier, publicKeys[index].lowLevelPublicKey);
-    });
-    const messageInfoCustomParams = recipientCipher.customParams();
-    try {
-      const signature = this.calculateSignature(myData, privateKey);
-      messageInfoCustomParams.addData(DATA_SIGNATURE_KEY, signature);
-      messageInfoCustomParams.addData(DATA_SIGNER_ID_KEY, privateKey.identifier);
-      recipientCipher.startEncryption();
-      const messageInfo = recipientCipher.packMessageInfo();
-      const processEncryption = recipientCipher.processEncryption(myData);
-      const finishEncryption = recipientCipher.finishEncryption();
-      return NodeBuffer.concat([messageInfo, processEncryption, finishEncryption]);
-    } finally {
-      if (randomPadding) {
-        randomPadding.delete();
-      }
-      if (paddingParams) {
-        paddingParams.delete();
-      }
-      recipientCipher.delete();
-      aes256Gcm.delete();
-      messageInfoCustomParams.delete();
-    }
+    const { messageInfo, processEncryption, finishEncryption } = this._signThenEncrypt(
+      data,
+      arg1,
+      publicKeys,
+      arg3,
+    );
+    return NodeBuffer.concat([messageInfo, processEncryption, finishEncryption]);
   }
 
   decryptAndVerify(
     encryptedData: Data,
     privateKey: VirgilPrivateKey,
-    publicKey: VirgilPublicKey | VirgilPublicKey[],
-  ) {
-    const myEncryptedData = dataToUint8Array(encryptedData, 'base64');
-    const publicKeys = toArray(publicKey);
+    publicKey: VirgilPublicKey,
+  ): BufferType;
+  decryptAndVerify(
+    encryptedData: Data,
+    privateKey: VirgilPrivateKey,
+    publicKeys: VirgilPublicKey[],
+  ): BufferType;
+  decryptAndVerify(arg0: Data, arg1: VirgilPrivateKey, arg2: VirgilPublicKey | VirgilPublicKey[]) {
+    const encryptedData = dataToUint8Array(arg0, 'base64');
+    validatePrivateKey(arg1);
+    const publicKeys = toArray(arg2);
     validatePublicKeysArray(publicKeys);
-    validatePrivateKey(privateKey);
-    const foundation = getFoundationModules();
-    const paddingParams = foundation.PaddingParams.newWithConstraints(
-      VirgilCrypto.PADDING_LEN,
-      VirgilCrypto.PADDING_LEN,
-    );
-    const recipientCipher = new foundation.RecipientCipher();
-    recipientCipher.random = getRandom();
-    recipientCipher.paddingParams = paddingParams;
-    let decryptedData: BufferType;
-    try {
-      recipientCipher.startDecryptionWithKey(
-        privateKey.identifier,
-        privateKey.lowLevelPrivateKey,
-        new Uint8Array(0),
-      );
-      const processDecryption = recipientCipher.processDecryption(myEncryptedData);
-      const finishDecryption = recipientCipher.finishDecryption();
-      decryptedData = NodeBuffer.concat([processDecryption, finishDecryption]);
-    } catch (error) {
-      paddingParams.delete();
-      recipientCipher.delete();
-      throw error;
-    }
-    if (!recipientCipher.isDataSigned()) {
-      paddingParams.delete();
-      recipientCipher.delete();
-      throw new Error('Data is not signed');
-    }
-    const signerInfoList = recipientCipher.signerInfos();
-    if (!signerInfoList.hasItem()) {
-      paddingParams.delete();
-      signerInfoList.delete();
-      recipientCipher.delete();
-      throw new Error('Data is not signed');
-    }
-    const signerInfo = signerInfoList.item();
-    let signerPublicKey: VirgilPublicKey;
-    for (let i = 0; i < publicKeys.length; i += 1) {
-      if (NodeBuffer.compare(signerInfo.signerId(), publicKeys[i].identifier) === 0) {
-        signerPublicKey = publicKeys[i];
-        break;
-      }
-      if (i === publicKeys.length - 1) {
-        paddingParams.delete();
-        signerInfo.delete();
-        signerInfoList.delete();
-        recipientCipher.delete();
-        throw new Error('Signer not found');
-      }
-    }
-    if (!recipientCipher.verifySignerInfo(signerInfo, signerPublicKey!.lowLevelPublicKey)) {
-      paddingParams.delete();
-      signerInfo.delete();
-      signerInfoList.delete();
-      recipientCipher.delete();
-      throw new Error('Invalid signature');
-    }
-    paddingParams.delete();
-    signerInfo.delete();
-    signerInfoList.delete();
-    recipientCipher.delete();
-    return decryptedData;
+    return this._decryptAndVerify(encryptedData, new Uint8Array(), arg1, publicKeys);
   }
 
   decryptThenVerify(
     encryptedData: Data,
     privateKey: VirgilPrivateKey,
-    publicKey: VirgilPublicKey | VirgilPublicKey[],
-  ) {
-    const myEncryptedData = dataToUint8Array(encryptedData, 'base64');
-    const publicKeys = toArray(publicKey);
+    publicKey: VirgilPublicKey,
+  ): BufferType;
+  decryptThenVerify(
+    encryptedData: Data,
+    privateKey: VirgilPrivateKey,
+    publicKeys: VirgilPublicKey[],
+  ): BufferType;
+  decryptThenVerify(arg0: Data, arg1: VirgilPrivateKey, arg2: VirgilPublicKey | VirgilPublicKey[]) {
+    const encryptedData = dataToUint8Array(arg0, 'base64');
+    validatePrivateKey(arg1);
+    const publicKeys = toArray(arg2);
     validatePublicKeysArray(publicKeys);
-    validatePrivateKey(privateKey);
-    const foundation = getFoundationModules();
-    const paddingParams = foundation.PaddingParams.newWithConstraints(
-      VirgilCrypto.PADDING_LEN,
-      VirgilCrypto.PADDING_LEN,
-    );
-    const recipientCipher = new foundation.RecipientCipher();
-    recipientCipher.random = getRandom();
-    recipientCipher.paddingParams = paddingParams;
-    let decryptedData: BufferType;
-    try {
-      recipientCipher.startDecryptionWithKey(
-        privateKey.identifier,
-        privateKey.lowLevelPrivateKey,
-        new Uint8Array(0),
-      );
-      const processDecryption = recipientCipher.processDecryption(myEncryptedData);
-      const finishDecryption = recipientCipher.finishDecryption();
-      decryptedData = NodeBuffer.concat([processDecryption, finishDecryption]);
-    } catch (error) {
-      paddingParams.delete();
-      recipientCipher.delete();
-      throw error;
-    }
-    const messageInfoCustomParams = recipientCipher.customParams();
-    let signerPublicKey: VirgilPublicKey | undefined;
-    if (publicKeys.length === 1) {
-      signerPublicKey = publicKeys[0];
-    } else {
-      let signerId: Uint8Array;
-      try {
-        signerId = messageInfoCustomParams.findData(DATA_SIGNER_ID_KEY);
-      } catch (error) {
-        paddingParams.delete();
-        recipientCipher.delete();
-        messageInfoCustomParams.delete();
-        throw error;
-      }
-      for (let i = 0; i < publicKeys.length; i += 1) {
-        if (NodeBuffer.compare(signerId, publicKeys[i].identifier) === 0) {
-          signerPublicKey = publicKeys[i];
-          break;
-        }
-      }
-      if (!signerPublicKey) {
-        paddingParams.delete();
-        recipientCipher.delete();
-        messageInfoCustomParams.delete();
-        throw new Error('Signer not found');
-      }
-    }
-    try {
-      const signature = messageInfoCustomParams.findData(DATA_SIGNATURE_KEY);
-      const isValid = this.verifySignature(decryptedData, signature, signerPublicKey);
-      if (!isValid) {
-        throw new Error('Invalid signature');
-      }
-      return decryptedData;
-    } finally {
-      paddingParams.delete();
-      recipientCipher.delete();
-      messageInfoCustomParams.delete();
-    }
+    return this._decryptThenVerify(encryptedData, new Uint8Array(), arg1, publicKeys);
   }
 
   getRandomBytes(length: number) {
@@ -512,132 +355,61 @@ export class VirgilCrypto implements ICrypto {
   signThenEncryptDetached(
     data: Data,
     privateKey: VirgilPrivateKey,
-    publicKey: VirgilPublicKey | VirgilPublicKey[],
+    publicKey: VirgilPublicKey,
     enablePadding?: boolean,
+  ): { encryptedData: BufferType; metadata: BufferType };
+  signThenEncryptDetached(
+    data: Data,
+    privateKey: VirgilPrivateKey,
+    publicKeys: VirgilPublicKey[],
+    enablePadding?: boolean,
+  ): { encryptedData: BufferType; metadata: BufferType };
+  signThenEncryptDetached(
+    arg0: Data,
+    arg1: VirgilPrivateKey,
+    arg2: VirgilPublicKey | VirgilPublicKey[],
+    arg3?: boolean,
   ) {
-    const myData = dataToUint8Array(data, 'utf8');
-    validatePrivateKey(privateKey);
-    const publicKeys = toArray(publicKey);
+    const data = dataToUint8Array(arg0, 'utf8');
+    validatePrivateKey(arg1);
+    const publicKeys = toArray(arg2);
     validatePublicKeysArray(publicKeys);
-    const foundation = getFoundationModules();
-    const random = getRandom();
-    const recipientCipher = new foundation.RecipientCipher();
-    const aes256Gcm = new foundation.Aes256Gcm();
-    recipientCipher.encryptionCipher = aes256Gcm;
-    recipientCipher.random = random;
-    let randomPadding: FoundationModules.RandomPadding | undefined;
-    let paddingParams: FoundationModules.PaddingParams | undefined;
-    if (enablePadding) {
-      randomPadding = new foundation.RandomPadding();
-      randomPadding.random = random;
-      recipientCipher.encryptionPadding = randomPadding;
-      paddingParams = foundation.PaddingParams.newWithConstraints(
-        VirgilCrypto.PADDING_LEN,
-        VirgilCrypto.PADDING_LEN,
-      );
-      recipientCipher.paddingParams = paddingParams;
-    }
-    publicKeys.forEach(({ identifier }, index) => {
-      recipientCipher.addKeyRecipient(identifier, publicKeys[index].lowLevelPublicKey);
-    });
-    const messageInfoCustomParams = recipientCipher.customParams();
-    try {
-      const signature = this.calculateSignature(myData, privateKey);
-      messageInfoCustomParams.addData(DATA_SIGNATURE_KEY, signature);
-      messageInfoCustomParams.addData(DATA_SIGNER_ID_KEY, privateKey.identifier);
-      recipientCipher.startEncryption();
-      const messageInfo = recipientCipher.packMessageInfo();
-      const processEncryption = recipientCipher.processEncryption(myData);
-      const finishEncryption = recipientCipher.finishEncryption();
-      const encryptedData = NodeBuffer.concat([processEncryption, finishEncryption]);
-      const metadata = toBuffer(messageInfo);
-      return { encryptedData, metadata };
-    } finally {
-      if (randomPadding) {
-        randomPadding.delete();
-      }
-      if (paddingParams) {
-        paddingParams.delete();
-      }
-      recipientCipher.delete();
-      aes256Gcm.delete();
-      messageInfoCustomParams.delete();
-    }
+    const { messageInfo, processEncryption, finishEncryption } = this._signThenEncrypt(
+      data,
+      arg1,
+      publicKeys,
+      arg3,
+    );
+    return {
+      encryptedData: NodeBuffer.concat([processEncryption, finishEncryption]),
+      metadata: toBuffer(messageInfo),
+    };
   }
 
   decryptThenVerifyDetached(
     encryptedData: Data,
     metadata: Data,
     privateKey: VirgilPrivateKey,
-    publicKey: VirgilPublicKey | VirgilPublicKey[],
+    publicKey: VirgilPublicKey,
+  ): BufferType;
+  decryptThenVerifyDetached(
+    encryptedData: Data,
+    metadata: Data,
+    privateKey: VirgilPrivateKey,
+    publicKeys: VirgilPublicKey[],
+  ): BufferType;
+  decryptThenVerifyDetached(
+    arg0: Data,
+    arg1: Data,
+    arg2: VirgilPrivateKey,
+    arg3: VirgilPublicKey | VirgilPublicKey[],
   ) {
-    const myEncryptedData = dataToUint8Array(encryptedData, 'base64');
-    const myMetadata = dataToUint8Array(metadata, 'base64');
-    validatePrivateKey(privateKey);
-    const publicKeys = toArray(publicKey);
+    const encryptedData = dataToUint8Array(arg0, 'base64');
+    const messageInfo = dataToUint8Array(arg1, 'base64');
+    validatePrivateKey(arg2);
+    const publicKeys = toArray(arg3);
     validatePublicKeysArray(publicKeys);
-    const foundation = getFoundationModules();
-    const paddingParams = foundation.PaddingParams.newWithConstraints(
-      VirgilCrypto.PADDING_LEN,
-      VirgilCrypto.PADDING_LEN,
-    );
-    const recipientCipher = new foundation.RecipientCipher();
-    recipientCipher.random = getRandom();
-    recipientCipher.paddingParams = paddingParams;
-    let decryptedData: BufferType;
-    try {
-      recipientCipher.startDecryptionWithKey(
-        privateKey.identifier,
-        privateKey.lowLevelPrivateKey,
-        myMetadata,
-      );
-      const processDecryption = recipientCipher.processDecryption(myEncryptedData);
-      const finishDecryption = recipientCipher.finishDecryption();
-      decryptedData = NodeBuffer.concat([processDecryption, finishDecryption]);
-    } catch (error) {
-      paddingParams.delete();
-      recipientCipher.delete();
-      throw error;
-    }
-    const messageInfoCustomParams = recipientCipher.customParams();
-    let signerPublicKey: VirgilPublicKey | undefined;
-    if (publicKeys.length === 1) {
-      signerPublicKey = publicKeys[0];
-    } else {
-      let signerId: Uint8Array;
-      try {
-        signerId = messageInfoCustomParams.findData(DATA_SIGNER_ID_KEY);
-      } catch (error) {
-        paddingParams.delete();
-        recipientCipher.delete();
-        messageInfoCustomParams.delete();
-        throw error;
-      }
-      for (let i = 0; i < publicKeys.length; i += 1) {
-        if (NodeBuffer.compare(signerId, publicKeys[i].identifier) === 0) {
-          signerPublicKey = publicKeys[i];
-          break;
-        }
-      }
-      if (!signerPublicKey) {
-        paddingParams.delete();
-        recipientCipher.delete();
-        messageInfoCustomParams.delete();
-        throw new Error('Signer not found');
-      }
-    }
-    try {
-      const signature = messageInfoCustomParams.findData(DATA_SIGNATURE_KEY);
-      const isValid = this.verifySignature(decryptedData, signature, signerPublicKey);
-      if (!isValid) {
-        throw new Error('Invalid signature');
-      }
-      return decryptedData;
-    } finally {
-      paddingParams.delete();
-      recipientCipher.delete();
-      messageInfoCustomParams.delete();
-    }
+    return this._decryptThenVerify(encryptedData, messageInfo, arg2, publicKeys);
   }
 
   createStreamCipher(publicKey: VirgilPublicKey | VirgilPublicKey[], signature?: Data) {
@@ -683,9 +455,9 @@ export class VirgilCrypto implements ICrypto {
   }
 
   private validateGroupId(groupId: Uint8Array) {
-    if (groupId.byteLength < MIN_GROUP_ID_BYTE_LENGTH) {
+    if (groupId.byteLength < VirgilCrypto.MIN_GROUP_ID_BYTE_LENGTH) {
       throw new Error(
-        `The given group Id is too short. Must be at least ${MIN_GROUP_ID_BYTE_LENGTH} bytes.`,
+        `The given group Id is too short. Must be at least ${VirgilCrypto.MIN_GROUP_ID_BYTE_LENGTH} bytes.`,
       );
     }
   }
@@ -741,5 +513,254 @@ export class VirgilCrypto implements ICrypto {
       privateKey: new VirgilPrivateKey(identifier, lowLevelPrivateKey),
       publicKey: new VirgilPublicKey(identifier, lowLevelPublicKey),
     };
+  }
+
+  private _signAndEncrypt(
+    data: Uint8Array,
+    privateKey: VirgilPrivateKey,
+    publicKeys: VirgilPublicKey[],
+    enablePadding?: boolean,
+  ) {
+    const foundation = getFoundationModules();
+    const random = getRandom();
+    const recipientCipher = new foundation.RecipientCipher();
+    const aes256Gcm = new foundation.Aes256Gcm();
+    const sha512 = new foundation.Sha512();
+    recipientCipher.encryptionCipher = aes256Gcm;
+    recipientCipher.random = random;
+    recipientCipher.signerHash = sha512;
+    let randomPadding: FoundationModules.RandomPadding | undefined;
+    let paddingParams: FoundationModules.PaddingParams | undefined;
+    if (enablePadding) {
+      randomPadding = new foundation.RandomPadding();
+      randomPadding.random = random;
+      recipientCipher.encryptionPadding = randomPadding;
+      paddingParams = foundation.PaddingParams.newWithConstraints(
+        VirgilCrypto.PADDING_LEN,
+        VirgilCrypto.PADDING_LEN,
+      );
+      recipientCipher.paddingParams = paddingParams;
+    }
+    publicKeys.forEach(({ identifier }, index) => {
+      recipientCipher.addKeyRecipient(identifier, publicKeys[index].lowLevelPublicKey);
+    });
+    try {
+      recipientCipher.addSigner(privateKey.identifier, privateKey.lowLevelPrivateKey);
+      recipientCipher.startSignedEncryption(data.length);
+      const messageInfo = recipientCipher.packMessageInfo();
+      const processEncryption = recipientCipher.processEncryption(data);
+      const finishEncryption = recipientCipher.finishEncryption();
+      const messageInfoFooter = recipientCipher.packMessageInfoFooter();
+      return {
+        messageInfo,
+        processEncryption,
+        finishEncryption,
+        messageInfoFooter,
+      };
+    } finally {
+      sha512.delete();
+      aes256Gcm.delete();
+      if (randomPadding) {
+        randomPadding.delete();
+      }
+      if (paddingParams) {
+        paddingParams.delete();
+      }
+      recipientCipher.delete();
+    }
+  }
+
+  private _signThenEncrypt(
+    data: Uint8Array,
+    privateKey: VirgilPrivateKey,
+    publicKeys: VirgilPublicKey[],
+    enablePadding?: boolean,
+  ) {
+    const foundation = getFoundationModules();
+    const random = getRandom();
+    const recipientCipher = new foundation.RecipientCipher();
+    const aes256Gcm = new foundation.Aes256Gcm();
+    recipientCipher.encryptionCipher = aes256Gcm;
+    recipientCipher.random = random;
+    let randomPadding: FoundationModules.RandomPadding | undefined;
+    let paddingParams: FoundationModules.PaddingParams | undefined;
+    if (enablePadding) {
+      randomPadding = new foundation.RandomPadding();
+      randomPadding.random = random;
+      recipientCipher.encryptionPadding = randomPadding;
+      paddingParams = foundation.PaddingParams.newWithConstraints(
+        VirgilCrypto.PADDING_LEN,
+        VirgilCrypto.PADDING_LEN,
+      );
+      recipientCipher.paddingParams = paddingParams;
+    }
+    publicKeys.forEach(({ identifier }, index) => {
+      recipientCipher.addKeyRecipient(identifier, publicKeys[index].lowLevelPublicKey);
+    });
+    const messageInfoCustomParams = recipientCipher.customParams();
+    try {
+      const signature = this.calculateSignature(data, privateKey);
+      messageInfoCustomParams.addData(DATA_SIGNATURE_KEY, signature);
+      messageInfoCustomParams.addData(DATA_SIGNER_ID_KEY, privateKey.identifier);
+      recipientCipher.startEncryption();
+      const messageInfo = recipientCipher.packMessageInfo();
+      const processEncryption = recipientCipher.processEncryption(data);
+      const finishEncryption = recipientCipher.finishEncryption();
+      return {
+        messageInfo,
+        processEncryption,
+        finishEncryption,
+      };
+    } finally {
+      messageInfoCustomParams.delete();
+      aes256Gcm.delete();
+      if (randomPadding) {
+        randomPadding.delete();
+      }
+      if (paddingParams) {
+        paddingParams.delete();
+      }
+      recipientCipher.delete();
+    }
+  }
+
+  private _decryptAndVerify(
+    encryptedData: Uint8Array,
+    messageInfo: Uint8Array,
+    privateKey: VirgilPrivateKey,
+    publicKeys: VirgilPublicKey[],
+  ) {
+    const foundation = getFoundationModules();
+    const paddingParams = foundation.PaddingParams.newWithConstraints(
+      VirgilCrypto.PADDING_LEN,
+      VirgilCrypto.PADDING_LEN,
+    );
+    const recipientCipher = new foundation.RecipientCipher();
+    recipientCipher.random = getRandom();
+    recipientCipher.paddingParams = paddingParams;
+    let decryptedData: BufferType;
+    try {
+      recipientCipher.startDecryptionWithKey(
+        privateKey.identifier,
+        privateKey.lowLevelPrivateKey,
+        messageInfo,
+      );
+      const processDecryption = recipientCipher.processDecryption(encryptedData);
+      const finishDecryption = recipientCipher.finishDecryption();
+      decryptedData = NodeBuffer.concat([processDecryption, finishDecryption]);
+    } catch (error) {
+      paddingParams.delete();
+      recipientCipher.delete();
+      throw error;
+    }
+    if (!recipientCipher.isDataSigned()) {
+      paddingParams.delete();
+      recipientCipher.delete();
+      throw new Error('Data is not signed');
+    }
+    const signerInfoList = recipientCipher.signerInfos();
+    if (!signerInfoList.hasItem()) {
+      paddingParams.delete();
+      signerInfoList.delete();
+      recipientCipher.delete();
+      throw new Error('Data is not signed');
+    }
+    const signerInfo = signerInfoList.item();
+    let signerPublicKey: VirgilPublicKey;
+    for (let i = 0; i < publicKeys.length; i += 1) {
+      if (NodeBuffer.compare(signerInfo.signerId(), publicKeys[i].identifier) === 0) {
+        signerPublicKey = publicKeys[i];
+        break;
+      }
+      if (i === publicKeys.length - 1) {
+        paddingParams.delete();
+        signerInfo.delete();
+        signerInfoList.delete();
+        recipientCipher.delete();
+        throw new Error('Signer not found');
+      }
+    }
+    if (!recipientCipher.verifySignerInfo(signerInfo, signerPublicKey!.lowLevelPublicKey)) {
+      paddingParams.delete();
+      signerInfo.delete();
+      signerInfoList.delete();
+      recipientCipher.delete();
+      throw new Error('Invalid signature');
+    }
+    paddingParams.delete();
+    signerInfo.delete();
+    signerInfoList.delete();
+    recipientCipher.delete();
+    return decryptedData;
+  }
+
+  private _decryptThenVerify(
+    encryptedData: Uint8Array,
+    messageInfo: Uint8Array,
+    privateKey: VirgilPrivateKey,
+    publicKeys: VirgilPublicKey[],
+  ) {
+    const foundation = getFoundationModules();
+    const paddingParams = foundation.PaddingParams.newWithConstraints(
+      VirgilCrypto.PADDING_LEN,
+      VirgilCrypto.PADDING_LEN,
+    );
+    const recipientCipher = new foundation.RecipientCipher();
+    recipientCipher.random = getRandom();
+    recipientCipher.paddingParams = paddingParams;
+    let decryptedData: BufferType;
+    try {
+      recipientCipher.startDecryptionWithKey(
+        privateKey.identifier,
+        privateKey.lowLevelPrivateKey,
+        messageInfo,
+      );
+      const processDecryption = recipientCipher.processDecryption(encryptedData);
+      const finishDecryption = recipientCipher.finishDecryption();
+      decryptedData = NodeBuffer.concat([processDecryption, finishDecryption]);
+    } catch (error) {
+      paddingParams.delete();
+      recipientCipher.delete();
+      throw error;
+    }
+    const messageInfoCustomParams = recipientCipher.customParams();
+    let signerPublicKey: VirgilPublicKey | undefined;
+    if (publicKeys.length === 1) {
+      signerPublicKey = publicKeys[0];
+    } else {
+      let signerId: Uint8Array;
+      try {
+        signerId = messageInfoCustomParams.findData(DATA_SIGNER_ID_KEY);
+      } catch (error) {
+        paddingParams.delete();
+        recipientCipher.delete();
+        messageInfoCustomParams.delete();
+        throw error;
+      }
+      for (let i = 0; i < publicKeys.length; i += 1) {
+        if (NodeBuffer.compare(signerId, publicKeys[i].identifier) === 0) {
+          signerPublicKey = publicKeys[i];
+          break;
+        }
+      }
+      if (!signerPublicKey) {
+        messageInfoCustomParams.delete();
+        paddingParams.delete();
+        recipientCipher.delete();
+        throw new Error('Signer not found');
+      }
+    }
+    try {
+      const signature = messageInfoCustomParams.findData(DATA_SIGNATURE_KEY);
+      const isValid = this.verifySignature(decryptedData, signature, signerPublicKey);
+      if (!isValid) {
+        throw new Error('Invalid signature');
+      }
+      return decryptedData;
+    } finally {
+      messageInfoCustomParams.delete();
+      paddingParams.delete();
+      recipientCipher.delete();
+    }
   }
 }

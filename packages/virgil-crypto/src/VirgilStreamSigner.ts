@@ -1,7 +1,7 @@
 import { dataToUint8Array, toBuffer } from '@virgilsecurity/data-utils';
 
 import { getFoundationModules } from './foundationModules';
-import { getRandom } from './getRandom';
+import { getRandom } from './globalInstances';
 import { Data } from './types';
 import { validatePrivateKey } from './validators';
 import { VirgilPrivateKey } from './VirgilPrivateKey';

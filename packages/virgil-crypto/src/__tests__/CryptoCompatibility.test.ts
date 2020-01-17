@@ -1,34 +1,21 @@
 import { expect } from 'chai';
 
-import initFoundation from '@virgilsecurity/core-foundation';
 import { NodeBuffer } from '@virgilsecurity/data-utils';
 
-import { hasFoundationModules, setFoundationModules } from '../foundationModules';
+import { initCrypto } from '../foundationModules';
 import { VirgilCrypto } from '../VirgilCrypto';
-
 import cryptoCompatibilityData from './crypto_compatibility_data.json';
 
 // https://github.com/VirgilSecurity/virgil-virgilCrypto-x/blob/master/Tests/VSM002_CryptoCompatibilityTests.swift
 describe('CryptoCompatibility', () => {
   let virgilCrypto: VirgilCrypto;
 
-  before(() => {
-    return new Promise(resolve => {
-      if (hasFoundationModules()) {
-        virgilCrypto = new VirgilCrypto({ useSha256Identifiers: true });
-        return resolve();
-      }
-
-      initFoundation().then(foundationModules => {
-        setFoundationModules(foundationModules);
-        virgilCrypto = new VirgilCrypto({ useSha256Identifiers: true });
-        resolve();
-      });
-    });
+  before(async () => {
+    await initCrypto();
   });
 
-  after(() => {
-    virgilCrypto.dispose();
+  beforeEach(() => {
+    virgilCrypto = new VirgilCrypto({ useSha256Identifiers: true });
   });
 
   it('test002_DecryptFromSingleRecipient_ShouldDecrypt', () => {

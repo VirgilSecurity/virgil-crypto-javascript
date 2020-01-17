@@ -1,7 +1,7 @@
 import { toBuffer } from '@virgilsecurity/data-utils';
 
 import { getFoundationModules } from '../foundationModules';
-import { getRandom } from '../getRandom';
+import { getRandom } from '../globalInstances';
 import { FoundationModules, IGroupSessionMessageInfo } from '../types';
 
 export function parseGroupSessionMessage(messageData: Uint8Array): IGroupSessionMessageInfo {

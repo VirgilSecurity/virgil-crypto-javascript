@@ -10,16 +10,13 @@ describe('compatibility', () => {
   let wasmFoundationModules: typeof FoundationModules;
   let asmjsFoundationModules: typeof FoundationModules;
 
-  before(() => {
-    return new Promise(resolve => {
-      Promise.all([initWasmFoundation(), initAsmjsFoundation()]).then(
-        ([wasmModules, asmjsModules]) => {
-          wasmFoundationModules = wasmModules;
-          asmjsFoundationModules = asmjsModules;
-          resolve();
-        },
-      );
-    });
+  before(async () => {
+    await Promise.all([initWasmFoundation(), initAsmjsFoundation()]).then(
+      ([wasmModules, asmjsModules]) => {
+        wasmFoundationModules = wasmModules;
+        asmjsFoundationModules = asmjsModules;
+      },
+    );
   });
 
   it('encrypts with WebAssembly and decrypts with asm.js', () => {
@@ -39,8 +36,6 @@ describe('compatibility', () => {
     const privateKey = asmjsVirgilCrypto.importPrivateKey(exportedPrivateKey);
     const decryptedData = asmjsVirgilCrypto.decrypt(encryptedData, privateKey);
     expect(decryptedData.toString()).to.equal(data);
-
-    wasmVirgilCrypto.dispose();
   });
 
   it('encrypts with asm.js and decrypts with WebAssembly', () => {
@@ -60,7 +55,5 @@ describe('compatibility', () => {
     const privateKey = wasmVirgilCrypto.importPrivateKey(exportedPrivateKey);
     const decryptedData = wasmVirgilCrypto.decrypt(encryptedData, privateKey);
     expect(decryptedData.toString()).to.equal(data);
-
-    wasmVirgilCrypto.dispose();
   });
 });

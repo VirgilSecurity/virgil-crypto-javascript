@@ -1,32 +1,20 @@
 import { expect } from 'chai';
 
-import initFoundation from '@virgilsecurity/core-foundation';
 import { NodeBuffer } from '@virgilsecurity/data-utils';
 
-import { hasFoundationModules, setFoundationModules } from '../foundationModules';
+import { initCrypto } from '../foundationModules';
 import { VirgilCrypto } from '../VirgilCrypto';
 
 // https://github.com/VirgilSecurity/virgil-crypto-x/blob/master/Tests/VSM003_CryptoFormatsTests.swift
 describe('CryptoFormats', () => {
   let virgilCrypto: VirgilCrypto;
 
-  before(() => {
-    return new Promise(resolve => {
-      if (hasFoundationModules()) {
-        virgilCrypto = new VirgilCrypto();
-        return resolve();
-      }
-
-      initFoundation().then(foundationModules => {
-        setFoundationModules(foundationModules);
-        virgilCrypto = new VirgilCrypto();
-        resolve();
-      });
-    });
+  before(async () => {
+    await initCrypto();
   });
 
-  after(() => {
-    virgilCrypto.dispose();
+  beforeEach(() => {
+    virgilCrypto = new VirgilCrypto();
   });
 
   it('test001_SignatureHash', () => {
@@ -56,6 +44,5 @@ describe('CryptoFormats', () => {
       virgilCrypto.hashAlgorithm.SHA256,
     );
     expect(publicKeyHash2.equals(keyPair2.privateKey.identifier)).to.be.true;
-    virgilCrypto2.dispose();
   });
 });

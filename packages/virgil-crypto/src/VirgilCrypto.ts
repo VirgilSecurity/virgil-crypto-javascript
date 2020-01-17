@@ -4,7 +4,7 @@ import { createVirgilGroupSession } from './groups/createVirgilGroupSession';
 import { computeSessionId, createInitialEpoch } from './groups/helpers';
 import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
 import { getFoundationModules } from './foundationModules';
-import { getRandom } from './getRandom';
+import { getRandom, getKeyProvider } from './globalInstances';
 import { HashAlgorithm } from './HashAlgorithm';
 import {
   KeyPairType,
@@ -41,46 +41,18 @@ export class VirgilCrypto implements ICrypto {
   readonly hashAlgorithm = HashAlgorithm;
   readonly keyPairType = KeyPairType;
 
-  private readonly random: FoundationModules.CtrDrbg;
-  private _isDisposed: boolean;
-
-  get isDisposed() {
-    return this._isDisposed;
-  }
-
   constructor(options: VirgilCryptoOptions = {}) {
-    this.random = getRandom();
     this.defaultKeyPairType = options.defaultKeyPairType || KeyPairType.DEFAULT;
     this.useSha256Identifiers = options.useSha256Identifiers || false;
-    this._isDisposed = false;
-  }
-
-  dispose() {
-    this._isDisposed = true;
   }
 
   generateKeys(type?: KeyPairType[keyof KeyPairType]) {
-    this.throwIfDisposed();
     const keyPairType = type ? type : this.defaultKeyPairType;
     const keyPairTypeConfig = getKeyPairTypeConfig(keyPairType);
-    const foundation = getFoundationModules();
-    const keyProvider = new foundation.KeyProvider();
-    keyProvider.random = this.random;
-    try {
-      keyProvider.setupDefaults();
-    } catch (error) {
-      keyProvider.delete();
-      throw error;
-    }
-    try {
-      return this.generateKeyPair(keyProvider, keyPairTypeConfig);
-    } finally {
-      keyProvider.delete();
-    }
+    return this.generateKeyPair(getKeyProvider(), keyPairTypeConfig);
   }
 
   generateKeysFromKeyMaterial(keyMaterial: Data, type?: KeyPairType[keyof KeyPairType]) {
-    this.throwIfDisposed();
     const keyPairType = type ? type : this.defaultKeyPairType;
     const keyPairTypeConfig = getKeyPairTypeConfig(keyPairType);
     const myKeyMaterial = dataToUint8Array(keyMaterial, 'base64');
@@ -105,16 +77,7 @@ export class VirgilCrypto implements ICrypto {
   }
 
   importPrivateKey(rawPrivateKey: Data) {
-    this.throwIfDisposed();
-    const foundation = getFoundationModules();
-    const keyProvider = new foundation.KeyProvider();
-    keyProvider.random = this.random;
-    try {
-      keyProvider.setupDefaults();
-    } catch (error) {
-      keyProvider.delete();
-      throw error;
-    }
+    const keyProvider = getKeyProvider();
     const serializedPrivateKey = dataToUint8Array(rawPrivateKey, 'base64');
     const lowLevelPrivateKey = keyProvider.importPrivateKey(serializedPrivateKey);
     const lowLevelPublicKey = lowLevelPrivateKey.extractPublicKey();
@@ -124,76 +87,45 @@ export class VirgilCrypto implements ICrypto {
       return new VirgilPrivateKey(identifier, lowLevelPrivateKey);
     } finally {
       lowLevelPublicKey.delete();
-      keyProvider.delete();
     }
   }
 
   exportPrivateKey(privateKey: VirgilPrivateKey) {
-    this.throwIfDisposed();
     validatePrivateKey(privateKey);
-    const foundation = getFoundationModules();
-    const keyProvider = new foundation.KeyProvider();
-    keyProvider.random = this.random;
-    try {
-      keyProvider.setupDefaults();
-    } catch (error) {
-      keyProvider.delete();
-      throw error;
-    }
+    const keyProvider = getKeyProvider();
     const publicKeyData = keyProvider.exportPrivateKey(privateKey.lowLevelPrivateKey);
-    keyProvider.delete();
     return toBuffer(publicKeyData);
   }
 
   importPublicKey(rawPublicKey: Data) {
-    this.throwIfDisposed();
     const serializedPublicKey = dataToUint8Array(rawPublicKey, 'base64');
-    const foundation = getFoundationModules();
-    const keyProvider = new foundation.KeyProvider();
-    keyProvider.random = this.random;
-    try {
-      keyProvider.setupDefaults();
-    } catch (error) {
-      keyProvider.delete();
-      throw error;
-    }
+    const keyProvider = getKeyProvider();
     const lowLevelPublicKey = keyProvider.importPublicKey(serializedPublicKey);
     const identifier = this.calculateKeyPairIdentifier(serializedPublicKey);
-    keyProvider.delete();
     return new VirgilPublicKey(identifier, lowLevelPublicKey);
   }
 
   exportPublicKey(publicKey: VirgilPublicKey) {
-    this.throwIfDisposed();
-    const foundation = getFoundationModules();
-    const keyProvider = new foundation.KeyProvider();
-    keyProvider.random = this.random;
-    try {
-      keyProvider.setupDefaults();
-    } catch (error) {
-      keyProvider.delete();
-      throw error;
-    }
+    const keyProvider = getKeyProvider();
     const publicKeyData = keyProvider.exportPublicKey(publicKey.lowLevelPublicKey);
-    keyProvider.delete();
     return toBuffer(publicKeyData);
   }
 
   encrypt(data: Data, publicKey: VirgilPublicKey | VirgilPublicKey[], enablePadding?: boolean) {
-    this.throwIfDisposed();
     const myData = dataToUint8Array(data, 'utf8');
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
     const foundation = getFoundationModules();
+    const random = getRandom();
     const recipientCipher = new foundation.RecipientCipher();
     const aes256Gcm = new foundation.Aes256Gcm();
     recipientCipher.encryptionCipher = aes256Gcm;
-    recipientCipher.random = this.random;
+    recipientCipher.random = random;
     let randomPadding: FoundationModules.RandomPadding | undefined;
     let paddingParams: FoundationModules.PaddingParams | undefined;
     if (enablePadding) {
       randomPadding = new foundation.RandomPadding();
-      randomPadding.random = this.random;
+      randomPadding.random = random;
       recipientCipher.encryptionPadding = randomPadding;
       paddingParams = foundation.PaddingParams.newWithConstraints(
         VirgilCrypto.PADDING_LEN,
@@ -223,12 +155,11 @@ export class VirgilCrypto implements ICrypto {
   }
 
   decrypt(encryptedData: Data, privateKey: VirgilPrivateKey) {
-    this.throwIfDisposed();
     const myData = dataToUint8Array(encryptedData, 'base64');
     validatePrivateKey(privateKey);
     const foundation = getFoundationModules();
     const recipientCipher = new foundation.RecipientCipher();
-    recipientCipher.random = this.random;
+    recipientCipher.random = getRandom();
     const paddingParams = foundation.PaddingParams.newWithConstraints(
       VirgilCrypto.PADDING_LEN,
       VirgilCrypto.PADDING_LEN,
@@ -272,26 +203,19 @@ export class VirgilCrypto implements ICrypto {
   }
 
   extractPublicKey(privateKey: VirgilPrivateKey) {
-    this.throwIfDisposed();
     validatePrivateKey(privateKey);
     const lowLevelPublicKey = privateKey.lowLevelPrivateKey.extractPublicKey();
     return new VirgilPublicKey(privateKey.identifier, lowLevelPublicKey);
   }
 
   calculateSignature(data: Data, privateKey: VirgilPrivateKey) {
-    this.throwIfDisposed();
-
     const myData = dataToUint8Array(data, 'utf8');
-
     validatePrivateKey(privateKey);
-
     const foundation = getFoundationModules();
-
     const signer = new foundation.Signer();
     const sha512 = new foundation.Sha512();
-    signer.random = this.random;
+    signer.random = getRandom();
     signer.hash = sha512;
-
     signer.reset();
     signer.appendData(myData);
     try {
@@ -304,15 +228,10 @@ export class VirgilCrypto implements ICrypto {
   }
 
   verifySignature(data: Data, signature: Data, publicKey: VirgilPublicKey) {
-    this.throwIfDisposed();
-
     const myData = dataToUint8Array(data, 'utf8');
     const mySignature = dataToUint8Array(signature, 'base64');
-
     validatePublicKey(publicKey);
-
     const foundation = getFoundationModules();
-
     const verifier = new foundation.Verifier();
     try {
       verifier.reset(mySignature);
@@ -321,11 +240,8 @@ export class VirgilCrypto implements ICrypto {
       throw error;
     }
     verifier.appendData(myData);
-
     const result = verifier.verify(publicKey.lowLevelPublicKey);
-
     verifier.delete();
-
     return result;
   }
 
@@ -335,23 +251,23 @@ export class VirgilCrypto implements ICrypto {
     publicKey: VirgilPublicKey | VirgilPublicKey[],
     enablePadding?: boolean,
   ) {
-    this.throwIfDisposed();
     const myData = dataToUint8Array(data, 'utf8');
     validatePrivateKey(privateKey);
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
     const foundation = getFoundationModules();
+    const random = getRandom();
     const recipientCipher = new foundation.RecipientCipher();
     const aes256Gcm = new foundation.Aes256Gcm();
     const sha512 = new foundation.Sha512();
     recipientCipher.encryptionCipher = aes256Gcm;
-    recipientCipher.random = this.random;
+    recipientCipher.random = random;
     recipientCipher.signerHash = sha512;
     let randomPadding: FoundationModules.RandomPadding | undefined;
     let paddingParams: FoundationModules.PaddingParams | undefined;
     if (enablePadding) {
       randomPadding = new foundation.RandomPadding();
-      randomPadding.random = this.random;
+      randomPadding.random = random;
       recipientCipher.encryptionPadding = randomPadding;
       paddingParams = foundation.PaddingParams.newWithConstraints(
         VirgilCrypto.PADDING_LEN,
@@ -394,26 +310,21 @@ export class VirgilCrypto implements ICrypto {
     publicKey: VirgilPublicKey | VirgilPublicKey[],
     enablePadding?: boolean,
   ) {
-    this.throwIfDisposed();
-
     const myData = dataToUint8Array(data, 'utf8');
-
     validatePrivateKey(privateKey);
-
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
-
     const foundation = getFoundationModules();
-
+    const random = getRandom();
     const recipientCipher = new foundation.RecipientCipher();
     const aes256Gcm = new foundation.Aes256Gcm();
     recipientCipher.encryptionCipher = aes256Gcm;
-    recipientCipher.random = this.random;
+    recipientCipher.random = random;
     let randomPadding: FoundationModules.RandomPadding | undefined;
     let paddingParams: FoundationModules.PaddingParams | undefined;
     if (enablePadding) {
       randomPadding = new foundation.RandomPadding();
-      randomPadding.random = this.random;
+      randomPadding.random = random;
       recipientCipher.encryptionPadding = randomPadding;
       paddingParams = foundation.PaddingParams.newWithConstraints(
         VirgilCrypto.PADDING_LEN,
@@ -421,19 +332,14 @@ export class VirgilCrypto implements ICrypto {
       );
       recipientCipher.paddingParams = paddingParams;
     }
-
     publicKeys.forEach(({ identifier }, index) => {
       recipientCipher.addKeyRecipient(identifier, publicKeys[index].lowLevelPublicKey);
     });
-
     const messageInfoCustomParams = recipientCipher.customParams();
-
     try {
       const signature = this.calculateSignature(myData, privateKey);
-
       messageInfoCustomParams.addData(DATA_SIGNATURE_KEY, signature);
       messageInfoCustomParams.addData(DATA_SIGNER_ID_KEY, privateKey.identifier);
-
       recipientCipher.startEncryption();
       const messageInfo = recipientCipher.packMessageInfo();
       const processEncryption = recipientCipher.processEncryption(myData);
@@ -457,7 +363,6 @@ export class VirgilCrypto implements ICrypto {
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
   ) {
-    this.throwIfDisposed();
     const myEncryptedData = dataToUint8Array(encryptedData, 'base64');
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
@@ -468,7 +373,7 @@ export class VirgilCrypto implements ICrypto {
       VirgilCrypto.PADDING_LEN,
     );
     const recipientCipher = new foundation.RecipientCipher();
-    recipientCipher.random = this.random;
+    recipientCipher.random = getRandom();
     recipientCipher.paddingParams = paddingParams;
     let decryptedData: BufferType;
     try {
@@ -531,25 +436,18 @@ export class VirgilCrypto implements ICrypto {
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
   ) {
-    this.throwIfDisposed();
-
     const myEncryptedData = dataToUint8Array(encryptedData, 'base64');
-
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
-
     validatePrivateKey(privateKey);
-
     const foundation = getFoundationModules();
-
     const paddingParams = foundation.PaddingParams.newWithConstraints(
       VirgilCrypto.PADDING_LEN,
       VirgilCrypto.PADDING_LEN,
     );
     const recipientCipher = new foundation.RecipientCipher();
-    recipientCipher.random = this.random;
+    recipientCipher.random = getRandom();
     recipientCipher.paddingParams = paddingParams;
-
     let decryptedData: BufferType;
     try {
       recipientCipher.startDecryptionWithKey(
@@ -565,9 +463,7 @@ export class VirgilCrypto implements ICrypto {
       recipientCipher.delete();
       throw error;
     }
-
     const messageInfoCustomParams = recipientCipher.customParams();
-
     let signerPublicKey: VirgilPublicKey | undefined;
     if (publicKeys.length === 1) {
       signerPublicKey = publicKeys[0];
@@ -594,7 +490,6 @@ export class VirgilCrypto implements ICrypto {
         throw new Error('Signer not found');
       }
     }
-
     try {
       const signature = messageInfoCustomParams.findData(DATA_SIGNATURE_KEY);
       const isValid = this.verifySignature(decryptedData, signature, signerPublicKey);
@@ -610,8 +505,7 @@ export class VirgilCrypto implements ICrypto {
   }
 
   getRandomBytes(length: number) {
-    this.throwIfDisposed();
-    const bytes = this.random.random(length);
+    const bytes = getRandom().random(length);
     return toBuffer(bytes);
   }
 
@@ -621,26 +515,21 @@ export class VirgilCrypto implements ICrypto {
     publicKey: VirgilPublicKey | VirgilPublicKey[],
     enablePadding?: boolean,
   ) {
-    this.throwIfDisposed();
-
     const myData = dataToUint8Array(data, 'utf8');
-
     validatePrivateKey(privateKey);
-
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
-
     const foundation = getFoundationModules();
-
+    const random = getRandom();
     const recipientCipher = new foundation.RecipientCipher();
     const aes256Gcm = new foundation.Aes256Gcm();
     recipientCipher.encryptionCipher = aes256Gcm;
-    recipientCipher.random = this.random;
+    recipientCipher.random = random;
     let randomPadding: FoundationModules.RandomPadding | undefined;
     let paddingParams: FoundationModules.PaddingParams | undefined;
     if (enablePadding) {
       randomPadding = new foundation.RandomPadding();
-      randomPadding.random = this.random;
+      randomPadding.random = random;
       recipientCipher.encryptionPadding = randomPadding;
       paddingParams = foundation.PaddingParams.newWithConstraints(
         VirgilCrypto.PADDING_LEN,
@@ -648,19 +537,14 @@ export class VirgilCrypto implements ICrypto {
       );
       recipientCipher.paddingParams = paddingParams;
     }
-
     publicKeys.forEach(({ identifier }, index) => {
       recipientCipher.addKeyRecipient(identifier, publicKeys[index].lowLevelPublicKey);
     });
-
     const messageInfoCustomParams = recipientCipher.customParams();
-
     try {
       const signature = this.calculateSignature(myData, privateKey);
-
       messageInfoCustomParams.addData(DATA_SIGNATURE_KEY, signature);
       messageInfoCustomParams.addData(DATA_SIGNER_ID_KEY, privateKey.identifier);
-
       recipientCipher.startEncryption();
       const messageInfo = recipientCipher.packMessageInfo();
       const processEncryption = recipientCipher.processEncryption(myData);
@@ -687,26 +571,19 @@ export class VirgilCrypto implements ICrypto {
     privateKey: VirgilPrivateKey,
     publicKey: VirgilPublicKey | VirgilPublicKey[],
   ) {
-    this.throwIfDisposed();
-
     const myEncryptedData = dataToUint8Array(encryptedData, 'base64');
     const myMetadata = dataToUint8Array(metadata, 'base64');
-
     validatePrivateKey(privateKey);
-
     const publicKeys = toArray(publicKey);
     validatePublicKeysArray(publicKeys);
-
     const foundation = getFoundationModules();
-
     const paddingParams = foundation.PaddingParams.newWithConstraints(
       VirgilCrypto.PADDING_LEN,
       VirgilCrypto.PADDING_LEN,
     );
     const recipientCipher = new foundation.RecipientCipher();
-    recipientCipher.random = this.random;
+    recipientCipher.random = getRandom();
     recipientCipher.paddingParams = paddingParams;
-
     let decryptedData: BufferType;
     try {
       recipientCipher.startDecryptionWithKey(
@@ -722,9 +599,7 @@ export class VirgilCrypto implements ICrypto {
       recipientCipher.delete();
       throw error;
     }
-
     const messageInfoCustomParams = recipientCipher.customParams();
-
     let signerPublicKey: VirgilPublicKey | undefined;
     if (publicKeys.length === 1) {
       signerPublicKey = publicKeys[0];
@@ -751,7 +626,6 @@ export class VirgilCrypto implements ICrypto {
         throw new Error('Signer not found');
       }
     }
-
     try {
       const signature = messageInfoCustomParams.findData(DATA_SIGNATURE_KEY);
       const isValid = this.verifySignature(decryptedData, signature, signerPublicKey);
@@ -767,54 +641,42 @@ export class VirgilCrypto implements ICrypto {
   }
 
   createStreamCipher(publicKey: VirgilPublicKey | VirgilPublicKey[], signature?: Data) {
-    this.throwIfDisposed();
     return new VirgilStreamCipher(publicKey, signature);
   }
 
   createStreamDecipher(privateKey: VirgilPrivateKey) {
-    this.throwIfDisposed();
     return new VirgilStreamDecipher(privateKey);
   }
 
   createStreamSigner() {
-    this.throwIfDisposed();
     return new VirgilStreamSigner();
   }
 
   createStreamVerifier(signature: Data) {
-    this.throwIfDisposed();
     return new VirgilStreamVerifier(signature);
   }
 
   generateGroupSession(groupId: Data): IGroupSession {
-    this.throwIfDisposed();
-
     const groupIdBytes = dataToUint8Array(groupId, 'utf8');
     this.validateGroupId(groupIdBytes);
     const sessionId = computeSessionId(groupIdBytes);
     const initialEpoch = createInitialEpoch(sessionId);
-
     const initialEpochMessage = initialEpoch.serialize();
     initialEpoch.delete();
     return createVirgilGroupSession([initialEpochMessage]);
   }
 
   importGroupSession(epochMessages: Data[]): IGroupSession {
-    this.throwIfDisposed();
-
     if (!Array.isArray(epochMessages)) {
       throw new TypeError('Epoch messages must be an array.');
     }
-
     if (epochMessages.length === 0) {
       throw new Error('Epoch messages must not be empty.');
     }
-
     return createVirgilGroupSession(epochMessages.map(it => dataToUint8Array(it, 'base64')));
   }
 
   calculateGroupSessionId(groupId: Data) {
-    this.throwIfDisposed();
     const groupIdBytes = dataToUint8Array(groupId, 'utf8');
     this.validateGroupId(groupIdBytes);
     return toBuffer(computeSessionId(groupIdBytes)).toString('hex');
@@ -879,13 +741,5 @@ export class VirgilCrypto implements ICrypto {
       privateKey: new VirgilPrivateKey(identifier, lowLevelPrivateKey),
       publicKey: new VirgilPublicKey(identifier, lowLevelPublicKey),
     };
-  }
-
-  private throwIfDisposed() {
-    if (this._isDisposed) {
-      throw new Error(
-        'Cannot use an instance of `VirgilCrypto` class after the `dispose` method has been called.',
-      );
-    }
   }
 }

@@ -1,11 +1,11 @@
-import { expect } from 'chai';
 import fs from 'fs';
 import path from 'path';
 
-import initFoundation from '@virgilsecurity/core-foundation';
+import { expect } from 'chai';
+
 import { NodeBuffer } from '@virgilsecurity/data-utils';
 
-import { hasFoundationModules, setFoundationModules } from '../foundationModules';
+import { initCrypto } from '../foundationModules';
 import { KeyPairType } from '../KeyPairType';
 import { VirgilCrypto } from '../VirgilCrypto';
 
@@ -30,23 +30,12 @@ describe('Crypto', () => {
     KeyPairType.CURVE25519_ED25519,
   ];
 
-  before(() => {
-    return new Promise(resolve => {
-      if (hasFoundationModules()) {
-        virgilCrypto = new VirgilCrypto();
-        return resolve();
-      }
-
-      initFoundation().then(foundationModules => {
-        setFoundationModules(foundationModules);
-        virgilCrypto = new VirgilCrypto();
-        resolve();
-      });
-    });
+  before(async () => {
+    await initCrypto();
   });
 
-  after(() => {
-    virgilCrypto.dispose();
+  beforeEach(() => {
+    virgilCrypto = new VirgilCrypto();
   });
 
   it('test01__key_generation__generate_one_key__should_succeed', () => {

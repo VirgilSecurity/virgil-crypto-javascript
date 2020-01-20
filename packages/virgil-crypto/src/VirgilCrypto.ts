@@ -2,7 +2,12 @@ import { NodeBuffer, dataToUint8Array, toBuffer } from '@virgilsecurity/data-uti
 
 import { createVirgilGroupSession } from './groups/createVirgilGroupSession';
 import { computeSessionId, createInitialEpoch } from './groups/helpers';
-import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY } from './constants';
+import {
+  DATA_SIGNATURE_KEY,
+  DATA_SIGNER_ID_KEY,
+  PADDING_LEN,
+  MIN_GROUP_ID_BYTE_LENGTH,
+} from './constants';
 import { getFoundationModules } from './foundationModules';
 import { getRandom, getKeyProvider } from './globalInstances';
 import { HashAlgorithm } from './HashAlgorithm';
@@ -20,6 +25,7 @@ import { VirgilPrivateKey } from './VirgilPrivateKey';
 import { VirgilPublicKey } from './VirgilPublicKey';
 import { VirgilStreamCipher } from './VirgilStreamCipher';
 import { VirgilStreamDecipher } from './VirgilStreamDecipher';
+import { VirgilStreamSignAndEncrypt } from './VirgilStreamSignAndEncrypt';
 import { VirgilStreamSigner } from './VirgilStreamSigner';
 import { VirgilStreamVerifier } from './VirgilStreamVerifier';
 
@@ -29,14 +35,6 @@ export interface VirgilCryptoOptions {
 }
 
 export class VirgilCrypto implements ICrypto {
-  static get PADDING_LEN() {
-    return 160;
-  }
-
-  static get MIN_GROUP_ID_BYTE_LENGTH() {
-    return 10;
-  }
-
   readonly hashAlgorithm = HashAlgorithm;
   readonly keyPairType = KeyPairType;
 
@@ -131,10 +129,7 @@ export class VirgilCrypto implements ICrypto {
       randomPadding = new foundation.RandomPadding();
       randomPadding.random = random;
       recipientCipher.encryptionPadding = randomPadding;
-      paddingParams = foundation.PaddingParams.newWithConstraints(
-        VirgilCrypto.PADDING_LEN,
-        VirgilCrypto.PADDING_LEN,
-      );
+      paddingParams = foundation.PaddingParams.newWithConstraints(PADDING_LEN, PADDING_LEN);
       recipientCipher.paddingParams = paddingParams;
     }
     publicKeys.forEach(({ identifier }, index) => {
@@ -164,10 +159,7 @@ export class VirgilCrypto implements ICrypto {
     const foundation = getFoundationModules();
     const recipientCipher = new foundation.RecipientCipher();
     recipientCipher.random = getRandom();
-    const paddingParams = foundation.PaddingParams.newWithConstraints(
-      VirgilCrypto.PADDING_LEN,
-      VirgilCrypto.PADDING_LEN,
-    );
+    const paddingParams = foundation.PaddingParams.newWithConstraints(PADDING_LEN, PADDING_LEN);
     recipientCipher.paddingParams = paddingParams;
     try {
       recipientCipher.startDecryptionWithKey(
@@ -412,12 +404,32 @@ export class VirgilCrypto implements ICrypto {
     return this._decryptThenVerify(encryptedData, messageInfo, arg2, publicKeys);
   }
 
-  createStreamCipher(publicKey: VirgilPublicKey | VirgilPublicKey[], signature?: Data) {
-    return new VirgilStreamCipher(publicKey, signature);
+  createStreamCipher(publicKey: VirgilPublicKey, signature?: Data): VirgilStreamCipher;
+  createStreamCipher(publicKeys: VirgilPublicKey[], signature?: Data): VirgilStreamCipher;
+  createStreamCipher(arg0: VirgilPublicKey | VirgilPublicKey[], arg1?: Data) {
+    return new VirgilStreamCipher(arg0, arg1);
   }
 
   createStreamDecipher(privateKey: VirgilPrivateKey) {
     return new VirgilStreamDecipher(privateKey);
+  }
+
+  createStreamSignAndEncrypt(
+    privateKey: VirgilPrivateKey,
+    publicKey: VirgilPublicKey,
+    enablePadding?: boolean,
+  ): VirgilStreamSignAndEncrypt;
+  createStreamSignAndEncrypt(
+    privateKey: VirgilPrivateKey,
+    publicKeys: VirgilPublicKey[],
+    enablePadding?: boolean,
+  ): VirgilStreamSignAndEncrypt;
+  createStreamSignAndEncrypt(
+    arg0: VirgilPrivateKey,
+    arg1: VirgilPublicKey | VirgilPublicKey[],
+    arg2?: boolean,
+  ) {
+    return new VirgilStreamSignAndEncrypt(arg0, arg1, arg2);
   }
 
   createStreamSigner() {
@@ -455,9 +467,9 @@ export class VirgilCrypto implements ICrypto {
   }
 
   private validateGroupId(groupId: Uint8Array) {
-    if (groupId.byteLength < VirgilCrypto.MIN_GROUP_ID_BYTE_LENGTH) {
+    if (groupId.byteLength < MIN_GROUP_ID_BYTE_LENGTH) {
       throw new Error(
-        `The given group Id is too short. Must be at least ${VirgilCrypto.MIN_GROUP_ID_BYTE_LENGTH} bytes.`,
+        `The given group Id is too short. Must be at least ${MIN_GROUP_ID_BYTE_LENGTH} bytes.`,
       );
     }
   }
@@ -535,10 +547,7 @@ export class VirgilCrypto implements ICrypto {
       randomPadding = new foundation.RandomPadding();
       randomPadding.random = random;
       recipientCipher.encryptionPadding = randomPadding;
-      paddingParams = foundation.PaddingParams.newWithConstraints(
-        VirgilCrypto.PADDING_LEN,
-        VirgilCrypto.PADDING_LEN,
-      );
+      paddingParams = foundation.PaddingParams.newWithConstraints(PADDING_LEN, PADDING_LEN);
       recipientCipher.paddingParams = paddingParams;
     }
     publicKeys.forEach(({ identifier }, index) => {
@@ -588,10 +597,7 @@ export class VirgilCrypto implements ICrypto {
       randomPadding = new foundation.RandomPadding();
       randomPadding.random = random;
       recipientCipher.encryptionPadding = randomPadding;
-      paddingParams = foundation.PaddingParams.newWithConstraints(
-        VirgilCrypto.PADDING_LEN,
-        VirgilCrypto.PADDING_LEN,
-      );
+      paddingParams = foundation.PaddingParams.newWithConstraints(PADDING_LEN, PADDING_LEN);
       recipientCipher.paddingParams = paddingParams;
     }
     publicKeys.forEach(({ identifier }, index) => {
@@ -631,10 +637,7 @@ export class VirgilCrypto implements ICrypto {
     publicKeys: VirgilPublicKey[],
   ) {
     const foundation = getFoundationModules();
-    const paddingParams = foundation.PaddingParams.newWithConstraints(
-      VirgilCrypto.PADDING_LEN,
-      VirgilCrypto.PADDING_LEN,
-    );
+    const paddingParams = foundation.PaddingParams.newWithConstraints(PADDING_LEN, PADDING_LEN);
     const recipientCipher = new foundation.RecipientCipher();
     recipientCipher.random = getRandom();
     recipientCipher.paddingParams = paddingParams;
@@ -701,10 +704,7 @@ export class VirgilCrypto implements ICrypto {
     publicKeys: VirgilPublicKey[],
   ) {
     const foundation = getFoundationModules();
-    const paddingParams = foundation.PaddingParams.newWithConstraints(
-      VirgilCrypto.PADDING_LEN,
-      VirgilCrypto.PADDING_LEN,
-    );
+    const paddingParams = foundation.PaddingParams.newWithConstraints(PADDING_LEN, PADDING_LEN);
     const recipientCipher = new foundation.RecipientCipher();
     recipientCipher.random = getRandom();
     recipientCipher.paddingParams = paddingParams;

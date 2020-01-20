@@ -9,8 +9,8 @@ import { VirgilPrivateKey } from './VirgilPrivateKey';
 export class VirgilStreamDecipher {
   private _isFinished = false;
   private _isDisposed = false;
-  private recipientCipher: FoundationModules.RecipientCipher;
-  private privateKey: VirgilPrivateKey;
+
+  private readonly recipientCipher: FoundationModules.RecipientCipher;
 
   get isFinished() {
     return this._isFinished;
@@ -23,13 +23,12 @@ export class VirgilStreamDecipher {
   constructor(privateKey: VirgilPrivateKey) {
     const foundationModules = getFoundationModules();
     validatePrivateKey(privateKey);
-    this.privateKey = privateKey;
     this.recipientCipher = new foundationModules.RecipientCipher();
     try {
       this.recipientCipher.startDecryptionWithKey(
         privateKey.identifier,
-        this.privateKey.lowLevelPrivateKey,
-        new Uint8Array(0),
+        privateKey.lowLevelPrivateKey,
+        new Uint8Array(),
       );
     } catch (error) {
       this.recipientCipher.delete();
@@ -38,14 +37,14 @@ export class VirgilStreamDecipher {
   }
 
   getSignature() {
-    if (!this._isFinished) {
-      throw new Error(
-        'Illegal state. Cannot get signature before the `final` method has been called.',
-      );
-    }
     if (this._isDisposed) {
       throw new Error(
         'Illegal state. Cannot get signature after the `dispose` method has been called.',
+      );
+    }
+    if (!this._isFinished) {
+      throw new Error(
+        'Illegal state. Cannot get signature before the `final` method has been called.',
       );
     }
     const messageInfoCustomParams = this.recipientCipher.customParams();
@@ -80,13 +79,13 @@ export class VirgilStreamDecipher {
   }
 
   private ensureLegalState() {
-    if (this._isFinished) {
-      throw new Error('Illegal state. Cannot use cipher after the `final` method has been called.');
-    }
     if (this._isDisposed) {
       throw new Error(
         'Illegal state. Cannot use cipher after the `dispose` method has been called.',
       );
+    }
+    if (this._isFinished) {
+      throw new Error('Illegal state. Cannot use cipher after the `final` method has been called.');
     }
   }
 }

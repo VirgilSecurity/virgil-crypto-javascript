@@ -7,7 +7,8 @@ import { VirgilPublicKey } from './VirgilPublicKey';
 
 export class VirgilStreamVerifier {
   private _isDisposed = false;
-  private verifier: FoundationModules.Verifier;
+
+  private readonly verifier: FoundationModules.Verifier;
 
   get isDisposed() {
     return this._isDisposed;

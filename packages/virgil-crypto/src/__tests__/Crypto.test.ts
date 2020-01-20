@@ -7,6 +7,7 @@ import { NodeBuffer } from '@virgilsecurity/data-utils';
 
 import { initCrypto } from '../foundationModules';
 import { KeyPairType } from '../KeyPairType';
+import { NodeBuffer as BufferType } from '../types';
 import { VirgilCrypto } from '../VirgilCrypto';
 
 // https://github.com/VirgilSecurity/virgil-crypto-x/blob/master/Tests/VSM001_CryptoTests.swift
@@ -152,23 +153,19 @@ describe('Crypto', () => {
       const keyPair2 = virgilCrypto.generateKeys(keyPairType);
       const cipher = virgilCrypto.createStreamCipher(keyPair1.publicKey);
       const readStream1 = fs.createReadStream(filePath);
-      const encryptedBufferStart = cipher.start();
-      const encryptedBuffers = new Array<Buffer>();
-      const fileData = new Array<Buffer>();
+      const encryptedBuffers = new Array<BufferType>();
+      const fileData = new Array<BufferType>();
+      encryptedBuffers.push(cipher.start());
       readStream1.on('data', data => {
         encryptedBuffers.push(cipher.update(data));
         fileData.push(data);
       });
       readStream1.on('close', () => {
-        const encryptedBufferEnd = cipher.final(true);
-        const encrypted = NodeBuffer.concat([
-          encryptedBufferStart,
-          ...encryptedBuffers,
-          encryptedBufferEnd,
-        ]);
+        encryptedBuffers.push(cipher.final(true));
+        const encrypted = NodeBuffer.concat(encryptedBuffers);
         const decipher1 = virgilCrypto.createStreamDecipher(keyPair1.privateKey);
         const decipher2 = virgilCrypto.createStreamDecipher(keyPair2.privateKey);
-        const decryptedBuffers = new Array<Buffer>();
+        const decryptedBuffers = new Array<BufferType>();
         decryptedBuffers.push(decipher1.update(encrypted));
         const decryptedBufferEnd = decipher1.final(true);
         const decrypted = NodeBuffer.concat([...decryptedBuffers, decryptedBufferEnd]);
@@ -246,12 +243,68 @@ describe('Crypto', () => {
     });
   });
 
-  it('test12__auth_encrypt__stream__should_match', () => {
-    // TODO: add this test
+  const streamSignAndEncryptTest = (keyPairType: KeyPairType) =>
+    new Promise(resolve => {
+      const filePath = path.join(__dirname, 'testData.txt');
+      const keyPair1 = virgilCrypto.generateKeys(keyPairType);
+      const keyPair2 = virgilCrypto.generateKeys(keyPairType);
+      const keyPair3 = virgilCrypto.generateKeys(keyPairType);
+      const signAndEncryptStream = virgilCrypto.createStreamSignAndEncrypt(
+        keyPair1.privateKey,
+        [keyPair1.publicKey, keyPair2.publicKey],
+        true,
+      );
+      const readStream = fs.createReadStream(filePath);
+      const buffers = new Array<BufferType>();
+      const fileData = new Array<BufferType>();
+      const stat = fs.statSync(filePath);
+      buffers.push(signAndEncryptStream.start(stat.size));
+      readStream.on('data', data => {
+        buffers.push(signAndEncryptStream.update(data));
+        fileData.push(data);
+      });
+      readStream.on('close', () => {
+        buffers.push(signAndEncryptStream.final(true));
+        const decryptAndVerifyStream = virgilCrypto.createStreamDecryptAndVerify();
+        decryptAndVerifyStream.start(keyPair1.privateKey);
+        const decryptedBuffers = buffers.map(buffer => decryptAndVerifyStream.update(buffer));
+        decryptedBuffers.push(decryptAndVerifyStream.final());
+        const notAnError = () => {
+          decryptAndVerifyStream.verify([keyPair1.publicKey, keyPair2.publicKey], false);
+        };
+        const error = () => {
+          decryptAndVerifyStream.verify(keyPair3.publicKey, false);
+        };
+        expect(NodeBuffer.concat(decryptedBuffers).equals(NodeBuffer.concat(fileData))).to.be.true;
+        expect(notAnError).not.to.throw;
+        expect(error).to.throw;
+        decryptAndVerifyStream.dispose();
+        resolve();
+      });
+    });
+
+  it('test12__auth_encrypt__stream__should_match', async () => {
+    const promises = signingKeyTypes.map(streamSignAndEncryptTest);
+    await Promise.all(promises);
   });
 
   it('test13__auth_encrypt__deprecated__should_work', () => {
-    // TODO: add this test
+    signingKeyTypes.forEach(keyPairType => {
+      const data = NodeBuffer.from('data', 'utf8');
+      const keyPair1 = virgilCrypto.generateKeys(keyPairType);
+      const keyPair2 = virgilCrypto.generateKeys(keyPairType);
+      const encrypted = virgilCrypto.signThenEncrypt(
+        data,
+        keyPair1.privateKey,
+        [keyPair1.publicKey, keyPair2.publicKey],
+        false,
+      );
+      const decrypted = virgilCrypto.decryptThenVerify(encrypted, keyPair1.privateKey, [
+        keyPair1.publicKey,
+        keyPair2.publicKey,
+      ]);
+      expect(decrypted.equals(data));
+    });
   });
 
   it('test14__auth_encrypt__padding__should_match', () => {

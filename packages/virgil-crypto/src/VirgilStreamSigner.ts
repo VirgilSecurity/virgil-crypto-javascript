@@ -8,9 +8,9 @@ import { VirgilPrivateKey } from './VirgilPrivateKey';
 
 export class VirgilStreamSigner {
   private _isDisposed = false;
-  private signer: FoundationModules.Signer;
-  private random: FoundationModules.CtrDrbg;
-  private sha512: FoundationModules.Sha512;
+
+  private readonly signer: FoundationModules.Signer;
+  private readonly sha512: FoundationModules.Sha512;
 
   get isDisposed() {
     return this._isDisposed;
@@ -20,9 +20,8 @@ export class VirgilStreamSigner {
     const foundationModules = getFoundationModules();
     this.signer = new foundationModules.Signer();
     this.sha512 = new foundationModules.Sha512();
-    this.random = getRandom();
     this.signer.hash = this.sha512;
-    this.signer.random = this.random;
+    this.signer.random = getRandom();
     this.signer.reset();
   }
 
@@ -54,8 +53,8 @@ export class VirgilStreamSigner {
   }
 
   dispose() {
-    this.signer.delete();
     this.sha512.delete();
+    this.signer.delete();
     this._isDisposed = true;
   }
 }

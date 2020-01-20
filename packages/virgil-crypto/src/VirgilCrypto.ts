@@ -25,6 +25,7 @@ import { VirgilPrivateKey } from './VirgilPrivateKey';
 import { VirgilPublicKey } from './VirgilPublicKey';
 import { VirgilStreamCipher } from './VirgilStreamCipher';
 import { VirgilStreamDecipher } from './VirgilStreamDecipher';
+import { VirgilStreamDecryptAndVerify } from './VirgilStreamDecryptAndVerify';
 import { VirgilStreamSignAndEncrypt } from './VirgilStreamSignAndEncrypt';
 import { VirgilStreamSigner } from './VirgilStreamSigner';
 import { VirgilStreamVerifier } from './VirgilStreamVerifier';
@@ -37,7 +38,6 @@ export interface VirgilCryptoOptions {
 export class VirgilCrypto implements ICrypto {
   readonly hashAlgorithm = HashAlgorithm;
   readonly keyPairType = KeyPairType;
-
   readonly useSha256Identifiers: boolean;
   readonly defaultKeyPairType: KeyPairType;
 
@@ -430,6 +430,10 @@ export class VirgilCrypto implements ICrypto {
     arg2?: boolean,
   ) {
     return new VirgilStreamSignAndEncrypt(arg0, arg1, arg2);
+  }
+
+  createStreamDecryptAndVerify() {
+    return new VirgilStreamDecryptAndVerify();
   }
 
   createStreamSigner() {

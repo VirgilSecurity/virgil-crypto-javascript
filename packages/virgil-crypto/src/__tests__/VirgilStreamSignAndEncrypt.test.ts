@@ -6,7 +6,7 @@ import { initCrypto } from '../foundationModules';
 import { NodeBuffer as BufferType } from '../types';
 import { VirgilCrypto } from '../VirgilCrypto';
 
-describe.only('VirgilStreamSignAndEncrypt', () => {
+describe('VirgilStreamSignAndEncrypt', () => {
   let virgilCrypto: VirgilCrypto;
 
   before(async () => {

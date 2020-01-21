@@ -1,11 +1,13 @@
 language: node_js
 node_js:
-  - "8"
-  - "10"
-  - "11"
-  - "12"
-before_script:
-  - yarn lerna bootstrap
+  - 8
+  - 10
+  - 11
+  - 12
+  - 13
+install:
+  - yarn --no-lockfile
+  - yarn prepare
 script:
   - yarn lint
   - yarn test

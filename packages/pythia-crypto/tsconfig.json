@@ -1,11 +1,12 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "ES2015",
-    "declaration": true,
-    "declarationDir": "./dist/types",
-    "strict": true,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true
-  }
+    "declarationDir": "./dist/types"
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "**/*.test.ts"
+  ]
 }

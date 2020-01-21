@@ -4,6 +4,7 @@ import { getFoundationModules } from './foundationModules';
 import { getRandom } from './globalInstances';
 import { Data } from './types';
 import { validatePrivateKey } from './validators';
+import { VirgilCryptoErrorStatus, VirgilCryptoError } from './VirgilCryptoError';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 
 export class VirgilStreamSigner {
@@ -27,8 +28,9 @@ export class VirgilStreamSigner {
 
   update(data: Data) {
     if (this._isDisposed) {
-      throw new Error(
-        'Illegal state. Cannot use signer after the `dispose` method has been called.',
+      throw new VirgilCryptoError(
+        VirgilCryptoErrorStatus.STREAM_ILLEGAL_STATE,
+        "Illegal state. Cannot use signer after the 'dispose' method has been called.",
       );
     }
     const myData = dataToUint8Array(data, 'utf8');
@@ -38,10 +40,9 @@ export class VirgilStreamSigner {
 
   sign(privateKey: VirgilPrivateKey, final = true) {
     if (this._isDisposed) {
-      throw new Error(
-        'Illegal state. The VirgilStreamSigner has been disposed. ' +
-          'Pass `false` as the second argument to the `sign` method ' +
-          'if you need to generate more than one signature.',
+      throw new VirgilCryptoError(
+        VirgilCryptoErrorStatus.STREAM_ILLEGAL_STATE,
+        "Illegal state. The VirgilStreamSigner has been disposed. Pass 'false' as the second argument to the 'sign' method if you need to generate more than one signature.",
       );
     }
     validatePrivateKey(privateKey);

@@ -3,6 +3,7 @@ import { dataToUint8Array } from '@virgilsecurity/data-utils';
 import { getFoundationModules } from './foundationModules';
 import { Data } from './types';
 import { validatePublicKey } from './validators';
+import { VirgilCryptoErrorStatus, VirgilCryptoError } from './VirgilCryptoError';
 import { VirgilPublicKey } from './VirgilPublicKey';
 
 export class VirgilStreamVerifier {
@@ -28,8 +29,9 @@ export class VirgilStreamVerifier {
 
   update(data: Data) {
     if (this._isDisposed) {
-      throw new Error(
-        'Illegal state. Cannot use signer after the `dispose` method has been called.',
+      throw new VirgilCryptoError(
+        VirgilCryptoErrorStatus.STREAM_ILLEGAL_STATE,
+        "Illegal state. Cannot use signer after the 'dispose' method has been called.",
       );
     }
     const myData = dataToUint8Array(data, 'utf8');
@@ -39,10 +41,9 @@ export class VirgilStreamVerifier {
 
   verify(publicKey: VirgilPublicKey, final = true) {
     if (this._isDisposed) {
-      throw new Error(
-        'Illegal state. The VirgilStreamVerifier has been disposed. ' +
-          'Pass `false` as the second argument to the `verify` method ' +
-          'if you need to verify with more than one public key.',
+      throw new VirgilCryptoError(
+        VirgilCryptoErrorStatus.STREAM_ILLEGAL_STATE,
+        "Illegal state. The VirgilStreamVerifier has been disposed. Pass 'false' as the second argument to the 'verify' method if you need to verify with more than one public key.",
       );
     }
     validatePublicKey(publicKey);

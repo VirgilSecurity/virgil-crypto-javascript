@@ -5,29 +5,30 @@ import { createGlobalInstances, resetGlobalInstances } from './globalInstances';
 import { FoundationModules } from './types';
 
 export const moduleInitializer = new ModuleInitializer();
+const FOUNDATION_MODULE_KEY = 'foundation';
 
-moduleInitializer.addModule<FoundationModules>('foundation', initFoundationModules);
+moduleInitializer.addModule<FoundationModules>(FOUNDATION_MODULE_KEY, initFoundationModules);
 
 moduleInitializer.on('load', (name, modules) => {
-  if (name === 'foundation') {
+  if (name === FOUNDATION_MODULE_KEY) {
     resetGlobalInstances();
     createGlobalInstances(modules);
   }
 });
 
 moduleInitializer.on('remove', name => {
-  if (name === 'foundation') {
+  if (name === FOUNDATION_MODULE_KEY) {
     resetGlobalInstances();
   }
 });
 
-export const hasFoundationModules = () => moduleInitializer.hasModule('foundation');
+export const hasFoundationModules = () => moduleInitializer.hasModule(FOUNDATION_MODULE_KEY);
 
 export const getFoundationModules = () =>
-  moduleInitializer.getModule<FoundationModules>('foundation');
+  moduleInitializer.getModule<FoundationModules>(FOUNDATION_MODULE_KEY);
 
 export const setFoundationModules = (foundationModules: FoundationModules) => {
-  moduleInitializer.setModule<FoundationModules>('foundation', foundationModules);
+  moduleInitializer.setModule<FoundationModules>(FOUNDATION_MODULE_KEY, foundationModules);
 };
 
 export const initCrypto = moduleInitializer.loadModules;

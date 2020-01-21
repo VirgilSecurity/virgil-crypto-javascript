@@ -22,6 +22,7 @@ import {
   validatePositiveNonZeroNumber,
   validateGroupId,
 } from './validators';
+import { VirgilCryptoErrorStatus, VirgilCryptoError } from './VirgilCryptoError';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 import { VirgilPublicKey } from './VirgilPublicKey';
 import { VirgilStreamCipher } from './VirgilStreamCipher';
@@ -462,7 +463,7 @@ export class VirgilCrypto implements ICrypto {
       throw new TypeError('Epoch messages must be an array.');
     }
     if (epochMessages.length === 0) {
-      throw new Error('Epoch messages must not be empty.');
+      throw new TypeError('Epoch messages must not be empty.');
     }
     return createVirgilGroupSession(epochMessages.map(it => dataToUint8Array(it, 'base64')));
   }
@@ -658,14 +659,14 @@ export class VirgilCrypto implements ICrypto {
     if (!recipientCipher.isDataSigned()) {
       paddingParams.delete();
       recipientCipher.delete();
-      throw new Error('Data is not signed');
+      throw new VirgilCryptoError(VirgilCryptoErrorStatus.DATA_NOT_SIGNED);
     }
     const signerInfoList = recipientCipher.signerInfos();
     if (!signerInfoList.hasItem()) {
       paddingParams.delete();
       signerInfoList.delete();
       recipientCipher.delete();
-      throw new Error('Data is not signed');
+      throw new VirgilCryptoError(VirgilCryptoErrorStatus.DATA_NOT_SIGNED);
     }
     const signerInfo = signerInfoList.item();
     let signerPublicKey: VirgilPublicKey;
@@ -679,7 +680,7 @@ export class VirgilCrypto implements ICrypto {
         signerInfo.delete();
         signerInfoList.delete();
         recipientCipher.delete();
-        throw new Error('Signer not found');
+        throw new VirgilCryptoError(VirgilCryptoErrorStatus.SIGNER_NOT_FOUND);
       }
     }
     if (!recipientCipher.verifySignerInfo(signerInfo, signerPublicKey!.lowLevelPublicKey)) {
@@ -687,7 +688,7 @@ export class VirgilCrypto implements ICrypto {
       signerInfo.delete();
       signerInfoList.delete();
       recipientCipher.delete();
-      throw new Error('Invalid signature');
+      throw new VirgilCryptoError(VirgilCryptoErrorStatus.INVALID_SIGNATURE);
     }
     paddingParams.delete();
     signerInfo.delete();
@@ -746,14 +747,14 @@ export class VirgilCrypto implements ICrypto {
         messageInfoCustomParams.delete();
         paddingParams.delete();
         recipientCipher.delete();
-        throw new Error('Signer not found');
+        throw new VirgilCryptoError(VirgilCryptoErrorStatus.SIGNER_NOT_FOUND);
       }
     }
     try {
       const signature = messageInfoCustomParams.findData(DATA_SIGNATURE_KEY);
       const isValid = this.verifySignature(decryptedData, signature, signerPublicKey);
       if (!isValid) {
-        throw new Error('Invalid signature');
+        throw new VirgilCryptoError(VirgilCryptoErrorStatus.INVALID_SIGNATURE);
       }
       return decryptedData;
     } finally {

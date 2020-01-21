@@ -4,6 +4,7 @@ import { DATA_SIGNATURE_KEY } from './constants';
 import { getFoundationModules } from './foundationModules';
 import { Data } from './types';
 import { validatePrivateKey } from './validators';
+import { VirgilCryptoErrorStatus, VirgilCryptoError } from './VirgilCryptoError';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 
 export class VirgilStreamDecipher {
@@ -38,13 +39,15 @@ export class VirgilStreamDecipher {
 
   getSignature() {
     if (this._isDisposed) {
-      throw new Error(
-        'Illegal state. Cannot get signature after the `dispose` method has been called.',
+      throw new VirgilCryptoError(
+        VirgilCryptoErrorStatus.STREAM_ILLEGAL_STATE,
+        "Illegal state. Cannot get signature after the 'dispose' method has been called.",
       );
     }
     if (!this._isFinished) {
-      throw new Error(
-        'Illegal state. Cannot get signature before the `final` method has been called.',
+      throw new VirgilCryptoError(
+        VirgilCryptoErrorStatus.STREAM_ILLEGAL_STATE,
+        "Illegal state. Cannot get signature before the 'final' method has been called.",
       );
     }
     const messageInfoCustomParams = this.recipientCipher.customParams();
@@ -80,12 +83,16 @@ export class VirgilStreamDecipher {
 
   private ensureLegalState() {
     if (this._isDisposed) {
-      throw new Error(
-        'Illegal state. Cannot use cipher after the `dispose` method has been called.',
+      throw new VirgilCryptoError(
+        VirgilCryptoErrorStatus.STREAM_ILLEGAL_STATE,
+        "Illegal state. Cannot use cipher after the 'dispose' method has been called.",
       );
     }
     if (this._isFinished) {
-      throw new Error('Illegal state. Cannot use cipher after the `final` method has been called.');
+      throw new VirgilCryptoError(
+        VirgilCryptoErrorStatus.STREAM_ILLEGAL_STATE,
+        "Illegal state. Cannot use cipher after the 'final' method has been called.",
+      );
     }
   }
 }

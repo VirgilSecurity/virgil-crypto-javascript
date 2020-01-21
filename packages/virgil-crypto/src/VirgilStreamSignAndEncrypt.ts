@@ -6,6 +6,7 @@ import { getRandom } from './globalInstances';
 import { FoundationModules, Data } from './types';
 import { toArray } from './utils';
 import { validatePrivateKey, validatePublicKeysArray } from './validators';
+import { VirgilCryptoErrorStatus, VirgilCryptoError } from './VirgilCryptoError';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 import { VirgilPublicKey } from './VirgilPublicKey';
 
@@ -32,9 +33,6 @@ export class VirgilStreamSignAndEncrypt {
     return this._isDisposed;
   }
 
-  // TODO: This doesn't work :(
-  // constructor(privateKey: VirgilPrivateKey, publicKey: VirgilPublicKey, enablePadding?: boolean);
-  // constructor(privateKey: VirgilPrivateKey, publicKeys: VirgilPublicKey[], enablePadding?: boolean);
   constructor(arg0: VirgilPrivateKey, arg1: VirgilPublicKey | VirgilPublicKey[], arg2?: boolean) {
     validatePrivateKey(arg0);
     const publicKeys = toArray(arg1);
@@ -115,18 +113,25 @@ export class VirgilStreamSignAndEncrypt {
 
   private ensureLegalState() {
     if (this._isDisposed) {
-      throw new Error(
-        'Illegal state. Cannot use cipher after the `dispose` method has been called.',
+      throw new VirgilCryptoError(
+        VirgilCryptoErrorStatus.STREAM_ILLEGAL_STATE,
+        "Illegal state. Cannot use cipher after the 'dispose' method has been called.",
       );
     }
     if (this._isFinished) {
-      throw new Error('Illegal state. Cannot use cipher after the `final` method has been called.');
+      throw new VirgilCryptoError(
+        VirgilCryptoErrorStatus.STREAM_ILLEGAL_STATE,
+        "Illegal state. Cannot use cipher after the 'final' method has been called.",
+      );
     }
   }
 
   private ensureIsRunning() {
     if (!this._isRunning) {
-      throw new Error('Illegal state. Cannot use cipher before the `start` method.');
+      throw new VirgilCryptoError(
+        VirgilCryptoErrorStatus.STREAM_ILLEGAL_STATE,
+        "Illegal state. Cannot use cipher before the 'start' method.",
+      );
     }
   }
 }

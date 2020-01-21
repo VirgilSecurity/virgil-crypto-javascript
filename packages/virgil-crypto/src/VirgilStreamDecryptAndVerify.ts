@@ -6,6 +6,7 @@ import { getRandom } from './globalInstances';
 import { FoundationModules, Data } from './types';
 import { toArray } from './utils';
 import { validatePrivateKey, validatePublicKeysArray } from './validators';
+import { VirgilCryptoErrorStatus, VirgilCryptoError } from './VirgilCryptoError';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 import { VirgilPublicKey } from './VirgilPublicKey';
 
@@ -59,24 +60,26 @@ export class VirgilStreamDecryptAndVerify {
     const publicKeys = toArray(arg0);
     validatePublicKeysArray(publicKeys);
     if (this._isDisposed) {
-      throw new Error(
-        'Illegal state. Cannot verify signature after the `dispose` method has been called.',
+      throw new VirgilCryptoError(
+        VirgilCryptoErrorStatus.STREAM_ILLEGAL_STATE,
+        "Illegal state. Cannot verify signature after the 'dispose' method has been called.",
       );
     }
     if (!this._isFinished) {
-      throw new Error(
-        'Illegal state. Cannot verify signature before the `final` method has been called.',
+      throw new VirgilCryptoError(
+        VirgilCryptoErrorStatus.STREAM_ILLEGAL_STATE,
+        "Illegal state. Cannot verify signature before the 'final' method has been called.",
       );
     }
     let signerInfo: FoundationModules.SignerInfo | undefined;
     let signerInfoList: FoundationModules.SignerInfoList | undefined;
     try {
       if (!this.recipientCipher.isDataSigned()) {
-        throw new Error('Data is not signed');
+        throw new VirgilCryptoError(VirgilCryptoErrorStatus.DATA_NOT_SIGNED);
       }
       signerInfoList = this.recipientCipher.signerInfos();
       if (!signerInfoList.hasItem()) {
-        throw new Error('Data is not signed');
+        throw new VirgilCryptoError(VirgilCryptoErrorStatus.DATA_NOT_SIGNED);
       }
       const signerInfo = signerInfoList.item();
       let signerPublicKey: VirgilPublicKey;
@@ -86,11 +89,11 @@ export class VirgilStreamDecryptAndVerify {
           break;
         }
         if (i === publicKeys.length - 1) {
-          throw new Error('Signer not found');
+          throw new VirgilCryptoError(VirgilCryptoErrorStatus.SIGNER_NOT_FOUND);
         }
       }
       if (!this.recipientCipher.verifySignerInfo(signerInfo, signerPublicKey!.lowLevelPublicKey)) {
-        throw new Error('Invalid signature');
+        throw new VirgilCryptoError(VirgilCryptoErrorStatus.INVALID_SIGNATURE);
       }
     } finally {
       if (signerInfo) {
@@ -113,12 +116,16 @@ export class VirgilStreamDecryptAndVerify {
 
   private ensureLegalState() {
     if (this._isDisposed) {
-      throw new Error(
-        'Illegal state. Cannot use cipher after the `dispose` method has been called.',
+      throw new VirgilCryptoError(
+        VirgilCryptoErrorStatus.STREAM_ILLEGAL_STATE,
+        "Illegal state. Cannot use cipher after the 'dispose' method has been called.",
       );
     }
     if (this._isFinished) {
-      throw new Error('Illegal state. Cannot use cipher after the `final` method has been called.');
+      throw new VirgilCryptoError(
+        VirgilCryptoErrorStatus.STREAM_ILLEGAL_STATE,
+        "Illegal state. Cannot use cipher after the 'final' method has been called.",
+      );
     }
   }
 }

@@ -6,7 +6,7 @@ let keyProvider: FoundationModules.KeyProvider | undefined;
 const ensureExist = () => {
   if (!random || !keyProvider) {
     throw new Error(
-      'Cannot use global instances if the `resetGlobalInstances` function has been called or `createGlobalInstances` function has not been called yet.',
+      "Cannot use global instances if the 'resetGlobalInstances' function has been called or 'createGlobalInstances' function has not been called yet.",
     );
   }
 };

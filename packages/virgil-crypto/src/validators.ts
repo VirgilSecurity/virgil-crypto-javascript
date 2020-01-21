@@ -1,37 +1,55 @@
+import { NodeBuffer } from '@virgilsecurity/data-utils';
+
+import { MIN_GROUP_ID_BYTE_LENGTH } from './constants';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 import { VirgilPublicKey } from './VirgilPublicKey';
 
-export function validatePrivateKey(privateKey: VirgilPrivateKey, label = 'privateKey') {
-  if (
-    privateKey == null ||
-    !(privateKey.identifier instanceof Uint8Array) ||
-    !(typeof privateKey.lowLevelPrivateKey === 'object') ||
-    !(typeof privateKey.isDisposed === 'boolean')
-  ) {
-    throw new TypeError(`\`${label}\` is not a VirgilPrivateKey.`);
+export function validatePrivateKey(privateKey: any) {
+  if (!(privateKey instanceof VirgilPrivateKey)) {
+    throw new TypeError("An argument is not an instance of 'VirgilPrivateKey' class.");
   }
   if (privateKey.isDisposed) {
-    throw new Error(`Cannot use \`${label}\` after it was disposed.`);
+    throw new TypeError(
+      "Cannot use an instance of 'VirgilPrivateKey' class after it was disposed.",
+    );
   }
 }
 
-export function validatePublicKey(publicKey: VirgilPublicKey, label = 'publicKey') {
-  if (
-    publicKey == null ||
-    !(publicKey.identifier instanceof Uint8Array) ||
-    !(typeof publicKey.lowLevelPublicKey === 'object') ||
-    !(typeof publicKey.isDisposed === 'boolean')
-  ) {
-    throw new TypeError(`\`${label}\` is not a VirgilPublicKey.`);
+export function validatePublicKey(publicKey: any) {
+  if (!(publicKey instanceof VirgilPublicKey)) {
+    throw new TypeError("An argument is not a 'VirgilPublicKey'.");
   }
   if (publicKey.isDisposed) {
-    throw new Error(`Cannot use \`${label}\` after is was disposed.`);
+    throw new TypeError("Cannot use an instance of 'VirgilPublicKey' class after it was disposed.");
   }
 }
 
-export function validatePublicKeysArray(publicKeys: VirgilPublicKey[], label = 'publicKeys') {
-  if (publicKeys.length === 0) {
-    throw new TypeError(`\`${label}\` array must not be empty.`);
+export function validatePublicKeysArray(publicKeys: any) {
+  if (!Array.isArray(publicKeys)) {
+    throw new TypeError('An argument is not an array.');
   }
-  publicKeys.forEach(publicKey => validatePublicKey(publicKey));
+  if (!publicKeys.length) {
+    throw new TypeError("An array of 'VirgilPublicKey' instances should not be empty.");
+  }
+  publicKeys.forEach(validatePublicKey);
+}
+
+export function validatePositiveNonZeroNumber(number: any) {
+  if (typeof number !== 'number') {
+    throw new TypeError('An argument is not a number.');
+  }
+  if (number <= 0) {
+    throw new TypeError(`An argument should be greater that '0', but received '${number}'.`);
+  }
+}
+
+export function validateGroupId(groupId: any) {
+  if (!(groupId instanceof Uint8Array)) {
+    throw new TypeError("An argument is not an instance of 'Uint8Array' class.");
+  }
+  if (groupId.byteLength < MIN_GROUP_ID_BYTE_LENGTH) {
+    throw new TypeError(
+      `An argument byte length is too small. Expected to be at least '${MIN_GROUP_ID_BYTE_LENGTH}' bytes.`,
+    );
+  }
 }

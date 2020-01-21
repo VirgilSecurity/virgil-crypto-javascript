@@ -2,12 +2,7 @@ import { NodeBuffer, dataToUint8Array, toBuffer } from '@virgilsecurity/data-uti
 
 import { createVirgilGroupSession } from './groups/createVirgilGroupSession';
 import { computeSessionId, createInitialEpoch } from './groups/helpers';
-import {
-  DATA_SIGNATURE_KEY,
-  DATA_SIGNER_ID_KEY,
-  PADDING_LEN,
-  MIN_GROUP_ID_BYTE_LENGTH,
-} from './constants';
+import { DATA_SIGNATURE_KEY, DATA_SIGNER_ID_KEY, PADDING_LEN } from './constants';
 import { getFoundationModules } from './foundationModules';
 import { getRandom, getKeyProvider } from './globalInstances';
 import { HashAlgorithm } from './HashAlgorithm';
@@ -20,7 +15,13 @@ import {
 } from './KeyPairType';
 import { FoundationModules, ICrypto, NodeBuffer as BufferType, Data, IGroupSession } from './types';
 import { toArray } from './utils';
-import { validatePrivateKey, validatePublicKey, validatePublicKeysArray } from './validators';
+import {
+  validatePrivateKey,
+  validatePublicKey,
+  validatePublicKeysArray,
+  validatePositiveNonZeroNumber,
+  validateGroupId,
+} from './validators';
 import { VirgilPrivateKey } from './VirgilPrivateKey';
 import { VirgilPublicKey } from './VirgilPublicKey';
 import { VirgilStreamCipher } from './VirgilStreamCipher';
@@ -106,6 +107,7 @@ export class VirgilCrypto implements ICrypto {
   }
 
   exportPublicKey(publicKey: VirgilPublicKey) {
+    validatePublicKey(publicKey);
     const keyProvider = getKeyProvider();
     const publicKeyData = keyProvider.exportPublicKey(publicKey.lowLevelPublicKey);
     return toBuffer(publicKeyData);
@@ -340,6 +342,7 @@ export class VirgilCrypto implements ICrypto {
   }
 
   getRandomBytes(length: number) {
+    validatePositiveNonZeroNumber(length);
     const bytes = getRandom().random(length);
     return toBuffer(bytes);
   }
@@ -446,7 +449,7 @@ export class VirgilCrypto implements ICrypto {
 
   generateGroupSession(groupId: Data): IGroupSession {
     const groupIdBytes = dataToUint8Array(groupId, 'utf8');
-    this.validateGroupId(groupIdBytes);
+    validateGroupId(groupIdBytes);
     const sessionId = computeSessionId(groupIdBytes);
     const initialEpoch = createInitialEpoch(sessionId);
     const initialEpochMessage = initialEpoch.serialize();
@@ -466,16 +469,8 @@ export class VirgilCrypto implements ICrypto {
 
   calculateGroupSessionId(groupId: Data) {
     const groupIdBytes = dataToUint8Array(groupId, 'utf8');
-    this.validateGroupId(groupIdBytes);
+    validateGroupId(groupIdBytes);
     return toBuffer(computeSessionId(groupIdBytes)).toString('hex');
-  }
-
-  private validateGroupId(groupId: Uint8Array) {
-    if (groupId.byteLength < MIN_GROUP_ID_BYTE_LENGTH) {
-      throw new Error(
-        `The given group Id is too short. Must be at least ${MIN_GROUP_ID_BYTE_LENGTH} bytes.`,
-      );
-    }
   }
 
   private createHash(

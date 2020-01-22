@@ -1,27 +1,19 @@
 import { expect } from 'chai';
 
-import initFoundation from '@virgilsecurity/core-foundation';
 import { NodeBuffer } from '@virgilsecurity/data-utils';
 
-import { hasFoundationModules, setFoundationModules } from '../foundationModules';
+import { initCrypto } from '../foundationModules';
 import { VirgilCrypto } from '../VirgilCrypto';
 
 describe('group encryption', () => {
   let virgilCrypto: VirgilCrypto;
 
-  before(() => {
-    return new Promise(resolve => {
-      if (hasFoundationModules()) {
-        virgilCrypto = new VirgilCrypto();
-        return resolve();
-      }
+  before(async () => {
+    await initCrypto();
+  });
 
-      initFoundation().then(foundationModules => {
-        setFoundationModules(foundationModules);
-        virgilCrypto = new VirgilCrypto();
-        resolve();
-      });
-    });
+  beforeEach(() => {
+    virgilCrypto = new VirgilCrypto();
   });
 
   describe('addNewEpoch', () => {

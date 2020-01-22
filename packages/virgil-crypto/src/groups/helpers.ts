@@ -1,25 +1,8 @@
 import { toBuffer } from '@virgilsecurity/data-utils';
 
 import { getFoundationModules } from '../foundationModules';
+import { getRandom } from '../globalInstances';
 import { FoundationModules, IGroupSessionMessageInfo } from '../types';
-
-const getRandom = (() => {
-  let random: FoundationModules.CtrDrbg | undefined;
-  return () => {
-    if (!random) {
-      const foundation = getFoundationModules();
-      random = new foundation.CtrDrbg();
-      try {
-        random.setupDefaults();
-      } catch (error) {
-        random.delete();
-        random = undefined;
-        throw error;
-      }
-    }
-    return random;
-  };
-})();
 
 export function parseGroupSessionMessage(messageData: Uint8Array): IGroupSessionMessageInfo {
   const message = getFoundationModules().GroupSessionMessage.deserialize(messageData);

@@ -1,2 +1,2 @@
 export * from './errors';
-export { ModuleInitializer } from './ModuleInitializer';
+export { ModuleInitializer, ModuleInitializerEvents } from './ModuleInitializer';

@@ -1,27 +1,18 @@
 import { expect } from 'chai';
 
-import initFoundation from '@virgilsecurity/core-foundation';
-
-import { hasFoundationModules, setFoundationModules } from '../foundationModules';
+import { initCrypto } from '../foundationModules';
 import { VirgilCrypto } from '../VirgilCrypto';
 import { VirgilPrivateKey } from '../VirgilPrivateKey';
 
 describe('VirgilStreamDecipher', () => {
   let virgilCrypto: VirgilCrypto;
 
-  before(() => {
-    return new Promise(resolve => {
-      if (hasFoundationModules()) {
-        virgilCrypto = new VirgilCrypto();
-        return resolve();
-      }
+  before(async () => {
+    await initCrypto();
+  });
 
-      initFoundation().then(foundationModules => {
-        setFoundationModules(foundationModules);
-        virgilCrypto = new VirgilCrypto();
-        resolve();
-      });
-    });
+  beforeEach(() => {
+    virgilCrypto = new VirgilCrypto();
   });
 
   it('throws if private key is invalid', () => {

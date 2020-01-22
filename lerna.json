@@ -1,12 +1,6 @@
 {
-  "command": {
-    "bootstrap": {
-      "npmClientArgs": [
-        "--no-lockfile"
-      ]
-    }
-  },
   "npmClient": "yarn",
+  "useWorkspaces": true,
   "packages": [
     "packages/*"
   ],

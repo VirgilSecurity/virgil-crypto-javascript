@@ -10,6 +10,7 @@ export { HashAlgorithm } from './HashAlgorithm';
 export { KeyPairType } from './KeyPairType';
 export { VirgilKeyPair } from './types';
 export { VirgilCrypto } from './VirgilCrypto';
+export * from './VirgilCryptoError';
 export { VirgilPrivateKey } from './VirgilPrivateKey';
 export { VirgilPublicKey } from './VirgilPublicKey';
 export { VirgilStreamCipher } from './VirgilStreamCipher';

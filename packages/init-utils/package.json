@@ -1,6 +1,6 @@
 {
   "name": "@virgilsecurity/init-utils",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Initialization utility for Virgil Security Inc. libraries",
   "main": "./dist/init-utils.cjs.js",
   "module": "./dist/init-utils.es.js",
@@ -17,16 +17,17 @@
     "clean": "rimraf .rpt2_cache dist",
     "prepare": "npm run clean && npm run build"
   },
+  "dependencies": {
+    "eventemitter3": "^4.0.0"
+  },
   "devDependencies": {
-    "@types/chai": "^4.2.6",
+    "@types/chai": "^4.2.7",
     "@types/mocha": "^5.2.7",
     "chai": "^4.2.0",
-    "mocha": "^6.2.2",
-    "rimraf": "^3.0.0",
-    "rollup": "^1.27.8",
+    "mocha": "^7.0.0",
+    "rollup": "^1.29.1",
     "rollup-plugin-typescript2": "^0.25.3",
-    "ts-node": "^8.5.4",
-    "typescript": "^3.7.3"
+    "ts-node": "^8.6.2"
   },
   "publishConfig": {
     "access": "public"

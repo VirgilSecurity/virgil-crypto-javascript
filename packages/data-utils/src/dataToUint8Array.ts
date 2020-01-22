@@ -7,7 +7,7 @@ export const createDataToUint8ArrayFunction = (NodeBuffer: any) => (
 ): Uint8Array => {
   if (typeof data === 'string') {
     if (typeof defaultEncoding === 'string' && !NodeBuffer.isEncoding(defaultEncoding)) {
-      throw new TypeError('Invalid default encoding');
+      throw new TypeError('Invalid default encoding.');
     }
     return NodeBuffer.from(data, defaultEncoding);
   }
@@ -21,5 +21,5 @@ export const createDataToUint8ArrayFunction = (NodeBuffer: any) => (
   ) {
     return NodeBuffer.from(data.value, data.encoding);
   }
-  throw new TypeError('Invalid format of Data');
+  throw new TypeError("Invalid format of 'Data'.");
 };

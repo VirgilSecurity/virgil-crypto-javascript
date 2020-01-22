@@ -1,9 +1,9 @@
 const path = require('path');
 
 const builtinModules = require('builtin-modules');
-const commonjs = require('rollup-plugin-commonjs');
+const commonjs = require('@rollup/plugin-commonjs');
 const copy = require('rollup-plugin-copy');
-const nodeResolve = require('rollup-plugin-node-resolve');
+const nodeResolve = require('@rollup/plugin-node-resolve');
 const replace = require('rollup-plugin-re');
 const { terser } = require('rollup-plugin-terser');
 const typescript = require('rollup-plugin-typescript2');

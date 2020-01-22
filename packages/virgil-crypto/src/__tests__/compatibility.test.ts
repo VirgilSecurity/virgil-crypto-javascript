@@ -10,16 +10,13 @@ describe('compatibility', () => {
   let wasmFoundationModules: typeof FoundationModules;
   let asmjsFoundationModules: typeof FoundationModules;
 
-  before(() => {
-    return new Promise(resolve => {
-      Promise.all([initWasmFoundation(), initAsmjsFoundation()]).then(
-        ([wasmModules, asmjsModules]) => {
-          wasmFoundationModules = wasmModules;
-          asmjsFoundationModules = asmjsModules;
-          resolve();
-        },
-      );
-    });
+  before(async () => {
+    await Promise.all([initWasmFoundation(), initAsmjsFoundation()]).then(
+      ([wasmModules, asmjsModules]) => {
+        wasmFoundationModules = wasmModules;
+        asmjsFoundationModules = asmjsModules;
+      },
+    );
   });
 
   it('encrypts with WebAssembly and decrypts with asm.js', () => {

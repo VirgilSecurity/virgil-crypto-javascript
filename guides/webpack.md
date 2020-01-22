@@ -26,7 +26,7 @@ Last, you need to import the library:
 import { initCrypto, VirgilCrypto } 'virgil-crypto';
 ```
 
-Here is [complete working demo](https://github.com/VirgilSecurity/virgil-crypto-javascript/tree/master/packages/webpack-demo) of this approach.
+Here is [complete working demo](https://github.com/VirgilSecurity/virgil-crypto-javascript/tree/master/examples/webpack) of this approach.
 
 ## asm.js
 First, you need to [disable mocking of Node.js modules and globals](https://webpack.js.org/configuration/node) in your Webpack config:

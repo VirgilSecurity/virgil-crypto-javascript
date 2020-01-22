@@ -1,9 +1,8 @@
 import { expect } from 'chai';
 
-import initFoundation from '@virgilsecurity/core-foundation';
 import { NodeBuffer } from '@virgilsecurity/data-utils';
 
-import { hasFoundationModules, setFoundationModules } from '../foundationModules';
+import { initCrypto } from '../foundationModules';
 import { HashAlgorithm } from '../HashAlgorithm';
 import { VirgilCrypto } from '../VirgilCrypto';
 import { VirgilPrivateKey } from '../VirgilPrivateKey';
@@ -16,19 +15,12 @@ import { VirgilStreamVerifier } from '../VirgilStreamVerifier';
 describe('VirgilCrypto', () => {
   let virgilCrypto: VirgilCrypto;
 
-  before(() => {
-    return new Promise(resolve => {
-      if (hasFoundationModules()) {
-        virgilCrypto = new VirgilCrypto();
-        return resolve();
-      }
+  before(async () => {
+    await initCrypto();
+  });
 
-      initFoundation().then(foundationModules => {
-        setFoundationModules(foundationModules);
-        virgilCrypto = new VirgilCrypto();
-        resolve();
-      });
-    });
+  beforeEach(() => {
+    virgilCrypto = new VirgilCrypto();
   });
 
   describe('generateKeys', () => {
@@ -98,12 +90,26 @@ describe('VirgilCrypto', () => {
     expect(exportedKey.toString('hex')).to.equal(publicKeyHex);
   });
 
-  it('encrypt -> decrypt', () => {
-    const data = 'data';
-    const keyPair = virgilCrypto.generateKeys();
-    const cipherData = virgilCrypto.encrypt({ value: data, encoding: 'utf8' }, keyPair.publicKey);
-    const decryptedData = virgilCrypto.decrypt(cipherData, keyPair.privateKey);
-    expect(decryptedData.toString()).to.equal(data);
+  describe('encrypt -> decrypt', () => {
+    it('encrypts and decrypts data', () => {
+      const data = 'data';
+      const keyPair = virgilCrypto.generateKeys();
+      const cipherData = virgilCrypto.encrypt({ value: data, encoding: 'utf8' }, keyPair.publicKey);
+      const decryptedData = virgilCrypto.decrypt(cipherData, keyPair.privateKey);
+      expect(decryptedData.toString()).to.equal(data);
+    });
+
+    it('encrypts and decrypts data with padding', () => {
+      const data = 'data';
+      const keyPair = virgilCrypto.generateKeys();
+      const cipherData = virgilCrypto.encrypt(
+        { value: data, encoding: 'utf8' },
+        keyPair.publicKey,
+        true,
+      );
+      const decryptedData = virgilCrypto.decrypt(cipherData, keyPair.privateKey);
+      expect(decryptedData.toString()).to.equal(data);
+    });
   });
 
   it('throws if `encrypt` is called with an empty array of recipients', () => {
@@ -163,6 +169,64 @@ describe('VirgilCrypto', () => {
       keyPair.publicKey,
     );
     expect(isValid).to.be.true;
+  });
+
+  describe('signAndEncrypt -> decryptAndVerify', () => {
+    it('decrypts and verifies', () => {
+      const senderKeyPair = virgilCrypto.generateKeys();
+      const recipientKeyPair = virgilCrypto.generateKeys();
+      const message = 'Secret message';
+      const cipherData = virgilCrypto.signAndEncrypt(
+        { value: message, encoding: 'utf8' },
+        senderKeyPair.privateKey,
+        recipientKeyPair.publicKey,
+      );
+      const decryptedMessage = virgilCrypto.decryptAndVerify(
+        cipherData,
+        recipientKeyPair.privateKey,
+        senderKeyPair.publicKey,
+      );
+      expect(decryptedMessage.toString()).to.equal(message);
+    });
+
+    it('decrypts and verifies given the right keys', () => {
+      const data = NodeBuffer.from('Secret message');
+      const senderKeyPair = virgilCrypto.generateKeys();
+      const recipientKeyPair = virgilCrypto.generateKeys();
+      const additionalKeyPair = virgilCrypto.generateKeys();
+      const anotherKeyPair = virgilCrypto.generateKeys();
+      const encryptedData = virgilCrypto.signAndEncrypt(
+        data,
+        senderKeyPair.privateKey,
+        recipientKeyPair.publicKey,
+      );
+      const decryptedData = virgilCrypto.decryptAndVerify(
+        encryptedData,
+        recipientKeyPair.privateKey,
+        [additionalKeyPair.publicKey, anotherKeyPair.publicKey, senderKeyPair.publicKey],
+      );
+      expect(decryptedData.equals(data)).to.be.true;
+    });
+
+    it('fails verification given the wrong keys', () => {
+      const data = NodeBuffer.from('Secret message');
+      const senderKeyPair = virgilCrypto.generateKeys();
+      const recipientKeyPair = virgilCrypto.generateKeys();
+      const additionalKeyPair = virgilCrypto.generateKeys();
+      const anotherKeyPair = virgilCrypto.generateKeys();
+      const encryptedData = virgilCrypto.signAndEncrypt(
+        data,
+        senderKeyPair.privateKey,
+        recipientKeyPair.publicKey,
+      );
+      const error = () => {
+        virgilCrypto.decryptAndVerify(encryptedData, recipientKeyPair.privateKey, [
+          additionalKeyPair.publicKey,
+          anotherKeyPair.publicKey,
+        ]);
+      };
+      expect(error).to.throw;
+    });
   });
 
   describe('signThenEncrypt -> decryptThenVerify', () => {

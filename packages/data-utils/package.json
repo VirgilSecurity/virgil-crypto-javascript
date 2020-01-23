@@ -1,6 +1,6 @@
 {
   "name": "@virgilsecurity/data-utils",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Library that contains different functions / classes that are used for data manipulation in different Virgil Security libraries.",
   "main": "./dist/node.cjs.js",
   "module": "./dist/node.es.js",

@@ -29,6 +29,7 @@ const TARGET = {
 
 const sourceDir = path.join(__dirname, 'src');
 const outputDir = path.join(__dirname, 'dist');
+const corePythiaDir = path.parse(require.resolve('@virgilsecurity/core-pythia')).dir;
 
 const getOutputFilename = (target, cryptoType, format) =>
   `${target}${cryptoType === CRYPTO_TYPE.ASMJS ? '.asmjs' : ''}.${format}.js`;
@@ -77,13 +78,7 @@ const createBrowserEntry = (target, cryptoType, format) => {
         copy({
           targets: [
             {
-              src: path.join(
-                __dirname,
-                'node_modules',
-                '@virgilsecurity',
-                'core-pythia',
-                `libpythia.${target}.wasm`,
-              ),
+              src: path.join(corePythiaDir, `libpythia.${target}.wasm`),
               dest: outputDir,
             },
           ],

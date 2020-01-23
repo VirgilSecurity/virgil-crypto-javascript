@@ -19,8 +19,5 @@ module.exports = {
       },
     ],
   },
-  plugins: [
-    new HtmlWebpackPlugin({ template: path.join(sourceRoot, 'index.html') }),
-    // new BundleAnalyzerPlugin(),
-  ],
+  plugins: [new HtmlWebpackPlugin({ template: path.join(sourceRoot, 'index.html') })],
 };

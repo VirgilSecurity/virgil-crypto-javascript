@@ -8,6 +8,7 @@ const sourcePath = path.join(__dirname, 'src');
 const outputPath = path.join(__dirname, 'dist');
 
 const createEntry = format => ({
+  external: ['eventemitter3'],
   input: path.join(sourcePath, 'index.ts'),
   output: {
     format,

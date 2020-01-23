@@ -1,6 +1,6 @@
 {
   "name": "@virgilsecurity/pythia-crypto",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Virgil Pythia Crypto library.",
   "main": "./dist/node.cjs.js",
   "module": "./dist/node.es.js",

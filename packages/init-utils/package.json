@@ -1,6 +1,6 @@
 {
   "name": "@virgilsecurity/init-utils",
-  "version": "0.3.1",
+  "version": "1.0.0",
   "description": "Initialization utility for Virgil Security Inc. libraries",
   "main": "./dist/init-utils.cjs.js",
   "module": "./dist/init-utils.es.js",

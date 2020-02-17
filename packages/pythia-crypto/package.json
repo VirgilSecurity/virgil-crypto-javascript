@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@virgilsecurity/core-pythia": "^1.0.0",
-    "@virgilsecurity/crypto-types": "^1.0.0",
+    "@virgilsecurity/crypto-types": "1.0.0",
     "@virgilsecurity/data-utils": "^1.0.0",
     "@virgilsecurity/init-utils": "^1.0.0"
   },

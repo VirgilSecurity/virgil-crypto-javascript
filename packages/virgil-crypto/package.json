@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@virgilsecurity/core-foundation": "^1.0.0",
-    "@virgilsecurity/crypto-types": "^1.0.0",
+    "@virgilsecurity/crypto-types": "1.0.0",
     "@virgilsecurity/data-utils": "^1.0.0",
     "@virgilsecurity/init-utils": "^1.0.0",
     "@virgilsecurity/sdk-crypto": "^1.0.0"

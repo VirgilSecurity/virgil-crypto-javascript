@@ -1,6 +1,6 @@
 {
   "name": "@virgilsecurity/core-pythia",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "description": "Virgil Pythia",
   "main": "./node.cjs.js",
   "module": "./node.es.js",

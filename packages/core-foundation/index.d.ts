@@ -218,6 +218,16 @@ declare namespace FoundationModules {
     finish(): Uint8Array;
   }
 
+  export interface AuthEncrypt {
+    authEncrypt(data: Uint8Array, authData: Uint8Array): { out: Uint8Array; tag: Uint8Array };
+    authEncryptedLen(dataLen: number): number;
+  }
+
+  export interface AuthDecrypt {
+    authDecrypt(data: Uint8Array, authData: Uint8Array, tag: Uint8Array): Uint8Array;
+    authDecryptedLen(dataLen: number): number;
+  }
+
   export class MessageInfoEditor extends FoundationObject {
     random: Random;
     setupDefaults(): void;
@@ -235,7 +245,11 @@ declare namespace FoundationModules {
     findData(key: Uint8Array): Uint8Array;
   }
 
-  export class Aes256Gcm extends FoundationObject implements Cipher {
+  export class Aes256Gcm extends FoundationObject implements AuthEncrypt, AuthDecrypt, Cipher {
+    KEY_LEN: number;
+    KEY_BITLEN: number;
+    BLOCK_LEN: number;
+    AUTH_TAG_LEN: number;
     setNonce(nonce: Uint8Array): void;
     setKey(key: Uint8Array): void;
     startEncryption(): void;
@@ -245,6 +259,10 @@ declare namespace FoundationModules {
     encryptedOutLen(dataLen: number): number;
     decryptedOutLen(dataLen: number): number;
     finish(): Uint8Array;
+    authEncrypt(data: Uint8Array, authData: Uint8Array): { out: Uint8Array; tag: Uint8Array };
+    authEncryptedLen(dataLen: number): number;
+    authDecrypt(data: Uint8Array, authData: Uint8Array, tag: Uint8Array): Uint8Array;
+    authDecryptedLen(dataLen: number): number;
   }
 
   export class RecipientCipher extends FoundationObject {

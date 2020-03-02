@@ -228,6 +228,17 @@ declare namespace FoundationModules {
     authDecryptedLen(dataLen: number): number;
   }
 
+  export interface CipherInfo {
+    NONCE_LEN: number;
+    KEY_LEN: number;
+    KEY_BITLEN: number;
+    BLOCK_LEN: number;
+  }
+
+  export interface CipherAuthInfo {
+    AUTH_TAG_LEN: number;
+  }
+
   export class MessageInfoEditor extends FoundationObject {
     random: Random;
     setupDefaults(): void;
@@ -245,7 +256,9 @@ declare namespace FoundationModules {
     findData(key: Uint8Array): Uint8Array;
   }
 
-  export class Aes256Gcm extends FoundationObject implements AuthEncrypt, AuthDecrypt, Cipher {
+  export class Aes256Gcm extends FoundationObject
+    implements AuthEncrypt, AuthDecrypt, Cipher, CipherInfo, CipherAuthInfo {
+    NONCE_LEN: number;
     KEY_LEN: number;
     KEY_BITLEN: number;
     BLOCK_LEN: number;

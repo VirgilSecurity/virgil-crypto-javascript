@@ -97,6 +97,51 @@ declare namespace PheModules {
     ): { newServerPrivateKey: Uint8Array; newServerPublicKey: Uint8Array; updateToken: Uint8Array };
   }
 
+  export class UokmsClient extends PheObject {
+    random: Random;
+    operationRandom: Random;
+    setupDefaults(): void;
+    setKeysOneparty(clientPrivateKey: Uint8Array): void;
+    setKeys(clientPrivateKey: Uint8Array, serverPublicKey: Uint8Array): void;
+    generateClientPrivateKey(): Uint8Array;
+    generateEncryptWrap(encryptionKeyLen: number): { wrap: Uint8Array; encryptionKey: Uint8Array };
+    decryptOneparty(wrap: Uint8Array, encryptionKeyLen: number): Uint8Array;
+    generateDecryptRequest(
+      wrap: Uint8Array,
+    ): { deblindFactor: Uint8Array; decryptRequest: Uint8Array };
+    processDecryptResponse(
+      wrap: Uint8Array,
+      decryptRequest: Uint8Array,
+      decryptResponse: Uint8Array,
+      deblindFactor: Uint8Array,
+      encryptionKeyLen: number,
+    ): Uint8Array;
+    rotateKeysOneparty(updateToken: Uint8Array): Uint8Array;
+    generateUpdateTokenOneparty(): Uint8Array;
+    rotateKeys(
+      updateToken: Uint8Array,
+    ): { newClientPrivateKey: Uint8Array; newServerPublicKey: Uint8Array };
+  }
+
+  export class UokmsServer extends PheObject {
+    random: Random;
+    operationRandom: Random;
+    setupDefaults(): void;
+    generateServerKeyPair(): { serverPrivateKey: Uint8Array; serverPublicKey: Uint8Array };
+    decryptResponseLen(): number;
+    processDecryptRequest(serverPrivateKey: Uint8Array, decryptRequest: Uint8Array): Uint8Array;
+    rotateKeys(
+      serverPrivateKey: Uint8Array,
+    ): { newServerPrivateKey: Uint8Array; newServerPublicKey: Uint8Array; updateToken: Uint8Array };
+  }
+
+  export class UokmsWrapRotation extends PheObject {
+    operationRandom: Random;
+    setupDefaults(): void;
+    setUpdateToken(updateToken: Uint8Array): void;
+    updateWrap(wrap: Uint8Array): Uint8Array;
+  }
+
   export class CtrDrbg extends PheObject implements Random {
     RESEED_INTERVAL: number;
     ENTROPY_LEN: number;

@@ -16,7 +16,7 @@
     "worker.cjs.js",
     "worker.es.js"
   ],
-  "repository": "https://github.com/VirgilSecurity/virgil-javascript/tree/master/packages/crypto",
+  "repository": "https://github.com/VirgilSecurity/virgil-crypto-javascript/tree/master/packages/virgil-crypto",
   "author": "Virgil Security Inc. <support@virgilsecurity.com>",
   "license": "BSD-3-Clause",
   "scripts": {

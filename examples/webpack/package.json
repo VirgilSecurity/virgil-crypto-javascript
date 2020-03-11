@@ -11,7 +11,7 @@
     "build": "webpack"
   },
   "dependencies": {
-    "virgil-crypto": "^4.0.0-alpha.17"
+    "virgil-crypto": "^4.0.1"
   },
   "devDependencies": {
     "file-loader": "^4.1.0",

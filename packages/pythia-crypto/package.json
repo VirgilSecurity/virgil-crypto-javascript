@@ -1,6 +1,6 @@
 {
   "name": "@virgilsecurity/pythia-crypto",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Virgil Pythia Crypto library.",
   "main": "./dist/node.cjs.js",
   "module": "./dist/node.es.js",
@@ -26,7 +26,7 @@
     "prepare": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@virgilsecurity/core-pythia": "^1.0.0",
+    "@virgilsecurity/core-pythia": "^1.0.1",
     "@virgilsecurity/crypto-types": "1.0.0",
     "@virgilsecurity/data-utils": "^1.0.0",
     "@virgilsecurity/init-utils": "^1.0.0"

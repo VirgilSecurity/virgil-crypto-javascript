@@ -15,9 +15,6 @@ Second, you need to add a [rule](https://webpack.js.org/configuration/module/#ru
   test: /\.wasm$/,
   type: 'javascript/auto',
   loader: 'file-loader',
-  options: {
-    name: '[name].[ext]'
-  }
 }
 ```
 

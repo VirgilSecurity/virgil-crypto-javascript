@@ -2,7 +2,7 @@ const { initPythia } = require('./dist/browser.cjs');
 const pythiaWasm = require('./dist/libpythia.browser.wasm');
 
 const defaultOptions = {
-  foundation: [{ locateFile: () => pythiaWasm }],
+  pythia: [{ locateFile: () => pythiaWasm }],
 };
 
 module.exports = require('./dist/browser.cjs');

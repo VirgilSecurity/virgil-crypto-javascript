@@ -2,7 +2,7 @@ const { initPythia } = require('./dist/worker.cjs');
 const pythiaWasm = require('./dist/libpythia.worker.wasm');
 
 const defaultOptions = {
-  foundation: [{ locateFile: () => pythiaWasm }],
+  pythia: [{ locateFile: () => pythiaWasm }],
 };
 
 module.exports = require('./dist/worker.cjs');

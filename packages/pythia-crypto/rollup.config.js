@@ -70,9 +70,14 @@ const createBrowserEntry = (target, cryptoType, format) => {
       nodeResolve({ browser: true, extensions: ['.js', '.ts'] }),
       commonjs(),
       typescript({
-        exclude: ['**/*.test.ts'],
         objectHashIgnoreUnknownHack: true,
         useTsconfigDeclarationDir: true,
+        tsconfigOverride: {
+          compilerOptions: {
+            declarationDir: path.join(outputDir, 'types'),
+          },
+          exclude: [outputDir, '**/*.test.ts'],
+        },
       }),
       cryptoType === CRYPTO_TYPE.WASM &&
         copy({
@@ -116,8 +121,13 @@ const createNodeJsEntry = (cryptoType, format) => {
       nodeResolve({ extensions: ['.js', '.ts'] }),
       commonjs(),
       typescript({
-        exclude: ['**/*.test.ts'],
         useTsconfigDeclarationDir: true,
+        tsconfigOverride: {
+          compilerOptions: {
+            declarationDir: path.join(outputDir, 'types'),
+          },
+          exclude: [outputDir, '**/*.test.ts'],
+        },
       }),
     ],
   };

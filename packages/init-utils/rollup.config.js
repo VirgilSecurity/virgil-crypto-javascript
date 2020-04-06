@@ -14,7 +14,17 @@ const createEntry = format => ({
     format,
     file: path.join(outputPath, `init-utils.${format}.js`),
   },
-  plugins: [typescript({ useTsconfigDeclarationDir: true })],
+  plugins: [
+    typescript({
+      useTsconfigDeclarationDir: true,
+      tsconfigOverride: {
+        compilerOptions: {
+          declarationDir: path.join(outputPath, 'types'),
+        },
+        exclude: [outputPath, '**/*.test.ts'],
+      },
+    }),
+  ],
 });
 
 module.exports = formats.map(createEntry);

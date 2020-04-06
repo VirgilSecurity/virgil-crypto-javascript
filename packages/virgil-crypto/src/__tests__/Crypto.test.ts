@@ -156,7 +156,7 @@ describe('Crypto', () => {
       const encryptedBuffers = new Array<BufferType>();
       const fileData = new Array<BufferType>();
       encryptedBuffers.push(cipher.start());
-      readStream1.on('data', data => {
+      readStream1.on('data', (data: BufferType) => {
         encryptedBuffers.push(cipher.update(data));
         fileData.push(data);
       });
@@ -259,7 +259,7 @@ describe('Crypto', () => {
       const fileData = new Array<BufferType>();
       const stat = fs.statSync(filePath);
       buffers.push(signAndEncryptStream.start(stat.size));
-      readStream.on('data', data => {
+      readStream.on('data', (data: BufferType) => {
         buffers.push(signAndEncryptStream.update(data));
         fileData.push(data);
       });

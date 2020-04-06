@@ -347,6 +347,74 @@ declare namespace FoundationModules {
     appendData(data: Uint8Array): void;
     verify(publicKey: PublicKey): boolean;
   }
+
+  export class MessageInfoFooter extends FoundationObject {
+    hasSignerInfos(): boolean;
+    signerInfos(): SignerInfoList;
+    signerDigest(): Uint8Array;
+  }
+
+  export class MessageInfo extends FoundationObject {
+    keyRecipientInfoList(): KeyRecipientInfoList;
+    passwordRecipientInfoList(): PasswordRecipientInfoList;
+    hasCustomParams(): boolean;
+    customParams(): MessageInfoCustomParams;
+    hasFooterInfo(): boolean;
+    footerInfo(): FooterInfo;
+    clear(): void;
+  }
+
+  export class MessageInfoDerSerializer extends FoundationObject {
+    PREFIX_LEN: number;
+    serializedLen(messageInfo: MessageInfo): number;
+    serialize(messageInfo: MessageInfo): Uint8Array;
+    readPrefix(data: Uint8Array): number;
+    deserialize(data: Uint8Array): MessageInfo;
+    serializedFooterLen(messageInfoFooter: MessageInfoFooter): number;
+    serializeFooter(messageInfoFooter: MessageInfoFooter): Uint8Array;
+    deserializeFooter(data: Uint8Array): MessageInfoFooter;
+    setupDefaults(): void;
+  }
+
+  export class KeyRecipientInfoList extends FoundationObject {
+    hasItem(): boolean;
+    item(): KeyRecipientInfo;
+    hasNext(): boolean;
+    next(): KeyRecipientInfoList;
+    hasPrev(): boolean;
+    prev(): KeyRecipientInfoList;
+    clear(): void;
+  }
+
+  export class KeyRecipientInfo extends FoundationObject {
+    recipientId(): Uint8Array;
+    encryptedKey(): Uint8Array;
+  }
+
+  export class PasswordRecipientInfoList extends FoundationObject {
+    hasItem(): boolean;
+    item(): PasswordRecipientInfo;
+    hasNext(): boolean;
+    next(): PasswordRecipientInfoList;
+    hasPrev(): boolean;
+    prev(): PasswordRecipientInfoList;
+    clear(): void;
+  }
+
+  export class PasswordRecipientInfo extends FoundationObject {
+    encryptedKey(): Uint8Array;
+  }
+
+  export class FooterInfo extends FoundationObject {
+    hasSignedDataInfo(): boolean;
+    signedDataInfo(): SignedDataInfo;
+    setDataSize(dataSize: number): void;
+    dataSize(): number;
+  }
+
+  export class SignedDataInfo extends FoundationObject {}
+
+  export class FoundationError extends Error {}
 }
 
 declare module '@virgilsecurity/core-foundation' {

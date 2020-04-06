@@ -19,7 +19,17 @@ const createNodeEntry = format => ({
     format,
     file: path.join(outputPath, `node.${format}.js`),
   },
-  plugins: [typescript({ useTsconfigDeclarationDir: true })],
+  plugins: [
+    typescript({
+      useTsconfigDeclarationDir: true,
+      tsconfigOverride: {
+        compilerOptions: {
+          declarationDir: path.join(outputPath, 'types'),
+        },
+        exclude: [outputPath, '**/*.test.ts'],
+      },
+    }),
+  ],
 });
 
 const createBrowserEntry = format => ({
@@ -31,7 +41,15 @@ const createBrowserEntry = format => ({
   plugins: [
     nodeResolve({ browser: true }),
     commonjs(),
-    typescript({ useTsconfigDeclarationDir: true }),
+    typescript({
+      useTsconfigDeclarationDir: true,
+      tsconfigOverride: {
+        compilerOptions: {
+          declarationDir: path.join(outputPath, 'types'),
+        },
+        exclude: [outputPath, '**/*.test.ts'],
+      },
+    }),
   ],
 });
 

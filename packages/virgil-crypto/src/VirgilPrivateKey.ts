@@ -1,7 +1,9 @@
-import { IPrivateKey } from './types';
+import { toBuffer } from '@virgilsecurity/data-utils';
+
+import { IPrivateKey, NodeBuffer } from './types';
 
 export class VirgilPrivateKey implements IPrivateKey {
-  public readonly identifier: Uint8Array;
+  public readonly identifier: NodeBuffer;
   public readonly lowLevelPrivateKey: FoundationModules.PrivateKey;
 
   private _isDisposed: boolean;
@@ -11,7 +13,7 @@ export class VirgilPrivateKey implements IPrivateKey {
   }
 
   constructor(indentifier: Uint8Array, lowLevelPrivateKey: FoundationModules.PrivateKey) {
-    this.identifier = indentifier;
+    this.identifier = toBuffer(indentifier);
     this.lowLevelPrivateKey = lowLevelPrivateKey;
     this._isDisposed = false;
   }

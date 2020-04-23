@@ -1,8 +1,10 @@
+import { toBuffer } from '@virgilsecurity/data-utils';
+
 import { getFoundationModules } from './foundationModules';
-import { FoundationModules, IPublicKey } from './types';
+import { FoundationModules, IPublicKey, NodeBuffer } from './types';
 
 export class VirgilPublicKey implements IPublicKey {
-  public readonly identifier: Uint8Array;
+  public readonly identifier: NodeBuffer;
   public readonly lowLevelPublicKey: FoundationModules.PublicKey;
 
   private _isDisposed: boolean;
@@ -23,7 +25,7 @@ export class VirgilPublicKey implements IPublicKey {
   }
 
   constructor(identifier: Uint8Array, lowLevelPublicKey: FoundationModules.PublicKey) {
-    this.identifier = identifier;
+    this.identifier = toBuffer(identifier);
     this.lowLevelPublicKey = lowLevelPublicKey;
     this._isDisposed = false;
   }

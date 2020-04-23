@@ -13,11 +13,13 @@ export interface StringWithEncoding {
 
 export type Data = NodeBuffer | Uint8Array | StringWithEncoding | string;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface IPrivateKey {}
+export interface IPrivateKey {
+  identifier: NodeBuffer;
+}
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface IPublicKey {}
+export interface IPublicKey {
+  identifier: NodeBuffer;
+}
 
 export interface IKeyPair {
   privateKey: IPrivateKey;

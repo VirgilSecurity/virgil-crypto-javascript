@@ -51,6 +51,11 @@ export interface ICrypto {
   exportPublicKey(publicKey: IPublicKey): NodeBuffer;
   encrypt(data: Data, publicKey: IPublicKey, enablePadding?: boolean): NodeBuffer;
   encrypt(data: Data, publicKeys: IPublicKey[], enablePadding?: boolean): NodeBuffer;
+  encrypt(
+    data: Data,
+    publicKeyOrPublicKeys: IPublicKey | IPublicKey[],
+    enablePadding?: boolean,
+  ): NodeBuffer;
   decrypt(encryptedData: Data, privateKey: IPrivateKey): NodeBuffer;
   calculateHash(data: Data, algorithm?: unknown): NodeBuffer;
   extractPublicKey(privateKey: IPrivateKey): IPublicKey;
@@ -68,6 +73,12 @@ export interface ICrypto {
     publicKeys: IPublicKey[],
     enablePadding?: boolean,
   ): NodeBuffer;
+  signAndEncrypt(
+    data: Data,
+    privateKey: IPrivateKey,
+    publicKeyOrPublicKeys: IPublicKey | IPublicKey[],
+    enablePadding?: boolean,
+  ): NodeBuffer;
   signThenEncrypt(
     data: Data,
     privateKey: IPrivateKey,
@@ -78,6 +89,12 @@ export interface ICrypto {
     data: Data,
     privateKey: IPrivateKey,
     publicKeys: IPublicKey[],
+    enablePadding?: boolean,
+  ): NodeBuffer;
+  signThenEncrypt(
+    data: Data,
+    privateKey: IPrivateKey,
+    publicKeyOrPublicKeys: IPublicKey | IPublicKey[],
     enablePadding?: boolean,
   ): NodeBuffer;
   decryptAndVerify(encryptedData: Data, privateKey: IPrivateKey, publicKey: IPublicKey): NodeBuffer;
@@ -86,6 +103,11 @@ export interface ICrypto {
     privateKey: IPrivateKey,
     publicKeys: IPublicKey[],
   ): NodeBuffer;
+  decryptAndVerify(
+    encryptedData: Data,
+    privateKey: IPrivateKey,
+    publicKeyOrPublicKeys: IPublicKey | IPublicKey[],
+  ): NodeBuffer;
   decryptThenVerify(
     encryptedData: Data,
     privateKey: IPrivateKey,
@@ -95,6 +117,11 @@ export interface ICrypto {
     encryptedData: Data,
     privateKey: IPrivateKey,
     publicKeys: IPublicKey[],
+  ): NodeBuffer;
+  decryptThenVerify(
+    encryptedData: Data,
+    privateKey: IPrivateKey,
+    publicKeyOrPublicKeys: IPublicKey | IPublicKey[],
   ): NodeBuffer;
   getRandomBytes(length: number): NodeBuffer;
   signThenEncryptDetached(
@@ -109,6 +136,12 @@ export interface ICrypto {
     publicKeys: IPublicKey[],
     enablePadding?: boolean,
   ): { encryptedData: NodeBuffer; metadata: NodeBuffer };
+  signThenEncryptDetached(
+    data: Data,
+    privateKey: IPrivateKey,
+    publicKeyOrPublicKeys: IPublicKey | IPublicKey[],
+    enablePadding?: boolean,
+  ): { encryptedData: NodeBuffer; metadata: NodeBuffer };
   decryptThenVerifyDetached(
     encryptedData: Data,
     metadata: Data,
@@ -120,6 +153,12 @@ export interface ICrypto {
     metadata: Data,
     privateKey: IPrivateKey,
     publicKeys: IPublicKey[],
+  ): NodeBuffer;
+  decryptThenVerifyDetached(
+    encryptedData: Data,
+    metadata: Data,
+    privateKey: IPrivateKey,
+    publicKeyOrPublicKeys: IPublicKey | IPublicKey[],
   ): NodeBuffer;
   generateGroupSession(groupId: Data): IGroupSession;
   importGroupSession(epochMessages: Data[]): IGroupSession;

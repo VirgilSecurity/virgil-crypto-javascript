@@ -74,7 +74,7 @@ export const getKeyPairTypeConfig = (
     case KeyPairType.CURVE25519_ROUND5_ED25519_FALCON:
       return {
         type: KeyPairType.CURVE25519_ROUND5_ED25519_FALCON,
-        cipherAlgIds: [AlgId.CURVE25519, AlgId.ROUND5_ND_5KEM_5D],
+        cipherAlgIds: [AlgId.CURVE25519, AlgId.ROUND5_ND_1CCA_5D],
         signerAlgIds: [AlgId.ED25519, AlgId.FALCON],
       };
     case KeyPairType.CURVE25519_ED25519:

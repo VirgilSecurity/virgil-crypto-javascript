@@ -13,7 +13,7 @@ import {
   isRSAKeyPairType,
   isCompoundKeyPairType,
 } from './KeyPairType';
-import { FoundationModules, ICrypto, NodeBuffer as BufferType, Data, IGroupSession } from './types';
+import { ICrypto, NodeBuffer as BufferType, Data, IGroupSession } from './types';
 import { toArray } from './utils';
 import {
   validatePrivateKey,

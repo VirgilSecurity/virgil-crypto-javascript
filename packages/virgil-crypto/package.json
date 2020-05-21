@@ -12,9 +12,13 @@
   "files": [
     "dist",
     "browser.cjs.js",
+    "browser.cjs.d.ts",
     "browser.es.js",
+    "browser.es.d.ts",
     "worker.cjs.js",
-    "worker.es.js"
+    "worker.cjs.d.ts",
+    "worker.es.js",
+    "worker.es.d.ts"
   ],
   "repository": "https://github.com/VirgilSecurity/virgil-crypto-javascript/tree/master/packages/virgil-crypto",
   "author": "Virgil Security Inc. <support@virgilsecurity.com>",

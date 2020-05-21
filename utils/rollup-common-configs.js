@@ -2,8 +2,6 @@ const copy = require('rollup-plugin-copy');
 const { getOutputFilename } = require('./build');
 const declarationTemplatePath = require.resolve('./declaration.d.ts.template');
 
-console.log('declarationTemplatePath', declarationTemplatePath);
-
 const createDeclarationForInnerEntry = (target, cryptoType, format, outputDir) =>
   copy({
     targets: [

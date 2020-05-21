@@ -112,6 +112,7 @@ const createNodeJsEntry = (cryptoType, format) => {
           exclude: [outputDir, '**/*.test.ts'],
         },
       }),
+      createDeclarationForInnerEntry(TARGET.NODE, cryptoType, format, outputDir),
     ],
   };
 };

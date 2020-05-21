@@ -9,36 +9,18 @@ const { terser } = require('rollup-plugin-terser');
 const typescript = require('rollup-plugin-typescript2');
 
 const packageJson = require('./package.json');
-
-const FORMAT = {
-  CJS: 'cjs',
-  ES: 'es',
-  UMD: 'umd',
-};
-
-const CRYPTO_TYPE = {
-  WASM: 'wasm',
-  ASMJS: 'asmjs',
-};
-
-const TARGET = {
-  BROWSER: 'browser',
-  WORKER: 'worker',
-  NODE: 'node',
-};
+const { createDeclarationForInnerEntry } = require('../../utils/rollup-common-configs');
+const {
+  FORMAT,
+  CRYPTO_TYPE,
+  TARGET,
+  getOutputFilename,
+  getCryptoEntryPointName,
+} = require('../../utils/build');
 
 const sourceDir = path.join(__dirname, 'src');
 const outputDir = path.join(__dirname, 'dist');
 const coreFoundationDir = path.parse(require.resolve('@virgilsecurity/core-foundation')).dir;
-
-const getOutputFilename = (target, cryptoType, format) =>
-  `${target}${cryptoType === CRYPTO_TYPE.ASMJS ? '.asmjs' : ''}.${format}.js`;
-
-const getCryptoEntryPointName = (target, cryptoType, format) => {
-  const myCryptoType = cryptoType === CRYPTO_TYPE.ASMJS ? '.asmjs' : '';
-  const myFormat = format === FORMAT.UMD ? 'es' : format;
-  return `${target}${myCryptoType}.${myFormat}.js`;
-};
 
 const createBrowserEntry = (target, cryptoType, format) => {
   const foundationEntryPoint = path.join(
@@ -79,6 +61,7 @@ const createBrowserEntry = (target, cryptoType, format) => {
           exclude: [outputDir, '**/*.test.ts'],
         },
       }),
+      createDeclarationForInnerEntry(target, cryptoType, format, outputDir),
       cryptoType === CRYPTO_TYPE.WASM &&
         copy({
           targets: [

@@ -104,6 +104,7 @@ const createNodeJsEntry = (cryptoType, format) => {
       nodeResolve({ extensions: ['.js', '.ts'] }),
       commonjs(),
       typescript({
+        objectHashIgnoreUnknownHack: true,
         useTsconfigDeclarationDir: true,
         tsconfigOverride: {
           compilerOptions: {

@@ -22,7 +22,7 @@ const sourceDir = path.join(__dirname, 'src');
 const outputDir = path.join(__dirname, 'dist');
 const corePythiaDir = path.parse(require.resolve('@virgilsecurity/core-pythia')).dir;
 
-const createBrowserEntry = (target, cryptoType, format) => {
+const createBrowserEntry = (target, cryptoType, format, declaration = false) => {
   const pythiaEntryPoint = path.join(
     '@virgilsecurity',
     'core-pythia',
@@ -56,7 +56,7 @@ const createBrowserEntry = (target, cryptoType, format) => {
         useTsconfigDeclarationDir: true,
         tsconfigOverride: {
           compilerOptions: {
-            declarationDir: path.join(outputDir, 'types'),
+            declaration,
           },
           exclude: [outputDir, '**/*.test.ts'],
         },
@@ -107,7 +107,7 @@ const createNodeJsEntry = (cryptoType, format) => {
         useTsconfigDeclarationDir: true,
         tsconfigOverride: {
           compilerOptions: {
-            declarationDir: path.join(outputDir, 'types'),
+            declaration: false,
           },
           exclude: [outputDir, '**/*.test.ts'],
         },
@@ -118,7 +118,7 @@ const createNodeJsEntry = (cryptoType, format) => {
 };
 
 module.exports = [
-  createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.ASMJS, FORMAT.CJS),
+  createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.ASMJS, FORMAT.CJS, true),
   createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.ASMJS, FORMAT.ES),
   createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.ASMJS, FORMAT.UMD),
   createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.WASM, FORMAT.CJS),

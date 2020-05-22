@@ -12,8 +12,11 @@
   "files": [
     "dist",
     "browser.cjs.js",
+    "browser.cjs.d.ts",
     "browser.es.js",
+    "browser.es.d.ts",
     "worker.cjs.js",
+    "worker.cjs.d.ts",
     "worker.es.js"
   ],
   "repository": "https://github.com/VirgilSecurity/virgil-crypto-javascript/tree/master/packages/pythia-crypto",

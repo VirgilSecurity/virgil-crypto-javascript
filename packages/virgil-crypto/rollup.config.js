@@ -9,38 +9,20 @@ const { terser } = require('rollup-plugin-terser');
 const typescript = require('rollup-plugin-typescript2');
 
 const packageJson = require('./package.json');
-
-const FORMAT = {
-  CJS: 'cjs',
-  ES: 'es',
-  UMD: 'umd',
-};
-
-const CRYPTO_TYPE = {
-  WASM: 'wasm',
-  ASMJS: 'asmjs',
-};
-
-const TARGET = {
-  BROWSER: 'browser',
-  WORKER: 'worker',
-  NODE: 'node',
-};
+const { createDeclarationForInnerEntry } = require('../../utils/rollup-common-configs');
+const {
+  FORMAT,
+  CRYPTO_TYPE,
+  TARGET,
+  getOutputFilename,
+  getCryptoEntryPointName,
+} = require('../../utils/build');
 
 const sourceDir = path.join(__dirname, 'src');
 const outputDir = path.join(__dirname, 'dist');
 const coreFoundationDir = path.parse(require.resolve('@virgilsecurity/core-foundation')).dir;
 
-const getOutputFilename = (target, cryptoType, format) =>
-  `${target}${cryptoType === CRYPTO_TYPE.ASMJS ? '.asmjs' : ''}.${format}.js`;
-
-const getCryptoEntryPointName = (target, cryptoType, format) => {
-  const myCryptoType = cryptoType === CRYPTO_TYPE.ASMJS ? '.asmjs' : '';
-  const myFormat = format === FORMAT.UMD ? 'es' : format;
-  return `${target}${myCryptoType}.${myFormat}.js`;
-};
-
-const createBrowserEntry = (target, cryptoType, format) => {
+const createBrowserEntry = (target, cryptoType, format, declaration = false) => {
   const foundationEntryPoint = path.join(
     '@virgilsecurity',
     'core-foundation',
@@ -74,11 +56,11 @@ const createBrowserEntry = (target, cryptoType, format) => {
         useTsconfigDeclarationDir: true,
         tsconfigOverride: {
           compilerOptions: {
-            declarationDir: path.join(outputDir, 'types'),
+            declaration,
           },
-          exclude: [outputDir, '**/*.test.ts'],
         },
       }),
+      createDeclarationForInnerEntry(target, cryptoType, format, outputDir),
       cryptoType === CRYPTO_TYPE.WASM &&
         copy({
           targets: [
@@ -121,29 +103,30 @@ const createNodeJsEntry = (cryptoType, format) => {
       nodeResolve({ extensions: ['.js', '.ts'] }),
       commonjs(),
       typescript({
+        objectHashIgnoreUnknownHack: true,
         useTsconfigDeclarationDir: true,
         tsconfigOverride: {
           compilerOptions: {
-            declarationDir: path.join(outputDir, 'types'),
+            declaration: false,
           },
-          exclude: [outputDir, '**/*.test.ts'],
         },
       }),
+      createDeclarationForInnerEntry(TARGET.NODE, cryptoType, format, outputDir),
     ],
   };
 };
 
 module.exports = [
-  createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.ASMJS, FORMAT.CJS),
-  createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.ASMJS, FORMAT.ES),
-  createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.ASMJS, FORMAT.UMD),
-  createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.WASM, FORMAT.CJS),
-  createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.WASM, FORMAT.ES),
-  createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.WASM, FORMAT.UMD),
   createNodeJsEntry(CRYPTO_TYPE.ASMJS, FORMAT.CJS),
   createNodeJsEntry(CRYPTO_TYPE.ASMJS, FORMAT.ES),
   createNodeJsEntry(CRYPTO_TYPE.WASM, FORMAT.CJS),
   createNodeJsEntry(CRYPTO_TYPE.WASM, FORMAT.ES),
+  createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.WASM, FORMAT.CJS, true),
+  createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.WASM, FORMAT.ES),
+  createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.WASM, FORMAT.UMD),
+  createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.ASMJS, FORMAT.CJS),
+  createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.ASMJS, FORMAT.ES),
+  createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.ASMJS, FORMAT.UMD),
   createBrowserEntry(TARGET.WORKER, CRYPTO_TYPE.ASMJS, FORMAT.CJS),
   createBrowserEntry(TARGET.WORKER, CRYPTO_TYPE.ASMJS, FORMAT.ES),
   createBrowserEntry(TARGET.WORKER, CRYPTO_TYPE.ASMJS, FORMAT.UMD),

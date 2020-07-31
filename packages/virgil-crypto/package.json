@@ -1,12 +1,12 @@
 {
   "name": "virgil-crypto",
-  "version": "4.2.2",
+  "version": "4.2.3",
   "description": "Virgil JavaScript Crypto Library is a high-level cryptographic library that allows you to perform all necessary operations for secure storing and transferring data and everything required to become HIPAA and GDPR compliant.",
   "main": "./dist/node.cjs.js",
-  "module": "./dist/node.es.js",
+  "module": "./dist/node.es.mjs",
   "browser": {
     "./dist/node.cjs.js": "./browser.cjs.js",
-    "./dist/node.es.js": "./browser.es.js"
+    "./dist/node.es.mjs": "./browser.es.mjs"
   },
   "typings": "./dist/types/index.d.ts",
   "files": [

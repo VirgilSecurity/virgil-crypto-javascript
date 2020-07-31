@@ -82,11 +82,13 @@ const createNodeJsEntry = (cryptoType, format) => {
     'core-pythia',
     getCryptoEntryPointName(TARGET.NODE, cryptoType, format),
   );
+  const extension = format === FORMAT.ES ? 'mjs' : 'js';
+
   return {
     input: path.join(sourceDir, 'index.ts'),
     output: {
       format,
-      file: path.join(outputDir, getOutputFilename(TARGET.NODE, cryptoType, format)),
+      file: path.join(outputDir, getOutputFilename(TARGET.NODE, cryptoType, format, extension)),
     },
     external: builtinModules
       .concat(Object.keys(packageJson.dependencies))

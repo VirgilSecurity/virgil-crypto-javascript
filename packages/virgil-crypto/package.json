@@ -41,9 +41,9 @@
   "dependencies": {
     "@virgilsecurity/core-foundation": "^1.2.1",
     "@virgilsecurity/crypto-types": "1.1.1",
-    "@virgilsecurity/data-utils": "^1.0.0",
+    "@virgilsecurity/data-utils": "^1.0.1",
     "@virgilsecurity/init-utils": "^1.0.0",
-    "@virgilsecurity/sdk-crypto": "^1.0.0"
+    "@virgilsecurity/sdk-crypto": "^1.1.1"
   },
   "devDependencies": {
     "@types/chai": "^4.2.7",

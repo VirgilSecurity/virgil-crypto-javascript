@@ -76,17 +76,19 @@ const createBrowserEntry = (target, cryptoType, format, declaration = false) => 
   };
 };
 
-const createNodeJsEntry = (cryptoType, format) => {
+const createNodeJsEntry = (cryptoType, format, isNodeES) => {
   const pythiaEntryPoint = path.join(
     '@virgilsecurity',
     'core-pythia',
-    getCryptoEntryPointName(TARGET.NODE, cryptoType, format),
+    getCryptoEntryPointName(TARGET.NODE, cryptoType, format, isNodeES),
   );
+  const extension = isNodeES ? 'mjs' : 'js';
+
   return {
     input: path.join(sourceDir, 'index.ts'),
     output: {
       format,
-      file: path.join(outputDir, getOutputFilename(TARGET.NODE, cryptoType, format)),
+      file: path.join(outputDir, getOutputFilename(TARGET.NODE, cryptoType, format, extension)),
     },
     external: builtinModules
       .concat(Object.keys(packageJson.dependencies))
@@ -127,8 +129,10 @@ module.exports = [
   createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.WASM, FORMAT.UMD),
   createNodeJsEntry(CRYPTO_TYPE.ASMJS, FORMAT.CJS),
   createNodeJsEntry(CRYPTO_TYPE.ASMJS, FORMAT.ES),
+  createNodeJsEntry(CRYPTO_TYPE.ASMJS, FORMAT.ES, true),
   createNodeJsEntry(CRYPTO_TYPE.WASM, FORMAT.CJS),
   createNodeJsEntry(CRYPTO_TYPE.WASM, FORMAT.ES),
+  createNodeJsEntry(CRYPTO_TYPE.WASM, FORMAT.ES, true),
   createBrowserEntry(TARGET.WORKER, CRYPTO_TYPE.ASMJS, FORMAT.CJS),
   createBrowserEntry(TARGET.WORKER, CRYPTO_TYPE.ASMJS, FORMAT.ES),
   createBrowserEntry(TARGET.WORKER, CRYPTO_TYPE.ASMJS, FORMAT.UMD),

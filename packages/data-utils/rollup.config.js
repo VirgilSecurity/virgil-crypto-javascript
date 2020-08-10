@@ -17,7 +17,7 @@ const createNodeEntry = format => ({
   input: path.join(sourcePath, 'node.ts'),
   output: {
     format,
-    file: path.join(outputPath, `node.${format}.js`),
+    file: path.join(outputPath, `node.${format}.${format === FORMAT.ES ? 'mjs' : 'js'}`),
   },
   plugins: [
     typescript({

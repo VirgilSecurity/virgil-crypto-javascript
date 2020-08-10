@@ -3,10 +3,16 @@
   "version": "1.0.1",
   "description": "Library that contains different functions / classes that are used for data manipulation in different Virgil Security libraries.",
   "main": "./dist/node.cjs.js",
-  "module": "./dist/node.es.mjs",
+  "module": "./dist/node.es.js",
   "browser": {
     "./dist/node.cjs.js": "./dist/browser.cjs.js",
     "./dist/node.es.js": "./dist/browser.es.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/node.es.mjs",
+      "require": "./dist/node.cjs.js"
+    }
   },
   "typings": "./dist/types/node.d.ts",
   "files": [

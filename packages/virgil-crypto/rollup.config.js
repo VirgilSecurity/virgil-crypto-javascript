@@ -75,13 +75,13 @@ const createBrowserEntry = (target, cryptoType, format, declaration = false) => 
   };
 };
 
-const createNodeJsEntry = (cryptoType, format) => {
+const createNodeJsEntry = (cryptoType, format, isNodeES) => {
   const foundationEntryPoint = path.join(
     '@virgilsecurity',
     'core-foundation',
-    getCryptoEntryPointName(TARGET.NODE, cryptoType, format),
+    getCryptoEntryPointName(TARGET.NODE, cryptoType, format, isNodeES),
   );
-  const extension = format === FORMAT.ES ? 'mjs' : 'js';
+  const extension = isNodeES ? 'mjs' : 'js';
 
   return {
     input: path.join(sourceDir, 'index.ts'),
@@ -121,8 +121,10 @@ const createNodeJsEntry = (cryptoType, format) => {
 module.exports = [
   createNodeJsEntry(CRYPTO_TYPE.ASMJS, FORMAT.CJS),
   createNodeJsEntry(CRYPTO_TYPE.ASMJS, FORMAT.ES),
+  createNodeJsEntry(CRYPTO_TYPE.ASMJS, FORMAT.ES, true),
   createNodeJsEntry(CRYPTO_TYPE.WASM, FORMAT.CJS),
   createNodeJsEntry(CRYPTO_TYPE.WASM, FORMAT.ES),
+  createNodeJsEntry(CRYPTO_TYPE.WASM, FORMAT.ES, true),
   createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.WASM, FORMAT.CJS, true),
   createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.WASM, FORMAT.ES),
   createBrowserEntry(TARGET.BROWSER, CRYPTO_TYPE.WASM, FORMAT.UMD),

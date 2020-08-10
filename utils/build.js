@@ -18,10 +18,11 @@ const TARGET = {
 const getOutputFilename = (target, cryptoType, format, extension = 'js') =>
   `${target}${cryptoType === CRYPTO_TYPE.ASMJS ? '.asmjs' : ''}.${format}.${extension}`;
 
-const getCryptoEntryPointName = (target, cryptoType, format) => {
+const getCryptoEntryPointName = (target, cryptoType, format, isNodeES) => {
   const myCryptoType = cryptoType === CRYPTO_TYPE.ASMJS ? '.asmjs' : '';
   const myFormat = format === FORMAT.UMD ? 'es' : format;
-  return `${target}${myCryptoType}.${myFormat}.js`;
+  const extension = isNodeES ? 'mjs' : 'js';
+  return `${target}${myCryptoType}.${myFormat}.${extension}`;
 };
 
 module.exports = {

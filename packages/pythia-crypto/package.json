@@ -3,7 +3,13 @@
   "version": "1.1.4",
   "description": "Virgil Pythia Crypto library.",
   "main": "./dist/node.cjs.js",
-  "module": "./dist/node.es.mjs",
+  "module": "./dist/node.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/node.es.mjs",
+      "require": "./dist/node.cjs.js"
+    }
+  },
   "browser": {
     "./dist/node.cjs.js": "./browser.cjs.js",
     "./dist/node.es.js": "./browser.es.js"
@@ -32,7 +38,7 @@
     "@virgilsecurity/core-pythia": "^1.0.1",
     "@virgilsecurity/crypto-types": "1.1.1",
     "@virgilsecurity/data-utils": "^1.0.1",
-    "@virgilsecurity/init-utils": "^1.0.0"
+    "@virgilsecurity/init-utils": "^1.0.1"
   },
   "devDependencies": {
     "@types/chai": "^4.2.7",

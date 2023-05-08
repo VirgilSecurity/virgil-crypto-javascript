@@ -11,13 +11,14 @@
     "build": "webpack"
   },
   "dependencies": {
+    "mocha": "10.2.0",
     "virgil-crypto": "^4.1.2"
   },
   "devDependencies": {
     "file-loader": "^4.1.0",
-    "html-webpack-plugin": "^3.2.0",
+    "html-webpack-plugin": "^5.5.1",
     "webpack": "^4.39.1",
     "webpack-cli": "^3.3.6",
-    "webpack-dev-server": "^3.7.2"
+    "webpack-dev-server": "^4.13.3"
   }
 }

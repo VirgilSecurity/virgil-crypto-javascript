@@ -20,7 +20,7 @@
     "core-js": "^3.2.1",
     "detect-browser": "^4.7.0",
     "file-loader": "^4.1.0",
-    "html-webpack-plugin": "^3.2.0",
+    "html-webpack-plugin": "^5.5.1",
     "os-name": "^3.1.0",
     "puppeteer": "^1.20.0",
     "regenerator-runtime": "^0.13.3",

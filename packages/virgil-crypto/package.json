@@ -43,7 +43,8 @@
     "@virgilsecurity/crypto-types": "1.1.1",
     "@virgilsecurity/data-utils": "^1.0.0",
     "@virgilsecurity/init-utils": "^1.0.0",
-    "@virgilsecurity/sdk-crypto": "^1.0.0"
+    "@virgilsecurity/sdk-crypto": "^1.0.0",
+    "html-webpack-plugin": "5.5.1"
   },
   "devDependencies": {
     "@types/chai": "^4.2.7",
@@ -51,7 +52,7 @@
     "@types/node": "^13.1.8",
     "builtin-modules": "^3.1.0",
     "chai": "^4.2.0",
-    "mocha": "^7.0.0",
+    "mocha": "^10.2.0",
     "rimraf": "^3.0.0",
     "rollup": "^1.29.1",
     "rollup-plugin-commonjs": "^10.1.0",

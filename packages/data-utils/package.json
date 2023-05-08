@@ -23,13 +23,14 @@
   },
   "dependencies": {
     "@virgilsecurity/crypto-types": "1.0.0",
-    "buffer": "^5.4.3"
+    "buffer": "^5.4.3",
+    "html-webpack-plugin": "5.5.1"
   },
   "devDependencies": {
     "@types/chai": "^4.2.7",
     "@types/mocha": "^5.2.7",
     "chai": "^4.2.0",
-    "mocha": "^7.0.0",
+    "mocha": "^10.2.0",
     "rimraf": "^3.0.0",
     "rollup": "^1.29.1",
     "rollup-plugin-commonjs": "^10.1.0",

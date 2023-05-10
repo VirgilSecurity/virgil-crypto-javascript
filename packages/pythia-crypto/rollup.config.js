@@ -1,12 +1,12 @@
 const path = require('path');
 
 const builtinModules = require('builtin-modules');
-const commonjs = require('rollup-plugin-commonjs');
+const commonjs = require('@rollup/plugin-commonjs');
 const copy = require('rollup-plugin-copy');
-const nodeResolve = require('rollup-plugin-node-resolve');
+const nodeResolve = require('@rollup/plugin-node-resolve');
 const replace = require('rollup-plugin-re');
-const { terser } = require('rollup-plugin-terser');
-const typescript = require('rollup-plugin-typescript2');
+const terser = require('@rollup/plugin-terser');
+const typescript = require('@rollup/plugin-typescript');
 
 const packageJson = require('./package.json');
 const { createDeclarationForInnerEntry } = require('../../utils/rollup-common-configs');
@@ -51,16 +51,7 @@ const createBrowserEntry = (target, cryptoType, format, declaration = false) => 
       }),
       nodeResolve({ browser: true, extensions: ['.js', '.ts'] }),
       commonjs(),
-      typescript({
-        objectHashIgnoreUnknownHack: true,
-        useTsconfigDeclarationDir: true,
-        tsconfigOverride: {
-          compilerOptions: {
-            declaration,
-          },
-          exclude: [outputDir, '**/*.test.ts'],
-        },
-      }),
+      typescript(),
       createDeclarationForInnerEntry(target, cryptoType, format, outputDir),
       cryptoType === CRYPTO_TYPE.WASM &&
         copy({
@@ -103,16 +94,7 @@ const createNodeJsEntry = (cryptoType, format) => {
       }),
       nodeResolve({ extensions: ['.js', '.ts'] }),
       commonjs(),
-      typescript({
-        objectHashIgnoreUnknownHack: true,
-        useTsconfigDeclarationDir: true,
-        tsconfigOverride: {
-          compilerOptions: {
-            declaration: false,
-          },
-          exclude: [outputDir, '**/*.test.ts'],
-        },
-      }),
+      typescript(),
       createDeclarationForInnerEntry(TARGET.NODE, cryptoType, format, outputDir),
     ],
   };

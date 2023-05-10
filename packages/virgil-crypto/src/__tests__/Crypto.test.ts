@@ -136,7 +136,6 @@ describe('Crypto', () => {
         readStream2.on('close', () => {
           expect(verifier.verify(keyPair1.publicKey, false)).to.be.true;
           expect(verifier.verify(keyPair2.publicKey, true)).to.be.false;
-          resolve();
         });
       });
     });
@@ -175,7 +174,6 @@ describe('Crypto', () => {
         };
         expect(decrypted.equals(file)).to.be.true;
         expect(error).to.throw;
-        resolve();
       });
     });
 
@@ -279,7 +277,6 @@ describe('Crypto', () => {
         expect(notAnError).not.to.throw;
         expect(error).to.throw;
         decryptAndVerifyStream.dispose();
-        resolve();
       });
     });
 

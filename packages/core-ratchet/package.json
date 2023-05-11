@@ -1,6 +1,6 @@
 {
   "name": "@virgilsecurity/core-ratchet",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Virgil Ratchet",
   "main": "./node.cjs.js",
   "module": "./node.es.js",

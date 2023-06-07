@@ -1,7 +1,7 @@
 const path = require('path');
 
 const builtinModules = require('builtin-modules');
-const commonjs = require('@rollup/plugin-commonjs');
+const commonjs  = require('@rollup/plugin-commonjs');
 const copy = require('rollup-plugin-copy');
 const nodeResolve = require('@rollup/plugin-node-resolve');
 const replace = require('rollup-plugin-re');
@@ -23,11 +23,7 @@ const outputDir = path.join(__dirname, 'dist');
 const coreFoundationDir = path.parse(require.resolve('@virgilsecurity/core-foundation')).dir;
 
 const createBrowserEntry = (target, cryptoType, format, declaration = false) => {
-  const foundationEntryPoint = path.join(
-    '@virgilsecurity',
-    'core-foundation',
-    getCryptoEntryPointName(target, cryptoType, format),
-  );
+  const foundationEntryPoint = `@virgilsecurity/core-foundation/${getCryptoEntryPointName(TARGET.NODE, cryptoType, format)}`;
   return {
     input: path.join(sourceDir, 'index.ts'),
     output: {
@@ -68,11 +64,7 @@ const createBrowserEntry = (target, cryptoType, format, declaration = false) => 
 };
 
 const createNodeJsEntry = (cryptoType, format) => {
-  const foundationEntryPoint = path.join(
-    '@virgilsecurity',
-    'core-foundation',
-    getCryptoEntryPointName(TARGET.NODE, cryptoType, format),
-  );
+  const foundationEntryPoint = `@virgilsecurity/core-foundation/${getCryptoEntryPointName(TARGET.NODE, cryptoType, format)}`;
   return {
     input: path.join(sourceDir, 'index.ts'),
     output: {

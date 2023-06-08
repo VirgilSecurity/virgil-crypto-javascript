@@ -7,6 +7,7 @@ const nodeResolve = require('@rollup/plugin-node-resolve');
 const replace = require('rollup-plugin-re');
 const terser = require('@rollup/plugin-terser');
 const typescript = require('@rollup/plugin-typescript');
+const wasm = require('@rollup/plugin-wasm');
 
 const packageJson = require('./package.json');
 const { createDeclarationForInnerEntry } = require('../../utils/rollup-common-configs');
@@ -19,8 +20,8 @@ const {
 } = require('../../utils/build');
 
 const sourceDir = path.join(__dirname, 'src');
-const outputDir = path.join(__dirname, 'dist');
-const coreFoundationDir = path.parse(require.resolve('@virgilsecurity/core-foundation')).dir;
+const outputDir = path.join(__dirname, 'dist').replaceAll('\\' + '', '/');
+const coreFoundationDir = path.parse(require.resolve('@virgilsecurity/core-foundation')).dir.replaceAll('\\' + '', '/');
 
 const createBrowserEntry = (target, cryptoType, format, declaration = false) => {
   const foundationEntryPoint = `@virgilsecurity/core-foundation/${getCryptoEntryPointName(TARGET.NODE, cryptoType, format)}`;
@@ -49,15 +50,18 @@ const createBrowserEntry = (target, cryptoType, format, declaration = false) => 
       commonjs(),
       typescript(),
       createDeclarationForInnerEntry(target, cryptoType, format, outputDir),
-      cryptoType === CRYPTO_TYPE.WASM &&
-        copy({
-          targets: [
-            {
-              src: path.join(coreFoundationDir, `libfoundation.${target}.wasm`),
-              dest: outputDir,
-            },
-          ],
-        }),
+      wasm({
+        publicPath: outputDir,
+        sync: [coreFoundationDir + `/libfoundation.${target}.wasm`],
+      }),
+      copy({
+        targets: [
+          {
+            src: coreFoundationDir + `/libfoundation.${target}.wasm`,
+            dest: outputDir,
+          },
+        ],
+      }),
       (format === FORMAT.ES || format === FORMAT.UMD) && terser(),
     ],
   };

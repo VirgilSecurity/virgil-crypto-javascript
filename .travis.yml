@@ -1,13 +1,11 @@
 dist: focal
 language: node_js
-env:
-  - NODE_OPTIONS="--max-old-space-size=2048"
 node_js:
   - 18
   - 20
   - 21
 install:
-  - yarn --no-lockfile
+  - yarn
   - yarn prepare
 script:
   - yarn lint

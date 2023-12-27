@@ -2,9 +2,6 @@ name: Build on Linux
 
 on: [push]
 
-env:
-  NODE_OPTIONS: --max-old-space-size=2048
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,7 +18,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        yarn --no-lockfile
+        yarn
         yarn prepare
 
     - name: Run linter

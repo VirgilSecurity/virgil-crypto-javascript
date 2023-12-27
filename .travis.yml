@@ -1,9 +1,8 @@
 language: node_js
 node_js:
-  - 10
-  - 11
-  - 12
-  - 13
+  - 18
+  - 20
+  - 21
 install:
   - yarn --no-lockfile
   - yarn prepare

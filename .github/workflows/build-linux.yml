@@ -9,6 +9,8 @@ jobs:
         matrix:
           node-version: ['18', '20', '21']
 
+    name: Node.js ${{ matrix.node-version }}
+
     steps:
     - uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}

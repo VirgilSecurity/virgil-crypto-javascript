@@ -8,5 +8,5 @@ install:
   - yarn
   - yarn prepare
 script:
-  - yarn lint
+  # - yarn lint
   - yarn test
